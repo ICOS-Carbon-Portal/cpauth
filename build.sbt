@@ -15,6 +15,7 @@ libraryDependencies ++= Seq(
   "io.spray"           %% "spray-can"        % "1.3.2",
   "io.spray"           %% "spray-routing"    % "1.3.2",
   "io.spray"           %% "spray-testkit"    % "1.3.2" % "test",
+  "commons-codec"			% "commons-codec"		% "1.9",
   "ch.qos.logback"      % "logback-classic"  % "1.0.13"
 )
 
