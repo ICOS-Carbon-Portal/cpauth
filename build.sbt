@@ -10,6 +10,8 @@ resolvers += "spray repo" at "http://repo.spray.io"
 
 libraryDependencies ++= Seq(
   "org.opensaml"       %  "opensaml"         % "2.6.1",
+  "xerces"             %  "xercesImpl"       % "2.11.0",
+  "net.jcip"           %  "jcip-annotations" % "1.0",
   "com.typesafe.akka"  %% "akka-actor"       % "2.3.6",
   "com.typesafe.akka"  %% "akka-slf4j"       % "2.3.6",
   "com.typesafe.akka"  %% "akka-testkit"     % "2.3.6" % "test",
@@ -30,6 +32,12 @@ scalacOptions ++= Seq(
   "-target:jvm-1.7",
   "-encoding", "UTF-8"
 )
+
+fork := true
+
+initialCommands in console := """
+import se.lu.nateko.samltest.Main._
+"""
 
 assemblySettings
 
