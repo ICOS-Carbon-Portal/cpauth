@@ -16,8 +16,9 @@ import scala.concurrent.duration._
 import org.opensaml.xml.parse.StaticBasicParserPool
 import org.opensaml.DefaultBootstrap
 import org.opensaml.xml.XMLObject
+import org.opensaml.saml2.metadata.provider.MetadataProvider
 
-object Main{
+object OpenSaml{
 
 	def setLoggingLevel(): Unit = {
 		import org.slf4j.LoggerFactory;
@@ -30,7 +31,8 @@ object Main{
 
 	setLoggingLevel()
 
-	val idpUrl = "https://idp.lu.se/idp/shibboleth"
+	//val idpUrl = "https://idp.lu.se/idp/shibboleth"
+	val idpUrl = "https://idp.testshib.org/idp/shibboleth"
 	DefaultBootstrap.bootstrap()
 
 //	implicit val system = ActorSystem("samltests")
@@ -43,13 +45,13 @@ object Main{
 //		Await.result(response, 3.seconds)
 //	}
 	
-	def getIdpMeta: XMLObject = {
+	def getIdpMeta: MetadataProvider = {
 		val metaProvider = new HTTPMetadataProvider(new Timer(), new HttpClient(), idpUrl)
 		val parserPool = new StaticBasicParserPool()
 		parserPool.initialize()
 		metaProvider.setParserPool(parserPool)
 		metaProvider.initialize()
-		metaProvider.getMetadata
+		metaProvider
 	}	
 	// Get the builder factory
 	//val builderFactory = Configuration.getSAML2ArtifactBuilderFactory()

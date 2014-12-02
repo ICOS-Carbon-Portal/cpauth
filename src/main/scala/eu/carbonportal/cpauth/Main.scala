@@ -29,8 +29,10 @@ object Main extends App with SimpleRoutingApp with ProxyDirectives {
 		path("login"){
 			redirect(Saml.getAuthUrl, StatusCodes.Found)
 		} ~
-		path("welcome"){
-			complete("Welcome!")
+		post{
+			path("saml/SSO/POST"){
+				complete("Welcome!")
+			}
 		}
 	}
 	

@@ -6,13 +6,14 @@ import java.net.URLEncoder
 
 object Saml {
 
-	val idpUrl = "https://idp.lu.se/idp/profile/SAML2/Redirect/SSO"
+	//val idpUrl = "https://idp.lu.se/idp/profile/SAML2/Redirect/SSO"
+	val idpUrl = "https://idp.testshib.org/idp/profile/SAML2/Redirect/SSO"
 	
 	def getAuthRequest: String = {
 		
 		val appSetts = new AppSettings()
-		appSetts.setAssertionConsumerServiceUrl("https://localhost.local:8080/welcome")
-		appSetts.setIssuer("Carbon Portal Authentication Service")
+		appSetts.setAssertionConsumerServiceUrl("https://oleg.mirzov.com/saml/SSO/POST")
+		appSetts.setIssuer("https://oleg.mirzov.com/saml/cpauth/")
 		
 		val req = new AuthRequest(appSetts, null)
 		return req.getRequest(0)

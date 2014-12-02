@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EntitiesDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata" Name="urn:mace:shibboleth:testshib:two" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:mdalg="urn:oasis:names:tc:SAML:metadata:algsupport" xmlns:mdui="urn:oasis:names:tc:SAML:metadata:ui" xmlns:shibmd="urn:mace:shibboleth:metadata:1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+<EntityDescriptor entityID="https://oleg.mirzov.com/saml/cpauth/">
+
+<SPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol urn:oasis:names:tc:SAML:1.1:protocol http://schemas.xmlsoap.org/ws/2003/07/secext">
+
+<KeyDescriptor>
+	<ds:KeyInfo>
+		<ds:X509Data>
+			<ds:X509Certificate>MIIECTCCAvGgAwIBAgIJANqBwwGtbkuOMA0GCSqGSIb3DQEBCwUAMIGaMQswCQYD
+VQQGEwJTRTERMA8GA1UECAwIU2vDg8KlbmUxDTALBgNVBAcMBEx1bmQxFDASBgNV
+BAoMC09sZWcgTWlyem92MRMwEQYDVQQLDApTQU1MIHRlc3RzMRgwFgYDVQQDDA9v
+bGVnLm1pcnpvdi5jb20xJDAiBgkqhkiG9w0BCQEWFW9sZWcubWlyem92QGdtYWls
+LmNvbTAeFw0xNDExMzAxNjQ4MDRaFw0xNTExMzAxNjQ4MDRaMIGaMQswCQYDVQQG
+EwJTRTERMA8GA1UECAwIU2vDg8KlbmUxDTALBgNVBAcMBEx1bmQxFDASBgNVBAoM
+C09sZWcgTWlyem92MRMwEQYDVQQLDApTQU1MIHRlc3RzMRgwFgYDVQQDDA9vbGVn
+Lm1pcnpvdi5jb20xJDAiBgkqhkiG9w0BCQEWFW9sZWcubWlyem92QGdtYWlsLmNv
+bTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMaOZJG8Fpy+U9gW0zjE
+wWXjgSHYXjrR0sfDdDGyILWLMoJMvyCTYd0BdDVvBXvirD7iJI1moAFfmK9ucoBk
+exX1soQbNo4FHZdXokpftZDrYK3GeQp8tzYg/4wMHbLgfXH/gQFP2NJSC8ysjsXW
+HRDbZWCtF6UzFUufTvAgFB9CLzsAmtU2fZ+D7BSnkw0W1fLTKyn9vTk4Tde0nhGi
+grLfCwG62viRzMQOYtFhGdmtUi6nk3AP1vYHV5wWvva0wy2lyO2uYWkGWc8ralOW
+iWHgHa7yXATK3WLNmF9OdLbgqwTMWKo8k764+7M2VvhX2LOrtzrkZE3gu7WrpXx6
+w3ECAwEAAaNQME4wHQYDVR0OBBYEFEytRAWGz3kaBzkheyMDw/bIOAUyMB8GA1Ud
+IwQYMBaAFEytRAWGz3kaBzkheyMDw/bIOAUyMAwGA1UdEwQFMAMBAf8wDQYJKoZI
+hvcNAQELBQADggEBAI6NgA45qaEvnDlzK3yDEGLfVShPaNbR1F7CJsZZbIHa8yZG
+X3745WEC/yNVc+KOWSrmE8N6JlYcfQ3W0WDqwJWZiRNWSvBAmbC2m1UdKgiMTCAw
+X/Ah/D9B+qh4vojNFJa61QMeucISKif7VUwvUJ7uhStDLoDStXeJsatrYAiafT0V
+J14Q9Nh01ovGjWMoUE6KRpBFHwA6uzRphKtagIV6giIvA9bgpkHWKkF5oHVhA/uM
+5RyV1Q5cduLRmc7h+Y5ag+82gB6ZyehbU85hGr4pEBYjidY22oBEtBcf8arCKTE0
+BP7rt8PQGR4oCixnmK0XVRCxl4C6oOv8gsMT7Hg=</ds:X509Certificate>
+		</ds:X509Data>
+	</ds:KeyInfo>
+</KeyDescriptor>
+
+<NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</NameIDFormat>
+
+<AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://oleg.mirzov.com/saml/SAML2/POST" index="1" isDefault="true"/>
+
+</SPSSODescriptor>
+
+<Organization>
+	<OrganizationName xmlns:xml="http://www.w3.org/XML/1998/namespace" xml:lang="en">ICOS Carbon Portal</OrganizationName>
+	<OrganizationDisplayName xmlns:xml="http://www.w3.org/XML/1998/namespace" xml:lang="en">Carbon Portal</OrganizationDisplayName>
+	<OrganizationURL xmlns:xml="http://www.w3.org/XML/1998/namespace" xml:lang="en">http://icos-cp.eu/</OrganizationURL>
+</Organization>
+
+<ContactPerson contactType="technical">
+	<GivenName>Vasja</GivenName>
+	<SurName>Pupkin</SurName>
+	<EmailAddress>vasja.pupkin@gmail.com</EmailAddress>
+</ContactPerson>
+
+</EntityDescriptor>
+</EntitiesDescriptor>

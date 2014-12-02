@@ -36,7 +36,7 @@ scalacOptions ++= Seq(
 fork := true
 
 initialCommands in console := """
-import se.lu.nateko.samltest.Main._
+import se.lu.nateko.samltest.OpenSaml._
 """
 
 assemblySettings
