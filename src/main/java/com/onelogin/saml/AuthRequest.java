@@ -24,7 +24,7 @@ public class AuthRequest {
 
 	public AuthRequest(AppSettings appSettings, AccountSettings accountSettings){
 		this.appSettings = appSettings;
-		id="_"+UUID.randomUUID().toString();
+		id="_" + UUID.randomUUID().toString();
 		SimpleDateFormat simpleDf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
 		issueInstant = simpleDf.format(new Date());
 	}
@@ -53,7 +53,7 @@ public class AuthRequest {
 
 		writer.writeStartElement("samlp", "NameIDPolicy", "urn:oasis:names:tc:SAML:2.0:protocol");
 
-		writer.writeAttribute("Format", "urn:oasis:names:tc:SAML:2.0:nameid-format:unspecified");
+		writer.writeAttribute("Format", "urn:oasis:names:tc:SAML:2.0:nameid-format:transient");
 		writer.writeAttribute("AllowCreate", "true");
 		writer.writeEndElement();
 

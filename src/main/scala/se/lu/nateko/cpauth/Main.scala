@@ -1,4 +1,4 @@
-package eu.carbonportal.cpauth
+package se.lu.nateko.cpauth
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.DurationInt
@@ -6,6 +6,7 @@ import akka.actor.ActorSystem
 import akka.util.Timeout
 import spray.routing.SimpleRoutingApp
 import spray.http._
+import spray.routing.HttpService._
 
 object Main extends App with SimpleRoutingApp with ProxyDirectives {
 	implicit val system = ActorSystem("cpauth")
@@ -22,16 +23,31 @@ object Main extends App with SimpleRoutingApp with ProxyDirectives {
 		httpOnly = true
 	)
 	
+	def completeWithError(msg: String) = complete{
+		HttpResponse(status = StatusCodes.InternalServerError, entity = msg)
+	}
+	
+	def getSamlResponse(formData: FormData): Option[String] = formData.fields
+		.collect{case ("SAMLResponse", resp) => resp}.headOption
+	
 	startServer(interface = "::0", port = 8080) {
 //		setCookie(cookie){
 //			proxyTo(Uri.NamedHost("oleg.mirzov.com"), 80)
 //		}
 		path("login"){
-			redirect(Saml.getAuthUrl, StatusCodes.Found)
+			_.redirect(Saml.getAuthUrl, StatusCodes.Found)
+			//redirect(Saml.getAuthUrl, StatusCodes.Found)
 		} ~
 		post{
-			path("saml/SSO/POST"){
-				complete("Welcome!")
+			path("saml" / "SAML2" / "POST"){
+				entity(as[FormData]){ fd =>
+					getSamlResponse(fd) match{
+						case None => completeWithError("No SAMLResponse received")
+						case Some(resp) => respondWithMediaType(MediaTypes.`application/xml`){
+							complete(Saml.decode64(resp))
+						}
+					}
+				}
 			}
 		}
 	}

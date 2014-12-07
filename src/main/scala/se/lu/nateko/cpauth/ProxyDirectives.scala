@@ -1,4 +1,4 @@
-package eu.carbonportal.cpauth
+package se.lu.nateko.cpauth
 
 import spray.routing.Directives
 import spray.http._

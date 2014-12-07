@@ -1,5 +1,6 @@
 *.class
 *.log
+*.pk8
 
 # sbt specific
 .cache/

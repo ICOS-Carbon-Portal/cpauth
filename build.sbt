@@ -12,6 +12,7 @@ libraryDependencies ++= Seq(
   "org.opensaml"       %  "opensaml"         % "2.6.1",
   "xerces"             %  "xercesImpl"       % "2.11.0",
   "net.jcip"           %  "jcip-annotations" % "1.0",
+  "org.joda"           %  "joda-convert"     % "1.2",
   "com.typesafe.akka"  %% "akka-actor"       % "2.3.6",
   "com.typesafe.akka"  %% "akka-slf4j"       % "2.3.6",
   "com.typesafe.akka"  %% "akka-testkit"     % "2.3.6" % "test",
@@ -36,7 +37,7 @@ scalacOptions ++= Seq(
 fork := true
 
 initialCommands in console := """
-import se.lu.nateko.samltest.OpenSaml._
+import se.lu.nateko.cpauth.OpenSaml._
 """
 
 assemblySettings
