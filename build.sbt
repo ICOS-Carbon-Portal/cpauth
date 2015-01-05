@@ -37,7 +37,7 @@ scalacOptions ++= Seq(
 fork := true
 
 initialCommands in console := """
-import se.lu.nateko.cpauth.OpenSaml._
+import se.lu.nateko.cpauth.Playground._
 """
 
 assemblySettings

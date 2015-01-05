@@ -7,8 +7,13 @@ import akka.util.Timeout
 import spray.routing.SimpleRoutingApp
 import spray.http._
 import spray.routing.HttpService._
+import core.Crypto
 
 object Main extends App with SimpleRoutingApp with ProxyDirectives {
+
+	//val idpUrl = "https://idp.lu.se/idp/shibboleth"
+	//val idpUrl = "https://idp.testshib.org/idp/shibboleth"
+
 	implicit val system = ActorSystem("cpauth")
 	implicit val timeout: Timeout = Timeout(60.seconds)
 	import system.dispatcher
@@ -36,16 +41,15 @@ object Main extends App with SimpleRoutingApp with ProxyDirectives {
 //		}
 		path("login"){
 			_.redirect(Saml.getAuthUrl, StatusCodes.Found)
-			//redirect(Saml.getAuthUrl, StatusCodes.Found)
 		} ~
 		post{
 			path("saml" / "SAML2" / "POST"){
 				entity(as[FormData]){ fd =>
 					getSamlResponse(fd) match{
 						case None => completeWithError("No SAMLResponse received")
-						case Some(resp) => respondWithMediaType(MediaTypes.`application/xml`){
-							complete(Saml.decode64(resp))
-						}
+						case Some(resp) =>
+							val response = Crypto.decode64(resp)
+							complete(Playground.getResponseSummary(response))
 					}
 				}
 			}

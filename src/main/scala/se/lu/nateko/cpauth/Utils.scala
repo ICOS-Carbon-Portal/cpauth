@@ -31,4 +31,20 @@ object Utils {
     else
       Seq(xmlObj.getClass)
   }
+  
+
+	import org.slf4j.LoggerFactory
+	import ch.qos.logback.classic.{Level, Logger}
+	
+	def setRootLoggingLevel(level: Level): Unit =
+		LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME)
+			.asInstanceOf[Logger]
+			.setLevel(level)
+
+	def setRootLoggingLevelToInfo(): Unit = setRootLoggingLevel(Level.INFO)
+
+	def getRootLoggingLevel: Level =
+		LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME)
+			.asInstanceOf[Logger]
+			.getLevel
 }
