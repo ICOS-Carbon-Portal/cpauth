@@ -1,27 +1,35 @@
 package se.lu.nateko.cpauth.core
 
-import scala.util.{Try, Success, Failure}
-import org.apache.commons.codec.binary.Base64
-import java.security.spec.X509EncodedKeySpec
-import java.security.KeyFactory
-import java.security.interfaces.RSAPrivateKey
-import java.security.Signature
 import java.nio.charset.Charset
+import java.security.KeyFactory
+import java.security.Signature
+import java.security.interfaces.RSAPrivateKey
+import java.security.interfaces.RSAPublicKey
+import java.security.spec.PKCS8EncodedKeySpec
+import java.security.spec.X509EncodedKeySpec
+
+import scala.util.Failure
+import scala.util.Try
+
+import org.apache.commons.codec.binary.Base64
 
 
 class PKCS8EncodedKey(val bytes: Array[Byte]) extends AnyVal
-class PEMPrivateRsaKey(val bytes: Array[Byte]) extends AnyVal
-class PEMPublicRsaKey(val bytes: Array[Byte]) extends AnyVal
 
 object Crypto{
 
 	def decode64(in: String) = new String(Base64.decodeBase64(in), "UTF-8")
 	
-	def rsaPrivateFromPemLines(lines: IndexedSeq[String]): Try[PEMPrivateRsaKey] =
-		keyFromPemLines(lines, "RSA PRIVATE").map(new PEMPrivateRsaKey(_))
-		
-	def rsaPublicFromPemLines(lines: IndexedSeq[String]): Try[PEMPublicRsaKey] =
-		keyFromPemLines(lines, "RSA PUBLIC").map(new PEMPublicRsaKey(_))
+	def rsaPrivateFromDerBytes(keyBytes: Array[Byte]): Try[RSAPrivateKey] = Try{
+		val privateKeySpec = new PKCS8EncodedKeySpec(keyBytes)
+		KeyFactory.getInstance("RSA").generatePrivate(privateKeySpec).asInstanceOf[RSAPrivateKey]
+	}
+	
+	def rsaPublicFromPemLines(lines: IndexedSeq[String]): Try[RSAPublicKey] =
+		keyFromPemLines(lines, "PUBLIC").flatMap(keyBytes => Try{
+			val publicKeySpec = new X509EncodedKeySpec(keyBytes)
+			KeyFactory.getInstance("RSA").generatePublic(publicKeySpec).asInstanceOf[RSAPublicKey]
+		})
 	
 	private def keyFromPemLines(lines: IndexedSeq[String], keyType: String): Try[Array[Byte]] = {
 		
@@ -36,16 +44,23 @@ object Crypto{
 		}else Failure(new Exception(s"Expected key specification to start with $prologue line, end with $epilogue line, and have body"))
 	}
 	
-	def signMessage(msg: String, key: PEMPrivateRsaKey): String = {
-		val privateKeySpec = new X509EncodedKeySpec(key.bytes)
-		val privateKey = KeyFactory.getInstance("RSA").generatePrivate(privateKeySpec).asInstanceOf[RSAPrivateKey]
-		
-		val signature = Signature.getInstance("SHA1withRSA")
-		signature.initSign(privateKey)
-		val msgBytes = msg.getBytes(Charset.forName("UTF-8"))
-		signature.update(msgBytes)
+	private def getSignature: Signature = Signature.getInstance("SHA1withRSA")
+	private def getMessageBytes(msg: String): Array[Byte] = msg.getBytes(Charset.forName("UTF-8"))
+	
+	def signMessage(msg: String, key: RSAPrivateKey): String = {
+		val signature = getSignature
+		signature.initSign(key)
+		signature.update(getMessageBytes(msg))
 		val signBytes = signature.sign()
 		Base64.encodeBase64String(signBytes)
+	}
+	
+	def verifySignature(msg: String, key: RSAPublicKey, signature: String): Boolean = {
+		val signer = getSignature
+		signer.initVerify(key)
+		signer.update(getMessageBytes(msg))
+		val signatureBytes = Base64.decodeBase64(signature)
+		signer.verify(signatureBytes)
 	}
 
 }

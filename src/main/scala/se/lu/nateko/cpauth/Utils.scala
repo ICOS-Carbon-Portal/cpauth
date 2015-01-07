@@ -2,6 +2,7 @@ package se.lu.nateko.cpauth
 
 import org.opensaml.xml.XMLObject
 import scala.collection.JavaConverters.asScalaBufferConverter
+import scala.io.Source
 
 object Utils {
   
@@ -22,6 +23,10 @@ object Utils {
     Files.readAllBytes(Paths.get(getClass.getResource(resourcePath).toURI))
   }
 
+	def getResourceLines(resourcePath: String): Iterator[String] = {
+		val stream = getClass.getResourceAsStream(resourcePath)
+		Source.fromInputStream(stream, "UTF-8").getLines
+	}
   
   def extractClasses(xmlObj: XMLObject): Seq[Class[_]] = {
     if(xmlObj == null)
