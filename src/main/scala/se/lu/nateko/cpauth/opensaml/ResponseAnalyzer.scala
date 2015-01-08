@@ -1,9 +1,11 @@
 package se.lu.nateko.cpauth.opensaml
 
-import java.security.KeyFactory
+import java.io.InputStream
+import java.io.StringReader
 import java.security.interfaces.RSAPrivateKey
-import java.security.spec.PKCS8EncodedKeySpec
+
 import scala.collection.JavaConverters.asScalaBufferConverter
+
 import org.opensaml.saml2.core.Assertion
 import org.opensaml.saml2.core.EncryptedAssertion
 import org.opensaml.saml2.core.Response
@@ -14,20 +16,15 @@ import org.opensaml.xml.parse.StaticBasicParserPool
 import org.opensaml.xml.schema.XSString
 import org.opensaml.xml.security.keyinfo.StaticKeyInfoCredentialResolver
 import org.opensaml.xml.security.x509.BasicX509Credential
-import se.lu.nateko.cpauth.core.PKCS8EncodedKey
 import org.w3c.dom.Document
-import java.io.StringReader
-import java.io.InputStream
 
-class ResponseAnalyzer(key: PKCS8EncodedKey){
+class ResponseAnalyzer(key: RSAPrivateKey){
 	import ResponseAnalyzer._
 
 	lazy val decrypter: AssertionDecrypter = {
-		val privateKeySpec = new PKCS8EncodedKeySpec(key.bytes)
-		val privateKey = KeyFactory.getInstance("RSA").generatePrivate(privateKeySpec).asInstanceOf[RSAPrivateKey]
 		
 		val decryptionCredential = new BasicX509Credential()
-		decryptionCredential.setPrivateKey(privateKey)
+		decryptionCredential.setPrivateKey(key)
 		
 		val decrypter = new Decrypter(null, new StaticKeyInfoCredentialResolver(decryptionCredential), new InlineEncryptedKeyResolver())
 

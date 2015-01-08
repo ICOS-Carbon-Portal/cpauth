@@ -1,14 +1,16 @@
 package se.lu.nateko.cpauth
 
-import core.PKCS8EncodedKey
 import opensaml.ResponseAnalyzer
 import ResponseAnalyzer._
+import se.lu.nateko.cpauth.core.Crypto
+import se.lu.nateko.cpauth.core.CoreUtils
 
 object Playground {
 
 	Utils.setRootLoggingLevelToInfo()
 
-	val privateKey = new PKCS8EncodedKey(Utils.getResourceBytes("/private_key.pk8"))
+	val keyBytes = CoreUtils.getResourceBytes("/private_key.der")
+	val privateKey = Crypto.rsaPrivateFromDerBytes(keyBytes).get
 	val responseAnalyzer = new ResponseAnalyzer(privateKey)
 	
 	def responseStream = getClass.getResourceAsStream("/response_sample.xml")

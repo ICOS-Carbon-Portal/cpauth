@@ -7,7 +7,7 @@ import akka.util.Timeout
 import spray.routing.SimpleRoutingApp
 import spray.http._
 import spray.routing.HttpService._
-import core.Crypto
+import core.CoreUtils
 
 object Main extends App with SimpleRoutingApp with ProxyDirectives {
 
@@ -48,7 +48,7 @@ object Main extends App with SimpleRoutingApp with ProxyDirectives {
 					getSamlResponse(fd) match{
 						case None => completeWithError("No SAMLResponse received")
 						case Some(resp) =>
-							val response = Crypto.decode64(resp)
+							val response = CoreUtils.decode64(resp)
 							complete(Playground.getResponseSummary(response))
 					}
 				}

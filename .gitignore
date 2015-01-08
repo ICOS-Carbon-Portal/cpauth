@@ -19,5 +19,6 @@ project/plugins/project/
 .project
 .settings/
 .classpath
+.cache
 
 nohup.out
