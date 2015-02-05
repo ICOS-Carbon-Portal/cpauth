@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <EntitiesDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata" Name="urn:mace:shibboleth:testshib:two" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:mdalg="urn:oasis:names:tc:SAML:metadata:algsupport" xmlns:mdui="urn:oasis:names:tc:SAML:metadata:ui" xmlns:shibmd="urn:mace:shibboleth:metadata:1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
-<EntityDescriptor entityID="https://oleg.mirzov.com/saml/cpauth/">
+<EntityDescriptor entityID="https://cpauth.icos-cp.eu/saml/cpauth">
 
 <SPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol urn:oasis:names:tc:SAML:1.1:protocol http://schemas.xmlsoap.org/ws/2003/07/secext">
 
@@ -36,7 +36,7 @@ BP7rt8PQGR4oCixnmK0XVRCxl4C6oOv8gsMT7Hg=</ds:X509Certificate>
 
 <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</NameIDFormat>
 
-<AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://oleg.mirzov.com/saml/SAML2/POST" index="1" isDefault="true"/>
+<AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://cpauth.icos-cp.eu/saml/SAML2/POST" index="1" isDefault="true"/>
 
 </SPSSODescriptor>
 
@@ -47,9 +47,9 @@ BP7rt8PQGR4oCixnmK0XVRCxl4C6oOv8gsMT7Hg=</ds:X509Certificate>
 </Organization>
 
 <ContactPerson contactType="technical">
-	<GivenName>Vasja</GivenName>
-	<SurName>Pupkin</SurName>
-	<EmailAddress>vasja.pupkin@gmail.com</EmailAddress>
+	<GivenName>Oleg</GivenName>
+	<SurName>Mirzov</SurName>
+	<EmailAddress>oleg.mirzov@nateko.lu.se</EmailAddress>
 </ContactPerson>
 
 </EntityDescriptor>
