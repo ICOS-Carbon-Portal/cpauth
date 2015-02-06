@@ -7,7 +7,9 @@ import akka.util.Timeout
 import spray.routing.SimpleRoutingApp
 import spray.http._
 import spray.routing.HttpService._
+
 import core.CoreUtils
+import core.Constants
 
 object Main extends App with SimpleRoutingApp with ProxyDirectives {
 
@@ -35,18 +37,18 @@ object Main extends App with SimpleRoutingApp with ProxyDirectives {
 	def getSamlResponse(formData: FormData): Option[String] = formData.fields
 		.collect{case ("SAMLResponse", resp) => resp}.headOption
 	
-  val metadataXmlStr: String = CoreUtils.getResourceLines("/icos-cp_sp_meta.xml").mkString("")
-  val xmlType = ContentType(MediaTypes.`application/xml`)
-  val metadataXmlEntity = HttpEntity(xmlType, metadataXmlStr)
-  
 	startServer(interface = "::0", port = 8080) {
 //		setCookie(cookie){
 //			proxyTo(Uri.NamedHost("icos-cp.eu"), 80)
 //		}
-		path("login"){
+		path("saml" / "login"){
 			_.redirect(Saml.getAuthUrl, StatusCodes.Found)
 		} ~
     path("saml" / "cpauth"){
+      val metadataXmlStr: String = CoreUtils.getResourceLines(Constants.samlSpXmlPath).mkString("")
+      val xmlType = ContentType(MediaTypes.`application/xml`)
+      val metadataXmlEntity = HttpEntity(xmlType, metadataXmlStr)
+      
       complete(metadataXmlEntity)  
     } ~
 		post{

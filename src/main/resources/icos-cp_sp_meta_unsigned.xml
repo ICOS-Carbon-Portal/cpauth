@@ -1,57 +1,7 @@
-<?xml version="1.0" encoding="UTF-8"?><md:EntitiesDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" ID="_a09b61ff99a2ef1c3d0f27fa5fb6d481dc12e027">
+<?xml version="1.0" encoding="UTF-8"?>
+<md:EntitiesDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" ID="_a09b61ff99a2ef1c3d0f27fa5fb6d481dc12e027">
 
 <md:EntityDescriptor entityID="https://cpauth.icos-cp.eu/saml/cpauth">
-
-<ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
-<ds:SignedInfo>
-	<ds:CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>
-	<ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
-	<ds:Reference URI="_a09b61ff99a2ef1c3d0f27fa5fb6d481dc12e027">
-		<ds:Transforms>
-			<ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
-			<ds:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
-		</ds:Transforms>
-		<ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
-		<ds:DigestValue>0weWzrpzCPwpMEwV6iWLQEuLjgk=</ds:DigestValue>
-	</ds:Reference>
-</ds:SignedInfo>
-<ds:SignatureValue>nA3aVFhXHo1tL3bqvq7O7y2xcEZdPgUqLa4kpVIC+pPcvdypi8Gf+MttXXXVRtKoIIKtI7FUQuN3
-d8W0UG/XWMH3mAYNMfAUFr4zBu5VZ7xDx0bXFoO4TGEKRZTMgv9jAl2pfBrxSFpFc6oUP569/16w
-RvH4pzJyCf4OAgp+6/7rljWPllh+5cpvLkezJxF6Qqn8DRMfi2nDMfriwXkOkasRRAkNUjMV15QL
-A2bbjT3hqxsCI6ri9aUDj8jJ56qGsUF41OQxS3O/GdZlvV60Lezm6o5R4UfFWo8hM8RPpAjuAoKU
-SZkSdiNaVJsD/lwvHIRf3HBr6YXtNSXe1fLIiA==</ds:SignatureValue>
-<ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
-      		<ds:KeyName>cpauth.icos-cp.eu</ds:KeyName>
-      		<ds:X509Data>
-      			<ds:X509SubjectName>CN=cpauth.icos-cp.eu</ds:X509SubjectName>
-      	   	<ds:X509Certificate>MIIEJzCCAw+gAwIBAgIJANC3VWNs7fbTMA0GCSqGSIb3DQEBCwUAMIGpMQswCQYD
-VQQGEwJTRTERMA8GA1UECAwIU2vDg8KlbmUxDTALBgNVBAcMBEx1bmQxGzAZBgNV
-BAoMEklDT1MgQ2FyYm9uIFBvcnRhbDEfMB0GA1UECwwWQXV0aGVudGljYXRpb24g
-U2VydmljZTEaMBgGA1UEAwwRY3BhdXRoLmljb3MtY3AuZXUxHjAcBgkqhkiG9w0B
-CQEWD2luZm9AaWNvcy1jcC5ldTAeFw0xNTAyMDUxMjI0MzZaFw0yNTAyMDIxMjI0
-MzZaMIGpMQswCQYDVQQGEwJTRTERMA8GA1UECAwIU2vDg8KlbmUxDTALBgNVBAcM
-BEx1bmQxGzAZBgNVBAoMEklDT1MgQ2FyYm9uIFBvcnRhbDEfMB0GA1UECwwWQXV0
-aGVudGljYXRpb24gU2VydmljZTEaMBgGA1UEAwwRY3BhdXRoLmljb3MtY3AuZXUx
-HjAcBgkqhkiG9w0BCQEWD2luZm9AaWNvcy1jcC5ldTCCASIwDQYJKoZIhvcNAQEB
-BQADggEPADCCAQoCggEBAM2QN1jaZJeuPAH+4sVMZKk7vg4JIbUuTMKk0+KIAg5M
-XiVsRiEUjY+LtIncrvA/kf2CIySI0WkbwZMjcDd03hNj4kLWhuyxfOCwDO6DsUbG
-MbyI6HIYWXJp5ljfEEFgtMqT3dDtD5vwq8h4Zy20ukxOoIokKczrAvn4JjkMsj6Z
-0CEAFBC29o4E8PWQbUBgvt6Z+2ao+RHMLD7nZVBx98Occ9KfnYnDDd9Oi1XFe009
-zaSbcqY2RpN8I9hcW/KQf3KnGW5xZ5dr4rhGklCkYr+h0W3xKu+hin8bk91t1Dkr
-gaKl/N7M3Oof3k+7ZBlwaV97es5InWCeNgDxCGkBRNsCAwEAAaNQME4wHQYDVR0O
-BBYEFDcD7MVudooGaNRYqXBYqQi3VzGxMB8GA1UdIwQYMBaAFDcD7MVudooGaNRY
-qXBYqQi3VzGxMAwGA1UdEwQFMAMBAf8wDQYJKoZIhvcNAQELBQADggEBABS02eZS
-weXGMJ2fEIy2JH0VhCbjuX/rz+8Hfh9LjzNb3QwKHuwP83yvPqRulV9FYmvOoK8T
-fMou5aW0mZ+QgJNKOrxY5vFxUq6pn3OiYbBu3m1C9ajbU/nx2evzt4+qUwTfHFb+
-ZgXpOtmxRekFzVvGZ18BSPJKwAAqqZ11X7skT/NwEAhbgplVPv9WkDmDzqNvHqQJ
-nyRgD2ZqUPU9nEOjGy0gI07dciVcYZQ+CiZeSECIWgQwjDEBDuwMCVAZA6gfdz6C
-KJuN+RUSKPEcxPxle1MiB4MU0ei5X4xUbvLWKn9Ok7TOXg2BpnMAv6eON1wVo0Aa
-D265cqy6Le/toVg=
-					</ds:X509Certificate>
-      		</ds:X509Data>
-			</ds:KeyInfo>
-
-</ds:Signature>
 
 	<md:Extensions xmlns:alg="urn:oasis:names:tc:SAML:metadata:algsupport">
     	<alg:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha512"/>
@@ -125,9 +75,9 @@ D265cqy6Le/toVg=
 	</md:SPSSODescriptor>
 
 <md:Organization>
-	<md:OrganizationName xml:lang="en" xmlns:xml="http://www.w3.org/XML/1998/namespace">ICOS Carbon Portal</md:OrganizationName>
-	<md:OrganizationDisplayName xml:lang="en" xmlns:xml="http://www.w3.org/XML/1998/namespace">Carbon Portal</md:OrganizationDisplayName>
-	<md:OrganizationURL xml:lang="en" xmlns:xml="http://www.w3.org/XML/1998/namespace">http://icos-cp.eu/</md:OrganizationURL>
+	<md:OrganizationName xmlns:xml="http://www.w3.org/XML/1998/namespace" xml:lang="en">ICOS Carbon Portal</md:OrganizationName>
+	<md:OrganizationDisplayName xmlns:xml="http://www.w3.org/XML/1998/namespace" xml:lang="en">Carbon Portal</md:OrganizationDisplayName>
+	<md:OrganizationURL xmlns:xml="http://www.w3.org/XML/1998/namespace" xml:lang="en">http://icos-cp.eu/</md:OrganizationURL>
 </md:Organization>
 
 <md:ContactPerson contactType="technical">
@@ -139,3 +89,4 @@ D265cqy6Le/toVg=
 </md:EntityDescriptor>
 
 </md:EntitiesDescriptor>
+

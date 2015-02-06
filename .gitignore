@@ -1,6 +1,5 @@
 *.class
 *.log
-*.pk8
 
 # sbt specific
 .cache/
@@ -22,3 +21,6 @@ project/plugins/project/
 .cache
 
 nohup.out
+
+#Security-specific
+src/main/resources/crypto/private/
