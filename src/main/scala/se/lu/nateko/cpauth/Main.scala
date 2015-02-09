@@ -13,10 +13,7 @@ import core.Constants
 
 object Main extends App with SimpleRoutingApp with ProxyDirectives {
 
-	//val idpUrl = "https://idp.lu.se/idp/shibboleth"
-	//val idpUrl = "https://idp.testshib.org/idp/shibboleth"
-
-  implicit val system = ActorSystem("cpauth")
+	implicit val system = ActorSystem("cpauth")
 	implicit val timeout: Timeout = Timeout(60.seconds)
 	import system.dispatcher
 
@@ -29,20 +26,24 @@ object Main extends App with SimpleRoutingApp with ProxyDirectives {
 //		maxAge = Some(10.minutes.toSeconds)
 		httpOnly = true
 	)
-	
+
 	def completeWithError(msg: String) = complete{
 		HttpResponse(status = StatusCodes.InternalServerError, entity = msg)
 	}
-	
+
 	def getSamlResponse(formData: FormData): Option[String] = formData.fields
 		.collect{case ("SAMLResponse", resp) => resp}.headOption
-	
+
+	def getAuthenticatingRequestUrl: String = {
+		Saml.getAuthUrl(Constants.idpUrl, Constants.consumerServiceUrl, Constants.spUrl)
+	}
+
 	startServer(interface = "::0", port = 8080) {
 //		setCookie(cookie){
 //			proxyTo(Uri.NamedHost("icos-cp.eu"), 80)
 //		}
 		path("saml" / "login"){
-			_.redirect(Saml.getAuthUrl, StatusCodes.Found)
+			_.redirect(getAuthenticatingRequestUrl, StatusCodes.Found)
 		} ~
     path("saml" / "cpauth"){
       val metadataXmlStr: String = CoreUtils.getResourceLines(Constants.samlSpXmlPath).mkString("")
