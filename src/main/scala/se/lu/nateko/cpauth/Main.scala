@@ -42,16 +42,18 @@ object Main extends App with SimpleRoutingApp with ProxyDirectives {
 //		setCookie(cookie){
 //			proxyTo(Uri.NamedHost("icos-cp.eu"), 80)
 //		}
-		path("saml" / "login"){
-			_.redirect(getAuthenticatingRequestUrl, StatusCodes.Found)
+		get{
+			path("saml" / "login"){
+				_.redirect(getAuthenticatingRequestUrl, StatusCodes.Found)
+			} ~
+			path("saml" / "cpauth"){
+				val metadataXmlStr: String = CoreUtils.getResourceLines(Constants.samlSpXmlPath).mkString("")
+				val xmlType = ContentType(MediaTypes.`application/xml`)
+				val metadataXmlEntity = HttpEntity(xmlType, metadataXmlStr)
+
+				complete(metadataXmlEntity)
+			}
 		} ~
-    path("saml" / "cpauth"){
-      val metadataXmlStr: String = CoreUtils.getResourceLines(Constants.samlSpXmlPath).mkString("")
-      val xmlType = ContentType(MediaTypes.`application/xml`)
-      val metadataXmlEntity = HttpEntity(xmlType, metadataXmlStr)
-      
-      complete(metadataXmlEntity)  
-    } ~
 		post{
 			path("saml" / "SAML2" / "POST"){
 				entity(as[FormData]){ fd =>
@@ -64,6 +66,7 @@ object Main extends App with SimpleRoutingApp with ProxyDirectives {
 				}
 			}
 		}
+
 	}
 	
 }

@@ -22,11 +22,20 @@ object Saml {
 
 		idpHttpRedirectUrl +"?SAMLRequest=" + URLEncoder.encode(authRequestBase64, "UTF-8")
 	}
+	
+	def getAuthUrl(idpHttpRedirectUrl: String, httpPostConsumerUrl: String,
+					serviceProviderUrl: String, relayState: String): String = {
+		
+		val relStateEncoded = URLEncoder.encode(relayState, "UTF-8")
+		
+		getAuthUrl(idpHttpRedirectUrl, httpPostConsumerUrl, serviceProviderUrl) +
+			"&RelayState=" + relStateEncoded
+	}
 
 
 	def authRequestXml(httpPostConsumerUrl: String, serviceProviderUrl: String): Elem = {
 
-		val id="_" + UUID.randomUUID().toString
+		val id = "_" + UUID.randomUUID().toString
 		val simpleDf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
 		val issueInstant = simpleDf.format(new Date())
 

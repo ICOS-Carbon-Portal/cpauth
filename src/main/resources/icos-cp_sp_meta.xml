@@ -21,10 +21,10 @@ RvH4pzJyCf4OAgp+6/7rljWPllh+5cpvLkezJxF6Qqn8DRMfi2nDMfriwXkOkasRRAkNUjMV15QL
 A2bbjT3hqxsCI6ri9aUDj8jJ56qGsUF41OQxS3O/GdZlvV60Lezm6o5R4UfFWo8hM8RPpAjuAoKU
 SZkSdiNaVJsD/lwvHIRf3HBr6YXtNSXe1fLIiA==</ds:SignatureValue>
 <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
-      		<ds:KeyName>cpauth.icos-cp.eu</ds:KeyName>
-      		<ds:X509Data>
-      			<ds:X509SubjectName>CN=cpauth.icos-cp.eu</ds:X509SubjectName>
-      	   	<ds:X509Certificate>MIIEJzCCAw+gAwIBAgIJANC3VWNs7fbTMA0GCSqGSIb3DQEBCwUAMIGpMQswCQYD
+	<ds:KeyName>cpauth.icos-cp.eu</ds:KeyName>
+		<ds:X509Data>
+			<ds:X509SubjectName>CN=cpauth.icos-cp.eu</ds:X509SubjectName>
+			<ds:X509Certificate>MIIEJzCCAw+gAwIBAgIJANC3VWNs7fbTMA0GCSqGSIb3DQEBCwUAMIGpMQswCQYD
 VQQGEwJTRTERMA8GA1UECAwIU2vDg8KlbmUxDTALBgNVBAcMBEx1bmQxGzAZBgNV
 BAoMEklDT1MgQ2FyYm9uIFBvcnRhbDEfMB0GA1UECwwWQXV0aGVudGljYXRpb24g
 U2VydmljZTEaMBgGA1UEAwwRY3BhdXRoLmljb3MtY3AuZXUxHjAcBgkqhkiG9w0B
@@ -47,29 +47,29 @@ ZgXpOtmxRekFzVvGZ18BSPJKwAAqqZ11X7skT/NwEAhbgplVPv9WkDmDzqNvHqQJ
 nyRgD2ZqUPU9nEOjGy0gI07dciVcYZQ+CiZeSECIWgQwjDEBDuwMCVAZA6gfdz6C
 KJuN+RUSKPEcxPxle1MiB4MU0ei5X4xUbvLWKn9Ok7TOXg2BpnMAv6eON1wVo0Aa
 D265cqy6Le/toVg=
-					</ds:X509Certificate>
-      		</ds:X509Data>
-			</ds:KeyInfo>
+			</ds:X509Certificate>
+		</ds:X509Data>
+	</ds:KeyInfo>
 
 </ds:Signature>
 
 	<md:Extensions xmlns:alg="urn:oasis:names:tc:SAML:metadata:algsupport">
-    	<alg:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha512"/>
-   	<alg:DigestMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#sha384"/>
-   	<alg:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/>
-   	<alg:DigestMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#sha224"/>
-   	<alg:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
-   	<alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha512"/>
-   	<alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha384"/>
-   	<alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha256"/>
-   	<alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha224"/>
-   	<alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha512"/>
-   	<alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha384"/>
-   	<alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>
-   	<alg:SigningMethod Algorithm="http://www.w3.org/2009/xmldsig11#dsa-sha256"/>
-   	<alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha1"/>
-   	<alg:SigningMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
-	   <alg:SigningMethod Algorithm="http://www.w3.org/2000/09/xmldsig#dsa-sha1"/>
+		<alg:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha512"/>
+		<alg:DigestMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#sha384"/>
+		<alg:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/>
+		<alg:DigestMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#sha224"/>
+		<alg:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+		<alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha512"/>
+		<alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha384"/>
+		<alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha256"/>
+		<alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha224"/>
+		<alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha512"/>
+		<alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha384"/>
+		<alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>
+		<alg:SigningMethod Algorithm="http://www.w3.org/2009/xmldsig11#dsa-sha256"/>
+		<alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha1"/>
+		<alg:SigningMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
+		<alg:SigningMethod Algorithm="http://www.w3.org/2000/09/xmldsig#dsa-sha1"/>
 	</md:Extensions>
 
 	<md:SPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
@@ -105,20 +105,18 @@ nyRgD2ZqUPU9nEOjGy0gI07dciVcYZQ+CiZeSECIWgQwjDEBDuwMCVAZA6gfdz6C
 KJuN+RUSKPEcxPxle1MiB4MU0ei5X4xUbvLWKn9Ok7TOXg2BpnMAv6eON1wVo0Aa
 D265cqy6Le/toVg=
 					</ds:X509Certificate>
-      		</ds:X509Data>
+				</ds:X509Data>
 			</ds:KeyInfo>
-	      <md:EncryptionMethod Algorithm="http://www.w3.org/2009/xmlenc11#aes128-gcm"/>
-   	   <md:EncryptionMethod Algorithm="http://www.w3.org/2009/xmlenc11#aes192-gcm"/>
-   	   <md:EncryptionMethod Algorithm="http://www.w3.org/2009/xmlenc11#aes256-gcm"/>
-   	   <md:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes128-cbc"/>
-   	   <md:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes192-cbc"/>
-   	   <md:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes256-cbc"/>
-   	   <md:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#tripledes-cbc"/>
-   	   <md:EncryptionMethod Algorithm="http://www.w3.org/2009/xmlenc11#rsa-oaep"/>
-   	   <md:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p"/>
+			<md:EncryptionMethod Algorithm="http://www.w3.org/2009/xmlenc11#aes128-gcm"/>
+			<md:EncryptionMethod Algorithm="http://www.w3.org/2009/xmlenc11#aes192-gcm"/>
+			<md:EncryptionMethod Algorithm="http://www.w3.org/2009/xmlenc11#aes256-gcm"/>
+			<md:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes128-cbc"/>
+			<md:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes192-cbc"/>
+			<md:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes256-cbc"/>
+			<md:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#tripledes-cbc"/>
+			<md:EncryptionMethod Algorithm="http://www.w3.org/2009/xmlenc11#rsa-oaep"/>
+			<md:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p"/>
 		</md:KeyDescriptor>
-
-   	<md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://cpauth.icos-cp.eu/saml/logout"/>
 
 		<md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://cpauth.icos-cp.eu/saml/SAML2/POST" index="1" isDefault="true"/>
 
