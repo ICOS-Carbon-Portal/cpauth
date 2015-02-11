@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+
+    	<title>Login to Carbon Portal</title>
+	    <meta charset="UTF-8"/>
+		<link rel="stylesheet" type="text/css" href="login.css">
+
+	</head>
+
+	<body>
+		<div id="loginDialog">
+		
+			<h2>Login</h2>
+			
+			<form action="saml/login">
+				 <fieldset>
+				    <legend>University login</legend>
+				    <p>
+						<label for="GET-idpUrl">Select university:</label>
+						<select id="GET-idpUrl" name="idpUrl">
+							<option value="https://idp.testshib.org/idp/profile/SAML2/Redirect/SSO">Test</option>
+							<option value="https://idp.lu.se/idp/profile/SAML2/Redirect/SSO">Lund University</option>
+						</select>
+				    </p>
+					<input class="targetUrlRelay" type="hidden" name="targetUrl">
+				    <p><input type="submit" value="Login!"></p>
+				 </fieldset>
+			</form>
+			
+			<p>OR</p>
+			
+			<form action="password/login" method="post">
+				 <fieldset>
+				    <legend>Username and password login</legend>
+				    <p>
+						<label for="POST-username">Username:</label>
+						<input id="POST-username" type="text" name="username">
+				    </p>
+				    <p>
+						<label for="POST-password">Password:</label>
+						<input id="POST-password" type="password" name="password">
+				    </p>
+					<input class="targetUrlRelay" type="hidden" name="targetUrl">
+				    <p> <input type="submit" value="Login!"> </p>
+				 </fieldset>
+			</form>
+			
+		</div>
+	</body>
+
+	<script src="login.js"></script>
+	
+</html>
+

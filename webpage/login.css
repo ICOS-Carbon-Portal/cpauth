@@ -1,0 +1,19 @@
+body{
+	background-color: #aaaaaa;
+}
+
+form{
+	margin: 10px;
+}
+
+#loginDialog {
+	background-color: #ffffff;
+	padding: 10px;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	width: 600px;                
+	height: 450px;              
+	margin-left: -300px;
+	margin-top: -225px;
+}
