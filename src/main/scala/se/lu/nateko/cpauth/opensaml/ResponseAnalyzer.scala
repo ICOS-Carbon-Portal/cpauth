@@ -59,8 +59,10 @@ object ResponseAnalyzer {
 			.mapValues(nameValuePairs => nameValuePairs.map{case (name, value) => value})
 	}
 
-	def apply(conf: Config): Try[ResponseAnalyzer] = {
-		val keyBytes = CoreUtils.getResourceBytes(conf.privateKeyPath)
+	def apply(conf: Config): Try[ResponseAnalyzer] = fromPrivateKeyAt(conf.privateKeyPath)
+
+	def fromPrivateKeyAt(path: String): Try[ResponseAnalyzer] = {
+		val keyBytes = CoreUtils.getResourceBytes(path)
 		val privateKey = Crypto.rsaPrivateFromDerBytes(keyBytes)
 		privateKey.map(new ResponseAnalyzer(_))
 	}
