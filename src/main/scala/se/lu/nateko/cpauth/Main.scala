@@ -7,9 +7,10 @@ import akka.util.Timeout
 import spray.routing.SimpleRoutingApp
 import spray.http._
 import spray.routing.HttpService._
-
 import core.CoreUtils
 import core.Constants
+import se.lu.nateko.cpauth.opensaml.ResponseParser
+import se.lu.nateko.cpauth.opensaml.ResponseAnalyzer
 
 object Main extends App with SimpleRoutingApp with ProxyDirectives {
 
@@ -17,34 +18,36 @@ object Main extends App with SimpleRoutingApp with ProxyDirectives {
 	implicit val timeout: Timeout = Timeout(60.seconds)
 	import system.dispatcher
 
-	val cookie = HttpCookie(
-		name = "testcookie",
-		content = "success",
-//		secure = true,
-		domain = Some(".localhost.local"),
-		path = Some("/"),
-//		maxAge = Some(10.minutes.toSeconds)
-		httpOnly = true
-	)
 
 	def completeWithError(msg: String) = complete{
-		HttpResponse(status = StatusCodes.InternalServerError, entity = msg)
+		HttpResponse(status = StatusCodes.BadRequest, entity = msg)
 	}
 
 	def getSamlResponse(formData: FormData): Option[String] = formData.fields
 		.collect{case ("SAMLResponse", resp) => resp}.headOption
 
-	def getAuthenticatingRequestUrl: String = {
-		Saml.getAuthUrl(Constants.idpUrl, Constants.consumerServiceUrl, Constants.spUrl)
+	def getAuthenticatingRequestUrl(idpUrl: String, targetUrl: Option[String]): String = {
+		import Constants._
+		targetUrl match{
+			case None => Saml.getAuthUrl(idpUrl, consumerServiceUrl, spUrl)
+			case Some(url) => Saml.getAuthUrl(idpUrl, consumerServiceUrl, spUrl, url)
+		}
+		
 	}
+
+	val parser = ResponseParser()
+	val analyzer = ResponseAnalyzer(Constants)
 
 	startServer(interface = "::0", port = 8080) {
 //		setCookie(cookie){
 //			proxyTo(Uri.NamedHost("icos-cp.eu"), 80)
 //		}
 		get{
-			path("saml" / "login"){
-				_.redirect(getAuthenticatingRequestUrl, StatusCodes.Found)
+			path("saml" / "login") {
+				parameter('idpUrl, 'targetUrl ?){ (idp, target) =>
+					redirect(getAuthenticatingRequestUrl(idp, target), StatusCodes.Found)
+				} ~
+				completeWithError("Identity provider has not been specified!")
 			} ~
 			path("saml" / "cpauth"){
 				val metadataXmlStr: String = CoreUtils.getResourceLines(Constants.samlSpXmlPath).mkString("")
@@ -60,8 +63,9 @@ object Main extends App with SimpleRoutingApp with ProxyDirectives {
 					getSamlResponse(fd) match{
 						case None => completeWithError("No SAMLResponse received")
 						case Some(resp) =>
-							val response = CoreUtils.decode64(resp)
-							complete(Playground.getResponseSummary(response))
+							//val response = parser.fromBase64(resp)
+							//complete(Playground.getResponseSummary(response, analyzer.get))
+							complete(CoreUtils.decode64(resp))
 					}
 				}
 			}
