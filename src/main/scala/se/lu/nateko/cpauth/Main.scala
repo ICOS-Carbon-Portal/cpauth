@@ -9,8 +9,9 @@ import spray.http._
 import spray.routing.HttpService._
 import core.CoreUtils
 import core.Constants
-import se.lu.nateko.cpauth.opensaml.ResponseParser
 import se.lu.nateko.cpauth.opensaml.ResponseAnalyzer
+import org.opensaml.saml2.core.Response
+import se.lu.nateko.cpauth.opensaml.Parser
 
 object Main extends App with SimpleRoutingApp with ProxyDirectives {
 
@@ -35,7 +36,6 @@ object Main extends App with SimpleRoutingApp with ProxyDirectives {
 		
 	}
 
-	val parser = ResponseParser()
 	val analyzer = ResponseAnalyzer(Constants)
 
 	startServer(interface = "::0", port = 8080) {
@@ -63,9 +63,9 @@ object Main extends App with SimpleRoutingApp with ProxyDirectives {
 					getSamlResponse(fd) match{
 						case None => completeWithError("No SAMLResponse received")
 						case Some(resp) =>
-							//val response = parser.fromBase64(resp)
-							//complete(Playground.getResponseSummary(response, analyzer.get))
-							complete(CoreUtils.decode64(resp))
+							val response = Parser.fromBase64[Response](resp)
+							complete(Playground.getResponseSummary(response, analyzer.get))
+							//complete(CoreUtils.decode64(resp))
 					}
 				}
 			}

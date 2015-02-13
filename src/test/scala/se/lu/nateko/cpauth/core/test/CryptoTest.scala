@@ -10,6 +10,13 @@ import Crypto._
 
 class CryptoTest extends FunSuite {
 
+	test("Public key extraction from X509 base64-encoded cert string works"){
+		val certStr: String = CoreUtils.getResourceLines("/certX509base64.txt").map(_.trim).mkString("")
+		val key = publicKeyFromX509Cert(certStr)
+		
+		assert(key.getAlgorithm === "RSA")
+	}
+	
 	test("Signing a simple message succeeds"){
 		val keyBytes = CoreUtils.getResourceBytes("/private1.der")
 		

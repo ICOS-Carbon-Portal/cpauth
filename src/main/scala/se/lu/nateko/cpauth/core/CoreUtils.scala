@@ -6,6 +6,8 @@ import org.apache.commons.io.IOUtils
 import java.io.ByteArrayOutputStream
 import java.util.zip.Deflater
 import java.util.zip.DeflaterOutputStream
+import java.io.InputStream
+import java.nio.charset.StandardCharsets
 
 object CoreUtils {
 

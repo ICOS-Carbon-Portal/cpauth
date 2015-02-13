@@ -2,21 +2,32 @@ package se.lu.nateko.cpauth.core
 
 import java.nio.charset.Charset
 import java.security.KeyFactory
+import java.security.PublicKey
+import java.security.cert.CertificateFactory
+import java.security.cert.X509Certificate
 import java.security.interfaces.RSAPrivateKey
 import java.security.interfaces.RSAPublicKey
 import java.security.spec.PKCS8EncodedKeySpec
 import java.security.spec.X509EncodedKeySpec
-
 import scala.util.Failure
 import scala.util.Try
-
 import org.apache.commons.codec.binary.Base64
+import org.apache.commons.io.IOUtils
+import java.io.ByteArrayInputStream
 
 
 class Signature(val base64: String) extends AnyVal
 
 object Crypto{
-	
+
+	def publicKeyFromX509Cert(base64: String): PublicKey = {
+		val cf = CertificateFactory.getInstance("X.509")
+		val certBytes: Array[Byte] = Base64.decodeBase64(base64)
+		val certInputStream = new ByteArrayInputStream(certBytes)
+		val cert = cf.generateCertificate(certInputStream).asInstanceOf[X509Certificate]
+		cert.getPublicKey
+	}
+
 	def rsaPrivateFromDerBytes(keyBytes: Array[Byte]): Try[RSAPrivateKey] = Try{
 		val privateKeySpec = new PKCS8EncodedKeySpec(keyBytes)
 		KeyFactory.getInstance("RSA").generatePrivate(privateKeySpec).asInstanceOf[RSAPrivateKey]
