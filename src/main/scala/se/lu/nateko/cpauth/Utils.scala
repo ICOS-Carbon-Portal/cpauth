@@ -2,6 +2,7 @@ package se.lu.nateko.cpauth
 
 import org.opensaml.xml.XMLObject
 import scala.collection.JavaConverters.asScalaBufferConverter
+import scala.collection.convert.WrapAsScala
 
 object Utils {
   
@@ -41,4 +42,12 @@ object Utils {
 		LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME)
 			.asInstanceOf[Logger]
 			.getLevel
+
+	implicit class SafeJavaCollectionWrapper[T](val list: java.util.Collection[T]) extends AnyVal {
+
+		def toSafeIterable: Iterable[T] =
+			if(list == null)
+				Iterable.empty[T]
+			else WrapAsScala.iterableAsScalaIterable(list)
+	}
 }

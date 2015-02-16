@@ -24,3 +24,6 @@ nohup.out
 
 #Security-specific
 src/main/resources/crypto/private/
+
+#Large and volatile
+src/main/resources/swamid-idp-transitive.xml

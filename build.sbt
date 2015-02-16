@@ -8,7 +8,7 @@ scalaVersion := "2.11.5"
 resolvers += "spray repo" at "http://repo.spray.io"
 
 libraryDependencies ++= Seq(
-  "org.opensaml"       %  "opensaml"         % "2.6.1" withJavadoc,
+  "org.opensaml"       %  "opensaml"         % "2.6.4" withJavadoc,
   "xerces"             %  "xercesImpl"       % "2.11.0",
   "net.jcip"           %  "jcip-annotations" % "1.0",
   "org.joda"           %  "joda-convert"     % "1.2",
@@ -18,6 +18,7 @@ libraryDependencies ++= Seq(
   "io.spray"           %% "spray-client"     % "1.3.2",
   "io.spray"           %% "spray-can"        % "1.3.2",
   "io.spray"           %% "spray-routing"    % "1.3.2",
+  "io.spray"           %% "spray-json"       % "1.3.1",
   "io.spray"           %% "spray-testkit"    % "1.3.2" % "test",
   "commons-codec"      %  "commons-codec"    % "1.9",
   "commons-io"         %  "commons-io"       % "2.4",
@@ -38,7 +39,8 @@ scalacOptions ++= Seq(
 fork := true
 
 initialCommands in console := """
-import se.lu.nateko.cpauth.Playground._
+import se.lu.nateko.cpauth.core.Constants
+import se.lu.nateko.cpauth.opensaml._
 """
 
 mainClass in assembly := Some("se.lu.nateko.cpauth.Main")

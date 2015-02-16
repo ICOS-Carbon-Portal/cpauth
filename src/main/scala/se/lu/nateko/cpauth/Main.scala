@@ -6,12 +6,23 @@ import akka.actor.ActorSystem
 import akka.util.Timeout
 import spray.routing.SimpleRoutingApp
 import spray.http._
+import spray.json.DefaultJsonProtocol
+import spray.httpx.SprayJsonSupport
 import spray.routing.HttpService._
 import core.CoreUtils
 import core.Constants
 import se.lu.nateko.cpauth.opensaml.ResponseAnalyzer
 import org.opensaml.saml2.core.Response
 import se.lu.nateko.cpauth.opensaml.Parser
+import se.lu.nateko.cpauth.opensaml.IdpLibrary
+import se.lu.nateko.cpauth.opensaml.IdpInfo
+
+
+object CpauthJsonProtocol extends DefaultJsonProtocol with SprayJsonSupport{
+	implicit val idpInfoFormat = jsonFormat2(IdpInfo)
+}
+
+import CpauthJsonProtocol._
 
 object Main extends App with SimpleRoutingApp with ProxyDirectives {
 
@@ -19,25 +30,9 @@ object Main extends App with SimpleRoutingApp with ProxyDirectives {
 	implicit val timeout: Timeout = Timeout(60.seconds)
 	import system.dispatcher
 
-
-	def completeWithError(msg: String) = complete{
-		HttpResponse(status = StatusCodes.BadRequest, entity = msg)
-	}
-
-	def getSamlResponse(formData: FormData): Option[String] = formData.fields
-		.collect{case ("SAMLResponse", resp) => resp}.headOption
-
-	def getAuthenticatingRequestUrl(idpUrl: String, targetUrl: Option[String]): String = {
-		import Constants._
-		targetUrl match{
-			case None => Saml.getAuthUrl(idpUrl, consumerServiceUrl, spUrl)
-			case Some(url) => Saml.getAuthUrl(idpUrl, consumerServiceUrl, spUrl, url)
-		}
-		
-	}
-
 	val analyzer = ResponseAnalyzer(Constants)
-
+	val idpLib: IdpLibrary = IdpLibrary.fromConfig(Constants)
+	
 	startServer(interface = "::0", port = 8080) {
 //		setCookie(cookie){
 //			proxyTo(Uri.NamedHost("icos-cp.eu"), 80)
@@ -55,6 +50,10 @@ object Main extends App with SimpleRoutingApp with ProxyDirectives {
 				val metadataXmlEntity = HttpEntity(xmlType, metadataXmlStr)
 
 				complete(metadataXmlEntity)
+			} ~
+			path("saml" / "idps"){
+				val infos = idpLib.getInfos.toSeq.sortBy(_.name)
+				complete(infos)
 			}
 		} ~
 		post{
@@ -72,7 +71,23 @@ object Main extends App with SimpleRoutingApp with ProxyDirectives {
 		}
 
 	}
-	
+
+	def completeWithError(msg: String) = complete{
+		HttpResponse(status = StatusCodes.BadRequest, entity = msg)
+	}
+
+	def getSamlResponse(formData: FormData): Option[String] = formData.fields
+		.collect{case ("SAMLResponse", resp) => resp}.headOption
+
+	def getAuthenticatingRequestUrl(idpUrl: String, targetUrl: Option[String]): String = {
+		import Constants._
+		targetUrl match{
+			case None => Saml.getAuthUrl(idpUrl, consumerServiceUrl, spUrl)
+			case Some(url) => Saml.getAuthUrl(idpUrl, consumerServiceUrl, spUrl, url)
+		}
+
+	}
+
 }
 
 

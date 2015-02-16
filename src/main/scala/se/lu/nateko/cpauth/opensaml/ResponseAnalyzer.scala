@@ -3,7 +3,7 @@ package se.lu.nateko.cpauth.opensaml
 import java.io.InputStream
 import java.io.StringReader
 import java.security.interfaces.RSAPrivateKey
-import scala.collection.JavaConverters.asScalaBufferConverter
+import scala.collection.JavaConverters._
 import org.opensaml.saml2.core.Assertion
 import org.opensaml.saml2.core.EncryptedAssertion
 import org.opensaml.saml2.core.Response
@@ -16,8 +16,9 @@ import se.lu.nateko.cpauth.core.Config
 import se.lu.nateko.cpauth.core.CoreUtils
 import se.lu.nateko.cpauth.core.Crypto
 import scala.util.Try
+import java.net.URI
 
-class ResponseAnalyzer(key: RSAPrivateKey){
+class ResponseAnalyzer(key: RSAPrivateKey, idpLib: IdpLibrary){
 	import ResponseAnalyzer._
 
 	lazy val decrypter: AssertionDecrypter = {
@@ -30,11 +31,20 @@ class ResponseAnalyzer(key: RSAPrivateKey){
 		decrypter.decrypt
 	}
 
-	def extractAssertions(response: Response): Seq[Assertion] = {
+	def extractAssertions(response: Response): Try[Seq[Assertion]] = {
 		val decryptedAssertions = response.getEncryptedAssertions.asScala.map(decrypter)
 		val unencryptedAssertions = response.getAssertions.asScala
-		unencryptedAssertions ++ decryptedAssertions
+		val unvalidated = unencryptedAssertions ++ decryptedAssertions
+		
+		getAssertionValidator(response).map{
+			validator => unvalidated.filter(ass => validator.getValidationError(ass).isEmpty)
+		}
 	}
+	
+	private def getAssertionValidator(response: Response): Try[AssertionValidator] = for {
+		idpId <- Try(new URI(response.getIssuer.getValue));
+		idpProp <- idpLib.getIdpProps(idpId)
+	} yield new AssertionValidator(idpProp.key)
 
 }
 
@@ -59,12 +69,12 @@ object ResponseAnalyzer {
 			.mapValues(nameValuePairs => nameValuePairs.map{case (name, value) => value})
 	}
 
-	def apply(conf: Config): Try[ResponseAnalyzer] = fromPrivateKeyAt(conf.privateKeyPath)
+	def apply(conf: Config): Try[ResponseAnalyzer] = fromPrivateKeyAt(conf.privateKeyPath, IdpLibrary.fromConfig(conf))
 
-	def fromPrivateKeyAt(path: String): Try[ResponseAnalyzer] = {
+	def fromPrivateKeyAt(path: String, idpLib: IdpLibrary): Try[ResponseAnalyzer] = {
 		val keyBytes = CoreUtils.getResourceBytes(path)
 		val privateKey = Crypto.rsaPrivateFromDerBytes(keyBytes)
-		privateKey.map(new ResponseAnalyzer(_))
+		privateKey.map(key => new ResponseAnalyzer(key, idpLib))
 	}
 
 }
