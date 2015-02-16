@@ -1,5 +1,7 @@
 #!/bin/bash
 
+cd "$(dirname "$0")"
+
 host="fsicos.lunarc.lu.se"
 deployPath="/disk/data/cpauth/"
 
