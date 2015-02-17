@@ -16,7 +16,39 @@ function ready(fn) {
   }
 }
 
+function callAjax(url, callback){
+	var request = new XMLHttpRequest();
+	request.open('GET', url, true);
+
+	request.onload = function() {
+		if (this.status >= 200 && this.status < 400) {
+			var data = JSON.parse(this.response);
+			callback(data);
+		} else {
+		 // We reached our target server, but it returned an error
+		}
+	};
+
+	request.onerror = function() {
+	  // There was a connection error of some sort
+	};
+
+	request.send();
+}
+
+function idpOptions(idpInfos){
+	var option = _.template('<option value="<%= id %>"><%= name %></option>');
+	return _.map(idpInfos, option).join('\n');
+}
+
 ready(function(){
+
+	callAjax('/saml/idps', function(idpInfos){
+		var optionsHtml = idpOptions(idpInfos);
+		var idpSelect = document.getElementById('GET-idpUrl');
+		idpSelect.innerHTML = optionsHtml;
+	});
+
 	var targetUrl = getJsonFromUrl().targetUrl;
 	
 	if(targetUrl){

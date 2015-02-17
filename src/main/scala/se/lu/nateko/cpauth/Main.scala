@@ -1,28 +1,33 @@
 package se.lu.nateko.cpauth
 
-import scala.concurrent.ExecutionContext.Implicits.global
+import java.net.URI
+import java.net.URL
+
 import scala.concurrent.duration.DurationInt
+import scala.util.Failure
+import scala.util.Success
+
+import org.opensaml.saml2.core.Response
+
 import akka.actor.ActorSystem
 import akka.util.Timeout
-import spray.routing.SimpleRoutingApp
-import spray.http._
-import spray.json.DefaultJsonProtocol
-import spray.httpx.SprayJsonSupport
-import spray.routing.HttpService._
-import core.CoreUtils
 import core.Constants
-import se.lu.nateko.cpauth.opensaml.ResponseAnalyzer
-import org.opensaml.saml2.core.Response
-import se.lu.nateko.cpauth.opensaml.Parser
+import core.Constants.consumerServiceUrl
+import core.Constants.spUrl
+import core.CoreUtils
+import se.lu.nateko.cpauth.CpauthJsonProtocol._
 import se.lu.nateko.cpauth.opensaml.IdpLibrary
-import se.lu.nateko.cpauth.opensaml.IdpInfo
+import se.lu.nateko.cpauth.opensaml.Parser
+import se.lu.nateko.cpauth.opensaml.ResponseAnalyzer
+import spray.http.ContentType
+import spray.http.FormData
+import spray.http.HttpEntity
+import spray.http.HttpResponse
+import spray.http.MediaTypes
+import spray.http.StatusCodes
+import spray.http.Uri.apply
+import spray.routing.SimpleRoutingApp
 
-
-object CpauthJsonProtocol extends DefaultJsonProtocol with SprayJsonSupport{
-	implicit val idpInfoFormat = jsonFormat2(IdpInfo)
-}
-
-import CpauthJsonProtocol._
 
 object Main extends App with SimpleRoutingApp with ProxyDirectives {
 
@@ -40,7 +45,12 @@ object Main extends App with SimpleRoutingApp with ProxyDirectives {
 		get{
 			path("saml" / "login") {
 				parameter('idpUrl, 'targetUrl ?){ (idp, target) =>
-					redirect(getAuthenticatingRequestUrl(idp, target), StatusCodes.Found)
+					idpLib.getIdpProps(new URI(idp)) match{
+						case Success(idpProp) =>
+							redirect(getAuthenticatingRequestUrl(idpProp.ssoRedirect, target), StatusCodes.Found)
+						case Failure(err) => completeWithError(err.getMessage)
+					}
+					
 				} ~
 				completeWithError("Identity provider has not been specified!")
 			} ~
@@ -53,7 +63,9 @@ object Main extends App with SimpleRoutingApp with ProxyDirectives {
 			} ~
 			path("saml" / "idps"){
 				val infos = idpLib.getInfos.toSeq.sortBy(_.name)
-				complete(infos)
+				//respondWithHeader(RawHeader("Access-Control-Allow-Origin", "*")) {
+					complete(infos)
+				//}
 			}
 		} ~
 		post{
@@ -79,7 +91,7 @@ object Main extends App with SimpleRoutingApp with ProxyDirectives {
 	def getSamlResponse(formData: FormData): Option[String] = formData.fields
 		.collect{case ("SAMLResponse", resp) => resp}.headOption
 
-	def getAuthenticatingRequestUrl(idpUrl: String, targetUrl: Option[String]): String = {
+	def getAuthenticatingRequestUrl(idpUrl: URL, targetUrl: Option[String]): String = {
 		import Constants._
 		targetUrl match{
 			case None => Saml.getAuthUrl(idpUrl, consumerServiceUrl, spUrl)

@@ -4,15 +4,14 @@ import java.net.URLEncoder
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.UUID
-
 import scala.xml.Elem
-
 import se.lu.nateko.cpauth.core.CoreUtils
+import java.net.URL
 
 object Saml {
 
 
-	def getAuthUrl(idpHttpRedirectUrl: String, httpPostConsumerUrl: String, serviceProviderUrl: String): String = {
+	def getAuthUrl(idpHttpRedirectUrl: URL, httpPostConsumerUrl: String, serviceProviderUrl: String): String = {
 
 		val reqXml = authRequestXml(httpPostConsumerUrl, serviceProviderUrl)
 
@@ -23,7 +22,7 @@ object Saml {
 		idpHttpRedirectUrl +"?SAMLRequest=" + URLEncoder.encode(authRequestBase64, "UTF-8")
 	}
 	
-	def getAuthUrl(idpHttpRedirectUrl: String, httpPostConsumerUrl: String,
+	def getAuthUrl(idpHttpRedirectUrl: URL, httpPostConsumerUrl: String,
 					serviceProviderUrl: String, relayState: String): String = {
 		
 		val relStateEncoded = URLEncoder.encode(relayState, "UTF-8")
