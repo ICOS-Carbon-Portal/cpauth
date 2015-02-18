@@ -38,6 +38,12 @@ object Utils {
 
 	def setRootLoggingLevelToInfo(): Unit = setRootLoggingLevel(Level.INFO)
 
+	def disableLogging(): () => Unit = {
+		val originalLevel = getRootLoggingLevel
+		setRootLoggingLevel(Level.OFF)
+		() => setRootLoggingLevel(originalLevel)
+	}
+
 	def getRootLoggingLevel: Level =
 		LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME)
 			.asInstanceOf[Logger]

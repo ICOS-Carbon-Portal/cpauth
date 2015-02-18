@@ -44,8 +44,12 @@ object IdpLibrary {
 
 	def fromConfig(config: Config): IdpLibrary = {
 		val idpMetaStream = getClass.getResourceAsStream(config.idpMetadataFilePath)
+		fromMetaStream(idpMetaStream)
+	}
 
-		val entsDescr = Parser.fromStream[EntitiesDescriptor](idpMetaStream)
+	def fromMetaStream(metadata: java.io.InputStream): IdpLibrary = {
+
+		val entsDescr = Parser.fromStream[EntitiesDescriptor](metadata)
 		val entDescrs = entsDescr.getEntityDescriptors.toSafeIterable
 
 		val urisToProps: Iterable[(URI, IdpProps)] = entDescrs.map(ed => {
@@ -68,12 +72,14 @@ object IdpLibrary {
 		}
 	}
 
-	private def idpToPublicKey(idp: IDPSSODescriptor): Try[PublicKey] = Try{
-		def keyDescr = idp.getKeyDescriptors.get(0)
-
-		def cert = keyDescr.getKeyInfo.getX509Datas.get(0).getX509Certificates.get(0).getValue
-		Crypto.publicKeyFromX509Cert(cert)
-	}
+	private def idpToPublicKey(idp: IDPSSODescriptor): Try[PublicKey] = for(
+		cert <- idpToCertInBase64(idp);
+		key <- Crypto.publicKeyFromX509Cert(cert)
+	) yield key
+	
+	private def idpToCertInBase64(idp: IDPSSODescriptor): Try[String] = Try(
+		idp.getKeyDescriptors.get(0).getKeyInfo.getX509Datas.get(0).getX509Certificates.get(0).getValue
+	)
 	
 	private def idpToSsoRedirect(idp: IDPSSODescriptor): Try[URL] = Try{
 		val redirectSss = idp.getSingleSignOnServices.toSafeIterable.find{

@@ -18,7 +18,7 @@ import core.CoreUtils
 import se.lu.nateko.cpauth.CpauthJsonProtocol._
 import se.lu.nateko.cpauth.opensaml.IdpLibrary
 import se.lu.nateko.cpauth.opensaml.Parser
-import se.lu.nateko.cpauth.opensaml.ResponseAnalyzer
+import se.lu.nateko.cpauth.opensaml.AssertionExtractor
 import spray.http.ContentType
 import spray.http.FormData
 import spray.http.HttpEntity
@@ -35,7 +35,7 @@ object Main extends App with SimpleRoutingApp with ProxyDirectives {
 	implicit val timeout: Timeout = Timeout(60.seconds)
 	import system.dispatcher
 
-	val analyzer = ResponseAnalyzer(Constants)
+	val assExtractor = AssertionExtractor(Constants)
 	val idpLib: IdpLibrary = IdpLibrary.fromConfig(Constants)
 	
 	startServer(interface = "::0", port = 8080) {
@@ -75,7 +75,7 @@ object Main extends App with SimpleRoutingApp with ProxyDirectives {
 						case None => completeWithError("No SAMLResponse received")
 						case Some(resp) =>
 							val response = Parser.fromBase64[Response](resp)
-							complete(Playground.getResponseSummary(response, analyzer.get))
+							complete(Playground.getResponseSummary(response, assExtractor.get, idpLib))
 							//complete(CoreUtils.decode64(resp))
 					}
 				}

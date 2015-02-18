@@ -20,7 +20,7 @@ class Signature(val base64: String) extends AnyVal
 
 object Crypto{
 
-	def publicKeyFromX509Cert(base64: String): PublicKey = {
+	def publicKeyFromX509Cert(base64: String): Try[PublicKey] = Try{
 		val cf = CertificateFactory.getInstance("X.509")
 		val certBytes: Array[Byte] = Base64.decodeBase64(base64)
 		val certInputStream = new ByteArrayInputStream(certBytes)

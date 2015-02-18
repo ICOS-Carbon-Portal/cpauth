@@ -7,6 +7,8 @@ import javax.xml.crypto.dsig.XMLSignatureFactory
 
 object SignatureValidator {
 
+	private[this] val fac: XMLSignatureFactory = XMLSignatureFactory.getInstance("DOM")
+
 	/**
 	 * Validates an http://www.w3.org/2000/09/xmldsig# enveloped signature against
 	 * an explicitly provided public key, instead of relying on the key info specified in the signature.
@@ -17,13 +19,11 @@ object SignatureValidator {
 		val nodeList = signedElem.getElementsByTagNameNS(XMLSignature.XMLNS, "Signature")
 
 		if (nodeList.getLength == 0) 
-			Some("No XML digital dignature found!")
+			Some("No XML digital signature found!")
 		else try{
 
 			val valContext = new DOMValidateContext(pubKey, nodeList.item(0))
 			valContext.setIdAttributeNS(signedElem, null, "ID")
-
-			val fac = XMLSignatureFactory.getInstance("DOM")
 
 			val signature: XMLSignature = fac.unmarshalXMLSignature(valContext)
 

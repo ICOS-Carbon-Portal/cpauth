@@ -8,10 +8,12 @@ import org.w3c.dom.Document
 import java.io.StringReader
 import java.io.InputStream
 import org.opensaml.xml.XMLObject
+import se.lu.nateko.cpauth.Utils
 
 object Parser {
 	
 	OpenSamlUtils.bootstrapOpenSaml()
+	Utils.setRootLoggingLevelToInfo()
 
 	private[this] val parserPool: ParserPool = {
 		val parserPool = new StaticBasicParserPool()
