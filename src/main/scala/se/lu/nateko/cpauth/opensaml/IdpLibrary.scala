@@ -13,7 +13,7 @@ import org.opensaml.saml2.metadata.IDPSSODescriptor
 import org.opensaml.saml2.metadata.provider.MetadataProviderException
 import org.opensaml.samlext.saml2mdui.UIInfo
 import se.lu.nateko.cpauth.Utils.SafeJavaCollectionWrapper
-import se.lu.nateko.cpauth.core.Config
+import se.lu.nateko.cpauth.core.SamlConfig
 import se.lu.nateko.cpauth.core.Crypto
 import se.lu.nateko.cpauth.Utils
 
@@ -42,7 +42,7 @@ object IdpLibrary {
 	Utils.setRootLoggingLevelToInfo()
 
 
-	def fromConfig(config: Config): IdpLibrary = {
+	def fromConfig(config: SamlConfig): IdpLibrary = {
 		val idpMetaStream = getClass.getResourceAsStream(config.idpMetadataFilePath)
 		fromMetaStream(idpMetaStream)
 	}

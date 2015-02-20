@@ -1,16 +1,17 @@
 package se.lu.nateko.cpauth
 
 import spray.http.HttpCookie
+import se.lu.nateko.cpauth.core.UrlsConfig
 
-class CookieSetter {
+class CookieSetter(config: UrlsConfig) {
 
-	val cookie = HttpCookie(
-		name = "testcookie",
-		content = "success",
-//		secure = true,
-		domain = Some(".icos-cp.eu"),
-		path = Some("/"),
-//		maxAge = Some(10.minutes.toSeconds)
-		httpOnly = true
+	def getLastIdpCookie(idpId: String): HttpCookie = HttpCookie(
+		name = "lastChosenIdp",
+		content = idpId,
+		secure = false,
+		domain = Some(config.serviceHost),
+		path = Some(config.loginPath),
+		httpOnly = false, //needs to be accessed by Javascript on the client
+		expires = None
 	)
 }

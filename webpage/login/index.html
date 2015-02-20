@@ -34,14 +34,14 @@
 				    <legend>Username and password login</legend>
 				    <p>
 						<label for="POST-username">Username:</label>
-						<input id="POST-username" type="text" name="username">
+						<input id="POST-username" type="text" name="username" disabled>
 				    </p>
 				    <p>
 						<label for="POST-password">Password:</label>
-						<input id="POST-password" type="password" name="password">
+						<input id="POST-password" type="password" name="password" disabled>
 				    </p>
 					<input class="targetUrlRelay" type="hidden" name="targetUrl">
-				    <p> <input type="submit" value="Login!"> </p>
+				    <p> <input type="submit" value="Login!" disabled> </p>
 				 </fieldset>
 			</form>
 			
@@ -49,6 +49,8 @@
 	</body>
 
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.7.0/underscore-min.js"></script>
+	<script src="https://static.icos-cp.eu/constant/cookies.js/1.2.1/cookies.min.js"></script>
+
 	<script src="login.js"></script>
 	
 </html>

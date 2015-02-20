@@ -14,7 +14,7 @@ import org.opensaml.xml.security.keyinfo.StaticKeyInfoCredentialResolver
 import org.opensaml.xml.security.x509.BasicX509Credential
 
 import se.lu.nateko.cpauth.Utils.SafeJavaCollectionWrapper
-import se.lu.nateko.cpauth.core.Config
+import se.lu.nateko.cpauth.core.SamlConfig
 import se.lu.nateko.cpauth.core.CoreUtils
 import se.lu.nateko.cpauth.core.Crypto
 
@@ -45,7 +45,7 @@ object AssertionExtractor {
 
 	OpenSamlUtils.bootstrapOpenSaml()
 
-	def apply(conf: Config): Try[AssertionExtractor] = fromPrivateKeyAt(conf.privateKeyPath)
+	def apply(conf: SamlConfig): Try[AssertionExtractor] = fromPrivateKeyAt(conf.privateKeyPath)
 
 	def fromPrivateKeyAt(path: String): Try[AssertionExtractor] = {
 		val keyBytes = CoreUtils.getResourceBytes(path)

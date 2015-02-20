@@ -37,8 +37,17 @@ function callAjax(url, callback){
 }
 
 function idpOptions(idpInfos){
-	var option = _.template('<option value="<%= id %>"><%= name %></option>');
-	return _.map(idpInfos, option).join('\n');
+	var lastIdp = Cookies.get('lastChosenIdp');
+
+	function withSelected(idpInfo){
+		return _.extend({selected: idpInfo.id == lastIdp ? "selected" : ""}, idpInfo);
+	}
+
+	var template = _.template('<option value="<%= id %>" <%= selected %> ><%= name %></option>');
+
+	var optionFun = _.compose(template, withSelected);
+
+	return _.map(idpInfos, optionFun).join('\n');
 }
 
 ready(function(){
