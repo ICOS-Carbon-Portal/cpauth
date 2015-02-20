@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<saml2p:Response xmlns:saml2p="urn:oasis:names:tc:SAML:2.0:protocol" Destination="https://cpauth.icos-cp.eu/saml/SAML2/POST" ID="_44f364654bf0332c08069b44e09a46d6" InResponseTo="_fb0f5e0e-bf06-49bd-bc44-e78017a19e64" IssueInstant="2015-02-17T22:22:12.396Z" Version="2.0">
+
+<saml2:Issuer xmlns:saml2="urn:oasis:names:tc:SAML:2.0:assertion" Format="urn:oasis:names:tc:SAML:2.0:nameid-format:entity">https://shibboleth.antagning.se/shibboleth-idp</saml2:Issuer>
+
+<saml2p:Status>
+
+	<saml2p:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Responder">
+		<saml2p:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:InvalidNameIDPolicy"/>
+	</saml2p:StatusCode>
+
+	<saml2p:StatusMessage>Required NameID format not supported</saml2p:StatusMessage>
+
+</saml2p:Status>
+
+</saml2p:Response>

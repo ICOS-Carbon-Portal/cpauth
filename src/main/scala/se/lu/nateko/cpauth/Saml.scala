@@ -7,6 +7,7 @@ import java.util.UUID
 import scala.xml.Elem
 import se.lu.nateko.cpauth.core.CoreUtils
 import java.net.URL
+import org.opensaml.saml2.core.NameIDType
 
 object Saml {
 
@@ -44,7 +45,7 @@ object Saml {
 
 			<saml:Issuer xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">{serviceProviderUrl}</saml:Issuer>
 
-			<samlp:NameIDPolicy Format="urn:oasis:names:tc:SAML:2.0:nameid-format:transient" AllowCreate="true"/>
+			<samlp:NameIDPolicy Format={NameIDType.UNSPECIFIED} AllowCreate="true"/>
 
 			<samlp:RequestedAuthnContext Comparison="exact">
 				<saml:AuthnContextClassRef xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">

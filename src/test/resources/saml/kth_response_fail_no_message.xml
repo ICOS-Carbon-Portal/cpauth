@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<saml2p:Response xmlns:saml2p="urn:oasis:names:tc:SAML:2.0:protocol"
+						Destination="https://cpauth.icos-cp.eu/saml/SAML2/POST"
+						ID="_3610bf3673da029c614dc8653e017c0f" InResponseTo="_e83ce8be-45b6-403f-9a4c-7834a3886662"
+						IssueInstant="2015-02-20T15:21:47.046Z" Version="2.0">
+	<saml2:Issuer xmlns:saml2="urn:oasis:names:tc:SAML:2.0:assertion"
+					Format="urn:oasis:names:tc:SAML:2.0:nameid-format:entity">https://saml.sys.kth.se/idp/shibboleth</saml2:Issuer>
+	<saml2p:Status>
+
+		<saml2p:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Responder">
+
+			<saml2p:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:AuthnFailed"/>
+
+		</saml2p:StatusCode>
+
+	</saml2p:Status>
+
+</saml2p:Response>

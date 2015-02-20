@@ -23,6 +23,11 @@ object CoreUtils {
 		Source.fromInputStream(stream, "UTF-8").getLines
 	}
 
+	def getResourceAsString(resourcePath: String): String = {
+		val stream = getClass.getResourceAsStream(resourcePath)
+		IOUtils.toString(stream, StandardCharsets.UTF_8)
+	}
+
 	def compressAndBase64(s: String): String = {
 
 		val utf8 = java.nio.charset.StandardCharsets.UTF_8

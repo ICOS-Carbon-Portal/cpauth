@@ -12,16 +12,20 @@ import se.lu.nateko.cpauth.opensaml.StatementExtractor
 import org.opensaml.saml2.core.Assertion
 import se.lu.nateko.cpauth.opensaml.Parser
 import se.lu.nateko.cpauth.core.CoreUtils
+import se.lu.nateko.cpauth.opensaml.ResponseStatusController
 
 object Playground {
 
 	Utils.setRootLoggingLevelToInfo()
 
-	def getResponseSummary(response: Response, extractor: AssertionExtractor, idpLib: IdpLibrary): Try[String] = 
-		AssertionValidator(response, idpLib).map(validator => 
+	def getResponseSummary(response: Response, extractorTry: Try[AssertionExtractor], idpLib: IdpLibrary): Try[String] = for(
+		goodResponse <- ResponseStatusController.ensureSuccess(response);
+		validator <-AssertionValidator(response, idpLib);
+		extractor <- extractorTry
+	) yield {
 			extractor.extractAssertions(response).map(validator.validate)
 				.flatMap(getAssertionSummary).toSeq.sortBy(s => s).mkString("\n")
-		)
+	}
 
 	private def getAssertionSummary(validated: ValidatedAssertion): Iterable[String] = {
 		val validityInfo = validated.error match{
@@ -33,13 +37,6 @@ object Playground {
 		}
 	}
 
-
-//	def getAssertions: Iterable[Assertion] = {
-//		val responseBase64 = CoreUtils.getResourceLines("/shib_net_lu_se_response.txt").mkString("")
-//		val response = Parser.fromBase64[Response](responseBase64)
-//		val assExtractor = AssertionExtractor(Constants).get
-//		assExtractor.extractAssertions(response)
-//	}
 
 	def produceXmlSignature(projRootPath: String): Unit = {
 		val resPath = projRootPath + "/src/main/resources"

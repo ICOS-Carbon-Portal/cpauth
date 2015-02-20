@@ -35,7 +35,7 @@ object Main extends App with SimpleRoutingApp with ProxyDirectives {
 	implicit val timeout: Timeout = Timeout(60.seconds)
 	import system.dispatcher
 
-	val assExtractor = AssertionExtractor(Constants)
+	val assExtractorTry = AssertionExtractor(Constants)
 	val idpLib: IdpLibrary = IdpLibrary.fromConfig(Constants)
 	
 	startServer(interface = "::0", port = 8080) {
@@ -55,7 +55,7 @@ object Main extends App with SimpleRoutingApp with ProxyDirectives {
 				completeWithError("Identity provider has not been specified!")
 			} ~
 			path("saml" / "cpauth"){
-				val metadataXmlStr: String = CoreUtils.getResourceLines(Constants.samlSpXmlPath).mkString("")
+				val metadataXmlStr: String = CoreUtils.getResourceAsString(Constants.samlSpXmlPath)
 				val xmlType = ContentType(MediaTypes.`application/xml`)
 				val metadataXmlEntity = HttpEntity(xmlType, metadataXmlStr)
 
@@ -75,7 +75,7 @@ object Main extends App with SimpleRoutingApp with ProxyDirectives {
 						case None => completeWithError("No SAMLResponse received")
 						case Some(resp) =>
 							val response = Parser.fromBase64[Response](resp)
-							complete(Playground.getResponseSummary(response, assExtractor.get, idpLib))
+							complete(Playground.getResponseSummary(response, assExtractorTry, idpLib))
 							//complete(CoreUtils.decode64(resp))
 					}
 				}
