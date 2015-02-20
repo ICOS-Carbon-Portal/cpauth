@@ -3,7 +3,7 @@
 cd "$(dirname "$0")"
 
 host="fsicos.lunarc.lu.se"
-deployPath="/disk/data/cpauth/"
+deployPath="/usr/share/cpauth/"
 
 if [[ -n "$1" ]]; then host="$1@$host"; fi # prepending user name if specified
 
