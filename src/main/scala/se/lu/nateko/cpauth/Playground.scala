@@ -4,7 +4,6 @@ import org.opensaml.saml2.core.Response
 import se.lu.nateko.cpauth.opensaml.AssertionValidator
 import se.lu.nateko.cpauth.opensaml.AssertionExtractor
 import se.lu.nateko.cpauth.opensaml.AssertionExtractor._
-import se.lu.nateko.cpauth.core.Constants
 import scala.util.Try
 import se.lu.nateko.cpauth.opensaml.IdpLibrary
 import se.lu.nateko.cpauth.opensaml.ValidatedAssertion

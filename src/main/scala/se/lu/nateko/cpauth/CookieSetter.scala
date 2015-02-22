@@ -12,6 +12,8 @@ class CookieSetter(config: UrlsConfig) {
 		domain = Some(config.serviceHost),
 		path = Some(config.loginPath),
 		httpOnly = false, //needs to be accessed by Javascript on the client
-		expires = None
+		maxAge = Some(31536000)
 	)
+
+	
 }

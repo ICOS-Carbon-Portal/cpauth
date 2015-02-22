@@ -15,17 +15,20 @@ object CoreUtils {
 
 	def getResourceBytes(resourcePath: String): Array[Byte] = {
 		val stream = getClass.getResourceAsStream(resourcePath)
-		IOUtils.toByteArray(stream)
+		if(stream == null) Array()
+		else IOUtils.toByteArray(stream)
 	}
 
 	def getResourceLines(resourcePath: String): Iterator[String] = {
 		val stream = getClass.getResourceAsStream(resourcePath)
-		Source.fromInputStream(stream, "UTF-8").getLines
+		if(stream == null) Iterator()
+		else Source.fromInputStream(stream, "UTF-8").getLines
 	}
 
 	def getResourceAsString(resourcePath: String): String = {
 		val stream = getClass.getResourceAsStream(resourcePath)
-		IOUtils.toString(stream, StandardCharsets.UTF_8)
+		if(stream == null) ""
+		else IOUtils.toString(stream, StandardCharsets.UTF_8)
 	}
 
 	def compressAndBase64(s: String): String = {

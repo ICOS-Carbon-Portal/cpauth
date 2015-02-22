@@ -30,7 +30,7 @@ object Main extends App with SimpleRoutingApp with ProxyDirectives {
 	implicit val timeout: Timeout = Timeout(60.seconds)
 	import system.dispatcher
 
-	val config: Config = se.lu.nateko.cpauth.core.Constants
+	val config: Config = Constants
 	val assExtractorTry = AssertionExtractor(config)
 	val idpLib: IdpLibrary = IdpLibrary.fromConfig(config)
 	val cookieSetter = new CookieSetter(config)

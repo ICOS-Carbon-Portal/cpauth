@@ -48,7 +48,7 @@ object Crypto{
 		new Signature(signString)
 	}
 	
-	def verifySignature(msg: String, key: RSAPublicKey, signature: Signature): Boolean = {
+	def verifySignature(msg: String, key: RSAPublicKey, signature: Signature): Try[Boolean] = Try{
 		val signer = getSigner
 		signer.initVerify(key)
 		signer.update(getMessageBytes(msg))
@@ -64,7 +64,7 @@ object Crypto{
 		val prologue = s"-----BEGIN $keyType KEY-----"
 		val epilogue = s"-----END $keyType KEY-----"
 
-		if(lines.size > 2 &&	lines.head == prologue &&	lines.last == epilogue){
+		if(lines.size > 2 && lines.head == prologue && lines.last == epilogue){
 			
 			val encoded = lines.tail.take(lines.size - 2).mkString("") 
 			Try(Base64.decodeBase64(encoded))
