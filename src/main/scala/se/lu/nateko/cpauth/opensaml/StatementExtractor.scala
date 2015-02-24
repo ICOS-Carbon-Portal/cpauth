@@ -28,8 +28,10 @@ class AllStatements(nameValues: Map[String, Seq[String]]){
 
 object StatementExtractor {
 
-	def extractAttributeStringValues(assertions: Iterable[Assertion]): AllStatements = {
-		val nameValues = assertions.flatMap(extractAttributeStringValues)
+	def extractAttributeStringValues(assertions: Iterable[ValidatedAssertion]): AllStatements = {
+		val nameValues = assertions.collect{
+			case ValidatedAssertion(validated, None) => validated
+		}.flatMap(extractAttributeStringValues)
 			.groupBy{case (name, value) => name}
 			.mapValues(nameValuePairs => nameValuePairs.map{case (name, value) => value}.toSeq)
 

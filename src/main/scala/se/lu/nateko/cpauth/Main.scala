@@ -33,7 +33,7 @@ object Main extends App with SimpleRoutingApp with ProxyDirectives {
 	val config: Config = Constants
 	val assExtractorTry = AssertionExtractor(config)
 	val idpLib: IdpLibrary = IdpLibrary.fromConfig(config)
-	val cookieSetter = new CookieSetter(config)
+	val cookieSetter = new CookieFactory(config)
 
 	startServer(interface = "::0", port = 8080) {
 		get{

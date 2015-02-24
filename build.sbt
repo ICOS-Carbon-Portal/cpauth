@@ -39,7 +39,7 @@ scalacOptions ++= Seq(
 fork := true
 
 initialCommands in console := """
-import se.lu.nateko.cpauth.core.Constants
+import se.lu.nateko.cpauth.Constants
 import se.lu.nateko.cpauth.opensaml._
 """
 

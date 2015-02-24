@@ -19,10 +19,10 @@ object Playground {
 
 	def getResponseSummary(response: Response, extractorTry: Try[AssertionExtractor], idpLib: IdpLibrary): Try[String] = for(
 		goodResponse <- ResponseStatusController.ensureSuccess(response);
-		validator <-AssertionValidator(response, idpLib);
+		validator <- AssertionValidator(goodResponse, idpLib);
 		extractor <- extractorTry
 	) yield {
-			extractor.extractAssertions(response).map(validator.validate)
+			extractor.extractAssertions(goodResponse).map(validator.validate)
 				.flatMap(getAssertionSummary).toSeq.sortBy(s => s).mkString("\n")
 	}
 

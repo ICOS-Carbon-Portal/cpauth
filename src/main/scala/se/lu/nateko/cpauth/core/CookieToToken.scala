@@ -12,14 +12,14 @@ object CookieToToken extends DefaultJsonProtocol {
 	implicit val tokenFormat = jsonFormat2(AuthToken)
 	implicit val signedTokenFormat = jsonFormat2(SignedToken)
 
-	def getToken(cookie: HttpCookie): Try[SignedToken] = Try{
+	def recoverToken(cookie: HttpCookie): Try[SignedToken] = Try{
 		val base64 = cookie.content
 		val jsonBytes = Base64.decodeBase64(base64)
 		val json = new String(jsonBytes, StandardCharsets.UTF_8)
 		json.parseJson.convertTo[SignedToken]
 	}
 
-	def getCookieContent(token: SignedToken): String = {
+	def constructCookieContent(token: SignedToken): String = {
 		val json = token.toJson.compactPrint
 		val jsonBytes = json.getBytes(StandardCharsets.UTF_8)
 		Base64.encodeBase64URLSafeString(jsonBytes)
