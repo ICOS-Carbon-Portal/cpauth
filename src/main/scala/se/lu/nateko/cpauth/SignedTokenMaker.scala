@@ -26,7 +26,7 @@ object SignedTokenMaker {
 		val keyBytes = CoreUtils.getResourceBytes(config.privateKeyPath)
 		for(
 			key <- Crypto.rsaPrivateFromDerBytes(keyBytes)
-		) yield new SignedTokenMaker(key, config.validitySeconds)
+		) yield new SignedTokenMaker(key, config.authTokenValiditySeconds)
 	}
 
 }

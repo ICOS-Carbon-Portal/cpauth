@@ -12,7 +12,7 @@ class AuthenticationTest extends FunSuite{
 	test("Properly formed fresh token validates successfully"){
 
 		val token = SignedTokenMaker(new PrivateAuthConfig{
-			val validitySeconds = 10
+			val authTokenValiditySeconds = 10
 			val privateKeyPath = "/private1.der"
 		}).get.makeToken(user)
 		
@@ -26,7 +26,7 @@ class AuthenticationTest extends FunSuite{
 
 	test("Expired token is rejected"){
 		val token = SignedTokenMaker(new PrivateAuthConfig{
-			val validitySeconds = -1
+			val authTokenValiditySeconds = -1
 			val privateKeyPath = "/private1.der"
 		}).get.makeToken(user)
 		
@@ -43,7 +43,7 @@ class AuthenticationTest extends FunSuite{
 	test("Token signed with a wrong key fails to authenticate"){
 
 		val tokenMaker = SignedTokenMaker(new PrivateAuthConfig{
-			val validitySeconds: Int = 10
+			val authTokenValiditySeconds: Int = 10
 			val privateKeyPath: String = "/saml/test_private_key.der"
 		}).get
 

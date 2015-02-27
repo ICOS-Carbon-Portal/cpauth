@@ -8,10 +8,14 @@ import java.util.zip.Deflater
 import java.util.zip.DeflaterOutputStream
 import java.io.InputStream
 import java.nio.charset.StandardCharsets
+import java.util.zip.Inflater
+import java.util.zip.InflaterOutputStream
 
 object CoreUtils {
 
-	def decode64(in: String) = new String(Base64.decodeBase64(in), "UTF-8")
+	private[this] val utf8 = java.nio.charset.StandardCharsets.UTF_8
+
+	def decode64(in: String) = new String(Base64.decodeBase64(in), utf8)
 
 	def getResourceBytes(resourcePath: String): Array[Byte] = {
 		val stream = getClass.getResourceAsStream(resourcePath)
@@ -22,30 +26,40 @@ object CoreUtils {
 	def getResourceLines(resourcePath: String): Iterator[String] = {
 		val stream = getClass.getResourceAsStream(resourcePath)
 		if(stream == null) Iterator()
-		else Source.fromInputStream(stream, "UTF-8").getLines
+		else Source.fromInputStream(stream, utf8.displayName).getLines
 	}
 
 	def getResourceAsString(resourcePath: String): String = {
 		val stream = getClass.getResourceAsStream(resourcePath)
 		if(stream == null) ""
-		else IOUtils.toString(stream, StandardCharsets.UTF_8)
+		else IOUtils.toString(stream, utf8)
 	}
 
-	def compressAndBase64(s: String): String = {
+	def compressAndBase64(s: String): String = compressAndBase64(s, false)
 
-		val utf8 = java.nio.charset.StandardCharsets.UTF_8
+	def compressAndBase64(s: String, hard: Boolean): String = {
+		val level = if(hard) Deflater.BEST_COMPRESSION else Deflater.DEFAULT_COMPRESSION
+		val deflater = new Deflater(level, true);
+		val byteStream = new ByteArrayOutputStream()
 
-		val byteStream = new ByteArrayOutputStream();
-		val deflater = new Deflater(Deflater.DEFAULT_COMPRESSION, true);
-
-		val defstr = new DeflaterOutputStream(byteStream, deflater);
+		val defstr = new DeflaterOutputStream(byteStream, deflater)
 		defstr.write(s.getBytes(utf8))
 		defstr.close()
 		byteStream.close()
 
-		val res = new String(new Base64().encode(byteStream.toByteArray), utf8);
+		new String(new Base64().encode(byteStream.toByteArray), utf8)
+	}
 
-		res.trim
+	def decompressFromBase64(s: String): String = {
+		val compressedBytes: Array[Byte] = Base64.decodeBase64(s)
+
+		val byteStream = new ByteArrayOutputStream()
+
+		val inflStream = new InflaterOutputStream(byteStream, new Inflater(true))
+		inflStream.write(compressedBytes)
+		inflStream.close()
+
+		new String(byteStream.toByteArray, utf8)
 	}
 
 }

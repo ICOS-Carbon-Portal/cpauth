@@ -20,13 +20,17 @@ trait SamlConfig{
 }
 
 trait PrivateAuthConfig{
-	def validitySeconds: Int
+	def authTokenValiditySeconds: Int
 	def privateKeyPath: String
 }
 
 trait PublicAuthConfig{
 	def publicKeyPath: String
+	val authCookieName = "cpauthToken"
+	val idpCookieName = "lastChosenIdp"
 }
 
-trait Config extends UrlsConfig with SamlConfig with PrivateAuthConfig with PublicAuthConfig
+trait AuthConfig extends PrivateAuthConfig with PublicAuthConfig
+
+trait Config extends UrlsConfig with SamlConfig with AuthConfig
 

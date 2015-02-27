@@ -1,11 +1,9 @@
 package se.lu.nateko.cpauth
 
 import scala.util.Try
-
 import org.opensaml.saml2.core.Response
-
 import se.lu.nateko.cpauth.core.CookieToToken
-import se.lu.nateko.cpauth.core.PrivateAuthConfig
+import se.lu.nateko.cpauth.core.AuthConfig
 import se.lu.nateko.cpauth.core.SamlConfig
 import se.lu.nateko.cpauth.core.UrlsConfig
 import se.lu.nateko.cpauth.core.UserInfo
@@ -17,12 +15,12 @@ import se.lu.nateko.cpauth.opensaml.ResponseStatusController
 import se.lu.nateko.cpauth.opensaml.StatementExtractor
 import spray.http.HttpCookie
 
-class CookieFactory(config: UrlsConfig with SamlConfig with PrivateAuthConfig) {
+class CookieFactory(config: UrlsConfig with SamlConfig with AuthConfig) {
 	
 	private[this] val tokenMakerTry = SignedTokenMaker(config)
 
 	def getLastIdpCookie(idpId: String): HttpCookie = HttpCookie(
-		name = "lastChosenIdp",
+		name = config.idpCookieName,
 		content = idpId,
 		secure = false,
 		domain = Some(config.serviceHost),
@@ -40,12 +38,12 @@ class CookieFactory(config: UrlsConfig with SamlConfig with PrivateAuthConfig) {
 		tokenMaker <- tokenMakerTry;
 		token = tokenMaker.makeToken(userInfo)
 	) yield HttpCookie(
-		name = "cpauthToken",
+		name = config.authCookieName,
 		content = CookieToToken.constructCookieContent(token),
 		domain = Some(config.authDomain),
+		path = Some("/"),
 		secure = true,
-		httpOnly = true,
-		maxAge = Some(3600)
+		httpOnly = true
 	)
 
 	def getUserInfo(statements: AllStatements): Try[UserInfo] = for(

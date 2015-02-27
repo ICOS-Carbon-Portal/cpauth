@@ -22,6 +22,10 @@ import spray.http.StatusCodes
 import spray.http.Uri.apply
 import spray.routing.SimpleRoutingApp
 import se.lu.nateko.cpauth.core.Config
+import se.lu.nateko.cpauth.core.Authenticator
+import se.lu.nateko.cpauth.core.CookieToToken
+import scala.util.Try
+import spray.http.Uri
 
 
 object Main extends App with SimpleRoutingApp with ProxyDirectives {
@@ -33,14 +37,15 @@ object Main extends App with SimpleRoutingApp with ProxyDirectives {
 	val config: Config = Constants
 	val assExtractorTry = AssertionExtractor(config)
 	val idpLib: IdpLibrary = IdpLibrary.fromConfig(config)
-	val cookieSetter = new CookieFactory(config)
+	val cookieFactory = new CookieFactory(config)
+	val authenticator = Authenticator(config)
 
 	startServer(interface = "::0", port = 8080) {
 		get{
 			path("saml" / "login") {
 				parameter('idpUrl, 'targetUrl ?){ (idp, target) =>
 
-					setCookie(cookieSetter.getLastIdpCookie(idp)) {
+					setCookie(cookieFactory.getLastIdpCookie(idp)) {
 						idpLib.getIdpProps(new URI(idp)) match{
 							case Success(idpProp) =>
 								redirect(getAuthenticatingRequestUrl(idpProp.ssoRedirect, target), StatusCodes.Found)
@@ -61,6 +66,21 @@ object Main extends App with SimpleRoutingApp with ProxyDirectives {
 			path("saml" / "idps"){
 				val infos = idpLib.getInfos.toSeq.sortBy(_.name)
 				complete(infos)
+			} ~
+			path("whoami"){
+				cookie(config.authCookieName){cookie =>
+					val user = for(
+						auth <- authenticator;
+						token <- CookieToToken.recoverToken(cookie);
+						uinfo <- auth.unwrapUserInfo(token)
+					) yield uinfo
+					user match{
+						case Success(uinfo) => complete(uinfo)
+						case Failure(err) => complete{
+							HttpResponse(status = StatusCodes.Unauthorized, entity = err.getMessage)
+						}
+					}
+				}
 			}
 		} ~
 		post{
@@ -69,10 +89,22 @@ object Main extends App with SimpleRoutingApp with ProxyDirectives {
 					getSamlResponse(fd) match{
 						case None => completeWithError("No SAMLResponse received")
 						case Some(resp) =>
-							val response = Parser.fromBase64[Response](resp)
-							val summary = Playground.getResponseSummary(response, assExtractorTry, idpLib)
-							val reply = summary.recover{case err => err.getMessage}
-							complete(reply)
+//							val response = Parser.fromBase64[Response](resp)
+//							val summary = Playground.getResponseSummary(response, assExtractorTry, idpLib)
+//							val reply = summary.recover{case err => err.getMessage}
+//							complete(reply)
+							val cookie = for(
+								extractor <- assExtractorTry;
+								response <- Try(Parser.fromBase64[Response](resp));
+								cookie <- cookieFactory.makeAuthenticationCookie(response, extractor, idpLib)
+							) yield cookie
+							
+							cookie match{
+								case Success(cookie) => setCookie(cookie) {
+									redirect(Uri("/whoami"), StatusCodes.Found)
+								}
+								case Failure(err) => completeWithError(err.getMessage)
+							}
 					}
 				}
 			}
