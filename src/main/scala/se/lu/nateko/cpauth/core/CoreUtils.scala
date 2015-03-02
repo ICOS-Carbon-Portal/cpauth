@@ -35,31 +35,26 @@ object CoreUtils {
 		else IOUtils.toString(stream, utf8)
 	}
 
-	def compressAndBase64(s: String): String = compressAndBase64(s, false)
-
-	def compressAndBase64(s: String, hard: Boolean): String = {
-		val level = if(hard) Deflater.BEST_COMPRESSION else Deflater.DEFAULT_COMPRESSION
-		val deflater = new Deflater(level, true);
+	def compress(data: Array[Byte]): Array[Byte] = {
+		val deflater = new Deflater(Deflater.BEST_COMPRESSION, true);
 		val byteStream = new ByteArrayOutputStream()
 
 		val defstr = new DeflaterOutputStream(byteStream, deflater)
-		defstr.write(s.getBytes(utf8))
+		defstr.write(data)
 		defstr.close()
 		byteStream.close()
 
-		new String(new Base64().encode(byteStream.toByteArray), utf8)
+		byteStream.toByteArray
 	}
 
-	def decompressFromBase64(s: String): String = {
-		val compressedBytes: Array[Byte] = Base64.decodeBase64(s)
-
+	def decompress(data: Array[Byte]): Array[Byte] = {
 		val byteStream = new ByteArrayOutputStream()
 
 		val inflStream = new InflaterOutputStream(byteStream, new Inflater(true))
-		inflStream.write(compressedBytes)
+		inflStream.write(data)
 		inflStream.close()
 
-		new String(byteStream.toByteArray, utf8)
+		byteStream.toByteArray
 	}
 
 }

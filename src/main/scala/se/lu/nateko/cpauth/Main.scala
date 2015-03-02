@@ -48,7 +48,8 @@ object Main extends App with SimpleRoutingApp with ProxyDirectives {
 					setCookie(cookieFactory.getLastIdpCookie(idp)) {
 						idpLib.getIdpProps(new URI(idp)) match{
 							case Success(idpProp) =>
-								redirect(getAuthenticatingRequestUrl(idpProp.ssoRedirect, target), StatusCodes.Found)
+								val reqUri = Saml.getAuthUri(idpProp.ssoRedirect, config.spConfig, target)
+								redirect(reqUri, StatusCodes.Found)
 							case Failure(err) => completeWithError(err.getMessage)
 						}
 					}
@@ -118,14 +119,6 @@ object Main extends App with SimpleRoutingApp with ProxyDirectives {
 
 	def getSamlResponse(formData: FormData): Option[String] = formData.fields
 		.collect{case ("SAMLResponse", resp) => resp}.headOption
-
-	def getAuthenticatingRequestUrl(idpUrl: URL, targetUrl: Option[String]): String = {
-		targetUrl match{
-			case None => Saml.getAuthUrl(idpUrl, config.consumerServiceUrl, config.spUrl)
-			case Some(url) => Saml.getAuthUrl(idpUrl, config.consumerServiceUrl, config.spUrl, url)
-		}
-
-	}
 
 }
 

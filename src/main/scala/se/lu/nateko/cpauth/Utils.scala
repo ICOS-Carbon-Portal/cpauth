@@ -1,32 +1,12 @@
 package se.lu.nateko.cpauth
 
-import org.opensaml.xml.XMLObject
-import scala.collection.JavaConverters.asScalaBufferConverter
 import scala.collection.convert.WrapAsScala
+import java.util.zip.Deflater
+import java.io.ByteArrayOutputStream
+import java.util.zip.DeflaterOutputStream
+import org.apache.commons.codec.binary.Base64
 
 object Utils {
-  
-  val domSerializer: org.w3c.dom.ls.LSSerializer = {
-    import  org.w3c.dom.bootstrap.DOMImplementationRegistry
-    import  org.w3c.dom.ls.DOMImplementationLS
-    
-    val registry = DOMImplementationRegistry.newInstance()
-    
-    val domImpl = registry.getDOMImplementation("LS").asInstanceOf[DOMImplementationLS]
-    domImpl.createLSSerializer()
-  }
-  
-  def xmlToStr(xml: org.w3c.dom.Element): String = domSerializer.writeToString(xml)
-  
-  def extractClasses(xmlObj: XMLObject): Seq[Class[_]] = {
-    if(xmlObj == null)
-      Nil
-    else if(xmlObj.hasChildren)
-      xmlObj.getOrderedChildren.asScala.flatMap(extractClasses)
-    else
-      Seq(xmlObj.getClass)
-  }
-  
 
 	import org.slf4j.LoggerFactory
 	import ch.qos.logback.classic.{Level, Logger}
@@ -56,4 +36,30 @@ object Utils {
 				Iterable.empty[T]
 			else WrapAsScala.iterableAsScalaIterable(list)
 	}
+
+	private[this] val domSerializer: org.w3c.dom.ls.LSSerializer = {
+		import  org.w3c.dom.bootstrap.DOMImplementationRegistry
+		import  org.w3c.dom.ls.DOMImplementationLS
+		
+		val registry = DOMImplementationRegistry.newInstance()
+		
+		val domImpl = registry.getDOMImplementation("LS").asInstanceOf[DOMImplementationLS]
+		domImpl.createLSSerializer()
+	}
+
+	def xmlToStr(xml: org.w3c.dom.Element): String = domSerializer.writeToString(xml)
+
+	def compressAndBase64ForSaml(s: String): String = {
+		val deflater = new Deflater(Deflater.DEFAULT_COMPRESSION, true);
+		val byteStream = new ByteArrayOutputStream()
+
+		val utf8 = java.nio.charset.StandardCharsets.UTF_8
+		val defstr = new DeflaterOutputStream(byteStream, deflater)
+		defstr.write(s.getBytes(utf8))
+		defstr.close()
+		byteStream.close()
+
+		new String(new Base64().encode(byteStream.toByteArray), utf8)
+	}
+
 }

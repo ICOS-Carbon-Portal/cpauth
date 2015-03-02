@@ -7,12 +7,13 @@ trait UrlsConfig{
 	def loginPath: String
 }
 
+case class SamlSpConfig(url: String, consumerServiceUrl: String)
+
 trait SamlConfig{
 	def idpMetadataFilePath: String
 	def samlSpXmlPath: String
 	def privateKeyPath: String
-	def consumerServiceUrl: String
-	def spUrl: String
+	def spConfig: SamlSpConfig
 
 	def mailAttr: String
 	def givenNameAttr: String

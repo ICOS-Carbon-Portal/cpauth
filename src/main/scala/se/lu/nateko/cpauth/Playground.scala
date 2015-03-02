@@ -12,6 +12,8 @@ import org.opensaml.saml2.core.Assertion
 import se.lu.nateko.cpauth.opensaml.Parser
 import se.lu.nateko.cpauth.core.CoreUtils
 import se.lu.nateko.cpauth.opensaml.ResponseStatusController
+import org.opensaml.xml.XMLObject
+import scala.collection.JavaConverters.asScalaBufferConverter
 
 object Playground {
 
@@ -36,15 +38,13 @@ object Playground {
 		}
 	}
 
-
-	def produceXmlSignature(projRootPath: String): Unit = {
-		val resPath = projRootPath + "/src/main/resources"
-		val xmlPath = resPath + "/icos-cp_sp_meta_unsigned.xml"
-		val privKeyPath = resPath + Constants.privateKeyPath
-		val pubKeyPath =  resPath + "/crypto/cpauth_public.der"
-		val destDoc =  resPath + "/icos-cp_sp_meta_signed.xml"
-		
-		val signGen = new com.ddlab.rnd.xml.digsig.XmlDigitalSignatureGenerator()
-		signGen.generateXMLDigitalSignature(xmlPath, destDoc, privKeyPath, pubKeyPath)
+	def extractClasses(xmlObj: XMLObject): Seq[Class[_]] = {
+		if(xmlObj == null)
+			Nil
+		else if(xmlObj.hasChildren)
+			xmlObj.getOrderedChildren.asScala.flatMap(extractClasses)
+		else
+			Seq(xmlObj.getClass)
 	}
+
 }

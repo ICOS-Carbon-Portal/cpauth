@@ -16,7 +16,9 @@ import org.apache.commons.io.IOUtils
 import java.io.ByteArrayInputStream
 
 
-class Signature(val base64: String) extends AnyVal
+case class Signature(bytes: Array[Byte]){
+	def base64: String = Base64.encodeBase64String(bytes)
+}
 
 object Crypto{
 
@@ -44,16 +46,14 @@ object Crypto{
 		signer.initSign(key)
 		signer.update(getMessageBytes(msg))
 		val signBytes = signer.sign()
-		val signString = Base64.encodeBase64String(signBytes)
-		new Signature(signString)
+		new Signature(signBytes)
 	}
 	
 	def verifySignature(msg: String, key: RSAPublicKey, signature: Signature): Try[Boolean] = Try{
 		val signer = getSigner
 		signer.initVerify(key)
 		signer.update(getMessageBytes(msg))
-		val signatureBytes = Base64.decodeBase64(signature.base64)
-		signer.verify(signatureBytes)
+		signer.verify(signature.bytes)
 	}
 	
 	private def getSigner = java.security.Signature.getInstance("SHA1withRSA")

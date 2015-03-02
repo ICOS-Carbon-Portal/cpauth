@@ -14,7 +14,7 @@ class SignedTokenMaker private(key: RSAPrivateKey, validity: Int){
 	def makeToken(userInfo: UserInfo): SignedToken = {
 		val expiryTime = new DateTime().getMillis + 1000 * validity
 		val token = AuthToken(userInfo, expiryTime)
-		val signature = Crypto.signMessage(token.toString, key).base64
+		val signature = Crypto.signMessage(token.toString, key)
 		SignedToken(token, signature)
 	}
 

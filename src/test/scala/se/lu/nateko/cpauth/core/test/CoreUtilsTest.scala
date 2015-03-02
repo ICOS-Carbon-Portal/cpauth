@@ -15,10 +15,10 @@ class CoreUtilsTest extends FunSpec {
 
 	describe("compression/decompression utility methods"){
 		it("round trip works"){
-			val data = "aaaaaaaaabbbbbbbb"
-			val encoded = CoreUtils.compressAndBase64(data)
+			val data: Array[Byte] = Array(0, 0, 0, 0, 1, 1, 2, 2, 2)
+			val encoded = CoreUtils.compress(data)
 			
-			val decoded = CoreUtils.decompressFromBase64(encoded)
+			val decoded = CoreUtils.decompress(encoded)
 			
 			assert(decoded === data)
 		}

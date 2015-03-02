@@ -12,28 +12,27 @@ case class UserInfo(givenName: String, surname: String, mail: String)
 
 case class AuthToken(userInfo: UserInfo, expiresOn: Long)
 
-case class SignedToken(token: AuthToken, signature: String)
+case class SignedToken(token: AuthToken, signature: Signature)
 
 class Authenticator private(key: RSAPublicKey){
 
 	def unwrapUserInfo(token: SignedToken): Try[UserInfo] = {
-		if(!tokenIsFresh(token.token))
+		if(tokenIsOld(token.token))
 			Failure(new Exception("Authentication token has expired") with NoStackTrace)
 
 		else signatureIsValid(token) match{
 			case Success(true) => Success(token.token.userInfo)
 			case Failure(err) => Failure(err)
-			case Success(false) => Failure(new Exception("Authentication token's signature is wrong") with NoStackTrace)
+			case Success(false) => Failure(new Exception("Authentication token's signature is invalid") with NoStackTrace)
 		}
 	}
 
 	private def signatureIsValid(token: SignedToken): Try[Boolean] = {
 		val message = token.token.toString
-		val signature = new Signature(token.signature)
-		Crypto.verifySignature(message, key, signature)
+		Crypto.verifySignature(message, key, token.signature)
 	}
 
-	private def tokenIsFresh(token: AuthToken): Boolean = new DateTime().getMillis < token.expiresOn
+	private def tokenIsOld(token: AuthToken): Boolean = new DateTime().getMillis >= token.expiresOn
 }
 
 object Authenticator{
