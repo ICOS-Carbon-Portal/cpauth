@@ -43,6 +43,8 @@ import se.lu.nateko.cpauth.Constants
 import se.lu.nateko.cpauth.opensaml._
 """
 
-mainClass in assembly := Some("se.lu.nateko.cpauth.Main")
+val cpauthMain = Some("se.lu.nateko.cpauth.Main")
+mainClass in assembly := cpauthMain
+mainClass in (Compile, run) := cpauthMain
 
 Revolver.settings

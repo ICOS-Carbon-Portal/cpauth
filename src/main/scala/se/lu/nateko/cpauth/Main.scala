@@ -26,6 +26,7 @@ import se.lu.nateko.cpauth.core.Authenticator
 import se.lu.nateko.cpauth.core.CookieToToken
 import scala.util.Try
 import spray.http.Uri
+import spray.routing.StandardRoute
 
 
 object Main extends App with SimpleRoutingApp with ProxyDirectives {
@@ -39,6 +40,8 @@ object Main extends App with SimpleRoutingApp with ProxyDirectives {
 	val idpLib: IdpLibrary = IdpLibrary.fromConfig(config)
 	val cookieFactory = new CookieFactory(config)
 	val authenticator = Authenticator(config)
+	val cpauthDirs = new CpauthDirectives(config, authenticator)
+	import cpauthDirs._
 
 	startServer(interface = "::0", port = 8080) {
 		get{
@@ -69,43 +72,33 @@ object Main extends App with SimpleRoutingApp with ProxyDirectives {
 				complete(infos)
 			} ~
 			path("whoami"){
-				cookie(config.authCookieName){cookie =>
-					val user = for(
-						auth <- authenticator;
-						token <- CookieToToken.recoverToken(cookie);
-						uinfo <- auth.unwrapUserInfo(token)
-					) yield uinfo
-					user match{
-						case Success(uinfo) => complete(uinfo)
-						case Failure(err) => complete{
-							HttpResponse(status = StatusCodes.Unauthorized, entity = err.getMessage)
-						}
-					}
-				}
+				user(uinfo => complete(uinfo)) ~
+				complete(HttpResponse(status = StatusCodes.Unauthorized))
+			} ~ 
+			parameter('drupallogin){ druplogin => user(uinfo => {
+					val name = uinfo.givenName + " " + uinfo.surname
+					proxyTo(Uri.IPv4Host("127.0.0.1"), 8085, ("login", "1"), ("name", name), ("email", uinfo.mail))
+				})
 			}
+//			{
+//				ctxt => ctxt.complete(ctxt.request.toString)
+//			}
 		} ~
 		post{
 			path("saml" / "SAML2" / "POST"){
-				entity(as[FormData]){ fd =>
-					getSamlResponse(fd) match{
-						case None => completeWithError("No SAMLResponse received")
-						case Some(resp) =>
-//							val response = Parser.fromBase64[Response](resp)
-//							val summary = Playground.getResponseSummary(response, assExtractorTry, idpLib)
-//							val reply = summary.recover{case err => err.getMessage}
-//							complete(reply)
-							val cookie = for(
-								extractor <- assExtractorTry;
-								response <- Try(Parser.fromBase64[Response](resp));
-								cookie <- cookieFactory.makeAuthenticationCookie(response, extractor, idpLib)
-							) yield cookie
-							
-							cookie match{
-								case Success(cookie) => setCookie(cookie) {
-									redirect(Uri("/whoami"), StatusCodes.Found)
-								}
-								case Failure(err) => completeWithError(err.getMessage)
-							}
+				formFields('SAMLResponse, 'RelayState ?){ (resp, relay) =>
+					val cookie = for(
+						extractor <- assExtractorTry;
+						response <- Try(Parser.fromBase64[Response](resp));
+						cookie <- cookieFactory.makeAuthenticationCookie(response, extractor, idpLib)
+					) yield cookie
+					
+					cookie match{
+						case Success(cookie) => setCookie(cookie) {
+							val target = relay.getOrElse("/whoami")
+							redirect(Uri(target), StatusCodes.Found)
+						}
+						case Failure(err) => completeWithError(err.getMessage)
 					}
 				}
 			}
@@ -116,9 +109,6 @@ object Main extends App with SimpleRoutingApp with ProxyDirectives {
 	def completeWithError(msg: String) = complete{
 		HttpResponse(status = StatusCodes.BadRequest, entity = msg)
 	}
-
-	def getSamlResponse(formData: FormData): Option[String] = formData.fields
-		.collect{case ("SAMLResponse", resp) => resp}.headOption
 
 }
 

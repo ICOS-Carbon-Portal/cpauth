@@ -10,25 +10,26 @@ import scala.util.{Success, Failure}
 import akka.actor.ActorSystem
 import akka.util.Timeout
 import scala.concurrent.ExecutionContext
+import spray.routing.Route
 
 trait ProxyDirectives extends Directives{
 
-	def proxyTo(host: Uri.Host, port: Int)(implicit actorSys: ActorSystem, timeout: Timeout, ectxt: ExecutionContext): RequestContext => Unit = ctxt => {
-		import ProxyDirectives._
-		
-		val req = ctxt.request
-		val newUri = req.uri.withHost(host).withPort(port)
-		val newReq = req.copy(uri = newUri).withHost(host, port)
+	import ProxyDirectives._
 
-		val relay = onComplete(IO(Http).ask(newReq).mapTo[HttpResponse]) {
-			case Success(resp) => ctxt => ctxt.responder ! resp.withoutRedundantHeaders
-			case Failure(ex) =>
-				val msg = s"An error occurred: ${ex.getMessage}"
-				val code = StatusCodes.InternalServerError
-				complete{(code, msg)}
-		}
-		relay(ctxt)
-	}
+	def proxyTo(host: Uri.Host, port: Int, query: (String, String)*)
+		(implicit actorSys: ActorSystem, timeout: Timeout, ectxt: ExecutionContext): Route =
+
+		extract(c => c.request)(req => {
+
+			val newUri = req.uri.withHost(host).withPort(port).withQuery(query :_*)
+			val newReq = req.copy(uri = newUri).withHost(host, port)
+	
+			onComplete(IO(Http).ask(newReq).mapTo[HttpResponse]) {
+				case Success(resp) => ctxt => ctxt.responder ! resp.withoutRedundantHeaders
+				case Failure(ex) =>
+					complete(HttpResponse(StatusCodes.InternalServerError, s"An error occurred: ${ex.getMessage}"))
+			}
+		})
 }
 
 object ProxyDirectives{
