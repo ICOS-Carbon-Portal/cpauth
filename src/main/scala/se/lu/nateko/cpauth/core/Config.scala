@@ -2,9 +2,13 @@ package se.lu.nateko.cpauth.core
 
 trait UrlsConfig{
 	def serviceHost: String
+	def servicePrivatePort: Int
 	def serviceUrl: String = "https://" + serviceHost
 	def authDomain: String = serviceHost.substring(serviceHost.indexOf("."))
 	def loginPath: String
+	
+	def drupalPrivateHost: String
+	def drupalPrivatePort: Int
 }
 
 case class SamlSpConfig(url: String, consumerServiceUrl: String)

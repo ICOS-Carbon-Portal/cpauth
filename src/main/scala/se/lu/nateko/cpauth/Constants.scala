@@ -6,7 +6,10 @@ import se.lu.nateko.cpauth.core.SamlSpConfig
 object Constants extends Config{
 
 	val serviceHost = "cpauth.icos-cp.eu"
-	val loginPath = "/login"
+	val loginPath = "/login/"
+	val drupalPrivateHost = "127.0.0.1"
+	val drupalPrivatePort = 8085
+	val servicePrivatePort = 8080
 
 	val idpMetadataFilePath = "/swamid-idps.xml"
 	val samlSpXmlPath = "/icos-cp_sp_meta.xml"
