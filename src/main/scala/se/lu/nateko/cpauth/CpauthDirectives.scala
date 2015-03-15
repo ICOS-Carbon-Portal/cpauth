@@ -9,24 +9,21 @@ import se.lu.nateko.cpauth.core.CookieToToken
 import se.lu.nateko.cpauth.core.UserInfo
 import spray.http.HttpHeader
 import spray.http.HttpHeaders
-import spray.routing.AuthenticationFailedRejection
-import spray.routing.Directives
-import spray.routing.Directive1
-import spray.routing.RequestContext
-import spray.routing.Route
 import spray.http.HttpResponse
 import spray.http.StatusCodes
+import spray.routing.AuthenticationFailedRejection
+import spray.routing.Directives
+import spray.routing.RequestContext
+import spray.routing.Route
 
 class CpauthDirectives(config: Config, authenticator: Try[Authenticator]) extends Directives {
 
-	def attempt[T](thunk: => T): Directive1[T] = attempt(Try(thunk))
+	def attempt[T](thunk: => T)(f: T => Route): Route = attempt(Try(thunk))(f)
 
-	def attempt[T](attempt: Try[T]) = new Directive1[T]{
-		override def happly(f: T => RequestContext => Unit): RequestContext => Unit = attempt match {
-			case Success(t) => f(t)
-			case Failure(err) => ctxt => ctxt.complete{
-				HttpResponse(status = StatusCodes.BadRequest, entity = err.getMessage)
-			}
+	def attempt[T](attempt: Try[T])(f: T => Route): Route = attempt match {
+		case Success(t) => f(t)
+		case Failure(err) => ctxt => ctxt.complete{
+			HttpResponse(status = StatusCodes.BadRequest, entity = err.getMessage)
 		}
 	}
 

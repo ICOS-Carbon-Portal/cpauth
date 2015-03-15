@@ -12,6 +12,8 @@ object ResponseStatusController {
 
 	def ensureSuccess(response: Response): Try[Response] = for(
 
+		_ <- ensureResponseTo(response);
+
 		status <- Try(response.getStatus);
 
 		statusCode <- Try(status.getStatusCode.getValue);
@@ -30,5 +32,11 @@ object ResponseStatusController {
 			}else Success(response)
 
 	) yield successfullResponse
+
+	private def ensureResponseTo(response: Response): Try[Unit] = Try{
+		val origReqId = response.getInResponseTo
+		assert(origReqId != null, "'InResponseTo' attribute must be present in SAML response")
+		assert(origReqId.length > 0, "'InResponseTo' must not be empty in SAML response")
+	}
 
 }

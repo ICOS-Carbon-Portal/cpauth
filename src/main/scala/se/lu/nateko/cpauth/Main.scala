@@ -23,6 +23,7 @@ import spray.http.MediaTypes
 import spray.http.StatusCodes
 import spray.http.Uri
 import spray.routing.SimpleRoutingApp
+import spray.http.HttpCookie
 
 
 object Main extends App with SimpleRoutingApp with ProxyDirectives {
@@ -36,6 +37,7 @@ object Main extends App with SimpleRoutingApp with ProxyDirectives {
 	val idpLib: IdpLibrary = IdpLibrary.fromConfig(config)
 	val idpInfos: Seq[IdpInfo] = idpLib.getInfos.toSeq.sortBy(_.name)
 	val cookieFactory = new CookieFactory(config)
+	val targetLookup: TargetUrlLookup = new MapBasedUrlLookup
 	val authenticator = Authenticator(config)
 	val cpauthDirs = new CpauthDirectives(config, authenticator)
 	import cpauthDirs._
@@ -51,17 +53,29 @@ object Main extends App with SimpleRoutingApp with ProxyDirectives {
 			path("saml" / "login") {
 				parameter('idpUrl, 'targetUrl ?){ (idp, target) =>
 
-					setCookie(cookieFactory.getLastIdpCookie(idp)) {
-						idpLib.getIdpProps(new URI(idp)) match{
-							case Success(idpProp) =>
-								val reqUri = Saml.getAuthUri(idpProp.ssoRedirect, config.spConfig, target)
-								redirect(reqUri, StatusCodes.Found)
-							case Failure(err) => completeWithError(err.getMessage)
+					val idpPropTry = for(
+						idpUri <- Try(new URI(idp));
+						prop <- idpLib.getIdpProps(idpUri)
+					) yield prop
+
+					attempt(idpPropTry) {idpProp =>
+						setCookie(cookieFactory.getLastIdpCookie(idp)) {
+							val (reqXml, reqId) = Saml.authRequestXmlAndId(config.spConfig)
+							val reqUri = Saml.getAuthUri(idpProp.ssoRedirect, reqXml)
+	
+							for(
+								uriStr <- target;
+								uri <- Try(Uri(uriStr)).toOption
+							) targetLookup.memorize(reqId, uri)
+	
+							redirect(reqUri, StatusCodes.Found)
 						}
 					}
 
-				} ~
-				completeWithError("Identity provider has not been specified!")
+				} ~ complete(HttpResponse(
+						status = StatusCodes.BadRequest,
+						entity = "Identity provider has not been specified!")
+					)
 			} ~
 			path("saml" / "cpauth"){ complete(metadataXml) } ~
 			path("saml" / "idps"){ complete(idpInfos) } ~
@@ -86,17 +100,18 @@ object Main extends App with SimpleRoutingApp with ProxyDirectives {
 		} ~
 		post{
 			path("saml" / "SAML2" / "POST"){
-				formFields('SAMLResponse, 'RelayState ?){ (resp, relay) =>
-					attempt(
-						for(
-							extractor <- assExtractorTry;
-							response <- Try(Parser.fromBase64[Response](resp));
-							cookie <- cookieFactory.makeAuthenticationCookie(response, extractor, idpLib)
-						) yield cookie
-					){ cookie =>
+				formField('SAMLResponse){ resp =>
+
+					val cookieAndReqIdTry: Try[(HttpCookie, String)] = for(
+						extractor <- assExtractorTry;
+						response <- Try(Parser.fromBase64[Response](resp));
+						cookie <- cookieFactory.makeAuthenticationCookie(response, extractor, idpLib)
+					) yield (cookie, response.getInResponseTo)
+
+					attempt(cookieAndReqIdTry){ case (cookie, reqId) =>
 						setCookie(cookie) {
-							val target = relay.getOrElse("/whoami")
-							redirect(Uri(target), StatusCodes.Found)
+							val target: Option[Uri] = targetLookup.getAndForget(reqId)
+							redirect(target.getOrElse(Uri("/whoami")), StatusCodes.Found)
 						}
 					}
 				}
