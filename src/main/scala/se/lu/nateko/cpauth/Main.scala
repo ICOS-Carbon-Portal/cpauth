@@ -76,30 +76,28 @@ object Main extends App with SimpleRoutingApp with ProxyDirectives {
 						("givenName", uinfo.givenName),
 						("surname", uinfo.surname),
 						("mail", uinfo.mail))
-				} ~ {
-					val target = Uri(druplogin)
+				} ~ attempt(Uri(druplogin))(target => {
 					val nextTarget = target.withQuery(("drupallogin", druplogin) +: target.query).toString
 					val redirectUri = Uri(config.serviceUrl + config.loginPath).withQuery(("targetUrl", nextTarget))
 					redirect(redirectUri, StatusCodes.Found)
-				}
+				})
 			} ~
 			complete(StatusCodes.NotFound)
 		} ~
 		post{
 			path("saml" / "SAML2" / "POST"){
 				formFields('SAMLResponse, 'RelayState ?){ (resp, relay) =>
-					val cookie = for(
-						extractor <- assExtractorTry;
-						response <- Try(Parser.fromBase64[Response](resp));
-						cookie <- cookieFactory.makeAuthenticationCookie(response, extractor, idpLib)
-					) yield cookie
-
-					cookie match{
-						case Success(cookie) => setCookie(cookie) {
+					attempt(
+						for(
+							extractor <- assExtractorTry;
+							response <- Try(Parser.fromBase64[Response](resp));
+							cookie <- cookieFactory.makeAuthenticationCookie(response, extractor, idpLib)
+						) yield cookie
+					){ cookie =>
+						setCookie(cookie) {
 							val target = relay.getOrElse("/whoami")
 							redirect(Uri(target), StatusCodes.Found)
 						}
-						case Failure(err) => completeWithError(err.getMessage)
 					}
 				}
 			}
