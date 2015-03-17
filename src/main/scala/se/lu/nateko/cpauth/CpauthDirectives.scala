@@ -12,11 +12,32 @@ import spray.http.HttpHeaders
 import spray.http.HttpResponse
 import spray.http.StatusCodes
 import spray.routing.AuthenticationFailedRejection
+import spray.routing.Directive0
 import spray.routing.Directives
 import spray.routing.RequestContext
 import spray.routing.Route
+import spray.http.Uri
+import spray.http.HttpHeaders
 
 class CpauthDirectives(config: Config, authenticator: Try[Authenticator]) extends Directives {
+
+	def redirectWhenDone(target: Uri) = respondWithHeader(HttpHeaders.Location(target)) &
+											respondWithStatus(StatusCodes.Found) &
+											setCookieHost(target.authority.host)
+
+	def setCookieHost(host: Uri.Host): Directive0 = mapHttpResponseHeaders(_.map(setCookieHost(host, _)))
+	
+	private def setCookieHost(host: Uri.Host, header: HttpHeader): HttpHeader = header match{
+		case HttpHeaders.`Set-Cookie`(cookie) =>
+			val newDomain = {
+				val segments = host.address.split('.')
+				if(segments.length <= 2) host.address
+				else segments.tail.map("." + _).mkString
+			}
+			val newCookie = cookie.copy(domain = Some(newDomain), secure = true)
+			HttpHeaders.`Set-Cookie`(newCookie)
+		case x => x
+	}
 
 	def attempt[T](thunk: => T)(f: T => Route): Route = attempt(Try(thunk))(f)
 

@@ -62,12 +62,12 @@ object Main extends App with SimpleRoutingApp with ProxyDirectives {
 						setCookie(cookieFactory.getLastIdpCookie(idp)) {
 							val (reqXml, reqId) = Saml.authRequestXmlAndId(config.spConfig)
 							val reqUri = Saml.getAuthUri(idpProp.ssoRedirect, reqXml)
-	
+
 							for(
-								uriStr <- target;
+								uriStr <- target if(uriStr != null && uriStr.trim.length > 0);
 								uri <- Try(Uri(uriStr)).toOption
 							) targetLookup.memorize(reqId, uri)
-	
+
 							redirect(reqUri, StatusCodes.Found)
 						}
 					}
@@ -82,18 +82,27 @@ object Main extends App with SimpleRoutingApp with ProxyDirectives {
 			path("whoami"){
 				user(uinfo => complete(uinfo)) ~
 				complete(HttpResponse(status = StatusCodes.Unauthorized))
-			} ~ 
-			parameter('drupallogin){ druplogin =>
-				user{ uinfo =>
-					proxyTo(Uri.IPv4Host(config.drupalPrivateHost), config.drupalPrivatePort,
-						("login", "1"),
-						("givenName", uinfo.givenName),
-						("surname", uinfo.surname),
-						("mail", uinfo.mail))
-				} ~ attempt(Uri(druplogin))(target => {
-					val nextTarget = target.withQuery(("drupallogin", druplogin) +: target.query).toString
-					val redirectUri = Uri(config.serviceUrl + config.loginPath).withQuery(("targetUrl", nextTarget))
-					redirect(redirectUri, StatusCodes.Found)
+			} ~
+			parameter('drupallogin){ targetUriStr =>
+				attempt(Uri(targetUriStr))(targetUri => {
+					user{ uinfo =>
+						redirectWhenDone(targetUri){
+							proxyTo(
+								Uri.IPv4Host(config.drupalPrivateHost),
+								config.drupalPrivatePort,
+								("login", "1"),
+								("givenName", uinfo.givenName),
+								("surname", uinfo.surname),
+								("mail", uinfo.mail)
+							)
+						}
+					} ~
+					extract(_.request.uri)(targetUri => {
+						val rootUri = Uri(config.serviceUrl)
+						val target = targetUri.withScheme(rootUri.scheme).withAuthority(rootUri.authority).toString
+						val redirectUri = Uri(config.serviceUrl + config.loginPath).withQuery(("targetUrl", target))
+						redirect(redirectUri, StatusCodes.Found)
+					})
 				})
 			} ~
 			complete(StatusCodes.NotFound)

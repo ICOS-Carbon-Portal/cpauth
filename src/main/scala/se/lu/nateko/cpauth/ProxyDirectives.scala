@@ -25,7 +25,7 @@ trait ProxyDirectives extends Directives{
 			val newReq = req.copy(uri = newUri).withHost(host, port)
 	
 			onComplete(IO(Http).ask(newReq).mapTo[HttpResponse]) {
-				case Success(resp) => ctxt => ctxt.responder ! resp.withoutRedundantHeaders
+				case Success(response) => complete(response.withoutRedundantHeaders)
 				case Failure(ex) =>
 					complete(HttpResponse(StatusCodes.InternalServerError, s"An error occurred: ${ex.getMessage}"))
 			}
@@ -39,8 +39,8 @@ object ProxyDirectives{
 		Set(`Content-Type`, `Content-Length`, Server, Date, `Transfer-Encoding`)
 			.map(_.lowercaseName)
 	}
-	
-	implicit class HeaderManipHttpMessage(val msg: HttpMessage) extends AnyVal{
+
+	implicit class HeaderManipHttpMessage[T <: HttpMessage](val msg: T) extends AnyVal{
 
 		def withHost(host: Uri.Host, port: Int): msg.Self = {
 			val hport = if(port == 80) 0 else port
