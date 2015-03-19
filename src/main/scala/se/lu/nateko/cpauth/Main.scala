@@ -17,13 +17,14 @@ import se.lu.nateko.cpauth.opensaml.IdpInfo
 import se.lu.nateko.cpauth.opensaml.IdpLibrary
 import se.lu.nateko.cpauth.opensaml.Parser
 import spray.http.ContentType
+import spray.http.HttpCookie
+import spray.http.HttpHeaders
 import spray.http.HttpEntity
 import spray.http.HttpResponse
 import spray.http.MediaTypes
 import spray.http.StatusCodes
 import spray.http.Uri
 import spray.routing.SimpleRoutingApp
-import spray.http.HttpCookie
 
 
 object Main extends App with SimpleRoutingApp with ProxyDirectives {
@@ -83,29 +84,29 @@ object Main extends App with SimpleRoutingApp with ProxyDirectives {
 				user(uinfo => complete(uinfo)) ~
 				complete(HttpResponse(status = StatusCodes.Unauthorized))
 			} ~
-			parameter('drupallogin){ targetUriStr =>
-				attempt(Uri(targetUriStr))(targetUri => {
+			headerValue{
+				case HttpHeaders.Host(host, 0) => config.drupalProxying.get(host)
+				case _ => None
+			}{ drupalProxy =>
+				extract(_.request.uri)(originalUri => {
+					val targetUri = originalUri.withScheme("https")
 					user{ uinfo =>
-						redirectWhenDone(targetUri){
+						redirectWhenDone(target = targetUri, dropParam = Some("login")){
 							proxyTo(
-								Uri.IPv4Host(config.drupalPrivateHost),
-								config.drupalPrivatePort,
-								("login", "1"),
+								Uri.IPv4Host(drupalProxy.ipv4Host),
+								drupalProxy.port,
 								("givenName", uinfo.givenName),
 								("surname", uinfo.surname),
 								("mail", uinfo.mail)
 							)
 						}
 					} ~
-					extract(_.request.uri)(targetUri => {
-						val rootUri = Uri(config.serviceUrl)
-						val target = targetUri.withScheme(rootUri.scheme).withAuthority(rootUri.authority).toString
-						val redirectUri = Uri(config.serviceUrl + config.loginPath).withQuery(("targetUrl", target))
-						redirect(redirectUri, StatusCodes.Found)
-					})
+					redirect(
+						Uri(config.serviceUrl + config.loginPath).withQuery(("targetUrl", targetUri.toString)),
+						StatusCodes.Found
+					)
 				})
-			} ~
-			complete(StatusCodes.NotFound)
+			}
 		} ~
 		post{
 			path("saml" / "SAML2" / "POST"){
@@ -127,10 +128,6 @@ object Main extends App with SimpleRoutingApp with ProxyDirectives {
 			}
 		}
 
-	}
-
-	def completeWithError(msg: String) = complete{
-		HttpResponse(status = StatusCodes.BadRequest, entity = msg)
 	}
 
 }

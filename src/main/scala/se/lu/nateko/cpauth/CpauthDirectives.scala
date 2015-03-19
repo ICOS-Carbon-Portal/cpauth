@@ -11,30 +11,34 @@ import spray.http.HttpHeader
 import spray.http.HttpHeaders
 import spray.http.HttpResponse
 import spray.http.StatusCodes
+import spray.http.Uri
 import spray.routing.AuthenticationFailedRejection
-import spray.routing.Directive0
 import spray.routing.Directives
 import spray.routing.RequestContext
 import spray.routing.Route
-import spray.http.Uri
-import spray.http.HttpHeaders
 
 class CpauthDirectives(config: Config, authenticator: Try[Authenticator]) extends Directives {
 
-	def redirectWhenDone(target: Uri) = respondWithHeader(HttpHeaders.Location(target)) &
-											respondWithStatus(StatusCodes.Found) &
-											setCookieHost(target.authority.host)
+	val remakeCookies = mapHttpResponseHeaders(_.map(remakeCookie))
 
-	def setCookieHost(host: Uri.Host): Directive0 = mapHttpResponseHeaders(_.map(setCookieHost(host, _)))
-	
-	private def setCookieHost(host: Uri.Host, header: HttpHeader): HttpHeader = header match{
-		case HttpHeaders.`Set-Cookie`(cookie) =>
-			val newDomain = {
-				val segments = host.address.split('.')
-				if(segments.length <= 2) host.address
-				else segments.tail.map("." + _).mkString
+	def redirectWhenDone(target: Uri, dropParam: Option[String] = None) =
+		respondWithHeader(HttpHeaders.Location(withoutParam(dropParam, target))) &
+		respondWithStatus(StatusCodes.Found) &
+		remakeCookies
+
+	private def withoutParam(param: Option[String], uri: Uri): Uri = param match{
+		case None => uri
+		case Some(drop) =>
+			val filteredQuery = uri.query.filter{
+				case (`drop`, _) => false
+				case _ => true
 			}
-			val newCookie = cookie.copy(domain = Some(newDomain), secure = true)
+			uri.withQuery(filteredQuery)
+	}
+
+	private def remakeCookie(header: HttpHeader): HttpHeader = header match{
+		case HttpHeaders.`Set-Cookie`(cookie) =>
+			val newCookie = cookie.copy(secure = true, httpOnly =true, expires = None)
 			HttpHeaders.`Set-Cookie`(newCookie)
 		case x => x
 	}

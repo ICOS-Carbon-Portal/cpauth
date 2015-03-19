@@ -21,9 +21,10 @@ trait ProxyDirectives extends Directives{
 
 		extract(c => c.request)(req => {
 
-			val newUri = req.uri.withHost(host).withPort(port).withQuery(query :_*)
+			val newQuery = req.uri.query ++ query
+			val newUri = req.uri.withHost(host).withPort(port).withQuery(newQuery :_*)
 			val newReq = req.copy(uri = newUri).withHost(host, port)
-	
+
 			onComplete(IO(Http).ask(newReq).mapTo[HttpResponse]) {
 				case Success(response) => complete(response.withoutRedundantHeaders)
 				case Failure(ex) =>
