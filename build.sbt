@@ -15,6 +15,8 @@ libraryDependencies ++= Seq(
   "com.typesafe.akka"  %% "akka-actor"       % "2.3.9",
   "com.typesafe.akka"  %% "akka-slf4j"       % "2.3.9",
   "com.typesafe.akka"  %% "akka-testkit"     % "2.3.9" % "test",
+  "com.typesafe.slick" %% "slick"            % "3.0.0-RC1",
+  "org.hsqldb"         %  "hsqldb"           % "2.3.2",
   "io.spray"           %% "spray-client"     % "1.3.2",
   "io.spray"           %% "spray-can"        % "1.3.2",
   "io.spray"           %% "spray-routing"    % "1.3.2",

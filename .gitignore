@@ -22,6 +22,9 @@ project/plugins/project/
 
 nohup.out
 
+#Cpauth DB
+db/
+
 #Security-specific
 src/main/resources/crypto/private/
 
