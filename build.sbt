@@ -17,6 +17,7 @@ libraryDependencies ++= Seq(
   "com.typesafe.akka"  %% "akka-testkit"     % "2.3.9" % "test",
   "com.typesafe.slick" %% "slick"            % "3.0.0-RC1",
   "org.hsqldb"         %  "hsqldb"           % "2.3.2",
+  "com.zaxxer"         %  "HikariCP"         % "2.3.5",
   "io.spray"           %% "spray-client"     % "1.3.2",
   "io.spray"           %% "spray-can"        % "1.3.2",
   "io.spray"           %% "spray-routing"    % "1.3.2",
@@ -34,7 +35,7 @@ scalacOptions ++= Seq(
   "-Xlint",
   "-Ywarn-dead-code",
   "-language:_",
-  "-target:jvm-1.7",
+  "-target:jvm-1.8",
   "-encoding", "UTF-8"
 )
 
