@@ -35,9 +35,13 @@ class CookieFactory(config: UrlsConfig with SamlConfig with AuthConfig) {
 		assertions = extractor.extractAssertions(goodResponse).map(validator.validate);
 		statements = StatementExtractor.extractAttributeStringValues(assertions);
 		userInfo <- getUserInfo(statements);
+		cookie <- makeAuthenticationCookie(userInfo)
+	) yield cookie
+
+	def makeAuthenticationCookie(userInfo: UserInfo): Try[HttpCookie] = for(
 		tokenMaker <- tokenMakerTry;
 		token = tokenMaker.makeToken(userInfo)
-	) yield HttpCookie(
+	)yield HttpCookie(
 		name = config.authCookieName,
 		content = CookieToToken.constructCookieContent(token),
 		domain = Some(config.authDomain),

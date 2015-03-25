@@ -9,6 +9,8 @@ import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 import java.util.Base64
 import scala.util.control.NoStackTrace
+import se.lu.nateko.cpauth.AuthenticationFailedException
+import se.lu.nateko.cpauth.Exceptions
 
 object Users {
 
@@ -56,15 +58,13 @@ object Users {
 
 		db.run(userQ.result).flatMap(_.toList match{
 			case Nil =>
-				failedFuture("Incorrect user name or password")
+				Future.failed(AuthenticationFailedException)
 			case (givenName, surname) :: Nil =>
 				Future.successful(UserInfo(givenName = givenName, surname = surname, mail = mail))
 			case _ =>
-				failedFuture("Inconsistent database state: duplicate user ")
+				Exceptions.failedFuture("Inconsistent database state: duplicate user ")
 		})
 	}
-
-	private def failedFuture[T](msg: String): Future[T] = Future.failed(new Exception(msg) with NoStackTrace)
 
 	def dropUser(mail: String): Future[Int] = {
 		val action = users.filter(_.mail === mail).delete

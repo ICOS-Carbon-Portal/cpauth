@@ -25,6 +25,7 @@ import spray.http.MediaTypes
 import spray.http.StatusCodes
 import spray.http.Uri
 import spray.routing.SimpleRoutingApp
+import se.lu.nateko.cpauth.accounts.Users
 
 
 object Main extends App with SimpleRoutingApp with ProxyDirectives {
@@ -72,17 +73,14 @@ object Main extends App with SimpleRoutingApp with ProxyDirectives {
 							redirect(reqUri, StatusCodes.Found)
 						}
 					}
-
-				} ~ complete(HttpResponse(
-						status = StatusCodes.BadRequest,
-						entity = "Identity provider has not been specified!")
-					)
+				} ~ complete(
+					HttpResponse(StatusCodes.BadRequest, "Identity provider has not been specified!")
+				)
 			} ~
 			path("saml" / "cpauth"){ complete(metadataXml) } ~
 			path("saml" / "idps"){ complete(idpInfos) } ~
 			path("whoami"){
-				user(uinfo => complete(uinfo)) ~
-				complete(HttpResponse(status = StatusCodes.Unauthorized))
+				user(uinfo => complete(uinfo)) ~ complete(StatusCodes.Unauthorized)
 			} ~
 			headerValue{
 				case HttpHeaders.Host(host, 0) => config.drupalProxying.get(host)
@@ -125,6 +123,23 @@ object Main extends App with SimpleRoutingApp with ProxyDirectives {
 						}
 					}
 				}
+			} ~
+			path("password" / "login"){
+				formFields('mail, 'password)((mail, password) =>
+
+					onComplete(Users.authenticateUser(mail, password)){ uinfoTry =>
+
+						uinfoTry.flatMap(cookieFactory.makeAuthenticationCookie) match{
+
+							case Success(cookie) => setCookie(cookie)(complete(StatusCodes.OK))
+	
+							case Failure(err) => err match {
+								case AuthenticationFailedException => complete(StatusCodes.Forbidden)
+								case _ => failWith(err)
+							}
+						}
+					}
+				)
 			}
 		}
 
