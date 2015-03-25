@@ -3,49 +3,138 @@
 
 	<head>
 
-    	<title>Login to Carbon Portal</title>
 	    <meta charset="UTF-8"/>
-		<link rel="stylesheet" type="text/css" href="login.css">
+	    
+	    <script src="https://static.icos-cp.eu/constant/jquery/1.11.2/jquery.min.js"></script>
+	    <link rel="stylesheet" href="https://static.icos-cp.eu/constant/bootstrap/3.3.4/css/bootstrap.min.css">
+	    <script src="https://static.icos-cp.eu/constant/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+	    
+	    <meta name="viewport" content="width=device-width, initial-scale=1">
+	    
+		<link rel="stylesheet" type="text/css" href="https://static.icos-cp.eu/css/style.css">
+		
+		<title>Login to Carbon Portal</title>
 
 	</head>
 
 	<body>
-		<div id="loginDialog">
-		
-			<h2>Login</h2>
+	
+		<div class="container-fluid">
+  			
+  			<div class="row hidden-xs">
+  				<div class="header">
+  					<div class="tint">
+  						<img src="https://static.icos-cp.eu/images/Icos_Logo_RGB_White_Carbon_Portal_80px.png" class="visible-lg-block logo_big" />
+  						<img src="https://static.icos-cp.eu/images/Icos_Logo_RGB_White_Carbon_Portal_48px.png" class="visible-sm-block visible-md-block logo_medium" />
+  					</div>
+  				</div>
+  			</div>
+  			
+  			<div class="row">
+  				<h4 class="hidden-xs padd">
+  					Welcome to ICOS! Please sign in.
+  				</h4>
+  				<h6 class="visible-xs-block padd">
+  					Welcome to ICOS! Please sign in.
+  				</h6>
+  			</div>
+  		
+  		
+  		
+  			
+			<div class="row">
 			
-			<form action="/saml/login">
-				 <fieldset>
-				    <legend>University login</legend>
-				    <p>
-						<label for="GET-idpUrl">Select university:</label>
-						<select id="GET-idpUrl" name="idpUrl">
-						</select>
-				    </p>
-					<input class="targetUrlRelay" type="hidden" name="targetUrl">
-				    <p><input type="submit" value="Login!"></p>
-				 </fieldset>
-			</form>
+				<ul class="nav nav-tabs" role="tablist">
+					<li role="presentation" class="active col-xs-12 col-sm-2">
+						<a href="#swamid" aria-controls="swamid" role="tab" data-toggle="tab">
+							University sign in
+						</a>
+					</li>
+
+					<li role="presentation" class="col-xs-12 col-sm-2">
+						<a href="#plain" aria-controls="plain" role="tab" data-toggle="tab">
+							Password sign in
+						</a>
+					</li>
+					
+					<!-- li role="presentation" class="col-xs-12 col-sm-2">
+						<a href="#facebook" aria-controls="face" role="tab" data-toggle="tab">
+							Facebook
+						</a>
+					</li -->
+					
+					<li class="col-sm-8"></li>
+				</ul>
+	
+			</div>  			
+  		
+  		
+  		
+  		
+			<div class="row">
 			
-			<p>OR</p>
+	  			<div class="tab-content">
+		  			<div role="tabpanel" class="tab-pane active" id="swamid">
+						<div class="panel panel-default">
+							<div class="panel-body">
+		  					
+								<form action="/saml/login">
+									<input class="targetUrlRelay" type="hidden" name="targetUrl">
+									
+									<div class="form-group">
+										<label for="GET-idpUrl">Select university:</label>
+										<select id="GET-idpUrl" name="idpUrl" class="form-control"></select>
+									</div>
+									 
+									<button type="submit" class="btn btn-default">Login!</button>
+								</form>		  					
+		  					
+		  					</div>
+						</div>
+		  			</div>
+		  			
+	  				<div role="tabpanel" class="tab-pane" id="plain">
+	  					<div class="panel panel-default">
+							<div class="panel-body">
+	  							
+	  							<p class="label label-info">Coming soon!</p>
+	  							 
+								<form action="/password/login" method="post">
+									<input class="targetUrlRelay" type="hidden" name="targetUrl">
+									 
+								    <div class="form-group">
+										<label for="POST-username">Username:</label>
+										<input id="POST-username" name="username" disabled type="text" class="form-control" placeholder="Enter username" />
+								    </div>
+								    
+								    <div class="form-group">
+										<label for="POST-password">Password:</label>
+										<input id="POST-password" name="password" disabled type="password" class="form-control" placeholder="Password" />
+								    </div>
+								    
+									<button type="submit" class="btn btn-default">Login!</button>
+									 
+								</form>	  							
+	  							
+	  						</div>
+						</div>
+	  				</div>
+	  				
+	  				<!-- div role="tabpanel" class="tab-pane" id="facebook">
+	  					<div class="panel panel-default">
+							<div class="panel-body">
+	  							
+	  						</div>
+						</div>
+	  				</div -->
+				
+				</div>
+				
+			</div>
 			
-			<form action="/password/login" method="post">
-				 <fieldset>
-				    <legend>Username and password login</legend>
-				    <p>
-						<label for="POST-username">Username:</label>
-						<input id="POST-username" type="text" name="username" disabled>
-				    </p>
-				    <p>
-						<label for="POST-password">Password:</label>
-						<input id="POST-password" type="password" name="password" disabled>
-				    </p>
-					<input class="targetUrlRelay" type="hidden" name="targetUrl">
-				    <p> <input type="submit" value="Login!" disabled> </p>
-				 </fieldset>
-			</form>
 			
 		</div>
+		
 	</body>
 
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.7.0/underscore-min.js"></script>
@@ -54,4 +143,3 @@
 	<script src="login.js"></script>
 	
 </html>
-
