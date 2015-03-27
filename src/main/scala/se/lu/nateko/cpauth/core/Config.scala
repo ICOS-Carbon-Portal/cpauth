@@ -6,7 +6,7 @@ trait UrlsConfig{
 	def serviceUrl: String = "https://" + serviceHost
 
 	def authDomain: String = UrlsConfig.cookieDomainFromHost(serviceHost)
-  
+
 	def loginPath: String
 
 	def drupalProxying: Map[String, ProxyConfig]
@@ -41,11 +41,12 @@ trait AuthConfig extends PrivateAuthConfig with PublicAuthConfig
 
 trait Config extends UrlsConfig with SamlConfig with AuthConfig
 
+
 object UrlsConfig{
 	
-	def cookieDomainFromHost(host: String): String = host.count { _ == '.' } match{
-    	case 0 => host
-    	case x => host.split('.').drop(x - 1).mkString(".", ".", "")
+	def cookieDomainFromHost(host: String): String = host.count(_ == '.') match{
+		case 0 => host
+		case x => host.split('.').drop(x - 1).mkString(".", ".", "")
 	}
 
 }

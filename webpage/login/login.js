@@ -1,39 +1,11 @@
-function getJsonFromUrl() {
-  var query = location.search.substr(1);
-  var result = {};
-  query.split("&").forEach(function(part) {
-    var item = part.split("=");
-    result[item[0]] = decodeURIComponent(item[1]);
-  });
-  return result;
-}
-
-function ready(fn) {
-  if (document.readyState != 'loading'){
-    fn();
-  } else {
-    document.addEventListener('DOMContentLoaded', fn);
-  }
-}
-
-function callAjax(url, callback){
-	var request = new XMLHttpRequest();
-	request.open('GET', url, true);
-
-	request.onload = function() {
-		if (this.status >= 200 && this.status < 400) {
-			var data = JSON.parse(this.response);
-			callback(data);
-		} else {
-		 // We reached our target server, but it returned an error
-		}
-	};
-
-	request.onerror = function() {
-	  // There was a connection error of some sort
-	};
-
-	request.send();
+function urlQueryAsObject() {
+	var query = location.search.substr(1);
+	var result = {};
+	query.split("&").forEach(function(part) {
+		var item = part.split("=");
+		result[item[0]] = decodeURIComponent(item[1]);
+	});
+	return result;
 }
 
 function idpOptions(idpInfos){
@@ -50,15 +22,43 @@ function idpOptions(idpInfos){
 	return _.map(idpInfos, optionFun).join('\n');
 }
 
-ready(function(){
+function doPlainLogin() {
 
-	callAjax('/saml/idps', function(idpInfos){
+	var $form = $('#plain-login').serializeArray();
+
+	$.post("/password/login", $form).complete(function(data) {
+
+		if (data.status == '200') {
+			window.location = urlQueryAsObject().targetUrl || '/home/';
+
+		} else if (data.status == '403') {
+			somePlainFail('Authentication error! Maybe you have entered wrong email or password. Please try again!');
+
+		} else {
+			somePlainFail('An unexpected server error has occured.');
+
+		}
+
+	});
+}
+
+function somePlainFail(message) {
+	$('#plain-fail').html(message);
+	$('#plain-fail').addClass('alert alert-danger');
+	$('#plain-fail').attr('role', 'alert');
+	$('#plain-fail').show();
+}
+
+
+$(function(){
+
+	$.getJSON('/saml/idps', function(idpInfos){
 		var optionsHtml = idpOptions(idpInfos);
 		var idpSelect = document.getElementById('GET-idpUrl');
 		idpSelect.innerHTML = optionsHtml;
 	});
 
-	var targetUrl = getJsonFromUrl().targetUrl;
+	var targetUrl = urlQueryAsObject().targetUrl;
 	
 	if(targetUrl){
 		var urlRelays = document.querySelectorAll('input.targetUrlRelay');
@@ -70,50 +70,3 @@ ready(function(){
 });
 
 
-
-function doPlainLogin() {
-	
-	$form = $('#plain-login').serializeArray();
-	
-    var ajax = $.post("/password/login", $form);
-    		
-	ajax.complete(function(data) {
-		
-		if (data.status == '200') {
-			goToSite();
-			
-		} else if (data.status == '403') {
-			somePlainFail('You have not been able to be authenticated. Maybe have you entered wrong email/password. Please try again!');
-			
-		} else if (data.status == '500') {
-			somePlainFail('Unfortunately there is some server error. Please try again!');
-			
-		}
-		
-	});	
-}
-
-function goToSite() {
-	window.location = getTargetUrl();
-}
-
-function getTargetUrl() {
-	var url = window.location.href;
-	
-	if (url.search('targetUrl=') > 0) {
-		var target = url.substring(url.indexOf('?') + 1);
-		target = target.replace('targetUrl=', '');
-		
-	} else {
-		target = 'https://www.icos-cp.eu';
-	}
-	
-    return target;
-}
-
-function somePlainFail(message) {
-	$('#plain-fail').html(message);
-	$('#plain-fail').addClass('alert alert-danger');
-	$('#plain-fail').attr('role', 'alert');
-	$('#plain-fail').show();	
-}
