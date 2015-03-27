@@ -101,22 +101,22 @@
 	  					<div class="panel panel-default">
 							<div class="panel-body">
 	  							
-	  							<p class="label label-info">Coming soon!</p>
+	  							<div id="plain-fail" style="display: hidden"></div>
 	  							 
-								<form action="/password/login" method="post">
+								<form id="plain-login">
 									<input class="targetUrlRelay" type="hidden" name="targetUrl">
 									 
 								    <div class="form-group">
-										<label for="POST-username">Username:</label>
-										<input id="POST-username" name="username" disabled type="text" class="form-control" placeholder="Enter username" />
+										<label for="mail">Email:</label>
+										<input id="mail" name="mail" type="email" class="form-control" placeholder="Enter email" />
 								    </div>
 								    
 								    <div class="form-group">
-										<label for="POST-password">Password:</label>
-										<input id="POST-password" name="password" disabled type="password" class="form-control" placeholder="Password" />
+										<label for="password">Password:</label>
+										<input id="password" name="password" type="password" class="form-control" placeholder="Password" />
 								    </div>
 								    
-									<button type="submit" class="btn btn-default">Login!</button>
+									<button type="button" class="btn btn-default" onClick="doPlainLogin()">Login!</button>
 									 
 								</form>	  							
 	  							

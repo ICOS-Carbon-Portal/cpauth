@@ -68,3 +68,52 @@ ready(function(){
 		}
 	}
 });
+
+
+
+function doPlainLogin() {
+	
+	$form = $('#plain-login').serializeArray();
+	
+    var ajax = $.post("/password/login", $form);
+    		
+	ajax.complete(function(data) {
+		
+		if (data.status == '200') {
+			goToSite();
+			
+		} else if (data.status == '403') {
+			somePlainFail('You have not been able to be authenticated. Maybe have you entered wrong email/password. Please try again!');
+			
+		} else if (data.status == '500') {
+			somePlainFail('Unfortunately there is some server error. Please try again!');
+			
+		}
+		
+	});	
+}
+
+function goToSite() {
+	window.location = getTargetUrl();
+}
+
+function getTargetUrl() {
+	var url = window.location.href;
+	
+	if (url.search('targetUrl=') > 0) {
+		var target = url.substring(url.indexOf('?') + 1);
+		target = target.replace('targetUrl=', '');
+		
+	} else {
+		target = 'https://www.icos-cp.eu';
+	}
+	
+    return target;
+}
+
+function somePlainFail(message) {
+	$('#plain-fail').html(message);
+	$('#plain-fail').addClass('alert alert-danger');
+	$('#plain-fail').attr('role', 'alert');
+	$('#plain-fail').show();	
+}
