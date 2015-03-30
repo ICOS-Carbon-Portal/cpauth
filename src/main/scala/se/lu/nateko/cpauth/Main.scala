@@ -26,6 +26,7 @@ import spray.http.StatusCodes
 import spray.http.Uri
 import spray.routing.SimpleRoutingApp
 import se.lu.nateko.cpauth.accounts.Users
+import se.lu.nateko.cpauth.core.UserInfo
 
 
 object Main extends App with SimpleRoutingApp with ProxyDirectives {
@@ -140,6 +141,30 @@ object Main extends App with SimpleRoutingApp with ProxyDirectives {
 						}
 					}
 				)
+			}	
+		} ~
+		put{
+			path("password" / "account" / "create"){
+				user{adminInfo =>
+					onComplete(Users.userIsAdmin(adminInfo.mail)){
+						case Failure(err) => failWith(err)
+						case Success(false) => complete(StatusCodes.Unauthorized)
+						case Success(true) => 
+							formFields('givenName, 'surname, 'mail, 'password)((givenName, surname, mail, password) =>
+								
+								onComplete(Users.userExists(mail)) { 
+									case Success(true) => complete(StatusCodes.Forbidden)
+									case Failure(err) => failWith(err)
+									case Success(false) =>
+										val uinfo = UserInfo(givenName, surname, mail)
+										onComplete(Users.addUser(uinfo, password, false)){
+											case Success(()) => complete(StatusCodes.OK)
+											case Failure(err) => failWith(err)
+										}
+								}
+							)
+					}
+				}
 			}
 		}
 

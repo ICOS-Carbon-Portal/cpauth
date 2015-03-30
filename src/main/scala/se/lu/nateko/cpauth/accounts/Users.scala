@@ -33,10 +33,10 @@ object Users {
 	def setup(): Unit = Await.result(db.run(users.schema.create), Duration.Inf)
 	def drop(): Unit = Await.result(db.run(users.schema.drop), Duration.Inf)
 
-	def addUser(uinfo: UserInfo, password: String): Future[Unit] = {
+	def addUser(uinfo: UserInfo, password: String, isAdmin: Boolean): Future[Unit] = {
 		val passHash = hash(uinfo.mail, password)
 
-		val action = users. += ((0, uinfo.givenName, uinfo.surname, uinfo.mail, passHash))
+		val action = users. += ((0, uinfo.givenName, uinfo.surname, uinfo.mail, passHash, isAdmin))
 
 		db.run(action).flatMap{ x =>
 			if(x == 1) Future.successful(())
@@ -89,6 +89,11 @@ object Users {
 		db.run(q.result).map(_.map({
 			case (givenName, surname, mail) => UserInfo(givenName, surname, mail)
 		}))
+	}
+	
+	def userIsAdmin(mail: String): Future[Boolean] = {
+		val q = users.filter(user => user.mail === mail && user.isAdmin).exists
+		db.run(q.result)
 	}
 
 }
