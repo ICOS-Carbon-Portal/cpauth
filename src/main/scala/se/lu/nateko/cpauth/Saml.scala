@@ -8,6 +8,7 @@ import scala.xml.Elem
 import java.net.URL
 import org.opensaml.saml2.core.NameIDType
 import se.lu.nateko.cpauth.core.SamlSpConfig
+import java.util.TimeZone
 
 object Saml {
 
@@ -23,8 +24,7 @@ object Saml {
 	def authRequestXmlAndId(spConfig: SamlSpConfig): (Elem, String) = {
 
 		val id = "_" + UUID.randomUUID().toString
-		val simpleDf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
-		val issueInstant = simpleDf.format(new Date())
+		val issueInstant = nowUtcIso
 
 		val xml = <samlp:AuthnRequest xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" ID={id} Version="2.0"
 			IssueInstant={issueInstant} ProtocolBinding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
@@ -42,6 +42,13 @@ object Saml {
 
 		</samlp:AuthnRequest>
 		(xml, id)
+	}
+	
+	def nowUtcIso: String = {
+		val tz = TimeZone.getTimeZone("UTC");
+		val df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+		df.setTimeZone(tz);
+		df.format(new Date());
 	}
 
 }
