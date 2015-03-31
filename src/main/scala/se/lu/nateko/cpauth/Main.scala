@@ -78,6 +78,9 @@ object Main extends App with SimpleRoutingApp with ProxyDirectives {
 					HttpResponse(StatusCodes.BadRequest, "Identity provider has not been specified!")
 				)
 			} ~
+			path("logout"){
+				deleteCookie(config.authCookieName, config.authDomain, "/"){complete(StatusCodes.OK)}
+			} ~
 			path("saml" / "cpauth"){ complete(metadataXml) } ~
 			path("saml" / "idps"){ complete(idpInfos) } ~
 			path("whoami"){
@@ -120,7 +123,7 @@ object Main extends App with SimpleRoutingApp with ProxyDirectives {
 					attempt(cookieAndReqIdTry){ case (cookie, reqId) =>
 						setCookie(cookie) {
 							val target: Option[Uri] = targetLookup.getAndForget(reqId)
-							redirect(target.getOrElse(Uri("/whoami")), StatusCodes.Found)
+							redirect(target.getOrElse(Uri("/home/")), StatusCodes.Found)
 						}
 					}
 				}

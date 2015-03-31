@@ -30,13 +30,32 @@
 					</div>
 				</div>
 			</div>
+			
+			<div class="madd" id="errorMessage" hidden>
+				<div class="alert alert-danger" role="alert"></div>
+			</div>
 
+			<div id="hello" hidden>
+				<div class="madd">
+					<h3>Welcome to ICOS Carbon Portal!</h3>
+					<h4>You are signed in with the following claims:</h4>
+					<p>Given name: <span class="label label-default" id="givenName"></span></p>
+					<p>Surname: <span class="label label-default" id="surname"></span></p>
+					<p>E-mail: <span class="label label-default" id="mail"></span></p>
+				</div>
 
-			<div class="row padd">
-				<h3>Welcome, <span class="label label-default" id="welcomeName"></span></h3>
+				<div class="madd">
+					<button type="button" class="btn btn-default" id="signOutButton">Sign out</button>
+				</div>
 			</div>
 			
-			
+			<div id="goodbye" hidden>
+				<div class="madd">
+					<h3>You are not signed in</h3>
+					<p>Sign in here: <a href="https://cpauth.icos-cp.eu/login/">https://cpauth.icos-cp.eu/login/</a></p>
+				</div>
+			</div>
+
 		</div>
 		
 	</body>
