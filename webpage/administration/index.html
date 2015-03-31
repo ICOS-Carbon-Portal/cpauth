@@ -34,10 +34,10 @@
 		
 			<div class="row padd">
 				<h4 class="hidden-xs">
-					Welcome to ICOS! Please create an account.
+					Welcome Admin!
 				</h4>
 				<h6 class="visible-xs-block">
-					Welcome to ICOS! Please create an account.
+					Welcome Admin!
 				</h6>
 			</div>
 		
@@ -46,21 +46,16 @@
 			<div class="row">
 			
 				<ul class="nav nav-tabs" role="tablist">
-					<li role="presentation" class="active col-xs-12 col-sm-2">
-						<a href="#first" aria-controls="first" role="tab" data-toggle="tab">
-							First
-						</a>
-					</li>
-
+					
 					<li role="presentation" class="col-xs-12 col-sm-2">
 						<a href="#create" aria-controls="create" role="tab" data-toggle="tab">
-							Create
+							Create an account
 						</a>
 					</li>
 					
 					<li role="presentation" class="col-xs-12 col-sm-2">
-						<a href="#third" aria-controls="third" role="tab" data-toggle="tab">
-							Third
+						<a href="#delete" aria-controls="delete" role="tab" data-toggle="tab">
+							Delete an account
 						</a>
 					</li>
 					
@@ -75,25 +70,18 @@
 			<div class="row">
 			
 				<div class="tab-content">
-		  			<div role="tabpanel" class="tab-pane active" id="first">
+				
+		  			<div role="tabpanel" class="tab-pane active">
 						<div class="panel panel-default">
 							<div class="panel-body">
+														
+								<div id="new-account-message-error" style="display: hidden"></div>
+								<div id="new-account-message-success" style="display: hidden"></div>
 		  					
-									  					
-		  					
-		  					</div>
-						</div>
-		  			</div>	
-		  		
-			
-		  			<div role="tabpanel" class="tab-pane active" id="create">
-						<div class="panel panel-default">
-							<div class="panel-body">
-		  					
-								<form action="/account/create" method="post">
+								<form id="new-account">
 								    <div class="form-group required">
-										<label for="givenname" class="control">Givenname:</label>
-										<input id="givenname" name="givenname" type="text" class="form-control" placeholder="Enter givenname" />
+										<label for="givenName" class="control">Givenname:</label>
+										<input id="givenName" name="givenName" type="text" class="form-control" placeholder="Enter givenname" />
 								    </div>
 					    
 									<div class="form-group required">
@@ -111,7 +99,7 @@
 										<input id="password" name="password" type="password" class="form-control" placeholder="Password" />
 									</div>
 					    
-									<button id="test" type="button" class="btn btn-default">Create!</button>
+									<button type="button" class="btn btn-default" onClick="createNewAccount()">Create!</button>
 						 
 								</form>									  					
 		  					
@@ -120,7 +108,7 @@
 		  			</div>	
 	  		
 	  		
-		  			<div role="tabpanel" class="tab-pane active" id="third">
+		  			<div role="tabpanel" class="tab-pane" id="delete">
 						<div class="panel panel-default">
 							<div class="panel-body">
 		  					
@@ -129,6 +117,7 @@
 		  					</div>
 						</div>
 		  			</div>	
+		  			
 		  		
 		  		</div>
 	  		</div>	
@@ -141,4 +130,4 @@
 </html>
 
 
-<script src="account.js"></script>
+<script src="admin.js"></script>

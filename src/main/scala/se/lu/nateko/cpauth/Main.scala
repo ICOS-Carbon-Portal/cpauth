@@ -141,9 +141,7 @@ object Main extends App with SimpleRoutingApp with ProxyDirectives {
 						}
 					}
 				)
-			}	
-		} ~
-		put{
+			} ~
 			path("password" / "account" / "create"){
 				user{adminInfo =>
 					onComplete(Users.userIsAdmin(adminInfo.mail)){
