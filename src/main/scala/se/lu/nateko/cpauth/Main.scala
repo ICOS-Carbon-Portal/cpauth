@@ -108,6 +108,12 @@ object Main extends App with SimpleRoutingApp with ProxyDirectives {
 						StatusCodes.Found
 					)
 				})
+			} ~
+			path("password" / "account" / "list"){
+				onComplete(Users.listUsers) {
+					case Success(users: Seq[UserInfo]) => complete(users)
+					case Failure(err) => failWith(err)
+				}
 			}
 		} ~
 		post{
