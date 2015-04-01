@@ -86,6 +86,9 @@ object Main extends App with SimpleRoutingApp with ProxyDirectives {
 			path("whoami"){
 				user(uinfo => complete(uinfo)) ~ complete(StatusCodes.Unauthorized)
 			} ~
+			path("password" / "account" / "list"){
+				admin(onSuccess(Users.listUsers) {users => complete(users)})
+			} ~
 			headerValue{
 				case HttpHeaders.Host(host, 0) => config.drupalProxying.get(host)
 				case _ => None
@@ -108,12 +111,6 @@ object Main extends App with SimpleRoutingApp with ProxyDirectives {
 						StatusCodes.Found
 					)
 				})
-			} ~
-			path("password" / "account" / "list"){
-				onComplete(Users.listUsers) {
-					case Success(users: Seq[UserInfo]) => complete(users)
-					case Failure(err) => failWith(err)
-				}
 			}
 		} ~
 		post{
@@ -152,25 +149,17 @@ object Main extends App with SimpleRoutingApp with ProxyDirectives {
 				)
 			} ~
 			path("password" / "account" / "create"){
-				user{adminInfo =>
-					onComplete(Users.userIsAdmin(adminInfo.mail)){
-						case Failure(err) => failWith(err)
-						case Success(false) => complete(StatusCodes.Unauthorized)
-						case Success(true) => 
-							formFields('givenName, 'surname, 'mail, 'password)((givenName, surname, mail, password) =>
-								
-								onComplete(Users.userExists(mail)) { 
-									case Success(true) => complete(StatusCodes.Forbidden)
-									case Failure(err) => failWith(err)
-									case Success(false) =>
-										val uinfo = UserInfo(givenName, surname, mail)
-										onComplete(Users.addUser(uinfo, password, false)){
-											case Success(()) => complete(StatusCodes.OK)
-											case Failure(err) => failWith(err)
-										}
+				admin{
+					formFields('givenName, 'surname, 'mail, 'password)((givenName, surname, mail, password) =>
+						onSuccess(Users.userExists(mail)) {
+							case true => complete(StatusCodes.Forbidden)
+							case false =>
+								val uinfo = UserInfo(givenName, surname, mail)
+								onSuccess(Users.addUser(uinfo, password, false)){ _ =>
+									complete(StatusCodes.OK)
 								}
-							)
-					}
+						}
+					)
 				}
 			}
 		}

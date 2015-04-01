@@ -16,8 +16,10 @@ import spray.routing.AuthenticationFailedRejection
 import spray.routing.Directives
 import spray.routing.RequestContext
 import spray.routing.Route
+import se.lu.nateko.cpauth.accounts.Users
+import scala.concurrent.ExecutionContext
 
-class CpauthDirectives(config: Config, authenticator: Try[Authenticator]) extends Directives {
+class CpauthDirectives(config: Config, authenticator: Try[Authenticator])(implicit ex: ExecutionContext) extends Directives {
 
 	val remakeCookies = mapHttpResponseHeaders(_.map(remakeCookie))
 
@@ -66,6 +68,14 @@ class CpauthDirectives(config: Config, authenticator: Try[Authenticator]) extend
 			}
 		}
 	}) ~ reject(new AuthenticationFailedRejection(AuthenticationFailedRejection.CredentialsMissing, Nil))
+
+	def admin(inner: => Route): Route = user(uinfo =>
+		onComplete(Users.userIsAdmin(uinfo.mail)){
+			case Failure(err) => failWith(err)
+			case Success(false) => complete(StatusCodes.Unauthorized)
+			case Success(true) => inner
+		}
+	)
 
 	private def getCookieHeaders(ctxt: RequestContext): List[HttpHeader] = {
 		val unfiltered: List[HttpHeader] = ctxt.request.headers
