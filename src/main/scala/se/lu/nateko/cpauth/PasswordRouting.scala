@@ -25,16 +25,11 @@ trait PasswordRouting extends Directives with CpauthDirectives {
 			path("login"){
 				formFields('mail, 'password)((mail, password) =>
 
-					onComplete(userDb.authenticateUser(mail, password)){ uinfoTry =>
+					onSuccess(userDb.authenticateUser(mail, password)){ uinfo =>
 
-						uinfoTry.flatMap(cookieFactory.makeAuthenticationCookie) match{
-
+						cookieFactory.makeAuthenticationCookie(uinfo) match{
 							case Success(cookie) => setCookie(cookie)(complete(StatusCodes.OK))
-	
-							case Failure(err) => err match {
-								case AuthenticationFailedException => complete(StatusCodes.Forbidden)
-								case _ => failWith(err)
-							}
+							case Failure(err) => failWith(err)
 						}
 					}
 				)
