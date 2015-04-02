@@ -16,16 +16,14 @@ case class SignedToken(token: AuthToken, signature: Signature)
 
 class Authenticator private(key: RSAPublicKey){
 
-	def unwrapUserInfo(token: SignedToken): Try[UserInfo] = {
+	def unwrapUserInfo(token: SignedToken): Try[UserInfo] =
 		if(tokenIsOld(token.token))
-			Failure(new Exception("Authentication token has expired") with NoStackTrace)
-
+			Exceptions.failure("Authentication token has expired")
 		else signatureIsValid(token) match{
 			case Success(true) => Success(token.token.userInfo)
 			case Failure(err) => Failure(err)
-			case Success(false) => Failure(new Exception("Authentication token's signature is invalid") with NoStackTrace)
+			case Success(false) => Exceptions.failure("Authentication token's signature is invalid")
 		}
-	}
 
 	private def signatureIsValid(token: SignedToken): Try[Boolean] = {
 		val message = token.token.toString

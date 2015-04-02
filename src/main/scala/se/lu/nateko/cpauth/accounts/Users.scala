@@ -9,10 +9,20 @@ import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 import java.util.Base64
 import scala.util.control.NoStackTrace
-import se.lu.nateko.cpauth.AuthenticationFailedException
-import se.lu.nateko.cpauth.Exceptions
+import se.lu.nateko.cpauth.core.AuthenticationFailedException
+import se.lu.nateko.cpauth.core.Exceptions
 
-object Users {
+trait UsersIo{
+	def addUser(uinfo: UserInfo, password: String, isAdmin: Boolean): Future[Unit]
+	def userExists(mail: String): Future[Boolean]
+	def authenticateUser(mail: String, password: String): Future[UserInfo]
+	def dropUser(mail: String): Future[Int]
+	def updateUser(oldMail: String, uinfo: UserInfo, newPass: String): Future[Int]
+	def listUsers: Future[Seq[UserInfo]]
+	def userIsAdmin(mail: String): Future[Boolean]
+}
+
+object Users extends UsersIo {
 
 	def hash(mail: String, pass: String): String = {
 		val md = MessageDigest.getInstance("MD5")
@@ -40,7 +50,7 @@ object Users {
 
 		db.run(action).flatMap{ x =>
 			if(x == 1) Future.successful(())
-			else Future.failed(new Exception("Was supposed to add one user, added " + x))
+			else Exceptions.failedFuture("Was supposed to add one user, added " + x)
 		}
 	}
 
