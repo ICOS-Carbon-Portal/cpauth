@@ -53,7 +53,7 @@ trait DrupalRouting extends Directives with CpauthDirectives with ProxyDirective
 		case None => uri
 		case Some(drop) =>
 			val filteredQuery = uri.query.filter{
-				case (`drop`, _) => false
+				case (param, _) if param.equalsIgnoreCase(drop) => false
 				case _ => true
 			}
 			uri.withQuery(filteredQuery)
