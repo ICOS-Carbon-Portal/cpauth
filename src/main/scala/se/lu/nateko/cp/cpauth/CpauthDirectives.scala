@@ -45,6 +45,13 @@ trait CpauthDirectives extends Directives {
 		}
 	}) ~ reject(new AuthenticationFailedRejection(AuthenticationFailedRejection.CredentialsMissing, Nil))
 
+
+	protected def primitiveToJson[T](v: T): HttpResponse = {
+		import spray.http.HttpEntity
+		import spray.http.ContentTypes
+		HttpResponse(entity = HttpEntity(ContentTypes.`application/json`, v.toString))
+	}
+
 	private def getCookieHeaders(ctxt: RequestContext): List[HttpHeader] = {
 		val unfiltered: List[HttpHeader] = ctxt.request.headers
 		unfiltered.filter(_.is(HttpHeaders.Cookie.lowercaseName))

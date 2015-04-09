@@ -42,11 +42,11 @@ scalacOptions ++= Seq(
 fork := true
 
 initialCommands in console := """
-import se.lu.nateko.cpauth.Constants
-import se.lu.nateko.cpauth.opensaml._
+import se.lu.nateko.cp.cpauth.accounts.Users
+import se.lu.nateko.cp.cpauth.core.UserInfo
 """
 
-val cpauthMain = Some("se.lu.nateko.cpauth.Main")
+val cpauthMain = Some("se.lu.nateko.cp.cpauth.Main")
 mainClass in assembly := cpauthMain
 mainClass in (Compile, run) := cpauthMain
 

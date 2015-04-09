@@ -8,17 +8,25 @@ import scala.util.Failure
 import spray.http.StatusCodes
 import se.lu.nateko.cp.cpauth.core.AuthenticationFailedException
 import se.lu.nateko.cp.cpauth.core.UserInfo
-import se.lu.nateko.cp.cpauth.CpauthJsonProtocol._
+import CpauthJsonProtocol._
 
 trait PasswordRouting extends Directives with CpauthDirectives {
 
+	
 	def userDb: UsersIo
 	def cookieFactory: CookieFactory
 
-	val passwordRoute: Route = pathPrefix("password"){
+	lazy val passwordRoute: Route = pathPrefix("password"){
 		get{
 			path("account" / "list"){
 				admin(onSuccess(userDb.listUsers) {users => complete(users)})
+			} ~
+			path("amilocal"){
+				user{user =>
+					onSuccess(userDb.userExists(user.mail)){
+						isLocal => complete(primitiveToJson(isLocal))
+					}
+				}
 			}
 		} ~
 		post{
@@ -50,7 +58,7 @@ trait PasswordRouting extends Directives with CpauthDirectives {
 			} ~
 			path("changepassword"){
 				user(uinfo =>
-					formFields('old, 'new)((oldPass, newPass) => {
+					formFields('oldPass, 'newPass)((oldPass, newPass) => {
 						val result = for(
 							_ <- userDb.authenticateUser(uinfo.mail, oldPass);
 							_ <- userDb.updateUser(uinfo.mail, uinfo, newPass)
@@ -69,4 +77,5 @@ trait PasswordRouting extends Directives with CpauthDirectives {
 			case Success(true) => inner
 		}
 	)
+	
 }

@@ -30,29 +30,70 @@
 					</div>
 				</div>
 			</div>
+
+			<div class="page-header">
+			  <h1>ICOS Carbon Portal Authentication Service <small>Manage your account here</small></h1>
+			</div>
 			
 			<div class="madd" id="errorMessage" hidden>
 				<div class="alert alert-danger" role="alert"></div>
 			</div>
 
 			<div id="hello" hidden>
-				<div class="madd">
-					<h3>Welcome to ICOS Carbon Portal!</h3>
-					<h4>You are signed in with the following claims:</h4>
-					<p>Given name: <span class="label label-default" id="givenName"></span></p>
-					<p>Surname: <span class="label label-default" id="surname"></span></p>
-					<p>E-mail: <span class="label label-default" id="mail"></span></p>
+				<div class="panel panel-info">
+					<div class="panel-heading"><h3 class="panel-title">You are signed in with the following claims:</h3></div>
+					<div class="panel-body">
+						<table class="table">
+							<tbody>
+								<tr><th>Given name:</th><td id="givenName"></td>
+									<td rowspan="3" style="text-align: center;vertical-align: middle">
+										<button type="button" class="btn btn-primary btn-lg" id="signOutButton">Sign out</button>
+									</td>
+								</tr>
+								<tr><th>Surname:</th><td id="surname"></td></tr>
+								<tr><th>E-mail:</th><td id="mail"></td></tr>
+							</tbody>
+						</table>
+					</div>
 				</div>
 
-				<div class="madd">
-					<button type="button" class="btn btn-default" id="signOutButton">Sign out</button>
+				<div id="forLocalsOnly" hidden>
+
+					<div class="panel panel-info">
+						<div class="panel-heading"><h3 class="panel-title">You can change your password here:</h3></div>
+						<div class="panel-body">
+							<div class="input-group">
+								<span class="input-group-addon">Enter your old password</span>
+								<input type="password" id="oldPassword" class="form-control" placeholder="Old password">
+							</div>
+							<br/>
+							<div class="input-group">
+								<span class="input-group-addon">Enter your new password</span>
+								<input type="password" id="newPassword" class="form-control" placeholder="New password">
+								<span class="input-group-btn">
+								  <button class="btn btn-default" type="button" id="changePasswordButton">Change!</button>
+								</span>
+							</div>
+						</div>
+					</div>
+
+					<div class="panel panel-danger">
+						<div class="panel-heading"><h3 class="panel-title">You can delete your account here:</h3></div>
+						<div class="panel-body">
+							<button type="button" class="btn btn-danger btn-lg" id="deleteAccountButton">Delete account</button>
+						</div>
+					</div>
+					
 				</div>
+
 			</div>
 			
 			<div id="goodbye" hidden>
-				<div class="madd">
-					<h3>You are not signed in</h3>
-					<p>Sign in here: <a href="https://cpauth.icos-cp.eu/login/">https://cpauth.icos-cp.eu/login/</a></p>
+				<div class="panel panel-info">
+					<div class="panel-heading"><h3 class="panel-title">You are not signed in</h3></div>
+					<div class="panel-body">
+						<p>Sign in here: <a href="https://cpauth.icos-cp.eu/login/">https://cpauth.icos-cp.eu/login/</a></p>
+					</div>
 				</div>
 			</div>
 

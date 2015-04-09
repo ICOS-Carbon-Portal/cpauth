@@ -42,15 +42,19 @@ object Main extends App with SimpleRoutingApp with SamlRouting with PasswordRout
 		handleExceptions(cpauthExceptionHandler){
 			samlRoute ~
 			passwordRoute ~
+			drupalRoute ~
 			get{
 				path("logout"){
 					deleteCookie(config.authCookieName, config.authDomain, "/"){complete(StatusCodes.OK)}
 				} ~
 				path("whoami"){
 					user(uinfo => complete(uinfo)) ~ complete(StatusCodes.Unauthorized)
+				} ~
+				pathEndOrSingleSlash{
+					user(_ => redirect("/home/", StatusCodes.Found)) ~
+					redirect("/login/", StatusCodes.Found)
 				}
-			} ~
-			drupalRoute
+			}
 		}
 	}
 
