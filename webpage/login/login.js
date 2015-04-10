@@ -50,6 +50,13 @@ function somePlainFail(message) {
 }
 
 
+function enterKeyHandler(innerFun){
+	return function(e){
+		if(e.which == 13) innerFun(e);
+	}
+}
+
+
 $(function(){
 
 	$.getJSON('/saml/idps', function(idpInfos){
@@ -65,9 +72,10 @@ $(function(){
 	}
 
 	$("#passwordLoginButton").click(doPlainLogin);
-	$("#password").keypress(function(e){
-		if(e.which == 13) doPlainLogin();
-	});
-});
+	$("#password").keypress(enterKeyHandler(doPlainLogin));
+	$("#mail").keypress(enterKeyHandler(function(){
+		$("#password").focus();
+	}));
 
+});
 

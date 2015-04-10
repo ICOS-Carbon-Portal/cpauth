@@ -66,6 +66,11 @@ trait PasswordRouting extends Directives with CpauthDirectives {
 						onSuccess(result)(_ => complete(StatusCodes.OK))
 					})
 				)
+			} ~
+			path("deleteaccount"){
+				user(uinfo =>
+					onSuccess(userDb.dropUser(uinfo.mail))(_ => logout)
+				)
 			}
 		}
 	}

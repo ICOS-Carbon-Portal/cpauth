@@ -36,7 +36,10 @@ object Users extends UsersIo {
 
 	private[this] val db = Database.forConfig("cpauth.hsqldb")
 
-	def closeDb(): Unit = db.close()
+	def closeDb(): Unit = {
+		println("Shutting down Users database")
+		db.close()
+	}
 
 	val users = TableQuery[UserAccounts]
 

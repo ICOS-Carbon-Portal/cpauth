@@ -7,6 +7,7 @@ import scala.util.Try
 import se.lu.nateko.cp.cpauth.core.Authenticator
 import se.lu.nateko.cp.cpauth.core.CookieToToken
 import se.lu.nateko.cp.cpauth.core.PublicAuthConfig
+import se.lu.nateko.cp.cpauth.core.UrlsConfig
 import se.lu.nateko.cp.cpauth.core.UserInfo
 import spray.http.HttpHeader
 import spray.http.HttpHeaders
@@ -19,7 +20,7 @@ import spray.routing.Route
 
 trait CpauthDirectives extends Directives {
 
-	def publicAuthConfig: PublicAuthConfig
+	def publicAuthConfig: PublicAuthConfig with UrlsConfig
 	def authenticator: Try[Authenticator]
 	implicit val dispatcher: ExecutionContext
 
@@ -45,6 +46,9 @@ trait CpauthDirectives extends Directives {
 		}
 	}) ~ reject(new AuthenticationFailedRejection(AuthenticationFailedRejection.CredentialsMissing, Nil))
 
+	lazy val logout: Route = deleteCookie(publicAuthConfig.authCookieName, publicAuthConfig.authDomain, "/"){
+		complete(StatusCodes.OK)
+	}
 
 	protected def primitiveToJson[T](v: T): HttpResponse = {
 		import spray.http.HttpEntity

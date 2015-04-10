@@ -41,7 +41,12 @@
 
 			<div id="hello" hidden>
 				<div class="panel panel-info">
-					<div class="panel-heading"><h3 class="panel-title">You are signed in with the following claims:</h3></div>
+					<div class="panel-heading">
+						<h3 class="panel-title">
+							<span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+							You are signed in with the following claims:
+						</h3>
+					</div>
 					<div class="panel-body">
 						<table class="table">
 							<tbody>
@@ -60,7 +65,12 @@
 				<div id="forLocalsOnly" hidden>
 
 					<div class="panel panel-info">
-						<div class="panel-heading"><h3 class="panel-title">You can change your password here:</h3></div>
+						<div class="panel-heading">
+							<h3 class="panel-title">
+								<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+								You can change your password here:
+							</h3>
+						</div>
 						<div class="panel-body">
 							<div class="input-group">
 								<span class="input-group-addon">Enter your old password</span>
@@ -71,16 +81,39 @@
 								<span class="input-group-addon">Enter your new password</span>
 								<input type="password" id="newPassword" class="form-control" placeholder="New password">
 								<span class="input-group-btn">
-								  <button class="btn btn-default" type="button" id="changePasswordButton">Change!</button>
+								  <button class="btn btn-primary" type="button" id="changePasswordButton">Change!</button>
 								</span>
 							</div>
 						</div>
 					</div>
 
-					<div class="panel panel-danger">
-						<div class="panel-heading"><h3 class="panel-title">You can delete your account here:</h3></div>
+					<div class="panel panel-info">
+						<div class="panel-heading">
+							<h3 class="panel-title">
+								<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+								You can delete your account here:
+							</h3>
+						</div>
 						<div class="panel-body">
-							<button type="button" class="btn btn-danger btn-lg" id="deleteAccountButton">Delete account</button>
+
+							<button type="button" class="btn btn-primary btn-lg" id="deleteAccountButton">Delete account</button>
+
+							<div id="deleteAccountConfirmation" hidden>
+								<br/>
+								<div class="panel panel-danger">
+									<div class="panel-heading">
+										<h3 class="panel-title">
+											<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+											ARE YOU SURE YOU WANT TO DELETE YOUR ACCOUNT?
+										</h3>
+									</div>
+									<div class="panel-body">
+										<button type="button" class="btn btn-primary btn-lg" id="cancelDeleteButton">NO! GO BACK TO SAFETY!</button>
+										<button type="button" class="btn btn-danger btn-lg" id="reallyDeleteButton">YES</button>
+									</div>
+								</div>
+							</div>
+
 						</div>
 					</div>
 					
@@ -90,9 +123,14 @@
 			
 			<div id="goodbye" hidden>
 				<div class="panel panel-info">
-					<div class="panel-heading"><h3 class="panel-title">You are not signed in</h3></div>
+					<div class="panel-heading">
+						<h3 class="panel-title">
+							<span class="glyphicon glyphicon-minus-sign" aria-hidden="true"></span>
+							You are not signed in
+						</h3>
+					</div>
 					<div class="panel-body">
-						<p>Sign in here: <a href="https://cpauth.icos-cp.eu/login/">https://cpauth.icos-cp.eu/login/</a></p>
+						<h4>Sign in here: <a href="https://cpauth.icos-cp.eu/login/">https://cpauth.icos-cp.eu/login/</a></h4>
 					</div>
 				</div>
 			</div>

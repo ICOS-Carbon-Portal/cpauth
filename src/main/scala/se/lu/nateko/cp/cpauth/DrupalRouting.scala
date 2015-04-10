@@ -1,20 +1,21 @@
 package se.lu.nateko.cp.cpauth
 
+import akka.actor.ActorSystem
+import akka.util.Timeout
+import scala.concurrent.ExecutionContext
+import scala.concurrent.duration.DurationInt
+import se.lu.nateko.cp.cpauth.core.UrlsConfig
 import spray.routing.Directives
 import spray.http.HttpHeaders
 import spray.http.Uri
 import spray.http.StatusCodes
-import akka.actor.ActorSystem
-import akka.util.Timeout
 import spray.http.HttpHeader
-import scala.concurrent.ExecutionContext
-import se.lu.nateko.cp.cpauth.core.UrlsConfig
 
 trait DrupalRouting extends Directives with CpauthDirectives with ProxyDirectives{
 
 	def urlsConfig: UrlsConfig
 	implicit val system: ActorSystem
-	implicit val timeout: Timeout
+	implicit val timeout = Timeout(60.seconds)
 
 	val drupalRoute = get{
 		headerValue{

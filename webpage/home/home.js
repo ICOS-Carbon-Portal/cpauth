@@ -39,6 +39,18 @@ function hideError(){
 }
 
 
+function showDeleteAccountConfirmation(){
+	$("#deleteAccountButton").hide();
+	$("#deleteAccountConfirmation").show();
+}
+
+
+function hideDeleteAccountConfirmation(){
+	$("#deleteAccountConfirmation").hide();
+	$("#deleteAccountButton").show();
+}
+
+
 function enterKeyHandler(innerFun){
 	return function(e){
 		if(e.which == 13) innerFun(e);
@@ -67,6 +79,11 @@ function changePassword(){
 		});
 }
 
+function deleteAccount(){
+	$.post("/password/deleteaccount")
+		.fail(reportError)
+		.done(switchToLoggedOutState);
+}
 
 $(function(){
 	$.getJSON('/whoami')
@@ -80,7 +97,14 @@ $(function(){
 
 	$("#signOutButton").click(signOut);
 	$("#changePasswordButton").click(changePassword);
+	$("#deleteAccountButton").click(showDeleteAccountConfirmation);
+	$("#cancelDeleteButton").click(hideDeleteAccountConfirmation);
+	$("#reallyDeleteButton").click(deleteAccount);
+
 	$("#newPassword").keypress(enterKeyHandler(changePassword));
-	$("#oldPassword").keypress(enterKeyHandler(function(){$("#newPassword").focus()}));
+	$("#oldPassword").keypress(enterKeyHandler(function(){
+		$("#newPassword").focus();
+	}));
+
 });
 

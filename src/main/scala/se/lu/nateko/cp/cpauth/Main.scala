@@ -1,8 +1,6 @@
 package se.lu.nateko.cp.cpauth
 
 import akka.actor.ActorSystem
-import akka.util.Timeout
-import scala.concurrent.duration.DurationInt
 import se.lu.nateko.cp.cpauth.CpauthJsonProtocol._
 import se.lu.nateko.cp.cpauth.accounts.Users
 import se.lu.nateko.cp.cpauth.core.Authenticator
@@ -19,7 +17,6 @@ import se.lu.nateko.cp.cpauth.core.AuthenticationFailedException
 object Main extends App with SimpleRoutingApp with SamlRouting with PasswordRouting with DrupalRouting {
 
 	implicit val system = ActorSystem("cpauth")
-	implicit val timeout = Timeout(60.seconds)
 	implicit val dispatcher = system.dispatcher
 
 	val config: Config = Constants
@@ -31,7 +28,9 @@ object Main extends App with SimpleRoutingApp with SamlRouting with PasswordRout
 	val targetLookup: TargetUrlLookup = new MapBasedUrlLookup
 	val authenticator = Authenticator(config)
 	val metadataXmlStr: String = CoreUtils.getResourceAsString(config.samlSpXmlPath)
+
 	val userDb = Users
+//	system.registerOnTermination(Users.closeDb)
 
 	val cpauthExceptionHandler = ExceptionHandler{
 		case AuthenticationFailedException => complete((StatusCodes.Forbidden, AuthenticationFailedException.getMessage))
@@ -44,9 +43,7 @@ object Main extends App with SimpleRoutingApp with SamlRouting with PasswordRout
 			passwordRoute ~
 			drupalRoute ~
 			get{
-				path("logout"){
-					deleteCookie(config.authCookieName, config.authDomain, "/"){complete(StatusCodes.OK)}
-				} ~
+				path("logout")(logout) ~
 				path("whoami"){
 					user(uinfo => complete(uinfo)) ~ complete(StatusCodes.Unauthorized)
 				} ~
@@ -56,6 +53,18 @@ object Main extends App with SimpleRoutingApp with SamlRouting with PasswordRout
 				}
 			}
 		}
-	}
+	}.onComplete(_ =>
+//		sys.addShutdownHook(() => {
+//			println("In JVM's shutdown hook!")
+//			Users.closeDb()
+//		})
+		Runtime.getRuntime.addShutdownHook(new Thread(){
+			override def run() = {
+				//println("In JVM's shutdown hook!")
+//				system.shutdown()
+				Users.closeDb()
+			}
+		})
+	)
 
 }
