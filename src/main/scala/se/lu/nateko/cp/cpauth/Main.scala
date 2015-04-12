@@ -1,6 +1,7 @@
 package se.lu.nateko.cp.cpauth
 
 import akka.actor.ActorSystem
+import akka.pattern.ask
 import se.lu.nateko.cp.cpauth.CpauthJsonProtocol._
 import se.lu.nateko.cp.cpauth.accounts.Users
 import se.lu.nateko.cp.cpauth.core.Authenticator
@@ -12,6 +13,9 @@ import spray.http.StatusCodes
 import spray.routing.ExceptionHandler
 import spray.routing.SimpleRoutingApp
 import se.lu.nateko.cp.cpauth.core.AuthenticationFailedException
+import spray.can.Http
+import scala.concurrent.Await
+import scala.concurrent.duration.Duration
 
 
 object Main extends App with SimpleRoutingApp with SamlRouting with PasswordRouting with DrupalRouting {
@@ -29,8 +33,7 @@ object Main extends App with SimpleRoutingApp with SamlRouting with PasswordRout
 	val authenticator = Authenticator(config)
 	val metadataXmlStr: String = CoreUtils.getResourceAsString(config.samlSpXmlPath)
 
-	val userDb = Users
-//	system.registerOnTermination(Users.closeDb)
+	lazy val userDb = Users
 
 	val cpauthExceptionHandler = ExceptionHandler{
 		case AuthenticationFailedException => complete((StatusCodes.Forbidden, AuthenticationFailedException.getMessage))
@@ -53,18 +56,19 @@ object Main extends App with SimpleRoutingApp with SamlRouting with PasswordRout
 				}
 			}
 		}
-	}.onComplete(_ =>
-//		sys.addShutdownHook(() => {
-//			println("In JVM's shutdown hook!")
-//			Users.closeDb()
-//		})
-		Runtime.getRuntime.addShutdownHook(new Thread(){
-			override def run() = {
-				//println("In JVM's shutdown hook!")
-//				system.shutdown()
-				Users.closeDb()
-			}
-		})
-	)
+	}.onSuccess{ case _ =>
+		sys.addShutdownHook{
+//			val serverStop = akka.io.IO(Http).ask(Http.Unbind)
+//			println("Sent Http.Unbind")
+			akka.io.IO(Http) ! akka.actor.PoisonPill
+			//println("Sent PoisonPill, waiting 1 sec")
+			Thread.sleep(1000)
+			//println("Shutting down the actor system")
+			system.shutdown()
+			//println("closing Users DB")
+			Users.closeDb()
+			//println("Users DB closed, done with the shutdown hook!")
+		}
+	}
 
 }
