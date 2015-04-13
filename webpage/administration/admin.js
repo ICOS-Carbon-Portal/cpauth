@@ -14,7 +14,7 @@ function createNewAccount() {
 		
 		var $form = $('#new-account').serializeArray();
 	
-		$.post("/password/account/create", $form).complete(function(data) {	
+		$.post("/password/createaccount", $form).complete(function(data) {
 			if (data.status == '200') {
 				resetNew();
 				newMessageSuccess('A new account is created!');
@@ -105,7 +105,7 @@ function resetValidateNewError() {
  */
 $('#list-accounts-butt').click(function() {
 	
-	$.getJSON( "/password/account/list", function() {
+	$.getJSON( "/password/accountslist", function() {
 		
 	})
 	.done(function(data) {

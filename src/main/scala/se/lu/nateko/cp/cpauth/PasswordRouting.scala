@@ -12,13 +12,12 @@ import CpauthJsonProtocol._
 
 trait PasswordRouting extends Directives with CpauthDirectives {
 
-	
 	def userDb: UsersIo
 	def cookieFactory: CookieFactory
 
 	lazy val passwordRoute: Route = pathPrefix("password"){
 		get{
-			path("account" / "list"){
+			path("accountslist"){
 				admin(onSuccess(userDb.listUsers) {users => complete(users)})
 			} ~
 			path("amilocal"){
@@ -42,20 +41,6 @@ trait PasswordRouting extends Directives with CpauthDirectives {
 					}
 				)
 			} ~
-			path("account" / "create"){
-				admin{
-					formFields('givenName, 'surname, 'mail, 'password)((givenName, surname, mail, password) =>
-						onSuccess(userDb.userExists(mail)) {
-							case true => complete((StatusCodes.Forbidden, "User already exists"))
-							case false =>
-								val uinfo = UserInfo(givenName, surname, mail)
-								onSuccess(userDb.addUser(uinfo, password, false)){ _ =>
-									complete(StatusCodes.OK)
-								}
-						}
-					)
-				}
-			} ~
 			path("changepassword"){
 				user(uinfo =>
 					formFields('oldPass, 'newPass)((oldPass, newPass) => {
@@ -71,6 +56,35 @@ trait PasswordRouting extends Directives with CpauthDirectives {
 				user(uinfo =>
 					onSuccess(userDb.dropUser(uinfo.mail))(_ => logout)
 				)
+			} ~
+			admin{
+				path("createaccount"){
+					formFields('givenName, 'surname, 'mail, 'password)((givenName, surname, mail, password) =>
+						onSuccess(userDb.userExists(mail)) {
+							case true => complete((StatusCodes.Forbidden, "User already exists"))
+							case false =>
+								val uinfo = UserInfo(givenName, surname, mail)
+								onSuccess(userDb.addUser(uinfo, password, false)){ _ =>
+									complete(StatusCodes.OK)
+								}
+						}
+					)
+				} ~
+				path("deleteaccount"){
+					formField('mail)(mail =>
+						onSuccess(userDb.setAdminRights(mail, true))(_ => complete(StatusCodes.OK))
+					)
+				} ~
+				path("makeadmin"){
+					formField('mail)(mail =>
+						onSuccess(userDb.setAdminRights(mail, true))(_ => complete(StatusCodes.OK))
+					)
+				} ~
+				path("unmakeadmin"){
+					formField('mail)(mail =>
+						onSuccess(userDb.setAdminRights(mail, false))(_ => complete(StatusCodes.OK))
+					)
+				}
 			}
 		}
 	}

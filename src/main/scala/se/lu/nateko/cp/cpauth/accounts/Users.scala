@@ -16,10 +16,11 @@ trait UsersIo{
 	def addUser(uinfo: UserInfo, password: String, isAdmin: Boolean): Future[Unit]
 	def userExists(mail: String): Future[Boolean]
 	def authenticateUser(mail: String, password: String): Future[UserEntry]
-	def dropUser(mail: String): Future[Int]
-	def updateUser(oldMail: String, uinfo: UserInfo, newPass: String, isAdmin: Boolean): Future[Int]
+	def dropUser(mail: String): Future[Unit]
+	def updateUser(oldMail: String, uinfo: UserInfo, newPass: String, isAdmin: Boolean): Future[Unit]
 	def listUsers: Future[Seq[UserEntry]]
 	def userIsAdmin(mail: String): Future[Boolean]
+	def setAdminRights(mail: String, isAdmin: Boolean): Future[Unit]
 }
 
 object Users extends UsersIo {
@@ -79,34 +80,47 @@ object Users extends UsersIo {
 		})
 	}
 
-	def dropUser(mail: String): Future[Int] = {
+	def dropUser(mail: String): Future[Unit] = ensureSingleUserChange(mail){
 		val action = users.filter(_.mail === mail).delete
 		db.run(action)
 	}
 
-	def updateUser(oldMail: String, uinfo: UserInfo, newPass: String, isAdmin: Boolean): Future[Int] = {
-		val newPassHash = hash(uinfo.mail, newPass)
+	def updateUser(oldMail: String, uinfo: UserInfo, newPass: String, isAdmin: Boolean): Future[Unit] =
+		ensureSingleUserChange(oldMail){
+			val newPassHash = hash(uinfo.mail, newPass)
 
-		val q = for(user <- users if user.mail === oldMail)
-			yield (user.givenName, user.surname, user.mail, user.password, user.isAdmin)
+			val q = for(user <- users if user.mail === oldMail)
+				yield (user.givenName, user.surname, user.mail, user.password, user.isAdmin)
 
-		val upd = q.update((uinfo.givenName, uinfo.surname, uinfo.mail, newPassHash, isAdmin))
+			val upd = q.update((uinfo.givenName, uinfo.surname, uinfo.mail, newPassHash, isAdmin))
 
-		db.run(upd)
-	}
-	
+			db.run(upd)
+		}
+
 	def listUsers: Future[Seq[UserEntry]] = {
 		val q = for(user <- users) yield
 			(user.givenName, user.surname, user.mail, user.isAdmin)
-		
+
 		db.run(q.result).map(_.map({
 			case (givenName, surname, mail, isAdmin) => UserEntry(UserInfo(givenName, surname, mail), isAdmin) 
 		}))
 	}
-	
+
 	def userIsAdmin(mail: String): Future[Boolean] = {
 		val q = users.filter(user => user.mail === mail && user.isAdmin).exists
 		db.run(q.result)
+	}
+
+	def setAdminRights(mail: String, isAdmin: Boolean): Future[Unit] =
+		ensureSingleUserChange(mail){
+			val q = for(user <- users if user.mail === mail) yield user.isAdmin
+			db.run(q.update(isAdmin))
+		}
+
+	private def ensureSingleUserChange(mail: String)(future: Future[Int]): Future[Unit] = future.flatMap{
+		case 0 => Exceptions.failedFuture(s"Operation failed. Does user '$mail' exist at all?")
+		case 1 => Future.successful(())
+		case _ => Exceptions.failedFuture("Unexpected error! Number of updated users was neither 0 nor 1!")
 	}
 
 }
