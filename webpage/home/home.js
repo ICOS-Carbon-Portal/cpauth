@@ -1,6 +1,6 @@
 
 function switchToLoggedOutState(){
-	hideError();
+	hideMessage();
 	$("#hello").hide();
 	$("#forLocalsOnly").hide();
 	$("#goodbye").show();
@@ -10,11 +10,6 @@ function switchToLoggedOutState(){
 function switchToLoggedInState(){
 	$("#goodbye").hide();
 	$("#hello").show();
-}
-
-
-function showFunctionalityForLocalUsers(){
-	$("#forLocalsOnly").show();
 }
 
 
@@ -29,13 +24,40 @@ function displayUserInfo(uinfo){
 
 
 function reportError(xhr){
-	$("#errorMessage div").html(xhr.responseText);
-	$("#errorMessage").show();
+	showMessage(xhr.responseText, "alert-danger");
 }
 
+function reportSuccess(msg){
+	showMessage(msg, "alert-success", 1500);
+}
 
-function hideError(){
-	$("#errorMessage").hide();
+function showMessage(message, msgType, hideAfter){
+	var $msg = $("#message");
+	var oldTimeout = $msg.data("hideTimeout");
+	if(oldTimeout) clearTimeout(oldTimeout);
+	
+	fadeOutMessage(function(){
+		$msg.html(message);
+		$msg.addClass(msgType);
+		$msg.show();
+
+		if(hideAfter){
+			var newTimeout = setTimeout(fadeOutMessage, hideAfter);
+			$msg.data("hideTimeout", newTimeout);
+		}
+	});
+}
+
+function fadeOutMessage(runAfter){
+	$("#message").fadeOut(function(){
+		hideMessage();
+		if($.isFunction(runAfter)) runAfter();
+	});
+}
+
+function hideMessage(){
+	$("#message").hide();
+	$("#message").removeClass("alert-success alert-info alert-warning alert-danger");
 }
 
 
@@ -76,6 +98,7 @@ function changePassword(){
 		.done(function(){
 			$("#oldPassword").val('');
 			$("#newPassword").val('');
+			reportSuccess("Password was changed successfully");
 		});
 }
 
@@ -92,7 +115,7 @@ $(function(){
 
 	$.getJSON('/password/amilocal')
 		.done(function(userIsLocal){
-			if(userIsLocal) showFunctionalityForLocalUsers();
+			if(userIsLocal) $("#forLocalsOnly").show();
 		});
 
 	$("#signOutButton").click(signOut);
