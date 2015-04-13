@@ -1,57 +1,63 @@
+/*
+ * Administration
+ */
+
+
+/*
+ * Code regarding create new account
+ */ 
 function createNewAccount() {
 
-	resetValidateNewAccountError();
+	resetValidateNewError();
 	
-	if (validateNewAccount()) {
+	if (validateNew()) {
 		
 		var $form = $('#new-account').serializeArray();
 	
-		$.post("/password/account/create", $form).complete(function(data) {
-	
+		$.post("/password/account/create", $form).complete(function(data) {	
 			if (data.status == '200') {
-				resetNewAccount();
-				newAccountMessageSuccess('A new account is created!');
+				resetNew();
+				newMessageSuccess('A new account is created!');
 	
 			} else if (data.status == '400') {
-				newAccountMessageError('Authentication error! This service requires administrator rights!');
+				newMessageError('Authentication error! This service requires administrator rights!');
 				
 			} else if (data.status == '401') {
-				newAccountMessageError('Authentication error! This service requires administrator rights!');
+				newMessageError('Authentication error! This service requires administrator rights!');
 	
 			} else if (data.status == '403') {
-				newAccountMessageError('An account with the same email already exists!');
+				newMessageError('An account with the same email already exists!');
 				
 			} else {
-				newAccountMessageError('An unexpected server error has occured.');
-	
+				newMessageError('An unexpected server error has occured.');
 			}
 	
 		});
 	
 	} else {
-		newAccountMessageError('You must complete all fields!');
+		newMessageError('You must complete all fields!');
 	}
 }
 
-function newAccountMessageError(message) {
-	$('#new-account-message-success').hide();
+function newMessageError(message) {
+	$('#new-message-success').hide();
 	
-	$('#new-account-message-error').html(message);
-	$('#new-account-message-error').addClass('alert alert-danger');
-	$('#new-account-message-error').attr('role', 'alert');
-	$('#new-account-message-error').show();
+	$('#new-message-error').html(message);
+	$('#new-message-error').addClass('alert alert-danger');
+	$('#new-message-error').attr('role', 'alert');
+	$('#new-message-error').show();
 }
 
-function newAccountMessageSuccess(message) {
-	$('#new-account-message-error').hide();
+function newMessageSuccess(message) {
+	$('#new-message-error').hide();
 	
-	$('#new-account-message-success').html(message);
-	$('#new-account-message-success').addClass('alert alert-success');
-	$('#new-account-message-success').attr('role', 'alert');
-	$('#new-account-message-success').show();
+	$('#new-message-success').html(message);
+	$('#new-message-success').addClass('alert alert-success');
+	$('#new-message-success').attr('role', 'alert');
+	$('#new-message-success').show();
 }
 
-function validateNewAccount() {
+function validateNew() {
 	var ok = true;
 	
 	if( $('#givenName').val().length < 1) {
@@ -77,7 +83,7 @@ function validateNewAccount() {
 	return ok;
 }
 
-function resetNewAccount() {
+function resetNew() {
 	$('#givenName').val('');
 	$('#surname').val('');
 	$('#mail').val('');
@@ -85,9 +91,99 @@ function resetNewAccount() {
 	
 }
 
-function resetValidateNewAccountError() {
+function resetValidateNewError() {
 	$('#givenName').parent().removeClass('has-error');
 	$('#surname').parent().removeClass('has-error');
 	$('#mail').parent().removeClass('has-error');
 	$('#password').parent().removeClass('has-error');
 }
+
+
+
+/*
+ * Code regarding edit account
+ */
+$('#list-accounts-butt').click(function() {
+	
+	$.getJSON( "/password/account/list", function() {
+		
+	})
+	.done(function(data) {
+		
+		$.each(data, function(i, entry){
+			
+			var info = entry.info;
+			var isAdmin = entry.isAdmin;
+			
+			var editAdmin = '';
+			if (isAdmin) {
+				//editAdmin = '<button class="btn btn-default" onClick="unmakeAdmin(\'' + info.mail + '\')">Unmake admin</button>';
+				editAdmin = '<label class="checkbox-inline"><input type="checkbox" onClick="unmakeAdmin(\'' + info.mail + '\')" value="">Unmake admin</label>';
+			} else {
+				//editAdmin = '<button class="btn btn-default" onClick="makeAdmin(\'' + info.mail + '\')">Make admin</button>';
+				editAdmin = '<label class="checkbox-inline"><input type="checkbox" onClick="makeAdmin(\'' + info.mail + '\')" value="">Make admin</label>';
+			}
+			
+			$('#list-accounts table').append('<tr><td>' + info.givenName + '&nbsp;' + info.surname + '&nbsp;(' + info.mail + ')</td><td><button class="btn btn-default" onClick="deleteAccount(\'' + info.mail + '\')">Delete</button></td><td>' + editAdmin + '</td></tr>');
+			
+		});
+		
+	})
+	.fail(function(data, status, error) {
+		if (data.status == '400') {
+			editMessageError('Authentication error! This service requires administrator rights!');
+
+		} else if (data.status == '401') {
+        	editMessageError('Authentication error! This service requires administrator rights!');
+
+		} else {
+			editMessageError('An unexpected server error has occured.');
+		}
+
+	});
+
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function deleteAccount(account) {
+	alert('deleteAccount ' + account);
+}
+
+function makeAdmin(account) {
+	alert('makeAdmin ' + account);
+}
+
+function unmakeAdmin(account) {
+	alert('unmakeAdmin ' + account);
+}
+
+function editMessageError(message) {
+        $('#edit-message-success').hide();
+
+        $('#edit-message-error').html(message);
+        $('#edit-message-error').addClass('alert alert-danger');
+        $('#edit-message-error').attr('role', 'alert');
+        $('#edit-message-error').show();
+}
+
+function editMessageSuccess(message) {
+        $('#edit-message-error').hide();
+
+        $('#edit-message-success').html(message);
+        $('#edit-message-success').addClass('alert alert-success');
+        $('#edit-message-success').attr('role', 'alert');
+        $('#edit-message-success').show();
+}
+

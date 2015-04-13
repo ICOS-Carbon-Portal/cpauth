@@ -33,9 +33,9 @@ trait PasswordRouting extends Directives with CpauthDirectives {
 			path("login"){
 				formFields('mail, 'password)((mail, password) =>
 
-					onSuccess(userDb.authenticateUser(mail, password)){ uinfo =>
+					onSuccess(userDb.authenticateUser(mail, password)){ uEntry =>
 
-						cookieFactory.makeAuthenticationCookie(uinfo) match{
+						cookieFactory.makeAuthenticationCookie(uEntry.info) match{
 							case Success(cookie) => setCookie(cookie)(complete(StatusCodes.OK))
 							case Failure(err) => failWith(err)
 						}
@@ -60,8 +60,8 @@ trait PasswordRouting extends Directives with CpauthDirectives {
 				user(uinfo =>
 					formFields('oldPass, 'newPass)((oldPass, newPass) => {
 						val result = for(
-							_ <- userDb.authenticateUser(uinfo.mail, oldPass);
-							_ <- userDb.updateUser(uinfo.mail, uinfo, newPass)
+							userEntry <- userDb.authenticateUser(uinfo.mail, oldPass);
+							_ <- userDb.updateUser(uinfo.mail, uinfo, newPass, userEntry.isAdmin)
 						) yield ()
 						onSuccess(result)(_ => complete(StatusCodes.OK))
 					})

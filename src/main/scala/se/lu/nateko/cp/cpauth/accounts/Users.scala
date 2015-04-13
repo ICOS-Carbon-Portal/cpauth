@@ -15,10 +15,10 @@ import se.lu.nateko.cp.cpauth.core.Exceptions
 trait UsersIo{
 	def addUser(uinfo: UserInfo, password: String, isAdmin: Boolean): Future[Unit]
 	def userExists(mail: String): Future[Boolean]
-	def authenticateUser(mail: String, password: String): Future[UserInfo]
+	def authenticateUser(mail: String, password: String): Future[UserEntry]
 	def dropUser(mail: String): Future[Int]
-	def updateUser(oldMail: String, uinfo: UserInfo, newPass: String): Future[Int]
-	def listUsers: Future[Seq[UserInfo]]
+	def updateUser(oldMail: String, uinfo: UserInfo, newPass: String, isAdmin: Boolean): Future[Int]
+	def listUsers: Future[Seq[UserEntry]]
 	def userIsAdmin(mail: String): Future[Boolean]
 }
 
@@ -62,18 +62,18 @@ object Users extends UsersIo {
 		db.run(user.result)
 	}
 
-	def authenticateUser(mail: String, password: String): Future[UserInfo] = {
+	def authenticateUser(mail: String, password: String): Future[UserEntry] = {
 		val passHash = hash(mail, password)
 
 		val userQ = for(
 			user <- users if user.mail === mail && user.password === passHash
-		) yield (user.givenName, user.surname)
+		) yield (user.givenName, user.surname, user.isAdmin)
 
 		db.run(userQ.result).flatMap(_.toList match{
 			case Nil =>
 				Future.failed(AuthenticationFailedException)
-			case (givenName, surname) :: Nil =>
-				Future.successful(UserInfo(givenName = givenName, surname = surname, mail = mail))
+			case (givenName, surname, admin) :: Nil =>
+				Future.successful(UserEntry(UserInfo(givenName, surname, mail), admin))
 			case _ =>
 				Exceptions.failedFuture("Inconsistent database state: duplicate user ")
 		})
@@ -84,23 +84,23 @@ object Users extends UsersIo {
 		db.run(action)
 	}
 
-	def updateUser(oldMail: String, uinfo: UserInfo, newPass: String): Future[Int] = {
+	def updateUser(oldMail: String, uinfo: UserInfo, newPass: String, isAdmin: Boolean): Future[Int] = {
 		val newPassHash = hash(uinfo.mail, newPass)
 
 		val q = for(user <- users if user.mail === oldMail)
-			yield (user.givenName, user.surname, user.mail, user.password)
+			yield (user.givenName, user.surname, user.mail, user.password, user.isAdmin)
 
-		val upd = q.update((uinfo.givenName, uinfo.surname, uinfo.mail, newPassHash))
+		val upd = q.update((uinfo.givenName, uinfo.surname, uinfo.mail, newPassHash, isAdmin))
 
 		db.run(upd)
 	}
 	
-	def listUsers: Future[Seq[UserInfo]] = {
+	def listUsers: Future[Seq[UserEntry]] = {
 		val q = for(user <- users) yield
-			(user.givenName, user.surname, user.mail)
+			(user.givenName, user.surname, user.mail, user.isAdmin)
 		
 		db.run(q.result).map(_.map({
-			case (givenName, surname, mail) => UserInfo(givenName, surname, mail)
+			case (givenName, surname, mail, isAdmin) => UserEntry(UserInfo(givenName, surname, mail), isAdmin) 
 		}))
 	}
 	
