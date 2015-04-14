@@ -103,7 +103,7 @@ function changePassword(){
 }
 
 function deleteAccount(){
-	$.post("/password/deleteaccount")
+	$.post("/password/deleteownaccount")
 		.fail(reportError)
 		.done(switchToLoggedOutState);
 }

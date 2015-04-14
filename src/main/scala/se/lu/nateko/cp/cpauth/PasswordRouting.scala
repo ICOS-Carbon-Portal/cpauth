@@ -52,7 +52,7 @@ trait PasswordRouting extends Directives with CpauthDirectives {
 					})
 				)
 			} ~
-			path("deleteaccount"){
+			path("deleteownaccount"){
 				user(uinfo =>
 					onSuccess(userDb.dropUser(uinfo.mail))(_ => logout)
 				)
