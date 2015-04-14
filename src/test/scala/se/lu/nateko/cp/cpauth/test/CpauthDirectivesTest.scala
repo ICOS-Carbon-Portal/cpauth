@@ -41,12 +41,16 @@ class CpauthDirectivesTest extends FunSpec with ScalatestRouteTest with Directiv
 		def serviceHost: String = "cpauth.icos-cp.eu"
 		def servicePrivatePort: Int = ???
 	}
+
 	val config = getConfig("/private1.der")
+
 	val dirs = new CpauthDirectives{
 		val publicAuthConfig = config
 		val authenticator = Authenticator(publicAuthConfig)
-		implicit val dispatcher = scala.concurrent.ExecutionContext.Implicits.global
+		implicit val dispatcher = system.dispatcher
+		implicit val scheduler = system.scheduler
 	}
+
 
 	describe("attempt directive"){
 

@@ -9,11 +9,17 @@ import spray.http.StatusCodes
 import se.lu.nateko.cp.cpauth.core.AuthenticationFailedException
 import se.lu.nateko.cp.cpauth.core.UserInfo
 import CpauthJsonProtocol._
+import scala.concurrent.Future
+import se.lu.nateko.cp.cpauth.accounts.UserEntry
+import scala.concurrent.duration._
 
 trait PasswordRouting extends Directives with CpauthDirectives {
 
 	def userDb: UsersIo
 	def cookieFactory: CookieFactory
+
+	private def authUser(mail: String, password: String): Future[UserEntry] =
+		Utils.slowFailureDown(userDb.authenticateUser(mail, password), 500 millis)
 
 	lazy val passwordRoute: Route = pathPrefix("password"){
 		get{
@@ -32,7 +38,7 @@ trait PasswordRouting extends Directives with CpauthDirectives {
 			path("login"){
 				formFields('mail, 'password)((mail, password) =>
 
-					onSuccess(userDb.authenticateUser(mail, password)){ uEntry =>
+					onSuccess(authUser(mail, password)){ uEntry =>
 
 						cookieFactory.makeAuthenticationCookie(uEntry.info) match{
 							case Success(cookie) => setCookie(cookie)(complete(StatusCodes.OK))
@@ -45,7 +51,7 @@ trait PasswordRouting extends Directives with CpauthDirectives {
 				user(uinfo =>
 					formFields('oldPass, 'newPass)((oldPass, newPass) => {
 						val result = for(
-							userEntry <- userDb.authenticateUser(uinfo.mail, oldPass);
+							userEntry <- authUser(uinfo.mail, oldPass);
 							_ <- userDb.updateUser(uinfo.mail, uinfo, newPass, userEntry.isAdmin)
 						) yield ()
 						onSuccess(result)(_ => complete(StatusCodes.OK))

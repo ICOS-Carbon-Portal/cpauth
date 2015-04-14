@@ -22,6 +22,7 @@ object Main extends App with SimpleRoutingApp with SamlRouting with PasswordRout
 
 	implicit val system = ActorSystem("cpauth")
 	implicit val dispatcher = system.dispatcher
+	implicit val scheduler = system.scheduler
 
 	val config: Config = Constants
 	val (urlsConfig, publicAuthConfig, samlConfig) = (config, config, config)

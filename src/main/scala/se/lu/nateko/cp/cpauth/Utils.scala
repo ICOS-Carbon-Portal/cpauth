@@ -5,6 +5,13 @@ import java.util.zip.Deflater
 import java.io.ByteArrayOutputStream
 import java.util.zip.DeflaterOutputStream
 import org.apache.commons.codec.binary.Base64
+import scala.concurrent.Future
+import scala.util.Success
+import scala.util.Failure
+import scala.concurrent.ExecutionContext
+import akka.pattern.Patterns.after
+import akka.actor.Scheduler
+import scala.concurrent.duration.FiniteDuration
 
 object Utils {
 
@@ -61,5 +68,10 @@ object Utils {
 
 		new String(new Base64().encode(byteStream.toByteArray), utf8)
 	}
+
+	def slowFailureDown[T](future: Future[T], time: FiniteDuration)(implicit ex: ExecutionContext, scheduler: Scheduler): Future[T] =
+		future.recoverWith{
+			case err => after(time, scheduler, ex, Future.failed(err))
+		}
 
 }

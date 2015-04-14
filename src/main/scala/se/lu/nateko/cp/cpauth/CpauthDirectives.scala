@@ -17,12 +17,17 @@ import spray.routing.AuthenticationFailedRejection
 import spray.routing.Directives
 import spray.routing.RequestContext
 import spray.routing.Route
+import scala.concurrent.Future
+import scala.concurrent.duration._
+import akka.actor.Scheduler
 
 trait CpauthDirectives extends Directives {
 
 	def publicAuthConfig: PublicAuthConfig with UrlsConfig
 	def authenticator: Try[Authenticator]
-	implicit val dispatcher: ExecutionContext
+
+	implicit def dispatcher: ExecutionContext
+	implicit def scheduler: Scheduler
 
 	def attempt[T](thunk: => T)(f: T => Route): Route = attempt(Try(thunk))(f)
 
@@ -38,7 +43,9 @@ trait CpauthDirectives extends Directives {
 			uinfo <- auth.unwrapUserInfo(token)
 		) yield uinfo
 
-		userTry match{
+		val userFuture = Utils.slowFailureDown(Future.fromTry(userTry), 500 millis)
+
+		onComplete(userFuture){
 			case Success(uinfo) => inner(uinfo)
 			case Failure(err) => extract(getCookieHeaders){ headers =>
 				reject(new AuthenticationFailedRejection(AuthenticationFailedRejection.CredentialsRejected, headers))
