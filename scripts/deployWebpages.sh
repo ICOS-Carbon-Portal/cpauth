@@ -2,4 +2,7 @@
 
 cd "$(dirname "$0")"
 
-scp -r ../webpage "$1":/usr/share/cpauth/
+source config.sh
+
+rsync -azP --delete ../webpage "$host:$deployPath"
+ssh "$host" chown -R :nginx "$deployPath"webpage

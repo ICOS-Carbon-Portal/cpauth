@@ -2,14 +2,11 @@
 
 cd "$(dirname "$0")"
 
-host="fsicos.lunarc.lu.se"
-deployPath="/usr/share/cpauth/"
+source config.sh
 
-if [[ -n "$1" ]]; then host="$1@$host"; fi # prepending user name if specified
+./deployWebpages.sh "$1"
 
-./deployWebpages.sh "$host"
-
-scp ./restart.sh "$host:$deployPath"
+scp stop.sh start.sh restart.sh "$host:$deployPath"
 
 scp ../target/scala-2.11/Carbon\ Portal\ Authentication\ Service-assembly-0.1.jar "$host:$deployPath"assembly.jar
 

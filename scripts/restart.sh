@@ -1,11 +1,4 @@
 #!/bin/bash
 cd "$(dirname "$0")"
-
-if [ -f pid ];
-then
-	kill `cat pid`
-fi
-
-java -jar "assembly.jar" >> sdout.log &
-
-echo $! > pid
+./stop.sh
+./start.sh
