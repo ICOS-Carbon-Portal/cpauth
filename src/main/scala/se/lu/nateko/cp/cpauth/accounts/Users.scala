@@ -13,11 +13,11 @@ import se.lu.nateko.cp.cpauth.core.AuthenticationFailedException
 import se.lu.nateko.cp.cpauth.core.Exceptions
 
 trait UsersIo{
-	def addUser(uinfo: UserInfo, password: String, isAdmin: Boolean): Future[Unit]
+	def addUser(userEntry: UserEntry, password: String): Future[Unit]
 	def userExists(mail: String): Future[Boolean]
 	def authenticateUser(mail: String, password: String): Future[UserEntry]
 	def dropUser(mail: String): Future[Unit]
-	def updateUser(oldMail: String, uinfo: UserInfo, newPass: String, isAdmin: Boolean): Future[Unit]
+	def updateUser(oldMail: String, userEntry: UserEntry, newPass: String): Future[Unit]
 	def listUsers: Future[Seq[UserEntry]]
 	def userIsAdmin(mail: String): Future[Boolean]
 	def setAdminRights(mail: String, isAdmin: Boolean): Future[Unit]
@@ -47,10 +47,11 @@ object Users extends UsersIo {
 	def setup(): Unit = Await.result(db.run(users.schema.create), Duration.Inf)
 	def drop(): Unit = Await.result(db.run(users.schema.drop), Duration.Inf)
 
-	def addUser(uinfo: UserInfo, password: String, isAdmin: Boolean): Future[Unit] = {
+	def addUser(userEntry: UserEntry, password: String): Future[Unit] = {
+		val uinfo = userEntry.info
 		val passHash = hash(uinfo.mail, password)
 
-		val action = users. += ((0, uinfo.givenName, uinfo.surname, uinfo.mail, passHash, isAdmin))
+		val action = users. += ((0, uinfo.givenName, uinfo.surname, uinfo.mail, passHash, userEntry.isAdmin))
 
 		db.run(action).flatMap{ x =>
 			if(x == 1) Future.successful(())
@@ -85,14 +86,15 @@ object Users extends UsersIo {
 		db.run(action)
 	}
 
-	def updateUser(oldMail: String, uinfo: UserInfo, newPass: String, isAdmin: Boolean): Future[Unit] =
+	def updateUser(oldMail: String, userEntry: UserEntry, newPass: String): Future[Unit] =
 		ensureSingleUserChange(oldMail){
+			val uinfo = userEntry.info
 			val newPassHash = hash(uinfo.mail, newPass)
 
 			val q = for(user <- users if user.mail === oldMail)
 				yield (user.givenName, user.surname, user.mail, user.password, user.isAdmin)
 
-			val upd = q.update((uinfo.givenName, uinfo.surname, uinfo.mail, newPassHash, isAdmin))
+			val upd = q.update((uinfo.givenName, uinfo.surname, uinfo.mail, newPassHash, userEntry.isAdmin))
 
 			db.run(upd)
 		}

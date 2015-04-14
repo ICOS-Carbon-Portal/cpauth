@@ -52,7 +52,7 @@ trait PasswordRouting extends Directives with CpauthDirectives {
 					formFields('oldPass, 'newPass)((oldPass, newPass) => {
 						val result = for(
 							userEntry <- authUser(uinfo.mail, oldPass);
-							_ <- userDb.updateUser(uinfo.mail, uinfo, newPass, userEntry.isAdmin)
+							_ <- userDb.updateUser(uinfo.mail, userEntry, newPass)
 						) yield ()
 						onSuccess(result)(_ => complete(StatusCodes.OK))
 					})
@@ -70,7 +70,8 @@ trait PasswordRouting extends Directives with CpauthDirectives {
 							case true => complete((StatusCodes.Forbidden, "User already exists"))
 							case false =>
 								val uinfo = UserInfo(givenName, surname, mail)
-								onSuccess(userDb.addUser(uinfo, password, false)){ _ =>
+								val userEntry = UserEntry(uinfo, false)
+								onSuccess(userDb.addUser(userEntry, password)){ _ =>
 									complete(StatusCodes.OK)
 								}
 						}
