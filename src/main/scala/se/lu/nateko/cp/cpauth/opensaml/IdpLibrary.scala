@@ -16,6 +16,7 @@ import se.lu.nateko.cp.cpauth.Utils.SafeJavaCollectionWrapper
 import se.lu.nateko.cp.cpauth.core.SamlConfig
 import se.lu.nateko.cp.cpauth.core.Crypto
 import se.lu.nateko.cp.cpauth.Utils
+import org.opensaml.saml2.metadata.LocalizedString
 
 case class IdpInfo(name: String, id: String)
 
@@ -60,7 +61,7 @@ object IdpLibrary {
 				id <- getId(ed);
 				key <- idpToPublicKey(idp);
 				redirect <- idpToSsoRedirect(idp);
-				name <- idpToName(idp, id.toString)
+				name <- entityDescrToName(ed).orElse(idpToName(idp, id.toString))
 			} yield (id, new IdpProps(name, key, redirect))
 
 		}).collect{
@@ -96,10 +97,20 @@ object IdpLibrary {
 			case ui: UIInfo => getDisplayName(ui)
 		}.flatten.headOption.getOrElse(fallback)
 	}
-	
+
 	private def getDisplayName(ui: UIInfo): Option[String] = {
-		val names = ui.getDisplayNames.toSafeIterable.map(_.getName).toIndexedSeq
-		names.find(_.getLanguage == "en").orElse(names.headOption).map(_.getLocalString)
+		val candidates = ui.getDisplayNames.toSafeIterable.map(_.getName)
+		getBestName(candidates)
+	}
+
+	private def entityDescrToName(ed: EntityDescriptor): Try[String] = Try{
+		val candidates = ed.getOrganization.getDisplayNames.toSafeIterable.map(_.getName)
+		getBestName(candidates).get
+	}
+	
+	private def getBestName(names: Iterable[LocalizedString]): Option[String] = {
+		val english = names.find(_.getLanguage == "en").map(_.getLocalString)
+		english.orElse(names.map(_.getLocalString).headOption)
 	}
 
 	private def getId(ed: EntityDescriptor): Try[URI] = Try{

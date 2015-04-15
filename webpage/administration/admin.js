@@ -11,27 +11,18 @@ function createNewAccount() {
 	resetValidateNewError();
 	
 	if (validateNew()) {
-		
+
 		var $form = $('#new-account').serializeArray();
 	
-		$.post("/password/createaccount", $form).complete(function(data) {
-			if (data.status == '200') {
-				resetNew();
-				newMessageSuccess('A new account is created!');
-	
-			} else if (data.status == '400') {
-				newMessageError('Authentication error! This service requires administrator rights!');
-				
-			} else if (data.status == '401') {
-				newMessageError('Authentication error! This service requires administrator rights!');
-	
-			} else if (data.status == '403') {
-				newMessageError('An account with the same email already exists!');
-				
-			} else {
-				newMessageError('An unexpected server error has occured.');
-			}
-	
+		$.post("/password/createaccount", $form)
+
+		.done(function() {
+			resetNew();
+			newMessageSuccess('A new account is created!');
+		})
+			
+		.fail(function(data) {
+			newMessageError(data.responseText);
 		});
 	
 	} else {
@@ -104,10 +95,15 @@ function resetValidateNewError() {
  * Code regarding edit account
  */
 $('#list-accounts-butt').click(function() {
+	populateListAccounts();
+});
+
+
+function populateListAccounts() {
+	$('#list-accounts table').empty();
 	
-	$.getJSON( "/password/accountslist", function() {
-		
-	})
+	$.getJSON("/password/accountslist")
+	
 	.done(function(data) {
 		
 		$.each(data, function(i, entry){
@@ -115,58 +111,67 @@ $('#list-accounts-butt').click(function() {
 			var info = entry.info;
 			var isAdmin = entry.isAdmin;
 			
+			var form = '<form><input type="hidden" name="mail" value="\'' + info.mail + '\'"></form>';
+			
 			var editAdmin = '';
 			if (isAdmin) {
-				//editAdmin = '<button class="btn btn-default" onClick="unmakeAdmin(\'' + info.mail + '\')">Unmake admin</button>';
-				editAdmin = '<label class="checkbox-inline"><input type="checkbox" onClick="unmakeAdmin(\'' + info.mail + '\')" value="">Unmake admin</label>';
+				editAdmin = '<input type="checkbox" onClick="unmakeAdmin(\'' + form + '\')" checked />';
 			} else {
-				//editAdmin = '<button class="btn btn-default" onClick="makeAdmin(\'' + info.mail + '\')">Make admin</button>';
-				editAdmin = '<label class="checkbox-inline"><input type="checkbox" onClick="makeAdmin(\'' + info.mail + '\')" value="">Make admin</label>';
+				editAdmin = '<input type="checkbox" onClick="makeAdmin(\'' + form + '\')" />';
 			}
 			
-			$('#list-accounts table').append('<tr><td>' + info.givenName + '&nbsp;' + info.surname + '&nbsp;(' + info.mail + ')</td><td><button class="btn btn-default" onClick="deleteAccount(\'' + info.mail + '\')">Delete</button></td><td>' + editAdmin + '</td></tr>');
+			$('#list-accounts table').append('<tr><td>' + info.givenName + '&nbsp;' + info.surname + '&nbsp;(' + info.mail + ')</td><td><button class="btn btn-default" onClick="deleteAccount(\'' + form + '\')">Delete</button></td><td>' + editAdmin + '</td></tr>');
 			
 		});
 		
 	})
-	.fail(function(data, status, error) {
-		if (data.status == '400') {
-			editMessageError('Authentication error! This service requires administrator rights!');
-
-		} else if (data.status == '401') {
-        	editMessageError('Authentication error! This service requires administrator rights!');
-
-		} else {
-			editMessageError('An unexpected server error has occured.');
-		}
-
+	
+	.fail(function(data) {
+		editMessageError(data.responseText);
 	});
-
-});
-
-
-
-
-
-
-
-
-
-
-
-
+}
 
 
 function deleteAccount(account) {
-	alert('deleteAccount ' + account);
+	$.post("/password/deleteaccount", account)
+
+	.done(function() {
+		
+	})
+		
+	.fail(function(data) {
+		editMessageError(data.responseText);
+	});
+	
+	populateListAccounts();
 }
 
 function makeAdmin(account) {
-	alert('makeAdmin ' + account);
+	$.post("/password/makeadmin", account)
+
+	.done(function() {
+		
+	})
+		
+	.fail(function(data) {
+		editMessageError(data.responseText);
+	});
+	
+	populateListAccounts();
 }
 
 function unmakeAdmin(account) {
-	alert('unmakeAdmin ' + account);
+	$.post("/password/unmakeadmin", account)
+
+	.done(function() {
+		
+	})
+		
+	.fail(function(data) {
+		editMessageError(data.responseText);
+	});
+	
+	populateListAccounts();
 }
 
 function editMessageError(message) {
