@@ -45,7 +45,7 @@
 				<ul class="nav nav-tabs" role="tablist">
 					
 					<li role="presentation" class="col-xs-12 col-sm-2">
-						<a href="#new" aria-controls="new" role="tab" data-toggle="tab">
+						<a href="#new" aria-controls="new" role="tab" data-toggle="tab" id="new-butt">
 							Create a new account
 						</a>
 					</li>
@@ -73,8 +73,7 @@
 							<div class="panel-body">
 														
 								<div id="new-message-error" style="display: hidden"></div>
-								<div id="new-message-success" style="display: hidden"></div>
-		  					
+								
 								<form id="new-account">
 								    <div class="form-group required">
 										<label for="givenName" class="control">Givenname:</label>
@@ -98,7 +97,10 @@
 					    
 									<button type="button" class="btn btn-default" onClick="createNewAccount()">Create!</button>
 						 
-								</form>									  					
+								</form>	
+								
+								<br/>
+								<div id="new-message-success" style="display: hidden"></div>								  					
 		  					
 		  					</div>
 						</div>
@@ -109,17 +111,8 @@
 						<div class="panel panel-default">
 							<div class="panel-body">
 		  						<div id="edit-message-error" style="display: hidden"></div>
-                            	<div id="edit-message-success" style="display: hidden"></div>
-
-								<div id="list-accounts">
-									<table class="table table-striped">
-										<tr>
-											<th>User</th>
-											<th>Delete</th>
-											<th>Is admin?</th>
-										</tr>
-									</table>
-								</div> 		  					
+                            	
+								<div id="list-accounts"></div> 		  					
 		  					
 		  					</div>
 						</div>

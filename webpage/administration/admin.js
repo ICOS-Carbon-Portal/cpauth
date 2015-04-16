@@ -6,19 +6,23 @@
 /*
  * Code regarding create new account
  */ 
+$('#new-butt').click(function() {
+	resetNew();
+	resetValidateNewError();
+	$('#new-message-success').hide();
+	$('#new-message-error').hide();
+});
+
 function createNewAccount() {
 
 	resetValidateNewError();
 	
 	if (validateNew()) {
-
-		var $form = $('#new-account').serializeArray();
-	
-		$.post("/password/createaccount", $form)
+		$.post("/password/createaccount", $('#new-account').serializeArray())
 
 		.done(function() {
 			resetNew();
-			newMessageSuccess('A new account is created!');
+			newMessageSuccess('A new account has been created!');
 		})
 			
 		.fail(function(data) {
@@ -46,27 +50,33 @@ function newMessageSuccess(message) {
 	$('#new-message-success').addClass('alert alert-success');
 	$('#new-message-success').attr('role', 'alert');
 	$('#new-message-success').show();
+	$('#new-message-success').fadeOut(1000 * 10);
 }
 
 function validateNew() {
 	var ok = true;
 	
-	if( $('#givenName').val().length < 1) {
+	if ($('#givenName').val().length < 1) {
 		$('#givenName').parent().addClass('has-error');
 		ok = false;
 	}
 	
-	if( $('#surname').val().length < 1) {
+	if ($('#surname').val().length < 1) {
 		$('#surname').parent().addClass('has-error');
 		ok = false;
 	}
 	
-	if( $('#mail').val().length < 1) {
+	if ($('#mail').val().length < 1) {
+		$('#mail').parent().addClass('has-error');
+		ok = false;
+		
+	} else if (! /\S+@\S+/.test($('#mail').val())) {
 		$('#mail').parent().addClass('has-error');
 		ok = false;
 	}
 	
-	if( $('#password').val().length < 1) {
+	
+	if ($('#password').val().length < 1) {
 		$('#password').parent().addClass('has-error');
 		ok = false;
 	}
@@ -100,28 +110,29 @@ $('#list-accounts-butt').click(function() {
 
 
 function populateListAccounts() {
-	$('#list-accounts table').empty();
+	$('#list-accounts').empty();
 	
 	$.getJSON("/password/accountslist")
 	
 	.done(function(data) {
+		
+		$('#list-accounts').append('<table class="table table-striped"></table>');
+		$('#list-accounts table').append('<tr><th>User</th><th>Delete</th><th>Is admin?</th></tr>');
 		
 		$.each(data, function(i, entry){
 			
 			var info = entry.info;
 			var isAdmin = entry.isAdmin;
 			
-			var form = '<form><input type="hidden" name="mail" value="\'' + info.mail + '\'"></form>';
-			
 			var editAdmin = '';
 			if (isAdmin) {
-				editAdmin = '<input type="checkbox" onClick="unmakeAdmin(\'' + form + '\')" checked />';
+				editAdmin = '<input type="checkbox" onClick="unmakeAdmin(\'' + info.mail + '\')" checked />';
 			} else {
-				editAdmin = '<input type="checkbox" onClick="makeAdmin(\'' + form + '\')" />';
+				editAdmin = '<input type="checkbox" onClick="makeAdmin(\'' + info.mail + '\')" />';
 			}
 			
-			$('#list-accounts table').append('<tr><td>' + info.givenName + '&nbsp;' + info.surname + '&nbsp;(' + info.mail + ')</td><td><button class="btn btn-default" onClick="deleteAccount(\'' + form + '\')">Delete</button></td><td>' + editAdmin + '</td></tr>');
-			
+			$('#list-accounts table').append('<tr><td>' + info.givenName + '&nbsp;' + info.surname + '&nbsp;(' + info.mail + ')</td><td><button class="btn btn-default" onClick="deleteAccount(\'' + info.mail + '\')">Delete</button></td><td>' + editAdmin + '</td></tr>');
+				
 		});
 		
 	})
@@ -132,11 +143,11 @@ function populateListAccounts() {
 }
 
 
-function deleteAccount(account) {
-	$.post("/password/deleteaccount", account)
+function deleteAccount(mail) {
+	$.post("/password/deleteaccount", 'mail=' + mail)
 
 	.done(function() {
-		
+		$('#edit-message-error').hide();
 	})
 		
 	.fail(function(data) {
@@ -146,11 +157,11 @@ function deleteAccount(account) {
 	populateListAccounts();
 }
 
-function makeAdmin(account) {
-	$.post("/password/makeadmin", account)
+function makeAdmin(mail) {
+	$.post("/password/makeadmin", 'mail=' + mail)
 
 	.done(function() {
-		
+		$('#edit-message-error').hide();
 	})
 		
 	.fail(function(data) {
@@ -160,11 +171,11 @@ function makeAdmin(account) {
 	populateListAccounts();
 }
 
-function unmakeAdmin(account) {
-	$.post("/password/unmakeadmin", account)
+function unmakeAdmin(mail) {
+	$.post("/password/unmakeadmin", 'mail=' + mail)
 
 	.done(function() {
-		
+		$('#edit-message-error').hide();
 	})
 		
 	.fail(function(data) {
@@ -175,20 +186,8 @@ function unmakeAdmin(account) {
 }
 
 function editMessageError(message) {
-        $('#edit-message-success').hide();
-
-        $('#edit-message-error').html(message);
-        $('#edit-message-error').addClass('alert alert-danger');
-        $('#edit-message-error').attr('role', 'alert');
-        $('#edit-message-error').show();
+    $('#edit-message-error').html(message);
+    $('#edit-message-error').addClass('alert alert-danger');
+    $('#edit-message-error').attr('role', 'alert');
+    $('#edit-message-error').show();
 }
-
-function editMessageSuccess(message) {
-        $('#edit-message-error').hide();
-
-        $('#edit-message-success').html(message);
-        $('#edit-message-success').addClass('alert alert-success');
-        $('#edit-message-success').attr('role', 'alert');
-        $('#edit-message-success').show();
-}
-
