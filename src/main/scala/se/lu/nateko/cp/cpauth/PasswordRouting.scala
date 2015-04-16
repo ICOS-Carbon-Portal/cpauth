@@ -79,7 +79,7 @@ trait PasswordRouting extends Directives with CpauthDirectives {
 				} ~
 				path("deleteaccount"){
 					formField('mail)(mail =>
-						onSuccess(userDb.setAdminRights(mail, true))(_ => complete(StatusCodes.OK))
+						onSuccess(userDb.dropUser(mail))(_ => complete(StatusCodes.OK))
 					)
 				} ~
 				path("makeadmin"){
