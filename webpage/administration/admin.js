@@ -146,43 +146,43 @@ function populateListAccounts() {
 function deleteAccount(mail) {
 	$.post("/password/deleteaccount", 'mail=' + mail)
 
-	.done(function() {
-		$('#edit-message-error').hide();
-	})
+		.done(function() {
+			$('#edit-message-error').hide();
+		})
+			
+		.fail(function(data) {
+			editMessageError(data.responseText);
+		})
 		
-	.fail(function(data) {
-		editMessageError(data.responseText);
-	});
-	
-	populateListAccounts();
+		.always(populateListAccounts);
 }
 
 function makeAdmin(mail) {
 	$.post("/password/makeadmin", 'mail=' + mail)
 
-	.done(function() {
-		$('#edit-message-error').hide();
-	})
+		.done(function() {
+			$('#edit-message-error').hide();
+		})
+			
+		.fail(function(data) {
+			editMessageError(data.responseText);
+		})
 		
-	.fail(function(data) {
-		editMessageError(data.responseText);
-	});
-	
-	populateListAccounts();
+		.always(populateListAccounts);	
 }
 
 function unmakeAdmin(mail) {
 	$.post("/password/unmakeadmin", 'mail=' + mail)
 
-	.done(function() {
-		$('#edit-message-error').hide();
-	})
+		.done(function() {
+			$('#edit-message-error').hide();
+		})
+			
+		.fail(function(data) {
+			editMessageError(data.responseText);
+		})
 		
-	.fail(function(data) {
-		editMessageError(data.responseText);
-	});
-	
-	populateListAccounts();
+		.always(populateListAccounts);
 }
 
 function editMessageError(message) {
