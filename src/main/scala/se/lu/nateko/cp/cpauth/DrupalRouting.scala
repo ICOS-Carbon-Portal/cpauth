@@ -10,6 +10,7 @@ import spray.http.HttpHeaders
 import spray.http.Uri
 import spray.http.StatusCodes
 import spray.http.HttpHeader
+import spray.http.HttpEntity
 
 trait DrupalRouting extends Directives with CpauthDirectives with ProxyDirectives{
 
@@ -43,10 +44,14 @@ trait DrupalRouting extends Directives with CpauthDirectives with ProxyDirective
 		}
 	}
 
-	val remakeCookies = mapHttpResponseHeaders(_.map(remakeCookie))
+	private val dropResponseBody = mapHttpResponseEntity(_ => HttpEntity.Empty)
+	private val dropLocation = mapHttpResponseHeaders(_.filterNot(_.is(HttpHeaders.Location.lowercaseName)))
+	private val remakeCookies = mapHttpResponseHeaders(_.map(remakeCookie))
 
 	def redirectWhenDone(target: Uri, dropParam: Option[String] = None) =
+		dropResponseBody &
 		respondWithHeader(HttpHeaders.Location(withoutParam(dropParam, target))) &
+		dropLocation & //happens before the previous line
 		respondWithStatus(StatusCodes.Found) &
 		remakeCookies
 

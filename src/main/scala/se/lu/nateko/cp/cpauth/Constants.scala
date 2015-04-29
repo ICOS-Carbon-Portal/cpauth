@@ -10,7 +10,10 @@ object Constants extends Config{
 	val loginPath = "/login/"
 	val servicePrivatePort = 8080
 
-	val drupalProxying = Map("www.icos-cp.eu" -> ProxyConfig("127.0.0.1", 8085))
+	val drupalProxying = Map(
+		"www.icos-cp.eu" -> ProxyConfig("127.0.0.1", 8085),
+		"ri.icos-cp.eu" ->  ProxyConfig("127.0.0.1", 8095)
+	)
 
 	val idpMetadataFilePath = "/swamid-idps.xml"
 	val samlSpXmlPath = "/icos-cp_sp_meta.xml"
