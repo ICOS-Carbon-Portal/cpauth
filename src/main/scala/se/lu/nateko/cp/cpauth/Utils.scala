@@ -44,18 +44,6 @@ object Utils {
 			else WrapAsScala.iterableAsScalaIterable(list)
 	}
 
-	private[this] val domSerializer: org.w3c.dom.ls.LSSerializer = {
-		import  org.w3c.dom.bootstrap.DOMImplementationRegistry
-		import  org.w3c.dom.ls.DOMImplementationLS
-		
-		val registry = DOMImplementationRegistry.newInstance()
-		
-		val domImpl = registry.getDOMImplementation("LS").asInstanceOf[DOMImplementationLS]
-		domImpl.createLSSerializer()
-	}
-
-	def xmlToStr(xml: org.w3c.dom.Element): String = domSerializer.writeToString(xml)
-
 	def compressAndBase64ForSaml(s: String): String = {
 		val deflater = new Deflater(Deflater.DEFAULT_COMPRESSION, true);
 		val byteStream = new ByteArrayOutputStream()

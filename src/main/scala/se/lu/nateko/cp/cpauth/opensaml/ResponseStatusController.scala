@@ -6,7 +6,6 @@ import scala.util.Try
 import org.opensaml.common.SAMLException
 import org.opensaml.saml2.core.Response
 import org.opensaml.saml2.core.StatusCode
-import se.lu.nateko.cp.cpauth.Utils
 
 object ResponseStatusController {
 
@@ -23,7 +22,7 @@ object ResponseStatusController {
 				val msg = Try(status.getStatusMessage.getMessage).getOrElse{
 
 					val idp = Try(response.getIssuer.getValue).getOrElse("the Identity provider")
-					val responseXml = Try(":\n" + Utils.xmlToStr(response.getDOM)).getOrElse("")
+					val responseXml = Try(":\n" + OpenSamlUtils.xmlToStr(response.getDOM)).getOrElse("")
 					"Got a failure response from " + idp + responseXml
 				}
 

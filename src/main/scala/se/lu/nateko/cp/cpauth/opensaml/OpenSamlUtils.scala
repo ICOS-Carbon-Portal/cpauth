@@ -15,5 +15,17 @@ object OpenSamlUtils {
 		
 		() => ()
 	}
-	
+
+	private[this] val domSerializer: org.w3c.dom.ls.LSSerializer = {
+		import  org.w3c.dom.bootstrap.DOMImplementationRegistry
+		import  org.w3c.dom.ls.DOMImplementationLS
+		
+		val registry = DOMImplementationRegistry.newInstance()
+		
+		val domImpl = registry.getDOMImplementation("LS").asInstanceOf[DOMImplementationLS]
+		domImpl.createLSSerializer()
+	}
+
+	def xmlToStr(xml: org.w3c.dom.Element): String = domSerializer.writeToString(xml)
+
 }

@@ -14,6 +14,10 @@ import se.lu.nateko.cp.cpauth.opensaml.IdpLibrary
 import se.lu.nateko.cp.cpauth.opensaml.ResponseStatusController
 import se.lu.nateko.cp.cpauth.opensaml.StatementExtractor
 import spray.http.HttpCookie
+import scala.util.Success
+import scala.util.Failure
+import se.lu.nateko.cp.cpauth.core.Exceptions
+import se.lu.nateko.cp.cpauth.opensaml.OpenSamlUtils
 
 class CookieFactory(config: UrlsConfig with SamlConfig with AuthConfig) {
 	
@@ -34,7 +38,8 @@ class CookieFactory(config: UrlsConfig with SamlConfig with AuthConfig) {
 		validator <- AssertionValidator(goodResponse, idpLib);
 		assertions = extractor.extractAssertions(goodResponse).map(validator.validate);
 		statements = StatementExtractor.extractAttributeStringValues(assertions);
-		userInfo <- getUserInfo(statements);
+		userInfoTry = getUserInfo(statements);
+		userInfo <- provideDebug(userInfoTry, goodResponse);
 		cookie <- makeAuthenticationCookie(userInfo)
 	) yield cookie
 
@@ -55,4 +60,12 @@ class CookieFactory(config: UrlsConfig with SamlConfig with AuthConfig) {
 		surname <- statements.getSingleValue(config.surnameAttr);
 		mail <- statements.getSingleValue(config.mailAttr)
 	) yield UserInfo(givenName = givenName, surname = surname, mail = mail)
+
+	private def provideDebug(uinfoTry: Try[UserInfo], response: Response): Try[UserInfo] = uinfoTry match {
+		case ok: Success[UserInfo] => ok
+		case Failure(err) => Exceptions.failure{
+			val responseAsString = OpenSamlUtils.xmlToStr(response.getDOM)
+			err.getMessage + "\nSAML response was:\n" + responseAsString
+		}
+	}
 }
