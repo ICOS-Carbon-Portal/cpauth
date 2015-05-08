@@ -1,6 +1,5 @@
 package se.lu.nateko.cp.cpauth.opensaml
 
-import org.opensaml.saml2.core.Response
 import se.lu.nateko.cp.cpauth.core.CoreUtils
 import org.opensaml.xml.parse.ParserPool
 import org.opensaml.xml.parse.StaticBasicParserPool

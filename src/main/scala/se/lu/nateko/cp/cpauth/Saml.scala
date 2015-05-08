@@ -32,7 +32,7 @@ object Saml {
 
 			<saml:Issuer xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">{spConfig.url}</saml:Issuer>
 
-			<samlp:NameIDPolicy Format={NameIDType.UNSPECIFIED} AllowCreate="true"/>
+			<samlp:NameIDPolicy Format={NameIDType.TRANSIENT} AllowCreate="true"/>
 
 			<samlp:RequestedAuthnContext Comparison="exact">
 				<saml:AuthnContextClassRef xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">

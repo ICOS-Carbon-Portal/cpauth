@@ -18,6 +18,7 @@ import scala.util.Success
 import scala.util.Failure
 import se.lu.nateko.cp.cpauth.core.Exceptions
 import se.lu.nateko.cp.cpauth.opensaml.OpenSamlUtils
+import se.lu.nateko.cp.cpauth.opensaml.ValidatedAssertion
 
 class CookieFactory(config: UrlsConfig with SamlConfig with AuthConfig) {
 	
@@ -39,7 +40,7 @@ class CookieFactory(config: UrlsConfig with SamlConfig with AuthConfig) {
 		assertions = extractor.extractAssertions(goodResponse).map(validator.validate);
 		statements = StatementExtractor.extractAttributeStringValues(assertions);
 		userInfoTry = getUserInfo(statements);
-		userInfo <- provideDebug(userInfoTry, goodResponse);
+		userInfo <- provideDebug(userInfoTry, assertions);
 		cookie <- makeAuthenticationCookie(userInfo)
 	) yield cookie
 
@@ -61,11 +62,11 @@ class CookieFactory(config: UrlsConfig with SamlConfig with AuthConfig) {
 		mail <- statements.getSingleValue(config.mailAttr)
 	) yield UserInfo(givenName = givenName, surname = surname, mail = mail)
 
-	private def provideDebug(uinfoTry: Try[UserInfo], response: Response): Try[UserInfo] = uinfoTry match {
+	private def provideDebug(uinfoTry: Try[UserInfo], assertions: => Iterable[ValidatedAssertion]): Try[UserInfo] = uinfoTry match {
 		case ok: Success[UserInfo] => ok
 		case Failure(err) => Exceptions.failure{
-			val responseAsString = OpenSamlUtils.xmlToStr(response.getDOM)
-			err.getMessage + "\nSAML response was:\n" + responseAsString
+			val assertionsAsString = assertions.map(_.assertion.getDOM).map(OpenSamlUtils.xmlToStr).mkString("\n")
+			err.getMessage + "\nReturned assertions were:\n" + assertionsAsString
 		}
 	}
 }
