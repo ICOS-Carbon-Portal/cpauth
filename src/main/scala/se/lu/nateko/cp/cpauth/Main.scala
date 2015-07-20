@@ -38,7 +38,9 @@ object Main extends App with SimpleRoutingApp with SamlRouting with PasswordRout
 
 	val cpauthExceptionHandler = ExceptionHandler{
 		case AuthenticationFailedException => complete((StatusCodes.Forbidden, AuthenticationFailedException.getMessage))
-		case ex => complete((StatusCodes.InternalServerError, ex.getMessage + "\n" + ex.getStackTrace))
+		case ex =>
+			val stack = ex.getStackTrace.map(_.toString).mkString("\n")
+			complete((StatusCodes.InternalServerError, ex.getMessage + "\n" + stack))
 	}
 
 	startServer(interface = "::0", port = config.servicePrivatePort) {
