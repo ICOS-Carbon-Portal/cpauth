@@ -11,8 +11,7 @@ object Constants extends Config{
 	val servicePrivatePort = 8080
 
 	val drupalProxying = Map(
-		"www.icos-cp.eu" -> ProxyConfig("127.0.0.1", 8085),
-		"www2.icos-cp.eu" -> ProxyConfig("127.0.0.1", 8096),
+		"www.icos-cp.eu" -> ProxyConfig("127.0.0.1", 8096),
 		"ri.icos-cp.eu" ->  ProxyConfig("127.0.0.1", 8095)
 	)
 
