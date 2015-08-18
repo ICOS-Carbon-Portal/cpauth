@@ -31,7 +31,7 @@ object Main extends App with SimpleRoutingApp with SamlRouting with PasswordRout
 	val idpLib: IdpLibrary = IdpLibrary.fromConfig(config)
 	val cookieFactory = new CookieFactory(config)
 	val targetLookup: TargetUrlLookup = new MapBasedUrlLookup
-	val authenticator = Authenticator(config)
+	val authenticator = Authenticator()
 	val metadataXmlStr: String = CoreUtils.getResourceAsString(config.samlSpXmlPath)
 
 	lazy val userDb = Users

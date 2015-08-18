@@ -32,7 +32,6 @@ trait PrivateAuthConfig{
 }
 
 trait PublicAuthConfig{
-	def publicKeyPath: String
 	val authCookieName = "cpauthToken"
 	val idpCookieName = "lastChosenIdp"
 }

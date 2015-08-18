@@ -39,7 +39,7 @@ trait CpauthDirectives extends Directives {
 	def user(inner: UserInfo => Route): Route = cookie(publicAuthConfig.authCookieName)(cookie => {
 		val userTry = for(
 			auth <- authenticator;
-			token <- CookieToToken.recoverToken(cookie);
+			token <- CookieToToken.recoverToken(cookie.content);
 			uinfo <- auth.unwrapUserInfo(token)
 		) yield uinfo
 

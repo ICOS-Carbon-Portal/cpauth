@@ -25,5 +25,4 @@ object Constants extends Config{
 	val surnameAttr = "sn"
 
 	val authTokenValiditySeconds: Int = 100000
-	val publicKeyPath = "/crypto/cpauth_public.pem"
 }

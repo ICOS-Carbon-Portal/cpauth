@@ -16,9 +16,7 @@ class AuthenticationTest extends FunSuite{
 			val privateKeyPath = "/private1.der"
 		}).get.makeToken(user)
 		
-		val unwrappedUser = Authenticator(new PublicAuthConfig{
-			val publicKeyPath = "/public1.pem"
-		}).get.unwrapUserInfo(token)
+		val unwrappedUser = Authenticator("/public1.pem").get.unwrapUserInfo(token)
 
 		assert(unwrappedUser.isSuccess)
 		assert(unwrappedUser.get === user)
@@ -30,9 +28,7 @@ class AuthenticationTest extends FunSuite{
 			val privateKeyPath = "/private1.der"
 		}).get.makeToken(user)
 		
-		val unwrappedUser = Authenticator(new PublicAuthConfig{
-			val publicKeyPath = "/public1.pem"
-		}).get.unwrapUserInfo(token)
+		val unwrappedUser = Authenticator("/public1.pem").get.unwrapUserInfo(token)
 
 		assert(unwrappedUser.isFailure)
 
@@ -47,9 +43,7 @@ class AuthenticationTest extends FunSuite{
 			val privateKeyPath: String = "/saml/test_private_key.der"
 		}).get
 
-		val auth = Authenticator(new PublicAuthConfig{
-			val publicKeyPath: String = "/public1.pem"
-		}).get
+		val auth = Authenticator("/public1.pem").get
 
 		val unwrappedUser = auth.unwrapUserInfo(tokenMaker.makeToken(user))
 

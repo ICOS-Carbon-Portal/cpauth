@@ -1,31 +1,25 @@
 package se.lu.nateko.cp.cpauth.test
 
 import org.scalatest.FunSpec
-import scala.util.Try
-import se.lu.nateko.cp.cpauth.core.Authenticator
-import scala.concurrent.ExecutionContext
+
 import se.lu.nateko.cp.cpauth.CpauthDirectives
-import se.lu.nateko.cp.cpauth.core.PublicAuthConfig
+import se.lu.nateko.cp.cpauth.CookieFactory
+import se.lu.nateko.cp.cpauth.core._
+
+import scala.util.Try
+import scala.concurrent.ExecutionContext
+
 import spray.testkit.ScalatestRouteTest
-import se.lu.nateko.cp.cpauth.core.Exceptions
 import spray.http.StatusCodes
 import spray.routing.Directives
 import spray.routing.AuthenticationFailedRejection
-import se.lu.nateko.cp.cpauth.core.UrlsConfig
-import se.lu.nateko.cp.cpauth.core.SamlConfig
-import se.lu.nateko.cp.cpauth.core.AuthConfig
-import se.lu.nateko.cp.cpauth.CookieFactory
-import se.lu.nateko.cp.cpauth.core.UserInfo
 import spray.http.HttpHeaders.Cookie
 
 class CpauthDirectivesTest extends FunSpec with ScalatestRouteTest with Directives{
 	
-	def getConfig(privKeyPath: String) = new UrlsConfig with SamlConfig with AuthConfig {
+	def getConfig(privKeyPath: String) = new Config {
 		def authTokenValiditySeconds: Int = 1000
 		def privateKeyPath: String = privKeyPath
-		
-		// Members declared in se.lu.nateko.cp.cpauth.core.PublicAuthConfig
-		def publicKeyPath: String = "/public1.pem"
 		
 		// Members declared in se.lu.nateko.cp.cpauth.core.SamlConfig
 		def givenNameAttr: String = ???
@@ -46,7 +40,7 @@ class CpauthDirectivesTest extends FunSpec with ScalatestRouteTest with Directiv
 
 	val dirs = new CpauthDirectives{
 		val publicAuthConfig = config
-		val authenticator = Authenticator(publicAuthConfig)
+		val authenticator = Authenticator("/public1.pem")
 		implicit val dispatcher = system.dispatcher
 		implicit val scheduler = system.scheduler
 	}

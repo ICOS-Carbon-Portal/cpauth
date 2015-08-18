@@ -2,13 +2,7 @@ package se.lu.nateko.cp.cpauth.core.test
 
 import org.scalatest.FunSuite
 
-import se.lu.nateko.cp.cpauth.core.AuthToken
-import se.lu.nateko.cp.cpauth.core.CookieToToken.{recoverToken, constructCookieContent}
-import se.lu.nateko.cp.cpauth.core.Signature
-import se.lu.nateko.cp.cpauth.core.SignedToken
-import se.lu.nateko.cp.cpauth.core.UserInfo
-
-import spray.http.HttpCookie
+import se.lu.nateko.cp.cpauth.core._
 
 class CookieToTokenTest extends FunSuite{
 
@@ -22,11 +16,9 @@ class CookieToTokenTest extends FunSuite{
 			Signature(Array(14, 120, -34))
 		)
 
-		val cookieContent = constructCookieContent(original)
+		val cookieContent = CookieToToken.constructCookieContent(original)
 
-		val cookie = HttpCookie("cpauthToken", cookieContent)
-
-		val roundTripToken = recoverToken(cookie)
+		val roundTripToken = CookieToToken.recoverToken(cookieContent)
 		assert(roundTripToken.isSuccess)
 		val roundTrip = roundTripToken.get
 
