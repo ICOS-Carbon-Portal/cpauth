@@ -35,12 +35,8 @@ class Authenticator private(key: RSAPublicKey){
 
 object Authenticator{
 
-	val defaultPublicKeyPath = "/crypto/cpauth_public.pem"
-
-	def apply(): Try[Authenticator] = apply(defaultPublicKeyPath)
-
-	def apply(publicKeyPath: String): Try[Authenticator] = {
-		val keyLines = CoreUtils.getResourceLines(publicKeyPath)
+	def apply(authConfig: PublicAuthConfig): Try[Authenticator] = {
+		val keyLines = CoreUtils.getResourceLines(authConfig.publicKeyPath)
 		for(
 			key <- Crypto.rsaPublicFromPemLines(keyLines.toIndexedSeq)
 		) yield new Authenticator(key)

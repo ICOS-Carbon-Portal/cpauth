@@ -63,13 +63,17 @@ lazy val cpauth = (project in file("."))
 		fork := true,
 
 		initialCommands in console := """
-		import se.lu.nateko.cp.cpauth.accounts.Users
-		import se.lu.nateko.cp.cpauth.core.UserInfo
-		""",
+			import se.lu.nateko.cp.cpauth._
+			import se.lu.nateko.cp.cpauth.accounts.Users
+			import se.lu.nateko.cp.cpauth.core.UserInfo""",
 
 		mainClass in assembly := cpauthMain,
-		mainClass in (Compile, run) := cpauthMain
-		
+		mainClass in (Compile, run) := cpauthMain,
+
+		assemblyMergeStrategy in assembly := {
+			case "application.conf" => MergeStrategy.concat
+			case x => ((assemblyMergeStrategy in assembly).value)(x)
+		}
 	)
 
 Revolver.settings

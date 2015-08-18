@@ -7,7 +7,6 @@ import java.util.UUID
 import scala.xml.Elem
 import java.net.URL
 import org.opensaml.saml2.core.NameIDType
-import se.lu.nateko.cp.cpauth.core.SamlSpConfig
 import java.util.TimeZone
 
 object Saml {

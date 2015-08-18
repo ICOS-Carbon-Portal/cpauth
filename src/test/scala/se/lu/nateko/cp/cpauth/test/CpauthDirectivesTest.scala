@@ -1,14 +1,10 @@
 package se.lu.nateko.cp.cpauth.test
 
 import org.scalatest.FunSpec
-
-import se.lu.nateko.cp.cpauth.CpauthDirectives
-import se.lu.nateko.cp.cpauth.CookieFactory
+import se.lu.nateko.cp.cpauth._
 import se.lu.nateko.cp.cpauth.core._
-
 import scala.util.Try
 import scala.concurrent.ExecutionContext
-
 import spray.testkit.ScalatestRouteTest
 import spray.http.StatusCodes
 import spray.routing.Directives
@@ -17,30 +13,32 @@ import spray.http.HttpHeaders.Cookie
 
 class CpauthDirectivesTest extends FunSpec with ScalatestRouteTest with Directives{
 	
-	def getConfig(privKeyPath: String) = new Config {
-		def authTokenValiditySeconds: Int = 1000
-		def privateKeyPath: String = privKeyPath
-		
-		// Members declared in se.lu.nateko.cp.cpauth.core.SamlConfig
-		def givenNameAttr: String = ???
-		def idpMetadataFilePath: String = ???
-		def mailAttr: String = ???
-		def samlSpXmlPath: String = ???
-		def spConfig = ???
-		def surnameAttr: String = ???
-		
-		// Members declared in se.lu.nateko.cp.cpauth.core.UrlsConfig
-		def drupalProxying = ???
-		def loginPath: String = ???
-		def serviceHost: String = "cpauth.icos-cp.eu"
-		def servicePrivatePort: Int = ???
-	}
+	def getConfig(privKeyPath: String) = CpauthConfig(
+		auth = AuthConfig(
+			priv = PrivateAuthConfig(
+				authTokenValiditySeconds = 1000,
+				privateKeyPath = privKeyPath
+			),
+			pub = PublicAuthConfig(
+				authCookieName = "",
+				publicKeyPath = "/public1.pem"
+			)
+		),
+		saml = null,
+		http = HttpConfig(
+			drupalProxying = null,
+			loginPath = null,
+			serviceHost = "cpauth.icos-cp.eu",
+			servicePrivatePort = 0
+		)
+	)
 
 	val config = getConfig("/private1.der")
 
 	val dirs = new CpauthDirectives{
-		val publicAuthConfig = config
-		val authenticator = Authenticator("/public1.pem")
+		val httpConfig = config.http
+		val publicAuthConfig = config.auth.pub
+		val authenticator = Authenticator(config.auth.pub)
 		implicit val dispatcher = system.dispatcher
 		implicit val scheduler = system.scheduler
 	}

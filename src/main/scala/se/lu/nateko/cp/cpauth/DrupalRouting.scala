@@ -4,7 +4,6 @@ import akka.actor.ActorSystem
 import akka.util.Timeout
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.DurationInt
-import se.lu.nateko.cp.cpauth.core.UrlsConfig
 import spray.routing.Directives
 import spray.http.HttpHeaders
 import spray.http.Uri
@@ -14,13 +13,13 @@ import spray.http.HttpEntity
 
 trait DrupalRouting extends Directives with CpauthDirectives with ProxyDirectives{
 
-	def urlsConfig: UrlsConfig
+	def httpConfig: HttpConfig
 	implicit val system: ActorSystem
 	implicit val timeout = Timeout(60.seconds)
 
 	val drupalRoute = get{
 		headerValue{
-			case HttpHeaders.Host(host, 0) => urlsConfig.drupalProxying.get(host)
+			case HttpHeaders.Host(host, 0) => httpConfig.drupalProxying.get(host)
 			case _ => None
 		}{ drupalProxy =>
 			extract(_.request.uri)(originalUri => {
@@ -37,7 +36,7 @@ trait DrupalRouting extends Directives with CpauthDirectives with ProxyDirective
 					}
 				} ~
 				redirect(
-					Uri(urlsConfig.serviceUrl + urlsConfig.loginPath).withQuery(("targetUrl", targetUri.toString)),
+					Uri(httpConfig.serviceUrl + httpConfig.loginPath).withQuery(("targetUrl", targetUri.toString)),
 					StatusCodes.Found
 				)
 			})

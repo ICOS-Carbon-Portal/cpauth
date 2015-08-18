@@ -5,7 +5,6 @@ import akka.pattern.ask
 import se.lu.nateko.cp.cpauth.CpauthJsonProtocol._
 import se.lu.nateko.cp.cpauth.accounts.Users
 import se.lu.nateko.cp.cpauth.core.Authenticator
-import se.lu.nateko.cp.cpauth.core.Config
 import se.lu.nateko.cp.cpauth.core.CoreUtils
 import se.lu.nateko.cp.cpauth.opensaml.AssertionExtractor
 import se.lu.nateko.cp.cpauth.opensaml.IdpLibrary
@@ -24,15 +23,15 @@ object Main extends App with SimpleRoutingApp with SamlRouting with PasswordRout
 	implicit val dispatcher = system.dispatcher
 	implicit val scheduler = system.scheduler
 
-	val config: Config = Constants
-	val (urlsConfig, publicAuthConfig, samlConfig) = (config, config, config)
+	val config: CpauthConfig = ConfigReader.getDefault
+	val (httpConfig, publicAuthConfig, samlConfig) = (config.http, config.auth.pub, config.saml)
 
-	val assExtractorTry = AssertionExtractor(config)
-	val idpLib: IdpLibrary = IdpLibrary.fromConfig(config)
+	val assExtractorTry = AssertionExtractor(config.saml)
+	val idpLib: IdpLibrary = IdpLibrary.fromConfig(config.saml)
 	val cookieFactory = new CookieFactory(config)
 	val targetLookup: TargetUrlLookup = new MapBasedUrlLookup
-	val authenticator = Authenticator()
-	val metadataXmlStr: String = CoreUtils.getResourceAsString(config.samlSpXmlPath)
+	val authenticator = Authenticator(publicAuthConfig)
+	val metadataXmlStr: String = CoreUtils.getResourceAsString(config.saml.samlSpXmlPath)
 
 	lazy val userDb = Users
 
@@ -43,7 +42,7 @@ object Main extends App with SimpleRoutingApp with SamlRouting with PasswordRout
 			complete((StatusCodes.InternalServerError, ex.getMessage + "\n" + stack))
 	}
 
-	startServer(interface = "::0", port = config.servicePrivatePort) {
+	startServer(interface = "::0", port = config.http.servicePrivatePort) {
 		handleExceptions(cpauthExceptionHandler){
 			samlRoute ~
 			passwordRoute ~

@@ -16,7 +16,6 @@ import spray.http.HttpCookie
 import org.opensaml.saml2.core.Response
 import se.lu.nateko.cp.cpauth.opensaml.Parser
 import se.lu.nateko.cp.cpauth.opensaml.AssertionExtractor
-import se.lu.nateko.cp.cpauth.core.SamlConfig
 
 trait SamlRouting extends Directives with CpauthDirectives{
 

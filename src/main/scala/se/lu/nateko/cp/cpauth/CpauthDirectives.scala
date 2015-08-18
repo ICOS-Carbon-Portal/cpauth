@@ -6,9 +6,8 @@ import scala.util.Success
 import scala.util.Try
 import se.lu.nateko.cp.cpauth.core.Authenticator
 import se.lu.nateko.cp.cpauth.core.CookieToToken
-import se.lu.nateko.cp.cpauth.core.PublicAuthConfig
-import se.lu.nateko.cp.cpauth.core.UrlsConfig
 import se.lu.nateko.cp.cpauth.core.UserInfo
+import se.lu.nateko.cp.cpauth.core.PublicAuthConfig
 import spray.http.HttpHeader
 import spray.http.HttpHeaders
 import spray.http.HttpResponse
@@ -23,7 +22,8 @@ import akka.actor.Scheduler
 
 trait CpauthDirectives extends Directives {
 
-	def publicAuthConfig: PublicAuthConfig with UrlsConfig
+	def publicAuthConfig: PublicAuthConfig
+	def httpConfig: HttpConfig
 	def authenticator: Try[Authenticator]
 
 	implicit def dispatcher: ExecutionContext
@@ -53,7 +53,7 @@ trait CpauthDirectives extends Directives {
 		}
 	}) ~ reject(new AuthenticationFailedRejection(AuthenticationFailedRejection.CredentialsMissing, Nil))
 
-	lazy val logout: Route = deleteCookie(publicAuthConfig.authCookieName, publicAuthConfig.authDomain, "/"){
+	lazy val logout: Route = deleteCookie(publicAuthConfig.authCookieName, httpConfig.authDomain, "/"){
 		complete(StatusCodes.OK)
 	}
 

@@ -1,51 +1,79 @@
-package se.lu.nateko.cp.cpauth.core
+package se.lu.nateko.cp.cpauth
 
-trait UrlsConfig{
-	def serviceHost: String
-	def servicePrivatePort: Int
+import com.typesafe.config.Config
+import spray.json.DefaultJsonProtocol
+import spray.json._
+import com.typesafe.config.ConfigRenderOptions
+import com.typesafe.config.ConfigFactory
+import se.lu.nateko.cp.cpauth.core.PublicAuthConfig
+
+case class HttpConfig(
+		serviceHost: String,
+		servicePrivatePort: Int,
+		loginPath: String,
+		drupalProxying: Map[String, ProxyConfig]){
 	def serviceUrl: String = "https://" + serviceHost
-
-	def authDomain: String = UrlsConfig.cookieDomainFromHost(serviceHost)
-
-	def loginPath: String
-
-	def drupalProxying: Map[String, ProxyConfig]
+	def authDomain: String = HttpConfig.cookieDomainFromHost(serviceHost)
 }
 
 case class SamlSpConfig(url: String, consumerServiceUrl: String)
 case class ProxyConfig(ipv4Host: String, port: Int)
+case class SamlAttrConfig(mail: String, givenName: String, surname: String)
 
-trait SamlConfig{
-	def idpMetadataFilePath: String
-	def samlSpXmlPath: String
-	def privateKeyPath: String
-	def spConfig: SamlSpConfig
+case class SamlConfig(
+	idpMetadataFilePath: String,
+	samlSpXmlPath: String,
+	idpCookieName: String,
+	privateKeyPath: String,
+	spConfig: SamlSpConfig,
+	attributes: SamlAttrConfig
+)
 
-	def mailAttr: String
-	def givenNameAttr: String
-	def surnameAttr: String
-}
+case class PrivateAuthConfig(authTokenValiditySeconds: Int, privateKeyPath: String)
+case class AuthConfig(priv: PrivateAuthConfig, pub: PublicAuthConfig)
 
-trait PrivateAuthConfig{
-	def authTokenValiditySeconds: Int
-	def privateKeyPath: String
-}
-
-trait PublicAuthConfig{
-	val authCookieName = "cpauthToken"
-	val idpCookieName = "lastChosenIdp"
-}
-
-trait AuthConfig extends PrivateAuthConfig with PublicAuthConfig
-
-trait Config extends UrlsConfig with SamlConfig with AuthConfig
+case class CpauthConfig(http: HttpConfig, saml: SamlConfig, auth: AuthConfig)
 
 
-object UrlsConfig{
+object HttpConfig{
 	
 	def cookieDomainFromHost(host: String): String = host.count(_ == '.') match{
 		case 0 => host
 		case x => host.split('.').drop(x - 1).mkString(".", ".", "")
+	}
+
+}
+
+object ConfigReader extends DefaultJsonProtocol{
+
+	def getDefault: CpauthConfig = fromAppConfig(getAppConfig)
+
+	def getAppConfig: Config = {
+		val default = ConfigFactory.load
+		val confFile = new java.io.File("application.conf").getAbsoluteFile
+		if(!confFile.exists) default
+		else ConfigFactory.parseFile(confFile).withFallback(default)
+	}
+
+	def fromAppConfig(applicationConfig: Config): CpauthConfig = {
+
+		implicit val samlSpConfigFormat = jsonFormat2(SamlSpConfig)
+		implicit val proxyConfigFormat = jsonFormat2(ProxyConfig)
+		implicit val samlAttrFormat = jsonFormat3(SamlAttrConfig)
+		//.apply needed because of the companion object that UrlsConfig has
+		implicit val urlsConfigFormat = jsonFormat4(HttpConfig.apply)
+		implicit val samlConfigFormat = jsonFormat6(SamlConfig)
+		
+		implicit val pubAuthConfigFormat = jsonFormat2(PublicAuthConfig)
+		implicit val privAuthConfigFormat = jsonFormat2(PrivateAuthConfig)
+		implicit val authConfigFormat = jsonFormat2(AuthConfig)
+		
+		implicit val cpauthConfigFormat = jsonFormat3(CpauthConfig)
+
+		val renderOpts = ConfigRenderOptions.concise.setJson(true)
+		val cpConfJson: String = applicationConfig.getValue("cpauth").render(renderOpts)
+		
+		cpConfJson.parseJson.convertTo[CpauthConfig]
 	}
 
 }

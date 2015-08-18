@@ -1,12 +1,9 @@
 package se.lu.nateko.cp.cpauth
 
 import java.security.interfaces.RSAPrivateKey
-
 import scala.util.Try
-
 import org.apache.commons.codec.binary.Base64
 import org.joda.time.DateTime
-
 import se.lu.nateko.cp.cpauth.core._
 
 class SignedTokenMaker private(key: RSAPrivateKey, validity: Int){
