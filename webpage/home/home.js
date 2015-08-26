@@ -22,6 +22,26 @@ function displayUserInfo(uinfo){
 	$("#mail").html(uinfo.mail);
 }
 
+function displayToken(token) {
+	$("#token").html(token);
+}
+
+function selectToken() {
+	var doc = document;
+	var text = doc.getElementById("token");
+
+	if (doc.body.createTextRange) { // ms
+		var range = doc.body.createTextRange();
+		range.moveToElementText(text);
+		range.select();
+	} else if (window.getSelection) { // moz, opera, webkit
+		var selection = window.getSelection();
+		var range = doc.createRange();
+		range.selectNodeContents(text);
+		selection.removeAllRanges();
+		selection.addRange(range);
+	}
+}
 
 function reportError(xhr){
 	showMessage(xhr.responseText, "alert-danger");
@@ -117,6 +137,15 @@ $(function(){
 		.done(function(userIsLocal){
 			if(userIsLocal) $("#forLocalsOnly").show();
 		});
+
+	$.ajax({
+		type: "GET",
+		url: "../cpauthcookie",
+		dateType: "text"
+	}).done(function(result){
+		displayToken(result);
+		$("#token").click(selectToken);
+	});
 
 	$("#signOutButton").click(signOut);
 	$("#changePasswordButton").click(changePassword);

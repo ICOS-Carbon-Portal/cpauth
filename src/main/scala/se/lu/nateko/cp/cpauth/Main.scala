@@ -42,7 +42,7 @@ object Main extends App with SimpleRoutingApp with SamlRouting with PasswordRout
 			complete((StatusCodes.InternalServerError, ex.getMessage + "\n" + stack))
 	}
 
-	startServer(interface = "::0", port = config.http.servicePrivatePort) {
+	startServer(interface = "127.0.0.1", port = config.http.servicePrivatePort) {
 		handleExceptions(cpauthExceptionHandler){
 			samlRoute ~
 			passwordRoute ~
@@ -51,6 +51,9 @@ object Main extends App with SimpleRoutingApp with SamlRouting with PasswordRout
 				path("logout")(logout) ~
 				path("whoami"){
 					user(uinfo => complete(uinfo)) ~ complete(StatusCodes.Unauthorized)
+				} ~
+				path("cpauthcookie"){
+					cpauthCookie
 				} ~
 				pathEndOrSingleSlash{
 					user(_ => redirect("/home/", StatusCodes.Found)) ~

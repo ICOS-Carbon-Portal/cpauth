@@ -1,3 +1,4 @@
+/application.conf
 *.class
 *.log
 
@@ -30,3 +31,6 @@ src/main/resources/crypto/private/
 
 #Large volatile files
 src/main/resources/swamid-idps.xml
+
+# Idea
+.idea

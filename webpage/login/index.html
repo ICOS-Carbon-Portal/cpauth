@@ -8,13 +8,17 @@
 
 		<script src="https://static.icos-cp.eu/constant/jquery/1.11.2/jquery.min.js"></script>
 		<script src="https://static.icos-cp.eu/constant/bootstrap/3.3.4/js/bootstrap.min.js"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.7.0/underscore-min.js"></script>
 		<script src="https://static.icos-cp.eu/constant/cookies.js/1.2.1/cookies.min.js"></script>
+		<script src="https://static.icos-cp.eu/constant/jquery/plugins/autocomplete/1.11.4/jquery-ui.min.js"></script>
 		<script src="login.js"></script>
-	    
+
 		<link rel="stylesheet" href="https://static.icos-cp.eu/constant/bootstrap/3.3.4/css/bootstrap.min.css">
 		<link rel="stylesheet" type="text/css" href="https://static.icos-cp.eu/css/style.css">
-		
+		<link rel="stylesheet" type="text/css" href="https://static.icos-cp.eu/constant/jquery/plugins/autocomplete/1.11.4/jquery-ui.min.css">
+		<link rel="stylesheet" type="text/css" href="https://static.icos-cp.eu/constant/jquery/plugins/autocomplete/1.11.4/jquery-ui.structure.min.css">
+		<link rel="stylesheet" type="text/css" href="https://static.icos-cp.eu/constant/jquery/plugins/autocomplete/1.11.4/jquery-ui.theme.min.css">
+
+
 		<title>Login to Carbon Portal</title>
 
 	</head>
@@ -69,10 +73,7 @@
 				</ul>
 	
 			</div>  			
-  		
-  		
-  		
-  		
+
 			<div class="row">
 			
 	  			<div class="tab-content">
@@ -80,15 +81,15 @@
 						<div class="panel panel-default">
 							<div class="panel-body">
 		  					
-								<form action="/saml/login">
-									<input class="targetUrlRelay" type="hidden" name="targetUrl">
-									
+								<form id="saml-login" action="/saml/login">
+									<input id="targetUrl" class="targetUrlRelay" type="hidden" name="targetUrl">
+
 									<div class="form-group">
-										<label for="GET-idpUrl">Select university:</label>
-										<select id="GET-idpUrl" name="idpUrl" class="form-control"></select>
+										<label for="idpUrlInput">Select university:</label><br>
+										<input type="text" id="idpUrlInput" class="form-control" style="width:50em;" />
 									</div>
-									 
-									<button type="submit" class="btn btn-default">Login!</button>
+
+									<button id="signonBtn" class="btn btn-default">Login!</button>
 								</form>		  					
 		  					
 		  					</div>

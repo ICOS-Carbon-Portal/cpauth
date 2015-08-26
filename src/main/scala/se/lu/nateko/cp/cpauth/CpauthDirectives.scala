@@ -12,10 +12,7 @@ import spray.http.HttpHeader
 import spray.http.HttpHeaders
 import spray.http.HttpResponse
 import spray.http.StatusCodes
-import spray.routing.AuthenticationFailedRejection
-import spray.routing.Directives
-import spray.routing.RequestContext
-import spray.routing.Route
+import spray.routing._
 import scala.concurrent.Future
 import scala.concurrent.duration._
 import akka.actor.Scheduler
@@ -52,6 +49,10 @@ trait CpauthDirectives extends Directives {
 			}
 		}
 	}) ~ reject(new AuthenticationFailedRejection(AuthenticationFailedRejection.CredentialsMissing, Nil))
+
+	def cpauthCookie: Route = cookie(publicAuthConfig.authCookieName)(cookie => {
+		complete(publicAuthConfig.authCookieName + "=" + cookie.content)
+	})
 
 	lazy val logout: Route = deleteCookie(publicAuthConfig.authCookieName, httpConfig.authDomain, "/"){
 		complete(StatusCodes.OK)
