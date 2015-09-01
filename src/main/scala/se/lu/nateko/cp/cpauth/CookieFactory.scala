@@ -28,7 +28,7 @@ class CookieFactory(config: CpauthConfig) {
 		domain = Some(config.http.serviceHost),
 		path = Some(config.http.loginPath),
 		httpOnly = false, //needs to be accessed by Javascript on the client
-		maxAge = Some(31536000)
+		maxAge = Some(31536000) //1 year in seconds
 	)
 
 	def makeAuthenticationCookie(response: Response, extractor: AssertionExtractor, idpLib: IdpLibrary): Try[HttpCookie] = for(

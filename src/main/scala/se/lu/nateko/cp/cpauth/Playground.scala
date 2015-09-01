@@ -14,6 +14,7 @@ import se.lu.nateko.cp.cpauth.core.CoreUtils
 import se.lu.nateko.cp.cpauth.opensaml.ResponseStatusController
 import org.opensaml.xml.XMLObject
 import scala.collection.JavaConverters.asScalaBufferConverter
+import se.lu.nateko.cp.cpauth.core.UserInfo
 
 object Playground {
 
@@ -47,4 +48,13 @@ object Playground {
 			Seq(xmlObj.getClass)
 	}
 
+	def makeLongLifeCookie(fname: String, lname: String, email: String): String = {
+		val validity = 3600 * 24 * 365 * 30 //30 years in seconds
+		val defConf = ConfigReader.getDefault
+		val privAuthConf = defConf.auth.priv.copy(authTokenValiditySeconds = validity)
+		val conf = defConf.copy(auth = defConf.auth.copy(priv = privAuthConf))
+		val factory = new CookieFactory(conf)
+		val uinfo = UserInfo(givenName = fname, surname = lname, mail = email)
+		factory.makeAuthenticationCookie(uinfo).get.content
+	}
 }
