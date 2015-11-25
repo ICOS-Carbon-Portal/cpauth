@@ -26,7 +26,15 @@ lazy val cpauthCore = (project in file("core"))
 			"commons-io"         %  "commons-io"       % "2.4",
 			"joda-time"          %  "joda-time"        % "2.2",
 			"org.joda"           %  "joda-convert"     % "1.2"
-		)
+		),
+		publishTo := {
+			val nexus = "https://repo.icos-cp.eu/content/repositories/"
+			if (isSnapshot.value)
+				Some("snapshots" at nexus + "snapshots") 
+			else
+				Some("releases"  at nexus + "releases")
+		},
+		credentials += Credentials(Path.userHome / ".ivy2" / ".credentials")
 	)
 
 val akkaVersion = "2.3.12"
