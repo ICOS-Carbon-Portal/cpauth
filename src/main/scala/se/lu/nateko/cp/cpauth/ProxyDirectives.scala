@@ -23,7 +23,7 @@ trait ProxyDirectives extends Directives{
 
 			val newQuery = req.uri.query ++ query
 			val newUri = req.uri.withHost(host).withPath(path).withPort(port).withQuery(newQuery :_*)
-			val newReq = req.copy(uri = newUri).withHost(host, port)
+			val newReq = req.copy(uri = newUri, protocol = HttpProtocols.`HTTP/1.1`).withHost(host, port)
 
 			onSuccess(IO(Http).ask(newReq).mapTo[HttpResponse]) {
 				response => complete(response.withoutRedundantHeaders)
