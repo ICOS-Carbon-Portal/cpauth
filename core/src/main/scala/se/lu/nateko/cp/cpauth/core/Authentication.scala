@@ -4,7 +4,6 @@ import org.joda.time.DateTime
 import scala.util.Try
 import org.apache.commons.codec.binary.Base64
 import scala.util.Failure
-import scala.util.control.NoStackTrace
 import scala.util.Success
 import java.security.interfaces.RSAPublicKey
 

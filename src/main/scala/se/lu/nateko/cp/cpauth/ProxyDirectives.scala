@@ -16,13 +16,13 @@ trait ProxyDirectives extends Directives{
 
 	import ProxyDirectives._
 
-	def proxyTo(host: Uri.Host, port: Int, query: (String, String)*)
+	def proxyTo(host: Uri.Host, path: Uri.Path, port: Int, query: (String, String)*)
 		(implicit actorSys: ActorSystem, timeout: Timeout, ectxt: ExecutionContext): Route =
 
 		extract(c => c.request)(req => {
 
 			val newQuery = req.uri.query ++ query
-			val newUri = req.uri.withHost(host).withPort(port).withQuery(newQuery :_*)
+			val newUri = req.uri.withHost(host).withPath(path).withPort(port).withQuery(newQuery :_*)
 			val newReq = req.copy(uri = newUri).withHost(host, port)
 
 			onSuccess(IO(Http).ask(newReq).mapTo[HttpResponse]) {

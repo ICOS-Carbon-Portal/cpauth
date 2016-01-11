@@ -17,7 +17,7 @@ case class HttpConfig(
 }
 
 case class SamlSpConfig(url: String, consumerServiceUrl: String)
-case class ProxyConfig(ipv4Host: String, port: Int)
+case class ProxyConfig(ipv4Host: String, path: Option[String], port: Int)
 case class SamlAttrConfig(mail: String, givenName: String, surname: String)
 
 case class SamlConfig(
@@ -58,7 +58,7 @@ object ConfigReader extends DefaultJsonProtocol{
 	def fromAppConfig(applicationConfig: Config): CpauthConfig = {
 
 		implicit val samlSpConfigFormat = jsonFormat2(SamlSpConfig)
-		implicit val proxyConfigFormat = jsonFormat2(ProxyConfig)
+		implicit val proxyConfigFormat = jsonFormat3(ProxyConfig)
 		implicit val samlAttrFormat = jsonFormat3(SamlAttrConfig)
 		//.apply needed because of the companion object that UrlsConfig has
 		implicit val urlsConfigFormat = jsonFormat4(HttpConfig.apply)
