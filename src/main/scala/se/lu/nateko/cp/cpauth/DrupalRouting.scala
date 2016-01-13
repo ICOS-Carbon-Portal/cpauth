@@ -28,8 +28,8 @@ trait DrupalRouting extends Directives with CpauthDirectives with ProxyDirective
 					redirectWhenDone(target = targetUri, dropParam = Some("login")){
 						proxyTo(
 							Uri.IPv4Host(drupalProxy.ipv4Host),
-							drupalProxy.path.map(Uri.Path(_)).getOrElse(Uri.Path.Empty),
 							drupalProxy.port,
+							drupalProxy.path.map(Uri.Path(_)).getOrElse(originalUri.path),
 							("givenName", uinfo.givenName),
 							("surname", uinfo.surname),
 							("mail", uinfo.mail)

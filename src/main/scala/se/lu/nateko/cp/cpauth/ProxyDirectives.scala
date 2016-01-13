@@ -18,7 +18,7 @@ trait ProxyDirectives extends Directives{
 
 	import ProxyDirectives._
 
-	def proxyTo(host: Uri.Host, path: Uri.Path, port: Int, query: (String, String)*)
+	def proxyTo(host: Uri.Host, port: Int, path: Uri.Path, query: (String, String)*)
 		(implicit actorSys: ActorSystem, timeout: Timeout, ectxt: ExecutionContext): Route = {
 
 		val pipeline: Future[SendReceive] = for (
@@ -28,8 +28,10 @@ trait ProxyDirectives extends Directives{
 		extract(c => c.request)(req => {
 
 			val newQuery = req.uri.query ++ query
-			val newUri = Uri.Empty.withPath(path).withQuery(newQuery :_*)
-			val newReq = req.copy(uri = newUri, protocol = HttpProtocols.`HTTP/1.1`)
+			val hostHeader = req.header[HttpHeaders.Host]
+			val finalPath = if(path.isEmpty) Uri.Path./ else path
+			val newUri = Uri.Empty.withPath(finalPath).withQuery(newQuery :_*)
+			val newReq = req.copy(uri = newUri, protocol = HttpProtocols.`HTTP/1.1`, headers = hostHeader.toList)
 
 			onSuccess(pipeline.flatMap(_(newReq)).mapTo[HttpResponse]) {
 				response => complete(response.withoutRedundantHeaders)
