@@ -28,7 +28,7 @@ trait ProxyDirectives extends Directives{
 		extract(c => c.request)(req => {
 
 			val newQuery = req.uri.query ++ query
-			val newUri = Uri.Empty.withPath(path).withPort(port).withQuery(newQuery :_*)
+			val newUri = Uri.Empty.withPath(path).withQuery(newQuery :_*)
 			val newReq = req.copy(uri = newUri, protocol = HttpProtocols.`HTTP/1.1`)
 
 			onSuccess(pipeline.flatMap(_(newReq)).mapTo[HttpResponse]) {
