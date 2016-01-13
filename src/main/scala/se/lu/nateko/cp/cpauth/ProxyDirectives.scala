@@ -11,24 +11,31 @@ import akka.actor.ActorSystem
 import akka.util.Timeout
 import scala.concurrent.ExecutionContext
 import spray.routing.Route
+import spray.client.pipelining._
+import scala.concurrent.Future
 
 trait ProxyDirectives extends Directives{
 
 	import ProxyDirectives._
 
 	def proxyTo(host: Uri.Host, path: Uri.Path, port: Int, query: (String, String)*)
-		(implicit actorSys: ActorSystem, timeout: Timeout, ectxt: ExecutionContext): Route =
+		(implicit actorSys: ActorSystem, timeout: Timeout, ectxt: ExecutionContext): Route = {
+
+		val pipeline: Future[SendReceive] = for (
+			Http.HostConnectorInfo(connector, _) <- IO(Http) ? Http.HostConnectorSetup(host.address, port)
+		) yield sendReceive(connector)
 
 		extract(c => c.request)(req => {
 
 			val newQuery = req.uri.query ++ query
-			val newUri = req.uri.withHost(host).withPath(path).withPort(port).withQuery(newQuery :_*)
-			val newReq = req.copy(uri = newUri, protocol = HttpProtocols.`HTTP/1.1`).withHost(host, port)
+			val newUri = Uri.Empty.withPath(path).withPort(port).withQuery(newQuery :_*)
+			val newReq = req.copy(uri = newUri, protocol = HttpProtocols.`HTTP/1.1`)
 
-			onSuccess(IO(Http).ask(newReq).mapTo[HttpResponse]) {
+			onSuccess(pipeline.flatMap(_(newReq)).mapTo[HttpResponse]) {
 				response => complete(response.withoutRedundantHeaders)
 			}
 		})
+	}
 }
 
 object ProxyDirectives{
@@ -41,12 +48,6 @@ object ProxyDirectives{
 
 	implicit class HeaderManipHttpMessage[T <: HttpMessage](val msg: T) extends AnyVal{
 
-		def withHost(host: Uri.Host, port: Int): msg.Self = {
-			val hport = if(port == 80) 0 else port
-			val hostHeader = HttpHeaders.Host(host.toString, hport)
-			msg.withHeaders(hostHeader)
-		}
-		
 		def withoutRedundantHeaders: msg.Self = {
 			val headers = msg.headers.filter(header => !blackList.contains(header.lowercaseName))
 			msg.withHeaders(headers)
