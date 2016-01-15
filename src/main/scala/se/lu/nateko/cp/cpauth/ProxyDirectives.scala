@@ -27,9 +27,9 @@ trait ProxyDirectives extends Directives{
 
 		extract(c => c.request)(req => {
 
-			val newQuery = req.uri.query ++ query
 			val finalPath = if(path.isEmpty) Uri.Path./ else path
-			val newUri = Uri.Empty.withPath(finalPath).withQuery(newQuery :_*)
+			val newQuery = mergeQueries(query, req.uri.query)
+			val newUri = Uri.Empty.withPath(finalPath).withQuery(newQuery)
 			val newReq = req.copy(uri = newUri, protocol = HttpProtocols.`HTTP/1.1`)
 
 			onSuccess(pipeline.flatMap(_(newReq)).mapTo[HttpResponse]) {
@@ -45,6 +45,12 @@ object ProxyDirectives{
 		import HttpHeaders._
 		Set(`Content-Type`, `Content-Length`, Server, Date, `Transfer-Encoding`)
 			.map(_.lowercaseName)
+	}
+
+	def mergeQueries(highPrio: Seq[(String, String)], old: Uri.Query) = Uri.Query{
+		old.foldLeft(highPrio.toMap){
+			case (map, pair @ (key, _)) => if(map.contains(key)) map else map + pair
+		}
 	}
 
 	implicit class HeaderManipHttpMessage[T <: HttpMessage](val msg: T) extends AnyVal{
