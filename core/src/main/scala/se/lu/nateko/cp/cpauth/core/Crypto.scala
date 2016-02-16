@@ -1,5 +1,6 @@
 package se.lu.nateko.cp.cpauth.core
 
+import java.io.ByteArrayInputStream
 import java.nio.charset.Charset
 import java.security.KeyFactory
 import java.security.PublicKey
@@ -9,22 +10,20 @@ import java.security.interfaces.RSAPrivateKey
 import java.security.interfaces.RSAPublicKey
 import java.security.spec.PKCS8EncodedKeySpec
 import java.security.spec.X509EncodedKeySpec
+
 import scala.util.Failure
 import scala.util.Try
-import org.apache.commons.codec.binary.Base64
-import org.apache.commons.io.IOUtils
-import java.io.ByteArrayInputStream
 
 
 case class Signature(bytes: Array[Byte]){
-	def base64: String = Base64.encodeBase64String(bytes)
+	def base64: String = CoreUtils.encodeToBase64String(bytes)
 }
 
 object Crypto{
 
 	def publicKeyFromX509Cert(base64: String): Try[PublicKey] = Try{
 		val cf = CertificateFactory.getInstance("X.509")
-		val certBytes: Array[Byte] = Base64.decodeBase64(base64)
+		val certBytes: Array[Byte] = CoreUtils.decodeBase64(base64)
 		val certInputStream = new ByteArrayInputStream(certBytes)
 		val cert = cf.generateCertificate(certInputStream).asInstanceOf[X509Certificate]
 		cert.getPublicKey
@@ -67,7 +66,7 @@ object Crypto{
 		if(lines.size > 2 && lines.head == prologue && lines.last == epilogue){
 			
 			val encoded = lines.tail.take(lines.size - 2).mkString("") 
-			Try(Base64.decodeBase64(encoded))
+			Try(CoreUtils.decodeBase64(encoded))
 			
 		}else Failure(new Exception(s"Expected key specification to start with $prologue line, end with $epilogue line, and have body"))
 	}

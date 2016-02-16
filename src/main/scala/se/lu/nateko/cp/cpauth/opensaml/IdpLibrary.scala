@@ -65,7 +65,7 @@ object IdpLibrary {
 			} yield (id, new IdpProps(name, key, redirect))
 
 		}).collect{
-			case (Success(uriToProps)) => uriToProps
+			case Success(uriToProps) => uriToProps
 		}
 
 		new IdpLibrary{

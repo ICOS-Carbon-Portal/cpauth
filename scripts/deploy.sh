@@ -8,6 +8,6 @@ source config.sh
 
 scp stop.sh start.sh restart.sh "$host:$deployPath"
 
-rsync -aP ../target/scala-2.11/Carbon\ Portal\ Authentication\ Service-assembly-0.2.jar "$host:$deployPath"assembly.jar
+rsync -aP ../target/scala-2.11/Carbon\ Portal\ Authentication\ Service-assembly-0.3.jar "$host:$deployPath"assembly.jar
 
 ssh "$host" "$deployPath"restart.sh

@@ -1,5 +1,8 @@
 #!/bin/bash
 
+echo 'Be careful with this script! Exiting for now.'
+exit 0
+
 cd "$(dirname "$0")"
 
 source config.sh

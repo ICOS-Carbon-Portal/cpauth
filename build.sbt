@@ -1,10 +1,9 @@
 
 lazy val commonSettings = Seq(
 	organization := "se.lu.nateko.cp",
-	version := "0.2",
 	scalaVersion := "2.11.7",
 
-	libraryDependencies += "org.scalatest" %% "scalatest" % "2.2.4" % "test",
+	libraryDependencies += "org.scalatest" %% "scalatest" % "2.2.6" % "test",
 	
 	scalacOptions ++= Seq(
 		"-unchecked",
@@ -21,11 +20,8 @@ lazy val cpauthCore = (project in file("core"))
 	.settings(commonSettings: _*)
 	.settings(
 		name := "cpauth-core",
+		version := "0.3-SNAPSHOT",
 		libraryDependencies ++= Seq(
-			"commons-codec"      %  "commons-codec"    % "1.9",
-			"commons-io"         %  "commons-io"       % "2.4",
-			"joda-time"          %  "joda-time"        % "2.2",
-			"org.joda"           %  "joda-convert"     % "1.2"
 		),
 		publishTo := {
 			val nexus = "https://repo.icos-cp.eu/content/repositories/"
@@ -37,7 +33,7 @@ lazy val cpauthCore = (project in file("core"))
 		credentials += Credentials(Path.userHome / ".ivy2" / ".credentials")
 	)
 
-val akkaVersion = "2.3.12"
+val akkaVersion = "2.3.14"
 val sprayVersion = "1.3.3"
 val cpauthMain = Some("se.lu.nateko.cp.cpauth.Main")
 
@@ -45,10 +41,8 @@ lazy val cpauth = (project in file("."))
 	.dependsOn(cpauthCore)
 	.settings(commonSettings: _*)
 	.settings(
-
 		name := "Carbon Portal Authentication Service",
-
-		resolvers += "spray repo" at "http://repo.spray.io",
+		version := "0.3",
 
 		libraryDependencies ++= Seq(
 			"org.opensaml"       %  "opensaml"         % "2.6.4" withJavadoc,
@@ -85,3 +79,4 @@ lazy val cpauth = (project in file("."))
 	)
 
 Revolver.settings
+

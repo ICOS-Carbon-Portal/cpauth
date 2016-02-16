@@ -1,38 +1,54 @@
 package se.lu.nateko.cp.cpauth.core
 
-import scala.io.Source
-import org.apache.commons.codec.binary.Base64
-import org.apache.commons.io.IOUtils
 import java.io.ByteArrayOutputStream
+import java.nio.file.Files
+import java.nio.file.Paths
+import java.util.Base64
 import java.util.zip.Deflater
 import java.util.zip.DeflaterOutputStream
-import java.io.InputStream
-import java.nio.charset.StandardCharsets
 import java.util.zip.Inflater
 import java.util.zip.InflaterOutputStream
+
+import scala.Iterator
+import scala.io.Source
 
 object CoreUtils {
 
 	private[this] val utf8 = java.nio.charset.StandardCharsets.UTF_8
+	private[this] val base64Decoder = Base64.getDecoder
+	private[this] val base64Encoder = Base64.getEncoder
+	private[this] val whiteRegex = "\\s+".r
 
-	def decode64(in: String) = new String(Base64.decodeBase64(in), utf8)
+	def decodeBase64ToString(in: String): String =
+		new String(base64Decoder.decode(noWhite(in)), utf8)
+
+	def encodeToBase64String(in: Array[Byte]): String =
+		base64Encoder.encodeToString(in)
+
+	def decodeBase64(in: String): Array[Byte] =
+		base64Decoder.decode(noWhite(in))
+
+	def noWhite(s: String): String = {
+		whiteRegex.replaceAllIn(s, "")
+	}
 
 	def getResourceBytes(resourcePath: String): Array[Byte] = {
-		val stream = getClass.getResourceAsStream(resourcePath)
-		if(stream == null) Array()
-		else IOUtils.toByteArray(stream)
+		val res = getClass.getResource(resourcePath)
+		if(res == null) Array.empty else{
+			val path = Paths.get(res.toURI)
+			Files.readAllBytes(path)
+		}
+	}
+
+	def getResourceAsString(resourcePath: String): String = {
+		val bytes = getResourceBytes(resourcePath)
+		new String(bytes, utf8)
 	}
 
 	def getResourceLines(resourcePath: String): Iterator[String] = {
 		val stream = getClass.getResourceAsStream(resourcePath)
 		if(stream == null) Iterator()
 		else Source.fromInputStream(stream, utf8.displayName).getLines
-	}
-
-	def getResourceAsString(resourcePath: String): String = {
-		val stream = getClass.getResourceAsStream(resourcePath)
-		if(stream == null) ""
-		else IOUtils.toString(stream, utf8)
 	}
 
 	def compress(data: Array[Byte]): Array[Byte] = {

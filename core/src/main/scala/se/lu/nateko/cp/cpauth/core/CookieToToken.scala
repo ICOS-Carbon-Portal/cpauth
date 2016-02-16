@@ -1,7 +1,6 @@
 package se.lu.nateko.cp.cpauth.core
 
 import scala.util.Try
-import org.apache.commons.codec.binary.Base64
 import java.io.ObjectOutputStream
 import java.io.ByteArrayOutputStream
 import java.io.ByteArrayInputStream
@@ -10,7 +9,7 @@ import java.io.ObjectInputStream
 object CookieToToken {
 
 	def recoverToken(base64: String): Try[SignedToken] = Try{
-		val serialized: Array[Byte] = Base64.decodeBase64(base64)
+		val serialized: Array[Byte] = CoreUtils.decodeBase64(base64)
 		val is = new ByteArrayInputStream(serialized)
 		val ois = new ObjectInputStream(is)
 		
@@ -41,6 +40,6 @@ object CookieToToken {
 		oos.writeObject(token.signature.bytes)
 		oos.close()
 		val serialized = byteStream.toByteArray
-		Base64.encodeBase64String(serialized)
+		CoreUtils.encodeToBase64String(serialized)
 	}
 }

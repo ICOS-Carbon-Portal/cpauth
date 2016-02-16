@@ -16,6 +16,8 @@ import spray.http.HttpCookie
 import org.opensaml.saml2.core.Response
 import se.lu.nateko.cp.cpauth.opensaml.Parser
 import se.lu.nateko.cp.cpauth.opensaml.AssertionExtractor
+import spray.http.ContentTypes
+import akka.actor.ActorSystem
 
 trait SamlRouting extends Directives with CpauthDirectives{
 
@@ -23,16 +25,13 @@ trait SamlRouting extends Directives with CpauthDirectives{
 	def idpLib: IdpLibrary
 	def cookieFactory: CookieFactory
 	def targetLookup: TargetUrlLookup
-	def metadataXmlStr: String
 	def assExtractorTry: Try[AssertionExtractor]
 
-	lazy val idpInfos: Seq[IdpInfo] = idpLib.getInfos.toSeq.sortBy(_.name)
-	lazy val metadataXml: HttpEntity = {
-		val xmlType = ContentType(MediaTypes.`application/xml`)
-		HttpEntity(xmlType, metadataXmlStr)
-	}
+	implicit val system: ActorSystem
 
-	val samlRoute: Route = pathPrefix("saml"){
+	lazy val idpInfos: Seq[IdpInfo] = idpLib.getInfos.toSeq.sortBy(_.name)
+
+	def samlRoute: Route = pathPrefix("saml"){
 		get{
 			path("login") {
 				parameter('idpUrl, 'targetUrl ?){ (idp, target) =>
@@ -57,7 +56,7 @@ trait SamlRouting extends Directives with CpauthDirectives{
 					}
 				} ~ complete((StatusCodes.BadRequest, "Identity provider has not been specified!"))
 			} ~
-			path("cpauth"){ complete(metadataXml) } ~
+			path("cpauth"){ getFromResource(samlConfig.samlSpXmlPath) } ~
 			path("idps"){ complete(idpInfos) }
 		} ~
 		post{

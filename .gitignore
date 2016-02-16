@@ -7,11 +7,12 @@
 .history/
 .lib/
 dist/*
-target/
+/target/
+/core/target/
 lib_managed/
 src_managed/
-project/boot/
-project/plugins/project/
+/project/project/
+/project/target/
 
 # Scala-IDE specific
 .scala_dependencies
@@ -36,3 +37,4 @@ src/main/resources/swamid-idps.xml
 
 # Idea
 .idea
+/bin/

@@ -1,11 +1,10 @@
 package se.lu.nateko.cp.cpauth.core
 
-import org.joda.time.DateTime
 import scala.util.Try
-import org.apache.commons.codec.binary.Base64
 import scala.util.Failure
 import scala.util.Success
 import java.security.interfaces.RSAPublicKey
+import java.time.Instant
 
 case class UserInfo(givenName: String, surname: String, mail: String)
 
@@ -29,7 +28,7 @@ class Authenticator private(key: RSAPublicKey){
 		Crypto.verifySignature(message, key, token.signature)
 	}
 
-	private def tokenIsOld(token: AuthToken): Boolean = new DateTime().getMillis >= token.expiresOn
+	private def tokenIsOld(token: AuthToken): Boolean = Instant.now.toEpochMilli >= token.expiresOn
 }
 
 object Authenticator{

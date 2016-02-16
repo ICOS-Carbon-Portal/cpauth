@@ -28,7 +28,7 @@ object Parser {
 		unmarshaller.unmarshall(metadataRoot).asInstanceOf[T]
 	}
 
-	def fromBase64[T <: XMLObject](base64: String): T = fromString[T](CoreUtils.decode64(base64))
+	def fromBase64[T <: XMLObject](base64: String): T = fromString[T](CoreUtils.decodeBase64ToString(base64))
 
 	def fromString[T <: XMLObject](objXml: String): T = {
 		val reader = new StringReader(objXml)
