@@ -8,9 +8,10 @@ import java.util.zip.Deflater
 import java.util.zip.DeflaterOutputStream
 import java.util.zip.Inflater
 import java.util.zip.InflaterOutputStream
-
 import scala.Iterator
 import scala.io.Source
+import java.nio.file.FileSystems
+import java.net.URI
 
 object CoreUtils {
 
@@ -35,8 +36,19 @@ object CoreUtils {
 	def getResourceBytes(resourcePath: String): Array[Byte] = {
 		val res = getClass.getResource(resourcePath)
 		if(res == null) Array.empty else{
-			val path = Paths.get(res.toURI)
-			Files.readAllBytes(path)
+			val uri = res.toURI
+			if(uri.toString.contains("!")){
+				val uriParts = uri.toString.split("!")
+				val fs = FileSystems.newFileSystem(
+					URI.create(uriParts(0)),
+					new java.util.HashMap[String, String]
+				)
+				val path = fs.getPath(uriParts(1))
+				val res = Files.readAllBytes(path)
+				fs.close()
+				res
+			}
+			else Files.readAllBytes(Paths.get(uri))
 		}
 	}
 

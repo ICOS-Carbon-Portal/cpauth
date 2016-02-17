@@ -48,6 +48,7 @@ lazy val cpauth = (project in file("."))
 			"org.opensaml"       %  "opensaml"         % "2.6.4" withJavadoc,
 			"xerces"             %  "xercesImpl"       % "2.11.0",
 			"net.jcip"           %  "jcip-annotations" % "1.0",
+			"org.joda"           %  "joda-convert"     % "1.2",
 			"com.typesafe.akka"  %% "akka-actor"       % akkaVersion,
 			"com.typesafe.akka"  %% "akka-slf4j"       % akkaVersion,
 			"com.typesafe.akka"  %% "akka-testkit"     % akkaVersion % "test",
