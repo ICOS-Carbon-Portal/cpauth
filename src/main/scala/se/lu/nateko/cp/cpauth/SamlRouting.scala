@@ -56,7 +56,8 @@ trait SamlRouting extends Directives with CpauthDirectives{
 					}
 				} ~ complete((StatusCodes.BadRequest, "Identity provider has not been specified!"))
 			} ~
-			path("cpauth"){ getFromResource(samlConfig.samlSpXmlPath) } ~
+			path("cpauth"){ getFromResource("icos-cp_sp_meta.xml") } ~
+			path("privacyStatement"){ getFromResource("privacyStatement.html")} ~
 			path("idps"){ complete(idpInfos) }
 		} ~
 		post{
