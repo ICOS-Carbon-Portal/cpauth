@@ -18,7 +18,7 @@ case class HttpConfig(
 
 case class SamlSpConfig(url: String, consumerServiceUrl: String)
 case class ProxyConfig(ipv4Host: String, path: Option[String], port: Int)
-case class SamlAttrConfig(mail: String, givenName: String, surname: String)
+case class SamlAttrConfig(mail: Seq[String], givenName: Seq[String], surname: Seq[String])
 
 case class SamlConfig(
 	idpMetadataFilePath: String,

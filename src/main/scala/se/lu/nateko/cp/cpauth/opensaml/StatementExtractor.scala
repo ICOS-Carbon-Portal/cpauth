@@ -11,18 +11,18 @@ import scala.util.Success
 
 class AllStatements(nameValues: Map[String, Seq[String]]){
 
-	def getSingleValue(attribute: String): Try[String] = {
+	def getSingleValue(attributes: Seq[String]): Try[String] =
+		attributes.flatMap(attr => nameValues.get(attr).toSeq.flatten).distinct.toList match {
 
-		nameValues.get(attribute).map(_.toList) match {
+			case Nil => fail(s"Attribute(s) '${attributes.mkString("', '")}' not available")
 
-			case None | Some(Nil) => fail(s"Attribute '$attribute' not available")
+			case theOnly :: Nil => Success(theOnly)
 
-			case Some(vals) if vals.size > 1 => fail(s"Attribute '$attribute' had multiple values")
+			case vals =>
+				fail(s"Attribute(s) '${attributes.mkString("', '")}' had contradicting values " + vals.mkString(", "))
 
-			case Some(theOnly :: Nil) => Success(theOnly)
 		}
-	}
-	
+
 	private def fail(msg: String) = Failure(new Exception(msg) with NoStackTrace)
 }
 
@@ -41,16 +41,15 @@ object StatementExtractor {
 	def extractAttributeStringValues(assertion: Assertion): Iterable[(String, String)] = for(
 		statement <- assertion.getAttributeStatements.toSafeIterable;
 		attribute <- statement.getAttributes.toSafeIterable;
-		name = getName(attribute);
+		name <- getNames(attribute);
 		attrValue <- getStringValues(attribute)
 	) yield (name, attrValue)
 
 
-	def getName(attribute: Attribute): String = eitherOr(attribute.getFriendlyName, attribute.getName)
+	def getNames(attribute: Attribute): Seq[String] = Seq(attribute.getFriendlyName, attribute.getName)
+		.filter(s => s != null && s.length != 0)
 	
 	def getStringValues(attribute: Attribute): Iterable[String] =
 		attribute.getAttributeValues.toSafeIterable.collect{ case s: XSString => s.getValue}
-
-	def eitherOr(opt1: String, opt2: String): String = if(opt1 == null || opt1.length == 0) opt2 else opt1
 
 }
