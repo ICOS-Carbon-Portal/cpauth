@@ -8,6 +8,7 @@ import scala.util.Try
 import scala.util.Failure
 import scala.util.control.NoStackTrace
 import scala.util.Success
+import org.slf4j.LoggerFactory
 
 class AllStatements(nameValues: Map[String, Seq[String]]){
 
@@ -28,9 +29,14 @@ class AllStatements(nameValues: Map[String, Seq[String]]){
 
 object StatementExtractor {
 
+	private[this] val log = LoggerFactory.getLogger(getClass)
+
 	def extractAttributeStringValues(assertions: Iterable[ValidatedAssertion]): AllStatements = {
 		val nameValues = assertions.collect{
 			case ValidatedAssertion(validated, None) => validated
+			case ValidatedAssertion(validated, Some(validationError)) =>
+				log.warn("Assertion validation error: " + validationError)
+				validated
 		}.flatMap(extractAttributeStringValues)
 			.groupBy{case (name, value) => name}
 			.mapValues(nameValuePairs => nameValuePairs.map{case (name, value) => value}.toSeq)

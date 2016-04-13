@@ -1,4 +1,4 @@
-package se.lu.nateko.cp.cpauth.opensaml.test
+package se.lu.nateko.cp.cpauth.test.opensaml
 
 import org.scalatest.FunSuite
 import se.lu.nateko.cp.cpauth.opensaml.IdpLibrary

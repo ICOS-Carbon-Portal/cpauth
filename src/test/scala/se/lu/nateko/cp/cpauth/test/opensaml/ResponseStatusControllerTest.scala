@@ -1,8 +1,6 @@
-package se.lu.nateko.cp.cpauth.opensaml.test
+package se.lu.nateko.cp.cpauth.test.opensaml
 
 import org.scalatest.FunSuite
-import se.lu.nateko.cp.cpauth.Utils
-import se.lu.nateko.cp.cpauth.core.CoreUtils
 import org.opensaml.saml2.core.Response
 import se.lu.nateko.cp.cpauth.opensaml.Parser
 import se.lu.nateko.cp.cpauth.opensaml.ResponseStatusController
