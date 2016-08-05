@@ -8,16 +8,17 @@ import scala.xml.Elem
 import java.net.URL
 import org.opensaml.saml2.core.NameIDType
 import java.util.TimeZone
+import akka.http.scaladsl.model.Uri
 
 object Saml {
 
-	def getAuthUri(idpHttpRedirectUrl: URL, reqXml: Elem): spray.http.Uri = {
+	def getAuthUri(idpHttpRedirectUrl: URL, reqXml: Elem): Uri = {
 
 		val trimmedReqStr = scala.xml.Utility.trim(reqXml).toString
 		val authRequestBase64 = Utils.compressAndBase64ForSaml(trimmedReqStr)
 		val authUrl = idpHttpRedirectUrl +"?SAMLRequest=" + URLEncoder.encode(authRequestBase64, "UTF-8")
 
-		spray.http.Uri(authUrl)
+		Uri(authUrl)
 	}
 
 	def authRequestXmlAndId(spConfig: SamlSpConfig): (Elem, String) = {

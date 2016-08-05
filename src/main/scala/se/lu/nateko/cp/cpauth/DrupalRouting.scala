@@ -4,14 +4,15 @@ import akka.actor.ActorSystem
 import akka.util.Timeout
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.DurationInt
-import spray.routing.Directives
-import spray.http.HttpHeaders
-import spray.http.Uri
-import spray.http.StatusCodes
-import spray.http.HttpHeader
-import spray.http.HttpEntity
+import akka.http.scaladsl.model.headers._
+import akka.http.scaladsl.model.StatusCodes
+import akka.http.scaladsl.model.Uri
+import akka.http.scaladsl.model.HttpHeader
+import akka.http.scaladsl.model.HttpEntity
+import akka.http.scaladsl.model.Uri.Query
+import akka.http.scaladsl.server.Directives._
 
-trait DrupalRouting extends Directives with CpauthDirectives with ProxyDirectives{
+trait DrupalRouting extends CpauthDirectives with ProxyDirectives{
 
 	def httpConfig: HttpConfig
 	implicit val system: ActorSystem
@@ -19,7 +20,7 @@ trait DrupalRouting extends Directives with CpauthDirectives with ProxyDirective
 
 	val drupalRoute = get{
 		headerValue{
-			case HttpHeaders.Host(host, 0) => httpConfig.drupalProxying.get(host)
+			case Host(host, 0) => httpConfig.drupalProxying.get(host.toString)
 			case _ => None
 		}{ drupalProxy =>
 			extract(_.request.uri)(originalUri => {
@@ -37,28 +38,28 @@ trait DrupalRouting extends Directives with CpauthDirectives with ProxyDirective
 					}
 				} ~
 				redirect(
-					Uri(httpConfig.serviceUrl + httpConfig.loginPath).withQuery(("targetUrl", targetUri.toString)),
+					Uri(httpConfig.serviceUrl + httpConfig.loginPath).withQuery(Query("targetUrl" -> targetUri.toString)),
 					StatusCodes.Found
 				)
 			})
 		}
 	}
 
-	private val dropResponseBody = mapHttpResponseEntity(_ => HttpEntity.Empty)
-	private val dropLocation = mapHttpResponseHeaders(_.filterNot(_.is(HttpHeaders.Location.lowercaseName)))
-	private val remakeCookies = mapHttpResponseHeaders(_.map(remakeCookie))
+	private val dropResponseBody = mapResponseEntity(_ => HttpEntity.Empty)
+	private val dropLocation = mapResponseHeaders(_.filterNot(_.is(Location.lowercaseName)))
+	private val remakeCookies = mapResponseHeaders(_.map(remakeCookie))
 
 	def redirectWhenDone(target: Uri, dropParam: Option[String] = None) =
 		dropResponseBody &
-		respondWithHeader(HttpHeaders.Location(withoutParam(dropParam, target))) &
+		respondWithHeader(Location(withoutParam(dropParam, target))) &
 		dropLocation & //happens before the previous line
-		respondWithStatus(StatusCodes.Found) &
+		mapResponse(_.copy(status = StatusCodes.Found)) &
 		remakeCookies
 
 	private def withoutParam(param: Option[String], uri: Uri): Uri = param match{
 		case None => uri
 		case Some(drop) =>
-			val filteredQuery = uri.query.filter{
+			val filteredQuery = uri.query().filter{
 				case (param, _) if param.equalsIgnoreCase(drop) => false
 				case _ => true
 			}
@@ -66,9 +67,9 @@ trait DrupalRouting extends Directives with CpauthDirectives with ProxyDirective
 	}
 
 	private def remakeCookie(header: HttpHeader): HttpHeader = header match{
-		case HttpHeaders.`Set-Cookie`(cookie) =>
+		case `Set-Cookie`(cookie) =>
 			val newCookie = cookie.copy(secure = true, httpOnly = true, expires = None)
-			HttpHeaders.`Set-Cookie`(newCookie)
+			`Set-Cookie`(newCookie)
 		case x => x
 	}
 }

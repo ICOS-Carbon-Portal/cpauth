@@ -1,27 +1,30 @@
 package se.lu.nateko.cp.cpauth
 
 import akka.actor.ActorSystem
-import akka.pattern.ask
 import se.lu.nateko.cp.cpauth.CpauthJsonProtocol._
 import se.lu.nateko.cp.cpauth.accounts.Users
 import se.lu.nateko.cp.cpauth.core.Authenticator
 import se.lu.nateko.cp.cpauth.core.CoreUtils
 import se.lu.nateko.cp.cpauth.opensaml.AssertionExtractor
 import se.lu.nateko.cp.cpauth.opensaml.IdpLibrary
-import spray.http.StatusCodes
-import spray.routing.ExceptionHandler
-import spray.routing.SimpleRoutingApp
 import se.lu.nateko.cp.cpauth.core.AuthenticationFailedException
-import spray.can.Http
 import scala.concurrent.Await
-import scala.concurrent.duration.Duration
+import scala.concurrent.duration.DurationInt
+import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.server.ExceptionHandler
+import akka.http.scaladsl.model.StatusCodes
+import scala.concurrent.ExecutionContext
+import akka.http.scaladsl.Http
+import akka.stream.ActorMaterializer
+import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
 
 
-object Main extends App with SimpleRoutingApp with SamlRouting with PasswordRouting with DrupalRouting {
+object Main extends App with SamlRouting with PasswordRouting with DrupalRouting {
 
 	implicit val system = ActorSystem("cpauth")
 	implicit val dispatcher = system.dispatcher
 	implicit val scheduler = system.scheduler
+	implicit val materializer = ActorMaterializer(namePrefix = Some("cpauth_mat"))
 
 	val config: CpauthConfig = ConfigReader.getDefault
 	val (httpConfig, publicAuthConfig, samlConfig) = (config.http, config.auth.pub, config.saml)
@@ -41,38 +44,36 @@ object Main extends App with SimpleRoutingApp with SamlRouting with PasswordRout
 			complete((StatusCodes.InternalServerError, ex.getMessage + "\n" + stack))
 	}
 
-	startServer(interface = "127.0.0.1", port = config.http.servicePrivatePort) {
-		handleExceptions(cpauthExceptionHandler){
-			samlRoute ~
-			passwordRoute ~
-			drupalRoute ~
-			get{
-				path("logout")(logout) ~
-				path("whoami"){
-					user(uinfo => complete(uinfo)) ~ complete(StatusCodes.Unauthorized)
-				} ~
-				path("cpauthcookie"){
-					cpauthCookie
-				} ~
-				pathEndOrSingleSlash{
-					user(_ => redirect("/home/", StatusCodes.Found)) ~
-					redirect("/login/", StatusCodes.Found)
-				}
+	val route = handleExceptions(cpauthExceptionHandler){
+		samlRoute ~
+		passwordRoute ~
+		drupalRoute ~
+		get{
+			path("logout")(logout) ~
+			path("whoami"){
+				user(uinfo => complete(uinfo)) ~ complete(StatusCodes.Unauthorized)
+			} ~
+			path("cpauthcookie"){
+				cpauthCookie
+			} ~
+			pathEndOrSingleSlash{
+				user(_ => redirect("/home/", StatusCodes.Found)) ~
+				redirect("/login/", StatusCodes.Found)
 			}
 		}
-	}.onSuccess{ case _ =>
-		sys.addShutdownHook{
-//			val serverStop = akka.io.IO(Http).ask(Http.Unbind)
-//			println("Sent Http.Unbind")
-			akka.io.IO(Http) ! akka.actor.PoisonPill
-			//println("Sent PoisonPill, waiting 1 sec")
-			Thread.sleep(1000)
-			//println("Shutting down the actor system")
-			system.shutdown()
-			//println("closing Users DB")
-			Users.closeDb()
-			//println("Users DB closed, done with the shutdown hook!")
-		}
 	}
+	Http()
+		.bindAndHandle(route, "127.0.0.1", config.http.servicePrivatePort)
+		.onSuccess{
+			case binding =>
+				sys.addShutdownHook{
+					val ctxt = ExecutionContext.Implicits.global
+					val doneFuture = binding.unbind()
+						.flatMap(_ => system.terminate())(ctxt)
+						.map(_ => Users.closeDb())(ctxt)
+					Await.result(doneFuture, 3 seconds)
+				}
+				println(binding)
+		}
 
 }

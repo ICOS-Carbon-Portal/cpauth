@@ -1,20 +1,22 @@
 package se.lu.nateko.cp.cpauth
 
+import scala.util.Failure
+import scala.util.Success
 import scala.util.Try
+
 import org.opensaml.saml2.core.Response
+
+import akka.http.scaladsl.model.headers.HttpCookie
 import se.lu.nateko.cp.cpauth.core.CookieToToken
+import se.lu.nateko.cp.cpauth.core.Exceptions
 import se.lu.nateko.cp.cpauth.core.UserInfo
 import se.lu.nateko.cp.cpauth.opensaml.AllStatements
 import se.lu.nateko.cp.cpauth.opensaml.AssertionExtractor
 import se.lu.nateko.cp.cpauth.opensaml.AssertionValidator
 import se.lu.nateko.cp.cpauth.opensaml.IdpLibrary
+import se.lu.nateko.cp.cpauth.opensaml.OpenSamlUtils
 import se.lu.nateko.cp.cpauth.opensaml.ResponseStatusController
 import se.lu.nateko.cp.cpauth.opensaml.StatementExtractor
-import spray.http.HttpCookie
-import scala.util.Success
-import scala.util.Failure
-import se.lu.nateko.cp.cpauth.core.Exceptions
-import se.lu.nateko.cp.cpauth.opensaml.OpenSamlUtils
 import se.lu.nateko.cp.cpauth.opensaml.ValidatedAssertion
 
 class CookieFactory(config: CpauthConfig) {
@@ -23,7 +25,7 @@ class CookieFactory(config: CpauthConfig) {
 
 	def getLastIdpCookie(idpId: String): HttpCookie = HttpCookie(
 		name = config.saml.idpCookieName,
-		content = idpId,
+		value = idpId,
 		secure = false,
 		domain = Some(config.http.serviceHost),
 		path = Some(config.http.loginPath),
@@ -46,7 +48,7 @@ class CookieFactory(config: CpauthConfig) {
 		token = tokenMaker.makeToken(userInfo)
 	)yield HttpCookie(
 		name = config.auth.pub.authCookieName,
-		content = CookieToToken.constructCookieContent(token),
+		value = CookieToToken.constructCookieContent(token),
 		domain = Some(config.http.authDomain),
 		path = Some("/"),
 		secure = true,

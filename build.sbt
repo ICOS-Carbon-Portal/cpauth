@@ -1,10 +1,10 @@
 
 lazy val commonSettings = Seq(
 	organization := "se.lu.nateko.cp",
-	scalaVersion := "2.11.7",
+	scalaVersion := "2.11.8",
 
-	libraryDependencies += "org.scalatest" %% "scalatest" % "2.2.6" % "test",
-	
+	libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.0" % "test",
+
 	scalacOptions ++= Seq(
 		"-unchecked",
 		"-deprecation",
@@ -20,7 +20,7 @@ lazy val cpauthCore = (project in file("core"))
 	.settings(commonSettings: _*)
 	.settings(
 		name := "cpauth-core",
-		version := "0.3-SNAPSHOT",
+		version := "0.4-SNAPSHOT",
 		libraryDependencies ++= Seq(
 		),
 		publishTo := {
@@ -33,8 +33,7 @@ lazy val cpauthCore = (project in file("core"))
 		credentials += Credentials(Path.userHome / ".ivy2" / ".credentials")
 	)
 
-val akkaVersion = "2.3.14"
-val sprayVersion = "1.3.3"
+val akkaVersion = "2.4.8"
 val cpauthMain = Some("se.lu.nateko.cp.cpauth.Main")
 
 lazy val cpauth = (project in file("."))
@@ -42,25 +41,20 @@ lazy val cpauth = (project in file("."))
 	.settings(commonSettings: _*)
 	.settings(
 		name := "Carbon Portal Authentication Service",
-		version := "0.3",
+		version := "0.4",
 
 		libraryDependencies ++= Seq(
-			"org.opensaml"       %  "opensaml"         % "2.6.4" withJavadoc,
-			"xerces"             %  "xercesImpl"       % "2.11.0",
-			"net.jcip"           %  "jcip-annotations" % "1.0",
-			"org.joda"           %  "joda-convert"     % "1.2",
-			"com.typesafe.akka"  %% "akka-actor"       % akkaVersion,
-			"com.typesafe.akka"  %% "akka-slf4j"       % akkaVersion,
-			"com.typesafe.akka"  %% "akka-testkit"     % akkaVersion % "test",
-			"com.typesafe.slick" %% "slick"            % "3.0.1",
-			"org.hsqldb"         %  "hsqldb"           % "2.3.2",
-			"com.zaxxer"         %  "HikariCP"         % "2.3.5",
-			"io.spray"           %% "spray-client"     % sprayVersion,
-			"io.spray"           %% "spray-can"        % sprayVersion,
-			"io.spray"           %% "spray-routing"    % sprayVersion,
-			"io.spray"           %% "spray-json"       % "1.3.2",
-			"io.spray"           %% "spray-testkit"    % sprayVersion % "test",
-			"ch.qos.logback"     %  "logback-classic"  % "1.0.13"
+			"com.typesafe.akka"      %% "akka-http-spray-json-experimental"  % akkaVersion,
+			"com.typesafe.akka"      %% "akka-slf4j"                         % akkaVersion,
+			"ch.qos.logback"         %  "logback-classic"                    % "1.1.3",
+			"org.opensaml"           %  "opensaml"                           % "2.6.4",
+			"org.scala-lang.modules" %% "scala-xml"                          % "1.0.5",
+//			"xerces"                 %  "xercesImpl"                         % "2.11.0",
+			"net.jcip"               %  "jcip-annotations"                   % "1.0",
+			"org.joda"               %  "joda-convert"                       % "1.7",
+			"com.typesafe.slick"     %% "slick"                              % "3.1.1",
+			"org.hsqldb"             %  "hsqldb"                             % "2.3.4",
+			"com.zaxxer"             %  "HikariCP"                           % "2.4.7"
 		),
 
 		fork := true,

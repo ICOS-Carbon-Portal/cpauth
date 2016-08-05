@@ -1,25 +1,22 @@
 package se.lu.nateko.cp.cpauth
 
-import spray.routing.Directives
-import spray.routing.Route
 import java.net.URI
 import scala.util.Try
 import se.lu.nateko.cp.cpauth.opensaml.IdpLibrary
-import spray.http.Uri
-import spray.http.StatusCodes
 import se.lu.nateko.cp.cpauth.opensaml.IdpInfo
 import se.lu.nateko.cp.cpauth.CpauthJsonProtocol._
-import spray.http.HttpEntity
-import spray.http.ContentType
-import spray.http.MediaTypes
-import spray.http.HttpCookie
 import org.opensaml.saml2.core.Response
 import se.lu.nateko.cp.cpauth.opensaml.Parser
 import se.lu.nateko.cp.cpauth.opensaml.AssertionExtractor
-import spray.http.ContentTypes
 import akka.actor.ActorSystem
+import akka.http.scaladsl.server.Route
+import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.model.StatusCodes
+import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
+import akka.http.scaladsl.model.headers.HttpCookie
+import akka.http.scaladsl.model.Uri
 
-trait SamlRouting extends Directives with CpauthDirectives{
+trait SamlRouting extends CpauthDirectives{
 
 	def samlConfig: SamlConfig
 	def idpLib: IdpLibrary

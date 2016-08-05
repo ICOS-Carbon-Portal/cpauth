@@ -8,22 +8,27 @@ import se.lu.nateko.cp.cpauth.core.Authenticator
 import se.lu.nateko.cp.cpauth.core.CookieToToken
 import se.lu.nateko.cp.cpauth.core.UserInfo
 import se.lu.nateko.cp.cpauth.core.PublicAuthConfig
-import spray.http.HttpHeader
-import spray.http.HttpHeaders
-import spray.http.HttpResponse
-import spray.http.StatusCodes
-import spray.routing._
 import scala.concurrent.Future
-import scala.concurrent.duration._
+import scala.concurrent.duration.DurationInt
 import akka.actor.Scheduler
+import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.model.StatusCodes
+import akka.http.scaladsl.server.Route
+import akka.http.scaladsl.model.HttpResponse
+import akka.http.scaladsl.model.HttpEntity
+import akka.http.scaladsl.model.ContentTypes
+import akka.http.scaladsl.model.headers.HttpChallenge
+import akka.http.scaladsl.server.AuthenticationFailedRejection
+import akka.stream.ActorMaterializer
 
-trait CpauthDirectives extends Directives {
+trait CpauthDirectives {
 
 	def publicAuthConfig: PublicAuthConfig
 	def httpConfig: HttpConfig
 	def authenticator: Try[Authenticator]
 
 	implicit def dispatcher: ExecutionContext
+	implicit def materializer: ActorMaterializer
 	implicit def scheduler: Scheduler
 
 	def attempt[T](thunk: => T)(f: T => Route): Route = attempt(Try(thunk))(f)
@@ -36,7 +41,7 @@ trait CpauthDirectives extends Directives {
 	def user(inner: UserInfo => Route): Route = cookie(publicAuthConfig.authCookieName)(cookie => {
 		val userTry = for(
 			auth <- authenticator;
-			token <- CookieToToken.recoverToken(cookie.content);
+			token <- CookieToToken.recoverToken(cookie.value);
 			uinfo <- auth.unwrapUserInfo(token)
 		) yield uinfo
 
@@ -44,14 +49,22 @@ trait CpauthDirectives extends Directives {
 
 		onComplete(userFuture){
 			case Success(uinfo) => inner(uinfo)
-			case Failure(err) => extract(getCookieHeaders){ headers =>
-				reject(new AuthenticationFailedRejection(AuthenticationFailedRejection.CredentialsRejected, headers))
-			}
+			case Failure(err) => reject(
+				new AuthenticationFailedRejection(
+					AuthenticationFailedRejection.CredentialsRejected,
+					HttpChallenge("https", "")
+				)
+			)
 		}
-	}) ~ reject(new AuthenticationFailedRejection(AuthenticationFailedRejection.CredentialsMissing, Nil))
+	}) ~ reject(
+		new AuthenticationFailedRejection(
+			AuthenticationFailedRejection.CredentialsMissing,
+			HttpChallenge("https", "")
+		)
+	)
 
 	def cpauthCookie: Route = cookie(publicAuthConfig.authCookieName)(cookie => {
-		complete(publicAuthConfig.authCookieName + "=" + cookie.content)
+		complete(publicAuthConfig.authCookieName + "=" + cookie.value)
 	})
 
 	lazy val logout: Route = deleteCookie(publicAuthConfig.authCookieName, httpConfig.authDomain, "/"){
@@ -59,13 +72,7 @@ trait CpauthDirectives extends Directives {
 	}
 
 	protected def primitiveToJson[T](v: T): HttpResponse = {
-		import spray.http.HttpEntity
-		import spray.http.ContentTypes
 		HttpResponse(entity = HttpEntity(ContentTypes.`application/json`, v.toString))
 	}
 
-	private def getCookieHeaders(ctxt: RequestContext): List[HttpHeader] = {
-		val unfiltered: List[HttpHeader] = ctxt.request.headers
-		unfiltered.filter(_.is(HttpHeaders.Cookie.lowercaseName))
-	}
 }

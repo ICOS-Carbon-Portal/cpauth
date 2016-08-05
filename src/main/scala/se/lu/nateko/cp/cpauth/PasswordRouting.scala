@@ -1,19 +1,20 @@
 package se.lu.nateko.cp.cpauth
 
-import spray.routing.Directives
-import spray.routing.Route
 import se.lu.nateko.cp.cpauth.accounts.UsersIo
 import scala.util.Success
 import scala.util.Failure
-import spray.http.StatusCodes
 import se.lu.nateko.cp.cpauth.core.AuthenticationFailedException
 import se.lu.nateko.cp.cpauth.core.UserInfo
 import CpauthJsonProtocol._
 import scala.concurrent.Future
 import se.lu.nateko.cp.cpauth.accounts.UserEntry
 import scala.concurrent.duration._
+import akka.http.scaladsl.server.Route
+import akka.http.scaladsl.model.StatusCodes
+import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
+import akka.http.scaladsl.server.Directives._
 
-trait PasswordRouting extends Directives with CpauthDirectives {
+trait PasswordRouting extends CpauthDirectives {
 
 	def userDb: UsersIo
 	def cookieFactory: CookieFactory
@@ -54,13 +55,13 @@ trait PasswordRouting extends Directives with CpauthDirectives {
 							userEntry <- authUser(uinfo.mail, oldPass);
 							_ <- userDb.updateUser(uinfo.mail, userEntry, newPass)
 						) yield ()
-						onSuccess(result)(_ => complete(StatusCodes.OK))
+						onSuccess(result)(complete(StatusCodes.OK))
 					})
 				)
 			} ~
 			path("deleteownaccount"){
 				user(uinfo =>
-					onSuccess(userDb.dropUser(uinfo.mail))(_ => logout)
+					onSuccess(userDb.dropUser(uinfo.mail))(logout)
 				)
 			} ~
 			admin{
@@ -71,7 +72,7 @@ trait PasswordRouting extends Directives with CpauthDirectives {
 							case false =>
 								val uinfo = UserInfo(givenName, surname, mail)
 								val userEntry = UserEntry(uinfo, false)
-								onSuccess(userDb.addUser(userEntry, password)){ _ =>
+								onSuccess(userDb.addUser(userEntry, password)){
 									complete(StatusCodes.OK)
 								}
 						}
@@ -79,17 +80,17 @@ trait PasswordRouting extends Directives with CpauthDirectives {
 				} ~
 				path("deleteaccount"){
 					formField('mail)(mail =>
-						onSuccess(userDb.dropUser(mail))(_ => complete(StatusCodes.OK))
+						onSuccess(userDb.dropUser(mail))(complete(StatusCodes.OK))
 					)
 				} ~
 				path("makeadmin"){
 					formField('mail)(mail =>
-						onSuccess(userDb.setAdminRights(mail, true))(_ => complete(StatusCodes.OK))
+						onSuccess(userDb.setAdminRights(mail, true))(complete(StatusCodes.OK))
 					)
 				} ~
 				path("unmakeadmin"){
 					formField('mail)(mail =>
-						onSuccess(userDb.setAdminRights(mail, false))(_ => complete(StatusCodes.OK))
+						onSuccess(userDb.setAdminRights(mail, false))(complete(StatusCodes.OK))
 					)
 				}
 			}

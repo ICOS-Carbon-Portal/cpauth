@@ -1,7 +1,7 @@
 package se.lu.nateko.cp.cpauth
 
-import spray.http.Uri
 import scala.collection.concurrent
+import akka.http.scaladsl.model.Uri
 
 trait TargetUrlLookup {
 	def memorize(requestId: String, uri: Uri): Unit

@@ -12,7 +12,7 @@ case class AuthToken(userInfo: UserInfo, expiresOn: Long)
 
 case class SignedToken(token: AuthToken, signature: Signature)
 
-class Authenticator private(key: RSAPublicKey){
+class Authenticator(key: RSAPublicKey){
 
 	def unwrapUserInfo(token: SignedToken): Try[UserInfo] =
 		if(tokenIsOld(token.token))

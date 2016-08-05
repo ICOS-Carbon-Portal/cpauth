@@ -55,6 +55,6 @@ object Playground {
 		val conf = defConf.copy(auth = defConf.auth.copy(priv = privAuthConf))
 		val factory = new CookieFactory(conf)
 		val uinfo = UserInfo(givenName = fname, surname = lname, mail = email)
-		factory.makeAuthenticationCookie(uinfo).get.content
+		factory.makeAuthenticationCookie(uinfo).get.value
 	}
 }
