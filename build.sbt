@@ -46,15 +46,15 @@ lazy val cpauth = (project in file("."))
 		libraryDependencies ++= Seq(
 			"com.typesafe.akka"      %% "akka-http-spray-json-experimental"  % akkaVersion,
 			"com.typesafe.akka"      %% "akka-slf4j"                         % akkaVersion,
+			"com.typesafe.akka"      %% "akka-http-testkit"                  % akkaVersion % "test",
 			"ch.qos.logback"         %  "logback-classic"                    % "1.1.3",
 			"org.opensaml"           %  "opensaml"                           % "2.6.4",
 			"org.scala-lang.modules" %% "scala-xml"                          % "1.0.5",
-//			"xerces"                 %  "xercesImpl"                         % "2.11.0",
 			"net.jcip"               %  "jcip-annotations"                   % "1.0",
 			"org.joda"               %  "joda-convert"                       % "1.7",
 			"com.typesafe.slick"     %% "slick"                              % "3.1.1",
-			"org.hsqldb"             %  "hsqldb"                             % "2.3.4",
-			"com.zaxxer"             %  "HikariCP"                           % "2.4.7"
+			"com.typesafe.slick"     %% "slick-hikaricp"                     % "3.1.1",
+			"org.hsqldb"             %  "hsqldb"                             % "2.3.4"
 		),
 
 		fork := true,
@@ -68,6 +68,4 @@ lazy val cpauth = (project in file("."))
 		mainClass in (Compile, run) := cpauthMain
 
 	)
-
-Revolver.settings
 

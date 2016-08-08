@@ -5,13 +5,14 @@ import se.lu.nateko.cp.cpauth._
 import se.lu.nateko.cp.cpauth.core._
 import scala.util.Try
 import scala.concurrent.ExecutionContext
-import spray.testkit.ScalatestRouteTest
-import spray.http.StatusCodes
-import spray.routing.Directives
-import spray.routing.AuthenticationFailedRejection
-import spray.http.HttpHeaders.Cookie
+import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.model.StatusCodes
+import akka.http.scaladsl.testkit.ScalatestRouteTest
+import akka.http.scaladsl.server.AuthenticationFailedRejection
+import akka.http.scaladsl.model.headers.Cookie
+import akka.stream.ActorMaterializer
 
-class CpauthDirectivesTest extends FunSpec with ScalatestRouteTest with Directives{
+class CpauthDirectivesTest extends FunSpec with ScalatestRouteTest {
 	
 	def getConfig(privKeyPath: String) = CpauthConfig(
 		auth = AuthConfig(
@@ -39,8 +40,9 @@ class CpauthDirectivesTest extends FunSpec with ScalatestRouteTest with Directiv
 		val httpConfig = config.http
 		val publicAuthConfig = config.auth.pub
 		val authenticator = Authenticator(config.auth.pub)
-		implicit val dispatcher = system.dispatcher
-		implicit val scheduler = system.scheduler
+		val dispatcher = system.dispatcher
+		val scheduler = system.scheduler
+		val materializer = ActorMaterializer(namePrefix = Some("cpauth_dir_test"))
 	}
 
 
@@ -90,7 +92,7 @@ class CpauthDirectivesTest extends FunSpec with ScalatestRouteTest with Directiv
 			val cookie = new CookieFactory(config).makeAuthenticationCookie(user).get
 			
 			it("delegates to the inner route"){
-				Get("/any") ~> Cookie(cookie) ~> route ~> check{
+				Get("/any") ~> Cookie(cookie.pair()) ~> route ~> check{
 					assert(responseAs[String] === user.givenName)
 				}
 			}
@@ -102,7 +104,7 @@ class CpauthDirectivesTest extends FunSpec with ScalatestRouteTest with Directiv
 			val cookie = new CookieFactory(wrongConfig).makeAuthenticationCookie(user).get
 			
 			it("rejects the request with 'CredentialsRejected' rejection"){
-				Get("/any") ~> Cookie(cookie) ~> route ~> check{
+				Get("/any") ~> Cookie(cookie.pair()) ~> route ~> check{
 					val authRejections = rejections.collect{
 						case AuthenticationFailedRejection(AuthenticationFailedRejection.CredentialsRejected, _) => 1
 					}
