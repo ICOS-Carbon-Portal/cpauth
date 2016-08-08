@@ -17,6 +17,7 @@ import se.lu.nateko.cp.cpauth.Utils.SafeJavaCollectionWrapper
 import se.lu.nateko.cp.cpauth.SamlConfig
 import se.lu.nateko.cp.cpauth.core.CoreUtils
 import se.lu.nateko.cp.cpauth.core.Crypto
+//import org.apache.xml.serializer.dom3.LSSerializerImpl
 
 class AssertionExtractor(key: RSAPrivateKey){
 	import AssertionExtractor._
@@ -28,6 +29,11 @@ class AssertionExtractor(key: RSAPrivateKey){
 
 		val decrypter = new Decrypter(null, new StaticKeyInfoCredentialResolver(decryptionCredential), new InlineEncryptedKeyResolver())
 
+//		encrAss => {
+//			val ser = new LSSerializerImpl()
+//			println(ser.writeToString(encrAss.getDOM))
+//			decrypter.decrypt(encrAss)
+//		}
 		decrypter.decrypt
 	}
 

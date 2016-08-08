@@ -42,14 +42,15 @@ lazy val cpauth = (project in file("."))
 	.settings(
 		name := "Carbon Portal Authentication Service",
 		version := "0.4",
-
 		libraryDependencies ++= Seq(
 			"com.typesafe.akka"      %% "akka-http-spray-json-experimental"  % akkaVersion,
 			"com.typesafe.akka"      %% "akka-slf4j"                         % akkaVersion,
 			"com.typesafe.akka"      %% "akka-http-testkit"                  % akkaVersion % "test",
 			"ch.qos.logback"         %  "logback-classic"                    % "1.1.3",
-			"org.opensaml"           %  "opensaml"                           % "2.6.4",
+			"org.opensaml"           %  "opensaml"                           % "2.6.6",
 			"org.scala-lang.modules" %% "scala-xml"                          % "1.0.5",
+			"org.apache.santuario"   %  "xmlsec"                             % "2.0.7", //to force a newer version
+//			"xalan"                  %  "serializer"                         % "2.7.2", //for DOM serialization to strings during debug
 			"net.jcip"               %  "jcip-annotations"                   % "1.0",
 			"org.joda"               %  "joda-convert"                       % "1.7",
 			"com.typesafe.slick"     %% "slick"                              % "3.1.1",
