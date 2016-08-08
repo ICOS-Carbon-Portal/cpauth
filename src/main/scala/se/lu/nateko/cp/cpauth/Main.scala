@@ -21,16 +21,18 @@ import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
 
 object Main extends App with SamlRouting with PasswordRouting with DrupalRouting {
 
+	val config: CpauthConfig = ConfigReader.getDefault
+	val (httpConfig, publicAuthConfig, samlConfig) = (config.http, config.auth.pub, config.saml)
+
 	implicit val system = ActorSystem("cpauth")
 	implicit val dispatcher = system.dispatcher
 	implicit val scheduler = system.scheduler
 	implicit val materializer = ActorMaterializer(namePrefix = Some("cpauth_mat"))
 
-	val config: CpauthConfig = ConfigReader.getDefault
-	val (httpConfig, publicAuthConfig, samlConfig) = (config.http, config.auth.pub, config.saml)
+	val http = Http()
 
-	val assExtractorTry = AssertionExtractor(config.saml)
-	val idpLib: IdpLibrary = IdpLibrary.fromConfig(config.saml)
+	val assExtractorTry = AssertionExtractor(samlConfig)
+	val idpLib: IdpLibrary = IdpLibrary.fromConfig(samlConfig)
 	val cookieFactory = new CookieFactory(config)
 	val targetLookup: TargetUrlLookup = new MapBasedUrlLookup
 	val authenticator = Authenticator(publicAuthConfig)
@@ -62,15 +64,14 @@ object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
 			}
 		}
 	}
-	Http()
-		.bindAndHandle(route, "127.0.0.1", config.http.servicePrivatePort)
+	http.bindAndHandle(route, "127.0.0.1", httpConfig.servicePrivatePort)
 		.onSuccess{
 			case binding =>
 				sys.addShutdownHook{
 					val ctxt = ExecutionContext.Implicits.global
 					val doneFuture = binding.unbind()
-						.flatMap(_ => system.terminate())(ctxt)
 						.map(_ => Users.closeDb())(ctxt)
+						.flatMap(_ => system.terminate())(ctxt)
 					Await.result(doneFuture, 3 seconds)
 				}
 				println(binding)

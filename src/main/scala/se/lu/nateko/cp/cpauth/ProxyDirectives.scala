@@ -1,33 +1,30 @@
 package se.lu.nateko.cp.cpauth
 
-import scala.util.{Success, Failure}
 import akka.actor.ActorSystem
 import akka.http.scaladsl.model.headers
-import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.model.Uri
 import akka.http.scaladsl.server.Route
+import akka.http.scaladsl.server.RouteResult.Complete
 import akka.http.scaladsl.model.HttpProtocols
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.HttpMessage
+import akka.http.scaladsl.HttpExt
 
 trait ProxyDirectives { this: CpauthDirectives =>
 
+	val http: HttpExt
+
 	import ProxyDirectives._
 
-	def proxyTo(host: Uri.Host, port: Int, path: Uri.Path, query: (String, String)*)
-		(implicit actorSys: ActorSystem): Route = {
+	def proxyTo(host: Uri.Host, port: Int, path: Uri.Path, query: (String, String)*): Route = ctxt => {
 
-		extract(c => c.request)(req => {
+		val req = ctxt.request
+		val finalPath = if(path.isEmpty) Uri.Path./ else path
+		val newQuery = mergeQueries(query, req.uri.query())
+		val newUri = req.uri.withPath(finalPath).withQuery(newQuery)
+		val newReq = req.copy(uri = newUri, protocol = HttpProtocols.`HTTP/1.1`)
 
-			val finalPath = if(path.isEmpty) Uri.Path./ else path
-			val newQuery = mergeQueries(query, req.uri.query())
-			val newUri = Uri.Empty.withPath(finalPath).withQuery(newQuery)
-			val newReq = req.copy(uri = newUri, protocol = HttpProtocols.`HTTP/1.1`)
-
-			onSuccess(Http().singleRequest(newReq)) {
-				response => complete(response.withoutRedundantHeaders)
-			}
-		})
+		http.singleRequest(newReq).map(response => Complete(response.withoutRedundantHeaders))
 	}
 }
 
