@@ -1,34 +1,33 @@
-/*
- * Administration
- */
 
+$(function(){
 
-/*
- * Code regarding create new account
- */ 
-$('#new-butt').click(function() {
-	resetNew();
-	resetValidateNewError();
-	$('#new-message-success').hide();
-	$('#new-message-error').hide();
+	$('#new-butt').click(function() {
+		resetNew();
+		resetValidateNewError();
+		$('#new-message-success').hide();
+		$('#new-message-error').hide();
+	});
+
+	$('#list-accounts-butt').click(function() {
+		populateAccountsList();
+	});
+
 });
+
 
 function createNewAccount() {
 
 	resetValidateNewError();
-	
+
 	if (validateNew()) {
 		$.post("/password/createaccount", $('#new-account').serializeArray())
-
-		.done(function() {
-			resetNew();
-			newMessageSuccess('A new account has been created!');
-		})
-			
-		.fail(function(data) {
-			newMessageError(data.responseText);
-		});
-	
+			.done(function() {
+				resetNew();
+				newMessageSuccess('A new account has been created!');
+			})
+			.fail(function(data) {
+				newMessageError(data.responseText);
+			});
 	} else {
 		newMessageError('You must complete all fields!');
 	}
@@ -55,32 +54,32 @@ function newMessageSuccess(message) {
 
 function validateNew() {
 	var ok = true;
-	
+
 	if ($('#givenName').val().length < 1) {
 		$('#givenName').parent().addClass('has-error');
 		ok = false;
 	}
-	
+
 	if ($('#surname').val().length < 1) {
 		$('#surname').parent().addClass('has-error');
 		ok = false;
 	}
-	
+
 	if ($('#mail').val().length < 1) {
 		$('#mail').parent().addClass('has-error');
 		ok = false;
-		
+
 	} else if (! /\S+@\S+/.test($('#mail').val())) {
 		$('#mail').parent().addClass('has-error');
 		ok = false;
 	}
-	
-	
+
+
 	if ($('#password').val().length < 1) {
 		$('#password').parent().addClass('has-error');
 		ok = false;
 	}
-	
+
 	return ok;
 }
 
@@ -89,7 +88,6 @@ function resetNew() {
 	$('#surname').val('');
 	$('#mail').val('');
 	$('#password').val('');
-	
 }
 
 function resetValidateNewError() {
@@ -100,75 +98,58 @@ function resetValidateNewError() {
 }
 
 
-
-/*
- * Code regarding edit account
- */
-$('#list-accounts-butt').click(function() {
-	populateListAccounts();
-});
-
-
-function populateListAccounts() {
+function populateAccountsList() {
 	$('#list-accounts').empty();
-	
+
 	$.getJSON("/password/accountslist")
-	
-	.done(function(data) {
-		
-		$('#list-accounts').append('<table class="table table-striped"></table>');
-		$('#list-accounts table').append('<tr><th>User</th><th>Delete</th><th>Is admin?</th></tr>');
-		
-		$.each(data, function(i, entry){
+		.done(function(data) {
+
+			$('#list-accounts').append('<table class="table table-striped"></table>');
+			$('#list-accounts table').append('<tr><th>User</th><th>Delete</th><th>Is admin?</th></tr>');
+
+			$.each(data, function(i, entry){
 			
-			var info = entry.info;
-			var isAdmin = entry.isAdmin;
-			
-			var editAdmin = '';
-			if (isAdmin) {
-				editAdmin = '<input type="checkbox" onClick="unmakeAdmin(\'' + info.mail + '\')" checked />';
-			} else {
-				editAdmin = '<input type="checkbox" onClick="makeAdmin(\'' + info.mail + '\')" />';
-			}
-			
-			$('#list-accounts table').append('<tr><td>' + info.givenName + '&nbsp;' + info.surname + '&nbsp;(' + info.mail + ')</td><td><button class="btn btn-default" onClick="deleteAccount(\'' + info.mail + '\')">Delete</button></td><td>' + editAdmin + '</td></tr>');
-				
+				var info = entry.info;
+				var isAdmin = entry.isAdmin;
+
+				var editAdmin = '';
+				if (isAdmin) {
+					editAdmin = '<input type="checkbox" onClick="unmakeAdmin(\'' + info.mail + '\')" checked />';
+				} else {
+					editAdmin = '<input type="checkbox" onClick="makeAdmin(\'' + info.mail + '\')" />';
+				}
+
+				$('#list-accounts table').append('<tr><td>' + info.givenName + '&nbsp;' + info.surname + '&nbsp;(' + info.mail + ')</td><td><button class="btn btn-default" onClick="deleteAccount(\'' + info.mail + '\')">Delete</button></td><td>' + editAdmin + '</td></tr>');
+
+			});
+
+		})
+		.fail(function(data) {
+			editMessageError(data.responseText);
 		});
-		
-	})
-	
-	.fail(function(data) {
-		editMessageError(data.responseText);
-	});
 }
 
 
 function deleteAccount(mail) {
 	$.post("/password/deleteaccount", 'mail=' + mail)
-
 		.done(function() {
 			$('#edit-message-error').hide();
 		})
-			
 		.fail(function(data) {
 			editMessageError(data.responseText);
 		})
-		
-		.always(populateListAccounts);
+		.always(populateAccountsList);
 }
 
 function makeAdmin(mail) {
 	$.post("/password/makeadmin", 'mail=' + mail)
-
 		.done(function() {
 			$('#edit-message-error').hide();
 		})
-			
 		.fail(function(data) {
 			editMessageError(data.responseText);
 		})
-		
-		.always(populateListAccounts);	
+		.always(populateAccountsList);
 }
 
 function unmakeAdmin(mail) {
@@ -177,17 +158,18 @@ function unmakeAdmin(mail) {
 		.done(function() {
 			$('#edit-message-error').hide();
 		})
-			
+
 		.fail(function(data) {
 			editMessageError(data.responseText);
 		})
-		
-		.always(populateListAccounts);
+
+		.always(populateAccountsList);
 }
 
 function editMessageError(message) {
-    $('#edit-message-error').html(message);
-    $('#edit-message-error').addClass('alert alert-danger');
-    $('#edit-message-error').attr('role', 'alert');
-    $('#edit-message-error').show();
+	$('#edit-message-error').html(message);
+	$('#edit-message-error').addClass('alert alert-danger');
+	$('#edit-message-error').attr('role', 'alert');
+	$('#edit-message-error').show();
 }
+

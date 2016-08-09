@@ -9,6 +9,8 @@
 dist/*
 /target/
 /core/target/
+/views/target/
+/viewsCore/target/
 lib_managed/
 src_managed/
 /project/project/
