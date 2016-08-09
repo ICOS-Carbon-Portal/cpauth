@@ -19,7 +19,7 @@ import akka.stream.ActorMaterializer
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
 
 
-object Main extends App with SamlRouting with PasswordRouting with DrupalRouting {
+object Main extends App with SamlRouting with PasswordRouting with DrupalRouting with StaticRouting {
 
 	val config: CpauthConfig = ConfigReader.getDefault
 	val (httpConfig, publicAuthConfig, samlConfig) = (config.http, config.auth.pub, config.saml)
@@ -37,16 +37,19 @@ object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
 	val targetLookup: TargetUrlLookup = new MapBasedUrlLookup
 	val authenticator = Authenticator(publicAuthConfig)
 
-	lazy val userDb = Users
+	val userDb = Users
+	system.registerOnTermination(Users.closeDb())
 
 	val cpauthExceptionHandler = ExceptionHandler{
-		case AuthenticationFailedException => complete((StatusCodes.Forbidden, AuthenticationFailedException.getMessage))
+		case AuthenticationFailedException =>
+			complete((StatusCodes.Forbidden, AuthenticationFailedException.getMessage))
 		case ex =>
 			val stack = ex.getStackTrace.map(_.toString).mkString("\n")
 			complete((StatusCodes.InternalServerError, ex.getMessage + "\n" + stack))
 	}
 
 	val route = handleExceptions(cpauthExceptionHandler){
+		staticRoute ~
 		samlRoute ~
 		passwordRoute ~
 		drupalRoute ~
@@ -64,14 +67,13 @@ object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
 			}
 		}
 	}
+
 	http.bindAndHandle(route, "127.0.0.1", httpConfig.servicePrivatePort)
 		.onSuccess{
 			case binding =>
 				sys.addShutdownHook{
-					val ctxt = ExecutionContext.Implicits.global
 					val doneFuture = binding.unbind()
-						.map(_ => Users.closeDb())(ctxt)
-						.flatMap(_ => system.terminate())(ctxt)
+						.flatMap(_ => system.terminate())(ExecutionContext.Implicits.global)
 					Await.result(doneFuture, 3 seconds)
 				}
 				println(binding)
