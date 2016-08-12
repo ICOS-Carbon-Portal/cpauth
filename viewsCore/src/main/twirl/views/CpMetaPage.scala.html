@@ -1,0 +1,28 @@
+@(title: String)(customHeader: Html)(body: Html)
+<!DOCTYPE html>
+<html>
+<head>
+	<link href="https://static.icos-cp.eu/constant/bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet" />
+	<link rel="shortcut icon" type="image/png" href="https://static.icos-cp.eu/images/favicon.png"/>
+
+	<meta charset="utf-8"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	@customHeader
+
+	<title>@title</title>
+
+	<style type="text/css">
+		.navbar-default {
+			background-color: #414042;
+			border-color: #414042;
+		}
+		.navbar-default span, .navbar-default p, .navbar-default h1 {
+			color: #ffffff;
+		}
+	</style>
+
+</head>
+<body>
+	@body
+</body>

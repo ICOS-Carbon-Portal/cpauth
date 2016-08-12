@@ -16,30 +16,35 @@ lazy val commonSettings = Seq(
 	)
 )
 
+lazy val publishingSettings = Seq(
+	publishTo := {
+		val nexus = "https://repo.icos-cp.eu/content/repositories/"
+		if (isSnapshot.value)
+			Some("snapshots" at nexus + "snapshots")
+		else
+			Some("releases"  at nexus + "releases")
+	},
+	credentials += Credentials(Path.userHome / ".ivy2" / ".credentials")
+)
+
 lazy val cpauthCore = (project in file("core"))
 	.settings(commonSettings: _*)
+	.settings(publishingSettings: _*)
 	.settings(
 		name := "cpauth-core",
 		version := "0.4-SNAPSHOT",
 		libraryDependencies ++= Seq(
-		),
-		publishTo := {
-			val nexus = "https://repo.icos-cp.eu/content/repositories/"
-			if (isSnapshot.value)
-				Some("snapshots" at nexus + "snapshots") 
-			else
-				Some("releases"  at nexus + "releases")
-		},
-		credentials += Credentials(Path.userHome / ".ivy2" / ".credentials")
+		)
 	)
 
 
 lazy val viewsCore = (project in file("viewsCore"))
 	.settings(commonSettings: _*)
+	.settings(publishingSettings: _*)
 	.enablePlugins(SbtTwirl)
 	.settings(
 		name := "views-core",
-		version := "0.1.0-SNAPSHOT"
+		version := "0.1-SNAPSHOT"
 	)
 
 
@@ -49,7 +54,7 @@ lazy val cpauthViews = (project in file("views"))
 	.enablePlugins(SbtTwirl)
 	.settings(
 		name := "cpauth-views",
-		version := "0.1.0-SNAPSHOT"
+		version := "0.1"
 	)
 
 
