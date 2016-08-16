@@ -13,45 +13,305 @@
 
 	<style type="text/css">
 
-		.header {
-			background-image: url('https://static.icos-cp.eu/images/icos-cp_header.gif');
-			background-repeat: no-repeat;
-			background-position: 0px 0px;
-			width: 100%;
-			height: 146.7px;
+		/** Body **/
+		body {
+			background-color: #fff !important;
+			font-size: 0.9rem;
+			line-height: 1.35rem;
+			color: #414042;
+			font-family: "Open Sans",sans-serif !important;
+		}
+
+		/** Header **/
+		#header {
 			background-size: cover;
+			background-image: url(https://www.icos-cp.eu/themes/cp_theme_d8/images/icos-cp_header_small.gif);
 		}
-		.tint {
+
+		@@media all and (min-width: 513px) {
+			#header {
+				background-image: url(https://www.icos-cp.eu/themes/cp_theme_d8/images/icos-cp_header_medium.gif);
+			}
+		}
+
+		@@media all and (min-width: 1025px) {
+			#header {
+				background-image: url(https://www.icos-cp.eu/themes/cp_theme_d8/images/icos-cp_header.gif);
+			}
+		}
+
+		#header {
+			line-height: 0;
+		}
+
+		#header .tint {
 			background-color: rgba(240, 99, 34, 0.3);
-			height: 100%;
 		}
-		.header .logo_big {
-			border: 0px none;
-			padding: 0px 0px;
-			margin-left: 22%;
-			margin-top: 0px;
+
+		#header .layout-container {
+			margin: 0px auto;
 		}
-		.header .logo_medium {
-			border: 0px none;
-			padding: 0px 0px;
-			margin-left: 280px;
-			margin-top: 0px;
+
+		#header .region-header {
+			padding: 0px;
+		}
+
+		#header .region-header img {
+			padding-left: 115px;
+			padding-top: 17px;
+			padding-bottom: 17px;
+		}
+
+		#header .site-branding__logo {
+			margin-bottom: 0px;
+		}
+
+		#header .site-branding__text {
+			display: none;
+		}
+
+		/** Menu **/
+		#cp_theme_d8_menu {
+			background-color: #414042;
+		}
+
+		#cp_theme_d8_menu li {
+			list-style: none;
+			list-style: none;
+			list-style-image: none;
+			list-style-type: none;
+		}
+
+		@@media all and (min-width: 800px) {
+			#cp_theme_d8_menu ul {
+				padding: 0em 0em 0em 0em;
+				margin: 0;
+				list-style: none;
+				list-style-image: none;
+				list-style-type: none;
+				margin: 0em auto 0em auto;
+				max-width: 1290px;
+			}
+
+			#cp_theme_d8_menu ul li {
+				display: block;
+				position: relative;
+				float: left;
+				background: #414042;
+			}
+
+			#cp_theme_d8_menu li ul {
+				display: none;
+			}
+
+			#cp_theme_d8_menu ul li a {
+				display: block;
+				padding: 0.6em;
+				text-decoration: none;
+				white-space: nowrap;
+				color: #ffffff;
+			}
+
+			#cp_theme_d8_menu ul li a:hover,
+			#cp_theme_d8_menu li:hover li a:hover {
+				color: #ffffff;
+			}
+
+			#cp_theme_d8_menu li:hover a {
+				background: #414042;
+			}
+
+			#cp_theme_d8_menu li:hover a:hover,
+			#cp_theme_d8_menu li:hover li a:hover {
+				background: #666468;
+			}
+
+			#cp_theme_d8_menu li:hover > ul {
+				display: block;
+				position: absolute;
+				z-index: 1000;
+			}
+
+			#cp_theme_d8_menu li:hover li {
+				float: none;
+			}
+
+			.cp_theme_d8_menu li ul li {
+				border-top: 0;
+			}
+
+			#cp_theme_d8_menu ul ul ul {
+				left: 100%;
+				top: 0;
+			}
+
+			#cp_theme_d8_menu ul:before,
+			#cp_theme_d8_menu ul:after {
+				content: " ";
+				display: table;
+			}
+
+			#cp_theme_d8_menu ul:after {
+				clear: both;
+			}
+
+			#cp_theme_d8_menu a:link {
+				border: 0;
+			}
+
+			#cp_theme_d8_menu a:focus {
+				outline: 0;
+			}
+
+			#cp_theme_d8_menu .has_subnodes img {
+				width: 1em;
+				margin-left: 2em;
+				margin-right: 1em;
+				margin-bottom: 0.2em;
+			}
+
+			#cp_theme_d8_menu .is_topnode .open_menu {
+				display: none;
+			}
+		}
+
+		@@media all and (max-width: 799px) {
+			#cp_theme_d8_menu ul {
+				padding: 0;
+				margin: 0;
+			}
+
+			#cp_theme_d8_menu ul li {
+				display: block;
+				background: #414042;
+			}
+
+			#cp_theme_d8_menu li ul {
+				display: none;
+			}
+
+			#cp_theme_d8_menu li.open ul {
+				display: block;
+			}
+
+			#cp_theme_d8_menu ul li a {
+				display: block;
+				padding: 1em;
+				text-decoration: none;
+				white-space: nowrap;
+				color: #ffffff;
+			}
+
+			#cp_theme_d8_menu li.is_topnode ul,
+			#cp_theme_d8_menu li.has_subnodes ul {
+				margin-left: 2em;
+			}
+
+			#cp_theme_d8_menu .has_subnodes img {
+				width: 0.8em;
+				margin-left: 1em;
+				margin-bottom: 0.2em;
+			}
+
+			#cp_theme_d8_menu .is_topnode .open_menu {
+				float: right;
+				height: 1.6em;
+				cursor: pointer;
+				padding-left: 50px;
+				padding-right: 50px;
+				position: relative;
+				top: 0.8em;
+			}
+		}
+
+		#cp_theme_d8_menu_breadcrumbs {
+			background-color: #ffffff;
+		}
+
+		#cp_theme_d8_menu_breadcrumbs li {
+			list-style: none;
+			list-style-image: none;
+			list-style-type: none;
+			display: inline;
+		}
+
+		#cp_theme_d8_menu_breadcrumbs a {
+			text-decoration: none;
+			padding: 0.4em 0.4em 0.4em 0em;
+			border: 0;
+			color: #414042;
+		}
+
+		#cp_theme_d8_menu_breadcrumbs span {
+			padding: 0em 0.4em 0em 0em;
+			color: #414042;
 		}
 	</style>
 
 </head>
 
 <body>
-	<div class="container-fluid">
-
-		<div class="row hidden-xs">
-			<div class="header">
-				<div class="tint">
-					<img src="https://static.icos-cp.eu/images/Icos_Logo_RGB_White_Carbon_Portal_80px.png" class="visible-lg-block logo_big" />
-					<img src="https://static.icos-cp.eu/images/Icos_Logo_RGB_White_Carbon_Portal_48px.png" class="visible-sm-block visible-md-block logo_medium" />
-				</div>
-			</div>
+	<header id="header" class="header">
+		<div class="tint">
+			<a href="https://www.icos-cp.eu/" title="Home">
+				<img src="https://www.icos-cp.eu/themes/cp_theme_d8/logo.svg" alt="Home">
+			</a>
 		</div>
+	</header>
+
+	<div id="cp_theme_d8_menu">
+		<ul>
+			<li><a href="/node/1">Home</a></li>
+			<li class="is_topnode"><a href="/node/2">Services</a>
+				<ul>
+					<li><a href="/node/45">Search, find, download</a></li>
+					<li><a href="/node/43">Station Labelling</a></li>
+					<li><a href="/node/44">Data upload</a></li>
+					<li><a href="/node/82">ICOS Stations map</a></li>
+					<li><a href="/node/83">ICOS Station table</a></li>
+					<li class="has_subnodes">
+						<a href="/node/9">Visualisations<img src="https://www.icos-cp.eu/themes/cp_theme_d8/images/arrow-down.svg"></a>
+						<ul>
+							<li class="has_subnodes">
+								<a href="/node/50">Spatial data<img src="https://www.icos-cp.eu/themes/cp_theme_d8/images/arrow-down.svg"></a>
+								<ul>
+									<li><a href="/node/52">Carbon Portal Service</a></li>
+									<li><a href="/node/51">THREDDS service</a></li>
+								</ul>
+							</li>
+							<li><a href="/node/49">Time series data</a></li>
+							<li><a href="/node/48">Flux estimates</a></li>
+							<li><a href="/node/47">Footprint tool</a></li>
+						</ul>
+					</li>
+					<li class="has_subnodes">
+						<a href="/node/10">Background info<img src="https://www.icos-cp.eu/themes/cp_theme_d8/images/arrow-down.svg"></a>
+						<ul>
+							<li><a href="/node/84">ICOS Data Flow</a></li>
+							<li><a href="/node/54">Prior flux maps</a></li>
+							<li><a href="/node/53">Inverse modelling</a></li>
+						</ul>
+					</li>
+				</ul>
+			</li>
+			<li><a href="/node/3">News &amp; Events</a></li>
+			<li><a href="/node/4">Documents</a></li>
+			<li class="is_topnode">
+				<a href="/node/6">About</a>
+				<ul>
+					<li><a href="/node/93">Carbon Portal</a></li>
+					<li><a href="/node/46">Feedback form</a></li>
+					<li><a href="/node/19">People</a></li>
+					<li><a href="/node/20">Structure</a></li>
+					<li><a href="/node/18">FAQ</a></li>
+					<li><a href="/node/40">Visit Carbon Portal</a></li>
+				</ul>
+			</li>
+		</ul>
+	</div>
+
+
+	<div class="container-fluid">
 
 		@body
 
