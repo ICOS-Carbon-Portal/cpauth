@@ -11,6 +11,8 @@ import akka.http.scaladsl.testkit.ScalatestRouteTest
 import akka.http.scaladsl.server.AuthenticationFailedRejection
 import akka.http.scaladsl.model.headers.Cookie
 import akka.stream.ActorMaterializer
+import se.lu.nateko.cp.cpauth.routing.CpauthDirectives
+import akka.http.scaladsl.server.MissingCookieRejection
 
 class CpauthDirectivesTest extends FunSpec with ScalatestRouteTest {
 	
@@ -31,6 +33,11 @@ class CpauthDirectivesTest extends FunSpec with ScalatestRouteTest {
 			loginPath = null,
 			serviceHost = "cpauth.icos-cp.eu",
 			servicePrivatePort = 0
+		),
+		restheart = RestHeartConfig(
+			baseUri = "http://127.0.0.1:8088",
+			dbName = "db",
+			usersCollection = "users"
 		)
 	)
 
@@ -43,6 +50,7 @@ class CpauthDirectivesTest extends FunSpec with ScalatestRouteTest {
 		val dispatcher = system.dispatcher
 		val scheduler = system.scheduler
 		val materializer = ActorMaterializer(namePrefix = Some("cpauth_dir_test"))
+		val userDb = null
 	}
 
 
@@ -80,7 +88,7 @@ class CpauthDirectivesTest extends FunSpec with ScalatestRouteTest {
 				
 				Get("/any") ~> route ~> check{
 					val authRejections = rejections.collect{
-						case AuthenticationFailedRejection(AuthenticationFailedRejection.CredentialsMissing, _) => 1
+						case MissingCookieRejection(_) => 1
 					}
 					assert(authRejections.length === 1)
 				}

@@ -31,11 +31,13 @@ case class SamlConfig(
 case class PrivateAuthConfig(authTokenValiditySeconds: Int, privateKeyPath: String)
 case class AuthConfig(priv: PrivateAuthConfig, pub: PublicAuthConfig)
 
-case class CpauthConfig(http: HttpConfig, saml: SamlConfig, auth: AuthConfig)
+case class RestHeartConfig(baseUri: String, dbName: String, usersCollection: String)
+
+case class CpauthConfig(http: HttpConfig, saml: SamlConfig, auth: AuthConfig, restheart: RestHeartConfig)
 
 
 object HttpConfig{
-	
+
 	def cookieDomainFromHost(host: String): String = host.count(_ == '.') match{
 		case 0 => host
 		case x => host.split('.').drop(x - 1).mkString(".", ".", "")
@@ -62,16 +64,17 @@ object ConfigReader extends DefaultJsonProtocol{
 		//.apply needed because of the companion object that UrlsConfig has
 		implicit val urlsConfigFormat = jsonFormat4(HttpConfig.apply)
 		implicit val samlConfigFormat = jsonFormat5(SamlConfig)
-		
+
 		implicit val pubAuthConfigFormat = jsonFormat2(PublicAuthConfig)
 		implicit val privAuthConfigFormat = jsonFormat2(PrivateAuthConfig)
 		implicit val authConfigFormat = jsonFormat2(AuthConfig)
-		
-		implicit val cpauthConfigFormat = jsonFormat3(CpauthConfig)
+		implicit val restHeartConfigFormat = jsonFormat3(RestHeartConfig)
+
+		implicit val cpauthConfigFormat = jsonFormat4(CpauthConfig)
 
 		val renderOpts = ConfigRenderOptions.concise.setJson(true)
 		val cpConfJson: String = applicationConfig.getValue("cpauth").render(renderOpts)
-		
+
 		cpConfJson.parseJson.convertTo[CpauthConfig]
 	}
 

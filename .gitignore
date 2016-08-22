@@ -27,6 +27,7 @@ src_managed/
 .cache-tests
 
 nohup.out
+viewsCore/.gitignore
 
 #Cpauth DB
 db/

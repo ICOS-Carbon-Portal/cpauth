@@ -1,4 +1,4 @@
-package se.lu.nateko.cp.cpauth
+package se.lu.nateko.cp.cpauth.routing
 
 import scala.concurrent.ExecutionContext
 import scala.util.Failure
@@ -19,13 +19,22 @@ import akka.http.scaladsl.model.HttpEntity
 import akka.http.scaladsl.model.ContentTypes
 import akka.http.scaladsl.model.headers.HttpChallenge
 import akka.http.scaladsl.server.AuthenticationFailedRejection
+import akka.http.scaladsl.server.Directive0
 import akka.stream.ActorMaterializer
+import se.lu.nateko.cp.cpauth.HttpConfig
+import se.lu.nateko.cp.cpauth.Utils
+import se.lu.nateko.cp.cpauth.accounts.UsersIo
+import akka.http.scaladsl.server.Directive
+import akka.http.scaladsl.server.Directive1
+import akka.http.scaladsl.server.AuthorizationFailedRejection
+import akka.http.scaladsl.server.StandardRoute
 
 trait CpauthDirectives {
 
 	def publicAuthConfig: PublicAuthConfig
 	def httpConfig: HttpConfig
 	def authenticator: Try[Authenticator]
+	def userDb: UsersIo
 
 	implicit def dispatcher: ExecutionContext
 	implicit def materializer: ActorMaterializer
@@ -38,30 +47,29 @@ trait CpauthDirectives {
 		case Failure(err) => complete((StatusCodes.BadRequest, err.getMessage))
 	}
 
-	def user(inner: UserInfo => Route): Route = cookie(publicAuthConfig.authCookieName)(cookie => {
-		val userTry = for(
-			auth <- authenticator;
-			token <- CookieToToken.recoverToken(cookie.value);
-			uinfo <- auth.unwrapUserInfo(token)
-		) yield uinfo
+	def forbid(message: String): StandardRoute = complete((StatusCodes.Forbidden, message))
 
-		val userFuture = Utils.slowFailureDown(Future.fromTry(userTry), 500 millis)
+	val user: Directive1[UserInfo] = Directive{inner =>
+		cookie(publicAuthConfig.authCookieName)(cookie => {
+			val userTry = for(
+				auth <- authenticator;
+				token <- CookieToToken.recoverToken(cookie.value);
+				uinfo <- auth.unwrapUserInfo(token)
+			) yield uinfo
 
-		onComplete(userFuture){
-			case Success(uinfo) => inner(uinfo)
-			case Failure(err) => reject(
-				new AuthenticationFailedRejection(
-					AuthenticationFailedRejection.CredentialsRejected,
-					HttpChallenge("https", "")
+			val userFuture = Utils.slowFailureDown(Future.fromTry(userTry), 500 millis)
+
+			onComplete(userFuture){
+				case Success(uinfo) => inner(Tuple1(uinfo))
+				case Failure(err) => reject(
+					new AuthenticationFailedRejection(
+						AuthenticationFailedRejection.CredentialsRejected,
+						HttpChallenge("https", "")
+					)
 				)
-			)
-		}
-	}) ~ reject(
-		new AuthenticationFailedRejection(
-			AuthenticationFailedRejection.CredentialsMissing,
-			HttpChallenge("https", "")
-		)
-	)
+			}
+		})
+	}
 
 	def cpauthCookie: Route = cookie(publicAuthConfig.authCookieName)(cookie => {
 		complete(publicAuthConfig.authCookieName + "=" + cookie.value)
@@ -71,8 +79,14 @@ trait CpauthDirectives {
 		complete(StatusCodes.OK)
 	}
 
-	protected def primitiveToJson[T](v: T): HttpResponse = {
-		HttpResponse(entity = HttpEntity(ContentTypes.`application/json`, v.toString))
-	}
+	val admin: Directive0 = user.tflatMap(uit => ifUserIsAdmin(uit._1)) |
+		complete((StatusCodes.Forbidden, "Need to be logged in as CPauth admin"))
 
+	def ifUserIsAdmin(uinfo: UserInfo): Directive0 = Directive{ inner =>
+		onComplete(userDb.userIsAdmin(uinfo.mail)){
+			case Failure(err) => failWith(err)
+			case Success(false) => reject(AuthorizationFailedRejection)
+			case Success(true) => inner(())
+		}
+	}
 }

@@ -1,11 +1,9 @@
-package se.lu.nateko.cp.cpauth
+package se.lu.nateko.cp.cpauth.routing
 
-import se.lu.nateko.cp.cpauth.accounts.UsersIo
 import scala.util.Success
 import scala.util.Failure
-import se.lu.nateko.cp.cpauth.core.AuthenticationFailedException
 import se.lu.nateko.cp.cpauth.core.UserInfo
-import CpauthJsonProtocol._
+import se.lu.nateko.cp.cpauth.CpauthJsonProtocol._
 import scala.concurrent.Future
 import se.lu.nateko.cp.cpauth.accounts.UserEntry
 import scala.concurrent.duration._
@@ -13,10 +11,12 @@ import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
 import akka.http.scaladsl.server.Directives._
+import se.lu.nateko.cp.cpauth.CookieFactory
+import se.lu.nateko.cp.cpauth.Utils
+import spray.json.JsBoolean
 
 trait PasswordRouting extends CpauthDirectives {
 
-	def userDb: UsersIo
 	def cookieFactory: CookieFactory
 
 	private def authUser(mail: String, password: String): Future[UserEntry] =
@@ -30,7 +30,7 @@ trait PasswordRouting extends CpauthDirectives {
 			path("amilocal"){
 				user{user =>
 					onSuccess(userDb.userExists(user.mail)){
-						isLocal => complete(primitiveToJson(isLocal))
+						isLocal => complete(JsBoolean(isLocal))
 					}
 				}
 			}
@@ -97,12 +97,4 @@ trait PasswordRouting extends CpauthDirectives {
 		}
 	}
 
-	private def admin(inner: => Route): Route = user(uinfo =>
-		onComplete(userDb.userIsAdmin(uinfo.mail)){
-			case Failure(err) => failWith(err)
-			case Success(false) => complete((StatusCodes.Forbidden, "Need to be logged in as CPauth admin"))
-			case Success(true) => inner
-		}
-	)
-	
 }

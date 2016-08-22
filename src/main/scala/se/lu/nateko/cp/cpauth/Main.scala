@@ -3,11 +3,12 @@ package se.lu.nateko.cp.cpauth
 import akka.actor.ActorSystem
 import se.lu.nateko.cp.cpauth.CpauthJsonProtocol._
 import se.lu.nateko.cp.cpauth.accounts.Users
+import se.lu.nateko.cp.cpauth.core.AuthenticationFailedException
 import se.lu.nateko.cp.cpauth.core.Authenticator
 import se.lu.nateko.cp.cpauth.core.CoreUtils
 import se.lu.nateko.cp.cpauth.opensaml.AssertionExtractor
 import se.lu.nateko.cp.cpauth.opensaml.IdpLibrary
-import se.lu.nateko.cp.cpauth.core.AuthenticationFailedException
+import se.lu.nateko.cp.cpauth.routing._
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
 import akka.http.scaladsl.server.Directives._
@@ -19,10 +20,10 @@ import akka.stream.ActorMaterializer
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
 
 
-object Main extends App with SamlRouting with PasswordRouting with DrupalRouting with StaticRouting {
+object Main extends App with SamlRouting with PasswordRouting with DrupalRouting with StaticRouting with RestHeartRouting{
 
 	val config: CpauthConfig = ConfigReader.getDefault
-	val (httpConfig, publicAuthConfig, samlConfig) = (config.http, config.auth.pub, config.saml)
+	val (httpConfig, publicAuthConfig, samlConfig, restheartConfig) = (config.http, config.auth.pub, config.saml, config.restheart)
 
 	implicit val system = ActorSystem("cpauth")
 	implicit val dispatcher = system.dispatcher
@@ -53,6 +54,7 @@ object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
 		samlRoute ~
 		passwordRoute ~
 		drupalRoute ~
+		restheartRoute ~
 		get{
 			path("logout")(logout) ~
 			path("whoami"){

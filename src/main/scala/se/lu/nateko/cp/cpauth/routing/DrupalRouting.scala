@@ -1,8 +1,7 @@
-package se.lu.nateko.cp.cpauth
+package se.lu.nateko.cp.cpauth.routing
 
 import akka.actor.ActorSystem
 import akka.util.Timeout
-import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.DurationInt
 import akka.http.scaladsl.model.headers._
 import akka.http.scaladsl.model.StatusCodes
@@ -11,6 +10,7 @@ import akka.http.scaladsl.model.HttpHeader
 import akka.http.scaladsl.model.HttpEntity
 import akka.http.scaladsl.model.Uri.Query
 import akka.http.scaladsl.server.Directives._
+import se.lu.nateko.cp.cpauth.HttpConfig
 
 trait DrupalRouting extends CpauthDirectives with ProxyDirectives{
 

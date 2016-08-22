@@ -1,4 +1,4 @@
-package se.lu.nateko.cp.cpauth
+package se.lu.nateko.cp.cpauth.routing
 
 import java.net.URI
 import scala.util.Try
@@ -15,6 +15,10 @@ import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
 import akka.http.scaladsl.model.headers.HttpCookie
 import akka.http.scaladsl.model.Uri
+import se.lu.nateko.cp.cpauth.CookieFactory
+import se.lu.nateko.cp.cpauth.Saml
+import se.lu.nateko.cp.cpauth.SamlConfig
+import se.lu.nateko.cp.cpauth.TargetUrlLookup
 
 trait SamlRouting extends CpauthDirectives{
 
