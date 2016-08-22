@@ -80,7 +80,7 @@ class CpauthDirectivesTest extends FunSpec with ScalatestRouteTest {
 
 	describe("user directive"){
 
-		val route = dirs.user(uinfo => complete(uinfo.givenName))
+		val route = dirs.user(uid => complete(uid.email))
 
 		describe("when no CPauth cookie is present"){
 	
@@ -96,18 +96,18 @@ class CpauthDirectivesTest extends FunSpec with ScalatestRouteTest {
 		}
 
 		describe("when a properly signed CPauth cookie is present"){
-			val user = UserInfo("name", "surname", "mail")
+			val user = UserId("mail")
 			val cookie = new CookieFactory(config).makeAuthenticationCookie(user).get
 			
 			it("delegates to the inner route"){
 				Get("/any") ~> Cookie(cookie.pair()) ~> route ~> check{
-					assert(responseAs[String] === user.givenName)
+					assert(responseAs[String] === user.email)
 				}
 			}
 		}
 
 		describe("when the cookie has been signed with a wrong private key"){
-			val user = UserInfo("name", "surname", "mail")
+			val user = UserId("mail")
 			val wrongConfig = getConfig("/saml/test_private_key.der")
 			val cookie = new CookieFactory(wrongConfig).makeAuthenticationCookie(user).get
 			

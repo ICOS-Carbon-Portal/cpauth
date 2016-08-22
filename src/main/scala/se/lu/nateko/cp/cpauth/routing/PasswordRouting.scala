@@ -2,7 +2,7 @@ package se.lu.nateko.cp.cpauth.routing
 
 import scala.util.Success
 import scala.util.Failure
-import se.lu.nateko.cp.cpauth.core.UserInfo
+import se.lu.nateko.cp.cpauth.core.UserId
 import se.lu.nateko.cp.cpauth.CpauthJsonProtocol._
 import scala.concurrent.Future
 import se.lu.nateko.cp.cpauth.accounts.UserEntry
@@ -28,8 +28,8 @@ trait PasswordRouting extends CpauthDirectives {
 				admin(onSuccess(userDb.listUsers) {users => complete(users)})
 			} ~
 			path("amilocal"){
-				user{user =>
-					onSuccess(userDb.userExists(user.mail)){
+				user{uid =>
+					onSuccess(userDb.userExists(uid)){
 						isLocal => complete(JsBoolean(isLocal))
 					}
 				}
@@ -41,7 +41,7 @@ trait PasswordRouting extends CpauthDirectives {
 
 					onSuccess(authUser(mail, password)){ uEntry =>
 
-						cookieFactory.makeAuthenticationCookie(uEntry.info) match{
+						cookieFactory.makeAuthenticationCookie(uEntry.id) match{
 							case Success(cookie) => setCookie(cookie)(complete(StatusCodes.OK))
 							case Failure(err) => failWith(err)
 						}
@@ -49,34 +49,34 @@ trait PasswordRouting extends CpauthDirectives {
 				)
 			} ~
 			path("changepassword"){
-				user(uinfo =>
+				user(uid =>
 					formFields('oldPass, 'newPass)((oldPass, newPass) => {
 						val result = for(
-							userEntry <- authUser(uinfo.mail, oldPass);
-							_ <- userDb.updateUser(uinfo.mail, userEntry, newPass)
+							userEntry <- authUser(uid.email, oldPass);
+							_ <- userDb.updateUser(uid.email, userEntry, newPass)
 						) yield ()
 						onSuccess(result)(complete(StatusCodes.OK))
 					})
 				)
 			} ~
 			path("deleteownaccount"){
-				user(uinfo =>
-					onSuccess(userDb.dropUser(uinfo.mail))(logout)
+				user(uid =>
+					onSuccess(userDb.dropUser(uid.email))(logout)
 				)
 			} ~
 			admin{
 				path("createaccount"){
-					formFields('givenName, 'surname, 'mail, 'password)((givenName, surname, mail, password) =>
-						onSuccess(userDb.userExists(mail)) {
+					formFields('mail, 'password){(mail, password) =>
+						val uid = UserId(mail)
+						onSuccess(userDb.userExists(uid)) {
 							case true => complete((StatusCodes.Forbidden, "User already exists"))
 							case false =>
-								val uinfo = UserInfo(givenName, surname, mail)
-								val userEntry = UserEntry(uinfo, false)
+								val userEntry = UserEntry(uid, false)
 								onSuccess(userDb.addUser(userEntry, password)){
 									complete(StatusCodes.OK)
 								}
 						}
-					)
+					}
 				} ~
 				path("deleteaccount"){
 					formField('mail)(mail =>

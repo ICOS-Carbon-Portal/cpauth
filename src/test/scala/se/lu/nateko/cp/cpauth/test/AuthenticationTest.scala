@@ -7,7 +7,7 @@ import se.lu.nateko.cp.cpauth.PrivateAuthConfig
 
 class AuthenticationTest extends FunSuite{
 
-	val user = UserInfo("Vasja", "Pupkin", "vasja.pupkin@mail.org")
+	val user = UserId("vasja.pupkin@mail.org")
 	val pubAuthConfig = PublicAuthConfig(authCookieName = "", publicKeyPath = "/public1.pem")
 	
 	test("Properly formed fresh token validates successfully"){
@@ -17,7 +17,7 @@ class AuthenticationTest extends FunSuite{
 			privateKeyPath = "/private1.der"
 		)).get.makeToken(user)
 		
-		val unwrappedUser = Authenticator(pubAuthConfig).get.unwrapUserInfo(token)
+		val unwrappedUser = Authenticator(pubAuthConfig).get.unwrapUserId(token)
 
 		assert(unwrappedUser.isSuccess)
 		assert(unwrappedUser.get === user)
@@ -29,7 +29,7 @@ class AuthenticationTest extends FunSuite{
 			privateKeyPath = "/private1.der"
 		)).get.makeToken(user)
 		
-		val unwrappedUser = Authenticator(pubAuthConfig).get.unwrapUserInfo(token)
+		val unwrappedUser = Authenticator(pubAuthConfig).get.unwrapUserId(token)
 
 		assert(unwrappedUser.isFailure)
 
@@ -46,7 +46,7 @@ class AuthenticationTest extends FunSuite{
 
 		val auth = Authenticator(pubAuthConfig).get
 
-		val unwrappedUser = auth.unwrapUserInfo(tokenMaker.makeToken(user))
+		val unwrappedUser = auth.unwrapUserId(tokenMaker.makeToken(user))
 
 		assert(unwrappedUser.isFailure)
 		val errMessage: String = unwrappedUser.failed.get.getMessage

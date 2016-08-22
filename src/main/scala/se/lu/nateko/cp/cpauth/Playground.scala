@@ -14,7 +14,8 @@ import se.lu.nateko.cp.cpauth.core.CoreUtils
 import se.lu.nateko.cp.cpauth.opensaml.ResponseStatusController
 import org.opensaml.xml.XMLObject
 import scala.collection.JavaConverters.asScalaBufferConverter
-import se.lu.nateko.cp.cpauth.core.UserInfo
+import se.lu.nateko.cp.cpauth.core.UserId
+
 
 object Playground {
 
@@ -54,7 +55,7 @@ object Playground {
 		val privAuthConf = defConf.auth.priv.copy(authTokenValiditySeconds = validity)
 		val conf = defConf.copy(auth = defConf.auth.copy(priv = privAuthConf))
 		val factory = new CookieFactory(conf)
-		val uinfo = UserInfo(givenName = fname, surname = lname, mail = email)
-		factory.makeAuthenticationCookie(uinfo).get.value
+		val uid = UserId(email)
+		factory.makeAuthenticationCookie(uid).get.value
 	}
 }

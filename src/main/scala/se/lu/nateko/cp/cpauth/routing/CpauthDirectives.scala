@@ -6,7 +6,7 @@ import scala.util.Success
 import scala.util.Try
 import se.lu.nateko.cp.cpauth.core.Authenticator
 import se.lu.nateko.cp.cpauth.core.CookieToToken
-import se.lu.nateko.cp.cpauth.core.UserInfo
+import se.lu.nateko.cp.cpauth.core.UserId
 import se.lu.nateko.cp.cpauth.core.PublicAuthConfig
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationInt
@@ -49,18 +49,18 @@ trait CpauthDirectives {
 
 	def forbid(message: String): StandardRoute = complete((StatusCodes.Forbidden, message))
 
-	val user: Directive1[UserInfo] = Directive{inner =>
+	val user: Directive1[UserId] = Directive{inner =>
 		cookie(publicAuthConfig.authCookieName)(cookie => {
 			val userTry = for(
 				auth <- authenticator;
 				token <- CookieToToken.recoverToken(cookie.value);
-				uinfo <- auth.unwrapUserInfo(token)
-			) yield uinfo
+				uid <- auth.unwrapUserId(token)
+			) yield uid
 
 			val userFuture = Utils.slowFailureDown(Future.fromTry(userTry), 500 millis)
 
 			onComplete(userFuture){
-				case Success(uinfo) => inner(Tuple1(uinfo))
+				case Success(uid) => inner(Tuple1(uid))
 				case Failure(err) => reject(
 					new AuthenticationFailedRejection(
 						AuthenticationFailedRejection.CredentialsRejected,
@@ -82,8 +82,8 @@ trait CpauthDirectives {
 	val admin: Directive0 = user.tflatMap(uit => ifUserIsAdmin(uit._1)) |
 		complete((StatusCodes.Forbidden, "Need to be logged in as CPauth admin"))
 
-	def ifUserIsAdmin(uinfo: UserInfo): Directive0 = Directive{ inner =>
-		onComplete(userDb.userIsAdmin(uinfo.mail)){
+	def ifUserIsAdmin(uid: UserId): Directive0 = Directive{ inner =>
+		onComplete(userDb.userIsAdmin(uid)){
 			case Failure(err) => failWith(err)
 			case Success(false) => reject(AuthorizationFailedRejection)
 			case Success(true) => inner(())

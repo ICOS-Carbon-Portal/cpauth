@@ -8,9 +8,9 @@ import se.lu.nateko.cp.cpauth.core._
 
 class SignedTokenMaker private(key: RSAPrivateKey, validity: Int){
 
-	def makeToken(userInfo: UserInfo): SignedToken = {
+	def makeToken(userId: UserId): SignedToken = {
 		val expiryTime = new DateTime().getMillis + 1000 * validity
-		val token = AuthToken(userInfo, expiryTime)
+		val token = AuthToken(userId, expiryTime)
 		val signature = Crypto.signMessage(token.toString, key)
 		SignedToken(token, signature)
 	}

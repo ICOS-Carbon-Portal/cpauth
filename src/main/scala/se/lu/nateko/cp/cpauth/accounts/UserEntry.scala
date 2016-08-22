@@ -1,5 +1,5 @@
 package se.lu.nateko.cp.cpauth.accounts
 
-import se.lu.nateko.cp.cpauth.core.UserInfo
+import se.lu.nateko.cp.cpauth.core.UserId
 
-case class UserEntry(info: UserInfo, isAdmin: Boolean)
+case class UserEntry(id: UserId, isAdmin: Boolean)

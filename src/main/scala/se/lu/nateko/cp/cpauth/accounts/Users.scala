@@ -4,7 +4,7 @@ import java.security.MessageDigest
 import slick.driver.HsqldbDriver.api._
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
-import se.lu.nateko.cp.cpauth.core.UserInfo
+import se.lu.nateko.cp.cpauth.core.UserId
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 import java.util.Base64
@@ -14,12 +14,13 @@ import se.lu.nateko.cp.cpauth.core.Exceptions
 
 trait UsersIo{
 	def addUser(userEntry: UserEntry, password: String): Future[Unit]
-	def userExists(mail: String): Future[Boolean]
+	def userExists(uid: UserId): Future[Boolean]
 	def authenticateUser(mail: String, password: String): Future[UserEntry]
 	def dropUser(mail: String): Future[Unit]
 	def updateUser(oldMail: String, userEntry: UserEntry, newPass: String): Future[Unit]
 	def listUsers: Future[Seq[UserEntry]]
-	def userIsAdmin(mail: String): Future[Boolean]
+	def listUsersOld: Future[Seq[(UserId, String, String)]]
+	def userIsAdmin(uid: UserId): Future[Boolean]
 	def setAdminRights(mail: String, isAdmin: Boolean): Future[Unit]
 }
 
@@ -48,10 +49,10 @@ object Users extends UsersIo {
 	def drop(): Unit = Await.result(db.run(users.schema.drop), Duration.Inf)
 
 	def addUser(userEntry: UserEntry, password: String): Future[Unit] = {
-		val uinfo = userEntry.info
-		val passHash = hash(uinfo.mail, password)
+		val uinfo = userEntry.id
+		val passHash = hash(uinfo.email, password)
 
-		val action = users. += ((0, uinfo.givenName, uinfo.surname, uinfo.mail, passHash, userEntry.isAdmin))
+		val action = users. += ((0, "", "", uinfo.email, passHash, userEntry.isAdmin))
 
 		db.run(action).flatMap{ x =>
 			if(x == 1) Future.successful(())
@@ -59,8 +60,8 @@ object Users extends UsersIo {
 		}
 	}
 
-	def userExists(mail: String): Future[Boolean] = {
-		val user = users.filter(_.mail === mail).exists
+	def userExists(uid: UserId): Future[Boolean] = {
+		val user = users.filter(_.mail === uid.email).exists
 		db.run(user.result)
 	}
 
@@ -75,7 +76,7 @@ object Users extends UsersIo {
 			case Nil =>
 				Future.failed(AuthenticationFailedException)
 			case (givenName, surname, admin) :: Nil =>
-				Future.successful(UserEntry(UserInfo(givenName, surname, mail), admin))
+				Future.successful(UserEntry(UserId(mail), admin))
 			case _ =>
 				Exceptions.failedFuture("Inconsistent database state: duplicate user ")
 		})
@@ -88,28 +89,36 @@ object Users extends UsersIo {
 
 	def updateUser(oldMail: String, userEntry: UserEntry, newPass: String): Future[Unit] =
 		ensureSingleUserChange(oldMail){
-			val uinfo = userEntry.info
-			val newPassHash = hash(uinfo.mail, newPass)
+			val uinfo = userEntry.id
+			val newPassHash = hash(uinfo.email, newPass)
 
 			val q = for(user <- users if user.mail === oldMail)
 				yield (user.givenName, user.surname, user.mail, user.password, user.isAdmin)
 
-			val upd = q.update((uinfo.givenName, uinfo.surname, uinfo.mail, newPassHash, userEntry.isAdmin))
+			val upd = q.update(("", "", uinfo.email, newPassHash, userEntry.isAdmin))
 
 			db.run(upd)
 		}
 
 	def listUsers: Future[Seq[UserEntry]] = {
-		val q = for(user <- users) yield
-			(user.givenName, user.surname, user.mail, user.isAdmin)
+		val q = for(user <- users) yield (user.mail, user.isAdmin)
 
 		db.run(q.result).map(_.map({
-			case (givenName, surname, mail, isAdmin) => UserEntry(UserInfo(givenName, surname, mail), isAdmin) 
+			case (mail, isAdmin) => UserEntry(UserId(mail), isAdmin)
 		}))
 	}
 
-	def userIsAdmin(mail: String): Future[Boolean] = {
-		val q = users.filter(user => user.mail === mail && user.isAdmin).exists
+	def listUsersOld: Future[Seq[(UserId, String, String)]] = {
+		val q = for(user <- users) yield
+			(user.givenName, user.surname, user.mail)
+
+		db.run(q.result).map(_.map({
+			case (givenName, surname, mail) => (UserId(mail), givenName, surname)
+		}))
+	}
+
+	def userIsAdmin(uid: UserId): Future[Boolean] = {
+		val q = users.filter(user => user.mail === uid.email && user.isAdmin).exists
 		db.run(q.result)
 	}
 

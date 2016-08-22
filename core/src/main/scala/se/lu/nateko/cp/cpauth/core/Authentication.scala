@@ -6,19 +6,19 @@ import scala.util.Success
 import java.security.interfaces.RSAPublicKey
 import java.time.Instant
 
-case class UserInfo(givenName: String, surname: String, mail: String)
+case class UserId(email: String)
 
-case class AuthToken(userInfo: UserInfo, expiresOn: Long)
+case class AuthToken(userId: UserId, expiresOn: Long)
 
 case class SignedToken(token: AuthToken, signature: Signature)
 
 class Authenticator(key: RSAPublicKey){
 
-	def unwrapUserInfo(token: SignedToken): Try[UserInfo] =
+	def unwrapUserId(token: SignedToken): Try[UserId] =
 		if(tokenIsOld(token.token))
 			Exceptions.failure("Authentication token has expired")
 		else signatureIsValid(token) match{
-			case Success(true) => Success(token.token.userInfo)
+			case Success(true) => Success(token.token.userId)
 			case Failure(err) => Failure(err)
 			case Success(false) => Exceptions.failure("Authentication token's signature is invalid")
 		}

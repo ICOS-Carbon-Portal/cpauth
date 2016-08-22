@@ -25,15 +25,16 @@ trait DrupalRouting extends CpauthDirectives with ProxyDirectives{
 		}{ drupalProxy =>
 			extract(_.request.uri)(originalUri => {
 				val targetUri = originalUri.withScheme("https")
-				user{ uinfo =>
+				user{ uid =>
 					redirectWhenDone(target = targetUri, dropParam = Some("login")){
 						proxyTo(
 							Uri.IPv4Host(drupalProxy.ipv4Host),
 							drupalProxy.port,
 							drupalProxy.path.map(Uri.Path(_)).getOrElse(originalUri.path),
-							("givenName", uinfo.givenName),
-							("surname", uinfo.surname),
-							("mail", uinfo.mail)
+							//TODO Fix fetching first/last names from RESTHeart
+							("givenName", "TO BE SUPPORTED SOON"),
+							("surname", "TO BE SUPPORTED SOON"),
+							("mail", uid.email)
 						)
 					}
 				} ~

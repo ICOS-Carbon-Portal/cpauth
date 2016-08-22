@@ -9,7 +9,7 @@ import org.opensaml.saml2.core.Response
 import akka.http.scaladsl.model.headers.HttpCookie
 import se.lu.nateko.cp.cpauth.core.CookieToToken
 import se.lu.nateko.cp.cpauth.core.Exceptions
-import se.lu.nateko.cp.cpauth.core.UserInfo
+import se.lu.nateko.cp.cpauth.core.UserId
 import se.lu.nateko.cp.cpauth.opensaml.AllStatements
 import se.lu.nateko.cp.cpauth.opensaml.AssertionExtractor
 import se.lu.nateko.cp.cpauth.opensaml.AssertionValidator
@@ -43,7 +43,7 @@ class CookieFactory(config: CpauthConfig) {
 		cookie <- makeAuthenticationCookie(userInfo)
 	) yield cookie
 
-	def makeAuthenticationCookie(userInfo: UserInfo): Try[HttpCookie] = for(
+	def makeAuthenticationCookie(userInfo: UserId): Try[HttpCookie] = for(
 		tokenMaker <- tokenMakerTry;
 		token = tokenMaker.makeToken(userInfo)
 	)yield HttpCookie(
@@ -56,17 +56,15 @@ class CookieFactory(config: CpauthConfig) {
 	)
 
 
-	def getUserInfo(statements: AllStatements): Try[UserInfo] = {
+	def getUserInfo(statements: AllStatements): Try[UserId] = {
 		val attrs = config.saml.attributes
 		for(
-			givenName <- statements.getSingleValue(attrs.givenName);
-			surname <- statements.getSingleValue(attrs.surname);
 			mail <- statements.getSingleValue(attrs.mail)
-		) yield UserInfo(givenName = givenName, surname = surname, mail = mail)
+		) yield UserId(email = mail)
 	}
 
-	private def provideDebug(uinfoTry: Try[UserInfo], assertions: => Iterable[ValidatedAssertion]): Try[UserInfo] = uinfoTry match {
-		case ok: Success[UserInfo] => ok
+	private def provideDebug(uinfoTry: Try[UserId], assertions: => Iterable[ValidatedAssertion]): Try[UserId] = uinfoTry match {
+		case ok: Success[UserId] => ok
 		case Failure(err) => Exceptions.failure{
 			val assertionsAsString = assertions.map(_.assertion.getDOM).map(OpenSamlUtils.xmlToStr).mkString("\n")
 			err.getMessage + "\nReturned assertions were:\n" + assertionsAsString

@@ -61,7 +61,7 @@ object ConfigReader extends DefaultJsonProtocol{
 		implicit val samlSpConfigFormat = jsonFormat2(SamlSpConfig)
 		implicit val proxyConfigFormat = jsonFormat3(ProxyConfig)
 		implicit val samlAttrFormat = jsonFormat3(SamlAttrConfig)
-		//.apply needed because of the companion object that UrlsConfig has
+		//.apply needed because of the companion object that HttpConfig has
 		implicit val urlsConfigFormat = jsonFormat4(HttpConfig.apply)
 		implicit val samlConfigFormat = jsonFormat5(SamlConfig)
 

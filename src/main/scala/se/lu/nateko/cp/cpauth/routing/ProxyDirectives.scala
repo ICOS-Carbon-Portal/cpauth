@@ -53,17 +53,6 @@ object ProxyDirectives{
 			msg.withHeaders(headers)
 		}
 
-/*		def ensureUppercaseHeaders: msg.Self = {
-			val headers = msg.headers.map{header =>
-				if(header.name().head.isUpper) header
-				else {
-					val old = header.name()
-					val newName = old.head.toUpper +: old.tail
-					RawHeader(newName, header.value())
-				}
-			}
-			msg.withHeaders(headers)
-		}*/
 	}
 
 }
