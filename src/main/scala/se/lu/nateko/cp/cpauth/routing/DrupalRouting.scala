@@ -12,7 +12,7 @@ import akka.http.scaladsl.model.Uri.Query
 import akka.http.scaladsl.server.Directives._
 import se.lu.nateko.cp.cpauth.HttpConfig
 
-trait DrupalRouting extends CpauthDirectives with ProxyDirectives{
+trait DrupalRouting extends RestHeartDirectives {
 
 	def httpConfig: HttpConfig
 	implicit val system: ActorSystem
@@ -23,26 +23,27 @@ trait DrupalRouting extends CpauthDirectives with ProxyDirectives{
 			case Host(host, 0) => httpConfig.drupalProxying.get(host.toString)
 			case _ => None
 		}{ drupalProxy =>
-			extract(_.request.uri)(originalUri => {
+			extract(_.request.uri){originalUri =>
 				val targetUri = originalUri.withScheme("https")
 				user{ uid =>
-					redirectWhenDone(target = targetUri, dropParam = Some("login")){
-						proxyTo(
-							Uri.IPv4Host(drupalProxy.ipv4Host),
-							drupalProxy.port,
-							drupalProxy.path.map(Uri.Path(_)).getOrElse(originalUri.path),
-							//TODO Fix fetching first/last names from RESTHeart
-							("givenName", "TO BE SUPPORTED SOON"),
-							("surname", "TO BE SUPPORTED SOON"),
-							("mail", uid.email)
-						)
+					onSuccess(restHeart.getGivenAndSurName(uid)){ case (givenName, surname) =>
+						redirectWhenDone(target = targetUri, dropParam = Some("login")){
+							proxyTo(
+								Uri.IPv4Host(drupalProxy.ipv4Host),
+								drupalProxy.port,
+								drupalProxy.path.map(Uri.Path(_)).getOrElse(originalUri.path),
+								("givenName", givenName),
+								("surname", surname),
+								("mail", uid.email)
+							)
+						}
 					}
 				} ~
 				redirect(
 					Uri(httpConfig.serviceUrl + httpConfig.loginPath).withQuery(Query("targetUrl" -> targetUri.toString)),
 					StatusCodes.Found
 				)
-			})
+			}
 		}
 	}
 

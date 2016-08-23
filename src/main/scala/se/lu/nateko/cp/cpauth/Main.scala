@@ -18,12 +18,13 @@ import scala.concurrent.ExecutionContext
 import akka.http.scaladsl.Http
 import akka.stream.ActorMaterializer
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
+import se.lu.nateko.cp.cpauth.accounts.RestHeartClient
 
 
 object Main extends App with SamlRouting with PasswordRouting with DrupalRouting with StaticRouting with RestHeartRouting{
 
 	val config: CpauthConfig = ConfigReader.getDefault
-	val (httpConfig, publicAuthConfig, samlConfig, restheartConfig) = (config.http, config.auth.pub, config.saml, config.restheart)
+	val (httpConfig, publicAuthConfig, samlConfig) = (config.http, config.auth.pub, config.saml)
 
 	implicit val system = ActorSystem("cpauth")
 	implicit val dispatcher = system.dispatcher
@@ -31,6 +32,7 @@ object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
 	implicit val materializer = ActorMaterializer(namePrefix = Some("cpauth_mat"))
 
 	val http = Http()
+	val restHeart = new RestHeartClient(config.restheart, http)
 
 	val assExtractorTry = AssertionExtractor(samlConfig)
 	val idpLib: IdpLibrary = IdpLibrary.fromConfig(samlConfig)
