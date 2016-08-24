@@ -20,6 +20,9 @@ import akka.http.scaladsl.unmarshalling.Unmarshal
 import scala.util.Try
 import scala.util.Success
 import scala.util.Failure
+import akka.http.scaladsl.model.ContentTypes
+import akka.http.scaladsl.model.HttpMethod
+import akka.http.scaladsl.model.StatusCodes
 
 class RestHeartClient(val config: RestHeartConfig, http: HttpExt)(implicit m: Materializer) {
 
@@ -31,14 +34,46 @@ class RestHeartClient(val config: RestHeartConfig, http: HttpExt)(implicit m: Ma
 		Uri(s"$baseUri/$dbName/$usersCollection/$email")
 	}
 
-	def createNewUser(uid: UserId, payload: JsObject): Future[Done] = {
+	def createUserIfNew(uid: UserId, givenName: String, surname: String): Future[Done] =
+		userExists(uid).flatMap{exists =>
+			if(exists) Future.successful(Done)
+			else {
+				val payload = JsObject("profile" -> JsObject(
+					"givenName" -> JsString(givenName),
+					"surname" -> JsString(surname)
+				))
+				createUser(uid, payload)
+			}
+		}
+
+	private def createUser(uid: UserId, payload: JsObject): Future[Done] =
+		writeUser(uid, payload, HttpMethods.PUT).flatMap{resp =>
+			if(resp.status.isSuccess()) {
+				Future.successful(Done)
+			} else Future.failed(
+				new Exception(s"Could not create user ${uid.email}, got response ${resp.status.defaultMessage()}")
+			)
+		}
+
+	private def writeUser(uid: UserId, payload: JsObject, verb: HttpMethod): Future[HttpResponse] = {
 		val uri = getUserUri(uid)
 		for(
 			entity <- Marshal(payload).to[RequestEntity];
-			req = HttpRequest(method = HttpMethods.PUT, uri = uri, entity = entity);
-			resp <- http.singleRequest(req);
-			done <- validateResponse(resp, "Failed to write for " + uid.email)
-		) yield Done
+			req = HttpRequest(method = verb, uri = uri, entity = entity);
+			resp <- http.singleRequest(req)
+		) yield resp
+	}
+
+	def userExists(uid: UserId): Future[Boolean] = {
+		val query = Uri.Query("keys" -> "{\"_id\": 1}")
+		val req = HttpRequest(uri = getUserUri(uid).withQuery(query))
+		http.singleRequest(req).flatMap{resp =>
+			if(resp.status.isSuccess()) Future.successful(true)
+			else if(resp.status == StatusCodes.NotFound) Future.successful(false)
+			else Future.failed(
+				new Exception(s"Failed checking user ${uid.email}, got response " + resp.status.defaultMessage())
+			)
+		}
 	}
 
 	def getUserProps(uid: UserId, projections: Seq[String] = Nil): Future[JsObject] = {
@@ -51,32 +86,25 @@ class RestHeartClient(val config: RestHeartConfig, http: HttpExt)(implicit m: Ma
 		val uri = getUserUri(uid).withQuery(query)
 		for(
 			resp <- http.singleRequest(HttpRequest(uri = uri));
-			userObj <- Unmarshal(resp.entity).to[JsValue]
+			userObj <- Unmarshal(resp.entity.withContentType(ContentTypes.`application/json`)).to[JsValue]
 		) yield userObj.asJsObject("Expected a JSON object, got a JSON value")
 	}
 
 	def getGivenAndSurName(uid: UserId): Future[(String, String)] =
-		getUserProps(uid, Seq("givenName", "surname")).flatMap{userObj =>
+		getUserProps(uid, Seq("profile.givenName", "profile.surname")).flatMap{userObj =>
 
-			def getField(field: String): Try[String] = {
-				userObj.fields.get(field) match {
+			def getField(obj: JsObject, field: String): Try[String] = {
+				obj.fields.get(field) match {
 					case Some(JsString(v)) => Success(v)
 					case _ => Failure(new Exception(s"Expected a string property '$field'"))
 				}
 			}
 			Future.fromTry(for(
-				givenName <- getField("givenName");
-				surname <- getField("surame")
+				profile <- Try{userObj.fields("profile").asJsObject("Expected 'profile' to be a JSON object")};
+				givenName <- getField(profile, "givenName");
+				surname <- getField(profile, "surname")
 			) yield (givenName, surname))
 		}
-
-	private def validateResponse(resp: HttpResponse, msg: String): Future[Done] = {
-		if(resp.status.isSuccess()) {
-			Future.successful(Done)
-		} else Future.failed(
-			new Exception(s"$msg, got response ${resp.status.defaultMessage()}")
-		)
-	}
 
 	def importOldUsers(users: Seq[(UserId, String, String)]): Future[Done] = {
 
@@ -84,12 +112,7 @@ class RestHeartClient(val config: RestHeartConfig, http: HttpExt)(implicit m: Ma
 		users.foldLeft(seed)(
 			(fut, user) => fut.flatMap{_ =>
 				val (uid, givenName, surname) = user
-	
-				val payload = JsObject(
-					"givenName" -> JsString(givenName),
-					"surname" -> JsString(surname)
-				)
-				createNewUser(uid, payload)
+				createUserIfNew(uid, givenName, surname)
 			}
 		)
 	}

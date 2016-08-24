@@ -12,7 +12,7 @@ import akka.http.scaladsl.model.Uri.Query
 import akka.http.scaladsl.server.Directives._
 import se.lu.nateko.cp.cpauth.HttpConfig
 
-trait DrupalRouting extends RestHeartDirectives {
+trait DrupalRouting extends CpauthDirectives with ProxyDirectives{
 
 	def httpConfig: HttpConfig
 	implicit val system: ActorSystem

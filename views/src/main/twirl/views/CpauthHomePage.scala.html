@@ -3,40 +3,63 @@
 	<div hidden id="message" class="alert" role="alert"></div>
 
 	<div id="hello" hidden>
-		<div class="panel panel-info">
-			<div class="panel-heading">
-				<h3 class="panel-title">
-					<span class="glyphicon glyphicon-user" aria-hidden="true"></span>
-					You are signed in with the following claims:
-				</h3>
-			</div>
-			<div class="panel-body">
-				<table class="table">
-					<tbody>
-						<tr><th>Given name:</th><td id="givenName"></td>
-							<td rowspan="3" style="text-align: center;vertical-align: middle">
-								<button type="button" class="btn btn-primary btn-lg" id="signOutButton">Sign out</button>
-							</td>
-						</tr>
-						<tr><th>Surname:</th><td id="surname"></td></tr>
-						<tr><th>E-mail:</th><td id="mail"></td></tr>
-					</tbody>
-				</table>
-			</div>
-		</div>
 
 		<div class="panel panel-info">
 			<div class="panel-heading">
 				<h3 class="panel-title">
 					<span class="glyphicon glyphicon-user" aria-hidden="true"></span>
-					Your API token:
+					User profile
 				</h3>
 			</div>
 			<div class="panel-body">
-				<div class="col-sm-1">
-					<strong>Token:</strong>
-				</div>
-				<div id="token" class="col-sm-11" style="word-wrap: break-word;"></div>
+				<table class="table">
+					<tbody>
+						<tr><th>User ID:</th><td id="email"></td>
+							<td style="text-align: center;vertical-align: middle">
+								<button type="button" class="btn btn-primary btn-lg" id="signOutButton">Sign out</button>
+							</td>
+						</tr>
+						<tr><th>First name:</th><td><input id="givenName" type="text" class="form-control" placeholder="First name"></td></tr>
+						<tr><th>Last name:</th><td><input id="surname" type="text" class="form-control" placeholder="Last name"></td></tr>
+						<tr>
+							<th>License acceptance:</th>
+							<td>
+								<div class="input-group">
+									<span class="input-group-addon">
+										<input id="icosLicenceOk" type="checkbox">
+									</span>
+									<input type="text" class="form-control" value="I accept the ICOS data license (CC BY 4.0)" readonly>
+								</div>
+							</td>
+						</tr>
+						<tr><th>ORCID id:</th><td><input id="orcid" type="text" class="form-control" placeholder="ORCID"></td></tr>
+						<tr><th>Affiliation:</th><td><input id="affiliation" type="text" class="form-control" placeholder="Affiliation"></td></tr>
+						<tr><th>Secondary affiliation:</th><td><input id="affiliation2" type="text" class="form-control" placeholder="Secondary affiliation"></td></tr>
+						<tr><th>Telephone (work):</th><td><input id="workPhone" type="text" class="form-control" placeholder="+XX XXX XXXX"></td></tr>
+						<tr><th>Mobile phone:</th><td><input id="mobilePhone" type="text" class="form-control" placeholder="+XX XXX XXXX"></td></tr>
+						<tr>
+							<th>Address:</th>
+							<td>
+								<table class="table">
+									<tbody>
+										<tr><th>Street address:</th><td><input id="streetAddress" type="text" class="form-control" placeholder="Street address (work)"></td></tr>
+										<tr><th>City:</th><td><input id="city" type="text" class="form-control" placeholder="City"></td></tr>
+										<tr><th>Zip code:</th><td><input id="zipCode" type="text" class="form-control" placeholder="Zip code"></td></tr>
+										<tr><th>Country:</th><td><input id="country" type="text" class="form-control" placeholder="Country"></td></tr>
+									</tbody>
+								</table>
+							</td>
+						</tr>
+						<tr><th>Gender:</th><td><input id="gender" type="text" class="form-control" placeholder="free text for now (temporary)"></td></tr>
+						<tr><th>Year of birth:</th><td><input id="birthYear" type="text" class="form-control" placeholder="nnnn"></td></tr>
+						<tr>
+							<td></td><td></td>
+							<td style="text-align: center;vertical-align: middle">
+								<button type="button" class="btn btn-primary btn-lg" id="updateProfileButton">Update profile</button>
+							</td>
+						</tr>
+					</tbody>
+				</table>
 			</div>
 		</div>
 
@@ -95,6 +118,21 @@
 				</div>
 			</div>
 			
+		</div>
+
+		<div class="panel panel-info">
+			<div class="panel-heading">
+				<h3 class="panel-title">
+					<span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+					Your API token:
+				</h3>
+			</div>
+			<div class="panel-body">
+				<div class="col-sm-1">
+					<strong>Token:</strong>
+				</div>
+				<div id="token" class="col-sm-11" style="word-wrap: break-word;"></div>
+			</div>
 		</div>
 
 	</div>

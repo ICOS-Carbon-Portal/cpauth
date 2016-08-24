@@ -28,6 +28,7 @@ import akka.http.scaladsl.server.Directive
 import akka.http.scaladsl.server.Directive1
 import akka.http.scaladsl.server.AuthorizationFailedRejection
 import akka.http.scaladsl.server.StandardRoute
+import se.lu.nateko.cp.cpauth.accounts.RestHeartClient
 
 trait CpauthDirectives {
 
@@ -35,6 +36,7 @@ trait CpauthDirectives {
 	def httpConfig: HttpConfig
 	def authenticator: Try[Authenticator]
 	def userDb: UsersIo
+	def restHeart: RestHeartClient
 
 	implicit def dispatcher: ExecutionContext
 	implicit def materializer: ActorMaterializer

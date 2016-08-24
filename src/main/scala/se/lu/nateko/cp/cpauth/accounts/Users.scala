@@ -15,13 +15,13 @@ import se.lu.nateko.cp.cpauth.core.Exceptions
 trait UsersIo{
 	def addUser(userEntry: UserEntry, password: String): Future[Unit]
 	def userExists(uid: UserId): Future[Boolean]
-	def authenticateUser(mail: String, password: String): Future[UserEntry]
-	def dropUser(mail: String): Future[Unit]
-	def updateUser(oldMail: String, userEntry: UserEntry, newPass: String): Future[Unit]
+	def authenticateUser(uid: UserId, password: String): Future[UserEntry]
+	def dropUser(uid: UserId): Future[Unit]
+	def updateUser(oldUid: UserId, userEntry: UserEntry, newPass: String): Future[Unit]
 	def listUsers: Future[Seq[UserEntry]]
 	def listUsersOld: Future[Seq[(UserId, String, String)]]
 	def userIsAdmin(uid: UserId): Future[Boolean]
-	def setAdminRights(mail: String, isAdmin: Boolean): Future[Unit]
+	def setAdminRights(uid: UserId, isAdmin: Boolean): Future[Unit]
 }
 
 object Users extends UsersIo {
@@ -65,37 +65,37 @@ object Users extends UsersIo {
 		db.run(user.result)
 	}
 
-	def authenticateUser(mail: String, password: String): Future[UserEntry] = {
-		val passHash = hash(mail, password)
+	def authenticateUser(uid: UserId, password: String): Future[UserEntry] = {
+		val passHash = hash(uid.email, password)
 
 		val userQ = for(
-			user <- users if user.mail === mail && user.password === passHash
+			user <- users if user.mail === uid.email && user.password === passHash
 		) yield (user.givenName, user.surname, user.isAdmin)
 
 		db.run(userQ.result).flatMap(_.toList match{
 			case Nil =>
 				Future.failed(AuthenticationFailedException)
 			case (givenName, surname, admin) :: Nil =>
-				Future.successful(UserEntry(UserId(mail), admin))
+				Future.successful(UserEntry(uid, admin))
 			case _ =>
 				Exceptions.failedFuture("Inconsistent database state: duplicate user ")
 		})
 	}
 
-	def dropUser(mail: String): Future[Unit] = ensureSingleUserChange(mail){
-		val action = users.filter(_.mail === mail).delete
+	def dropUser(uid: UserId): Future[Unit] = ensureSingleUserChange(uid.email){
+		val action = users.filter(_.mail === uid.email).delete
 		db.run(action)
 	}
 
-	def updateUser(oldMail: String, userEntry: UserEntry, newPass: String): Future[Unit] =
-		ensureSingleUserChange(oldMail){
+	def updateUser(oldUid: UserId, userEntry: UserEntry, newPass: String): Future[Unit] =
+		ensureSingleUserChange(oldUid.email){
 			val uinfo = userEntry.id
 			val newPassHash = hash(uinfo.email, newPass)
 
-			val q = for(user <- users if user.mail === oldMail)
-				yield (user.givenName, user.surname, user.mail, user.password, user.isAdmin)
+			val q = for(user <- users if user.mail === oldUid.email)
+				yield (user.mail, user.password, user.isAdmin)
 
-			val upd = q.update(("", "", uinfo.email, newPassHash, userEntry.isAdmin))
+			val upd = q.update((uinfo.email, newPassHash, userEntry.isAdmin))
 
 			db.run(upd)
 		}
@@ -122,9 +122,9 @@ object Users extends UsersIo {
 		db.run(q.result)
 	}
 
-	def setAdminRights(mail: String, isAdmin: Boolean): Future[Unit] =
-		ensureSingleUserChange(mail){
-			val q = for(user <- users if user.mail === mail) yield user.isAdmin
+	def setAdminRights(uid: UserId, isAdmin: Boolean): Future[Unit] =
+		ensureSingleUserChange(uid.email){
+			val q = for(user <- users if user.mail === uid.email) yield user.isAdmin
 			db.run(q.update(isAdmin))
 		}
 

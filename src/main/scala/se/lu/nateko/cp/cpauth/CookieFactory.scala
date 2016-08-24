@@ -33,19 +33,23 @@ class CookieFactory(config: CpauthConfig) {
 		maxAge = Some(31536000) //1 year in seconds
 	)
 
-	def makeAuthenticationCookie(response: Response, extractor: AssertionExtractor, idpLib: IdpLibrary): Try[HttpCookie] = for(
+	def makeAuthenticationCookie(
+		response: Response,
+		extractor: AssertionExtractor,
+		idpLib: IdpLibrary
+	): Try[(HttpCookie, UserId, AllStatements)] = for(
 		goodResponse <- ResponseStatusController.ensureSuccess(response);
 		validator <- AssertionValidator(goodResponse, idpLib);
 		assertions = extractor.extractAssertions(goodResponse).map(validator.validate);
 		statements = StatementExtractor.extractAttributeStringValues(assertions);
-		userInfoTry = getUserInfo(statements);
-		userInfo <- provideDebug(userInfoTry, assertions);
-		cookie <- makeAuthenticationCookie(userInfo)
-	) yield cookie
+		userIdTry = getUserId(statements);
+		userId <- provideDebug(userIdTry, assertions);
+		cookie <- makeAuthenticationCookie(userId)
+	) yield (cookie, userId, statements)
 
-	def makeAuthenticationCookie(userInfo: UserId): Try[HttpCookie] = for(
+	def makeAuthenticationCookie(userId: UserId): Try[HttpCookie] = for(
 		tokenMaker <- tokenMakerTry;
-		token = tokenMaker.makeToken(userInfo)
+		token = tokenMaker.makeToken(userId)
 	)yield HttpCookie(
 		name = config.auth.pub.authCookieName,
 		value = CookieToToken.constructCookieContent(token),
@@ -56,7 +60,7 @@ class CookieFactory(config: CpauthConfig) {
 	)
 
 
-	def getUserInfo(statements: AllStatements): Try[UserId] = {
+	def getUserId(statements: AllStatements): Try[UserId] = {
 		val attrs = config.saml.attributes
 		for(
 			mail <- statements.getSingleValue(attrs.mail)

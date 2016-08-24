@@ -19,8 +19,8 @@ trait PasswordRouting extends CpauthDirectives {
 
 	def cookieFactory: CookieFactory
 
-	private def authUser(mail: String, password: String): Future[UserEntry] =
-		Utils.slowFailureDown(userDb.authenticateUser(mail, password), 500 millis)
+	private def authUser(uid: UserId, password: String): Future[UserEntry] =
+		Utils.slowFailureDown(userDb.authenticateUser(uid, password), 500 millis)
 
 	lazy val passwordRoute: Route = pathPrefix("password"){
 		get{
@@ -39,7 +39,7 @@ trait PasswordRouting extends CpauthDirectives {
 			path("login"){
 				formFields('mail, 'password)((mail, password) =>
 
-					onSuccess(authUser(mail, password)){ uEntry =>
+					onSuccess(authUser(UserId(mail), password)){ uEntry =>
 
 						cookieFactory.makeAuthenticationCookie(uEntry.id) match{
 							case Success(cookie) => setCookie(cookie)(complete(StatusCodes.OK))
@@ -52,8 +52,8 @@ trait PasswordRouting extends CpauthDirectives {
 				user(uid =>
 					formFields('oldPass, 'newPass)((oldPass, newPass) => {
 						val result = for(
-							userEntry <- authUser(uid.email, oldPass);
-							_ <- userDb.updateUser(uid.email, userEntry, newPass)
+							userEntry <- authUser(uid, oldPass);
+							_ <- userDb.updateUser(uid, userEntry, newPass)
 						) yield ()
 						onSuccess(result)(complete(StatusCodes.OK))
 					})
@@ -61,7 +61,7 @@ trait PasswordRouting extends CpauthDirectives {
 			} ~
 			path("deleteownaccount"){
 				user(uid =>
-					onSuccess(userDb.dropUser(uid.email))(logout)
+					onSuccess(userDb.dropUser(uid))(logout)
 				)
 			} ~
 			admin{
@@ -80,17 +80,17 @@ trait PasswordRouting extends CpauthDirectives {
 				} ~
 				path("deleteaccount"){
 					formField('mail)(mail =>
-						onSuccess(userDb.dropUser(mail))(complete(StatusCodes.OK))
+						onSuccess(userDb.dropUser(UserId(mail)))(complete(StatusCodes.OK))
 					)
 				} ~
 				path("makeadmin"){
 					formField('mail)(mail =>
-						onSuccess(userDb.setAdminRights(mail, true))(complete(StatusCodes.OK))
+						onSuccess(userDb.setAdminRights(UserId(mail), true))(complete(StatusCodes.OK))
 					)
 				} ~
 				path("unmakeadmin"){
 					formField('mail)(mail =>
-						onSuccess(userDb.setAdminRights(mail, false))(complete(StatusCodes.OK))
+						onSuccess(userDb.setAdminRights(UserId(mail), false))(complete(StatusCodes.OK))
 					)
 				}
 			}

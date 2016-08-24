@@ -12,15 +12,47 @@ function switchToLoggedInState(){
 	$("#hello").show();
 }
 
+var stringKeys = ['givenName', 'surname', 'orcid', 'affiliation', 'affiliation2', 'workPhone', 'mobilePhone',
+	'streetAddress', 'city', 'zipCode', 'country', 'gender', 'birthYear'];
 
-function displayUserInfo(uinfo){
-
+function displayUserInfo(uid){
 	switchToLoggedInState();
+	$("#email").html(uid.email);
 
-	$("#givenName").html(uinfo.givenName);
-	$("#surname").html(uinfo.surname);
-	$("#mail").html(uinfo.mail);
+	var keys = '{profile: 1}';
+
+	$.getJSON('/db/users/' + uid.email + '?keys=' + encodeURIComponent(keys))
+		.done(function(userInfo){
+			var profile = userInfo.profile;
+			stringKeys.forEach(function(key){
+				$('#' + key).val(profile[key]);
+			});
+			document.getElementById("icosLicenceOk").checked = profile.icosLicenceOk;
+		}).fail(reportError);
 }
+
+
+function updateUserProfile(){
+	var email = $("#email").html();
+
+	var payload = stringKeys.reduce(
+		function(seed, key){
+			seed[key] = $('#' + key).val();
+			return seed;
+		},
+		{icosLicenceOk: document.getElementById("icosLicenceOk").checked}
+	);
+
+	$.ajax({
+		method: "PATCH",
+		url: "/db/users/" + email,
+		contentType: 'application/json',
+		data: JSON.stringify({profile: payload})
+	}).done(function(){
+		reportSuccess('Profile updated');
+	}).fail(reportError);
+}
+
 
 function displayToken(token) {
 	$("#token").html(token);
@@ -148,6 +180,7 @@ $(function(){
 	});
 
 	$("#signOutButton").click(signOut);
+	$("#updateProfileButton").click(updateUserProfile);
 	$("#changePasswordButton").click(changePassword);
 	$("#deleteAccountButton").click(showDeleteAccountConfirmation);
 	$("#cancelDeleteButton").click(hideDeleteAccountConfirmation);

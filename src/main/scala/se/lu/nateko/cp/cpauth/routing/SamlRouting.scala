@@ -68,8 +68,15 @@ trait SamlRouting extends CpauthDirectives{
 					val cookieAndReqIdTry: Try[(HttpCookie, String)] = for(
 						extractor <- assExtractorTry;
 						response <- Try(Parser.fromBase64[Response](resp));
-						cookie <- cookieFactory.makeAuthenticationCookie(response, extractor, idpLib)
-					) yield (cookie, response.getInResponseTo)
+						(cookie, uid, statements) <- cookieFactory.makeAuthenticationCookie(response, extractor, idpLib)
+					) yield {
+						for( //side effect: creating new entry in RESTHeart if not present
+							givenName <- statements.getSingleValue(samlConfig.attributes.givenName);
+							surname <- statements.getSingleValue(samlConfig.attributes.surname)
+						) yield restHeart.createUserIfNew(uid, givenName, surname)
+
+						(cookie, response.getInResponseTo)
+					}
 
 					attempt(cookieAndReqIdTry){ case (cookie, reqId) =>
 						setCookie(cookie) {
