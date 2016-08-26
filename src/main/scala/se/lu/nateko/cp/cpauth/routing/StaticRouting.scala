@@ -34,6 +34,9 @@ trait StaticRouting {
 				} ~
 				path(s"$page.js"){
 					getFromResource(s"www/$page.js")
+				} ~
+				path("common.js"){
+					getFromResource(s"www/common.js")
 				}
 			} else reject
 		}
