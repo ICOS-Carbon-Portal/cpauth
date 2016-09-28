@@ -14,6 +14,7 @@ import akka.http.scaladsl.server.Directives._
 import se.lu.nateko.cp.cpauth.CookieFactory
 import se.lu.nateko.cp.cpauth.Utils
 import spray.json.JsBoolean
+import se.lu.nateko.cp.cpauth.core.AuthSource
 
 trait PasswordRouting extends CpauthDirectives {
 
@@ -41,7 +42,7 @@ trait PasswordRouting extends CpauthDirectives {
 
 					onSuccess(authUser(UserId(mail), password)){ uEntry =>
 
-						cookieFactory.makeAuthenticationCookie(uEntry.id) match{
+						cookieFactory.makeAuthenticationCookie(uEntry.id, AuthSource.Password) match{
 							case Success(cookie) => setCookie(cookie)(complete(StatusCodes.OK))
 							case Failure(err) => failWith(err)
 						}

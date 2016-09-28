@@ -18,6 +18,7 @@ import se.lu.nateko.cp.cpauth.opensaml.OpenSamlUtils
 import se.lu.nateko.cp.cpauth.opensaml.ResponseStatusController
 import se.lu.nateko.cp.cpauth.opensaml.StatementExtractor
 import se.lu.nateko.cp.cpauth.opensaml.ValidatedAssertion
+import se.lu.nateko.cp.cpauth.core.AuthSource
 
 class CookieFactory(config: CpauthConfig) {
 	
@@ -44,12 +45,12 @@ class CookieFactory(config: CpauthConfig) {
 		statements = StatementExtractor.extractAttributeStringValues(assertions);
 		userIdTry = getUserId(statements);
 		userId <- provideDebug(userIdTry, assertions);
-		cookie <- makeAuthenticationCookie(userId)
+		cookie <- makeAuthenticationCookie(userId, AuthSource.Saml)
 	) yield (cookie, userId, statements)
 
-	def makeAuthenticationCookie(userId: UserId): Try[HttpCookie] = for(
+	def makeAuthenticationCookie(userId: UserId, source: AuthSource.Value): Try[HttpCookie] = for(
 		tokenMaker <- tokenMakerTry;
-		token = tokenMaker.makeToken(userId)
+		token = tokenMaker.makeToken(userId, source)
 	)yield HttpCookie(
 		name = config.auth.pub.authCookieName,
 		value = CookieToToken.constructCookieContent(token),

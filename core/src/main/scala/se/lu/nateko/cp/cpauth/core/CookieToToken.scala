@@ -15,13 +15,15 @@ object CookieToToken {
 		
 		val expiresOn = ois.readLong()
 		val email = ois.readObject().asInstanceOf[String]
+		val authSource = AuthSource.withName(ois.readObject().asInstanceOf[String])
 		val signatureBytes = ois.readObject().asInstanceOf[Array[Byte]]
 		ois.close()
 
 		SignedToken(
 			AuthToken(
 				UserId(email),
-				expiresOn
+				expiresOn,
+				authSource
 			),
 			Signature(signatureBytes)
 		)
@@ -33,6 +35,7 @@ object CookieToToken {
 
 		oos.writeLong(token.token.expiresOn)
 		oos.writeObject(token.token.userId.email)
+		oos.writeObject(token.token.source.toString)
 		oos.writeObject(token.signature.bytes)
 		oos.close()
 		val serialized = byteStream.toByteArray

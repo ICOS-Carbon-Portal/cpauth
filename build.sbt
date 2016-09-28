@@ -58,7 +58,7 @@ lazy val cpauthViews = (project in file("views"))
 	)
 
 
-val akkaVersion = "2.4.9"
+val akkaVersion = "2.4.10"
 val cpauthMain = Some("se.lu.nateko.cp.cpauth.Main")
 
 lazy val cpauth = (project in file("."))

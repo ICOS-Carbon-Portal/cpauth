@@ -13,6 +13,7 @@ import akka.http.scaladsl.model.headers.Cookie
 import akka.stream.ActorMaterializer
 import se.lu.nateko.cp.cpauth.routing.CpauthDirectives
 import akka.http.scaladsl.server.MissingCookieRejection
+import akka.http.scaladsl.model.headers.HttpCookie
 
 class CpauthDirectivesTest extends FunSpec with ScalatestRouteTest {
 	
@@ -51,6 +52,7 @@ class CpauthDirectivesTest extends FunSpec with ScalatestRouteTest {
 		val scheduler = system.scheduler
 		val materializer = ActorMaterializer(namePrefix = Some("cpauth_dir_test"))
 		val userDb = null
+		val restHeart = null
 	}
 
 
@@ -95,21 +97,22 @@ class CpauthDirectivesTest extends FunSpec with ScalatestRouteTest {
 			}
 		}
 
+		def makeCookie(uid: String, config: CpauthConfig): HttpCookie =
+			new CookieFactory(config).makeAuthenticationCookie(UserId(uid), AuthSource.Password).get
+
 		describe("when a properly signed CPauth cookie is present"){
-			val user = UserId("mail")
-			val cookie = new CookieFactory(config).makeAuthenticationCookie(user).get
+			val cookie = makeCookie("test1", config)
 			
 			it("delegates to the inner route"){
 				Get("/any") ~> Cookie(cookie.pair()) ~> route ~> check{
-					assert(responseAs[String] === user.email)
+					assert(responseAs[String] === "test1")
 				}
 			}
 		}
 
 		describe("when the cookie has been signed with a wrong private key"){
-			val user = UserId("mail")
 			val wrongConfig = getConfig("/saml/test_private_key.der")
-			val cookie = new CookieFactory(wrongConfig).makeAuthenticationCookie(user).get
+			val cookie = makeCookie("test2", wrongConfig)
 			
 			it("rejects the request with 'CredentialsRejected' rejection"){
 				Get("/any") ~> Cookie(cookie.pair()) ~> route ~> check{

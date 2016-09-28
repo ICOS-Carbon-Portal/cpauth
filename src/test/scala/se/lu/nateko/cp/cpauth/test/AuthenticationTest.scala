@@ -15,7 +15,7 @@ class AuthenticationTest extends FunSuite{
 		val token = SignedTokenMaker(PrivateAuthConfig(
 			authTokenValiditySeconds = 10,
 			privateKeyPath = "/private1.der"
-		)).get.makeToken(user)
+		)).get.makeToken(user, AuthSource.Password)
 		
 		val unwrappedUser = Authenticator(pubAuthConfig).get.unwrapUserId(token)
 
@@ -27,7 +27,7 @@ class AuthenticationTest extends FunSuite{
 		val token = SignedTokenMaker(PrivateAuthConfig(
 			authTokenValiditySeconds = -1,
 			privateKeyPath = "/private1.der"
-		)).get.makeToken(user)
+		)).get.makeToken(user, AuthSource.Password)
 		
 		val unwrappedUser = Authenticator(pubAuthConfig).get.unwrapUserId(token)
 
@@ -35,6 +35,20 @@ class AuthenticationTest extends FunSuite{
 
 		val errMessage: String = unwrappedUser.failed.get.getMessage
 		assert(errMessage.contains("expired"))
+	}
+
+	test("Token originating from an untrusted source is rejected"){
+		val token = SignedTokenMaker(PrivateAuthConfig(
+			authTokenValiditySeconds = 10,
+			privateKeyPath = "/private1.der"
+		)).get.makeToken(user, AuthSource.Saml)
+
+		val unwrappedUser = Authenticator(pubAuthConfig).get.unwrapUserId(token, AuthSource.ValueSet(AuthSource.Password))
+
+		assert(unwrappedUser.isFailure)
+
+		val errMessage: String = unwrappedUser.failed.get.getMessage
+		assert(errMessage.contains("not trusted"))
 	}
 
 	test("Token signed with a wrong key fails to authenticate"){
@@ -46,7 +60,7 @@ class AuthenticationTest extends FunSuite{
 
 		val auth = Authenticator(pubAuthConfig).get
 
-		val unwrappedUser = auth.unwrapUserId(tokenMaker.makeToken(user))
+		val unwrappedUser = auth.unwrapUserId(tokenMaker.makeToken(user, AuthSource.Password))
 
 		assert(unwrappedUser.isFailure)
 		val errMessage: String = unwrappedUser.failed.get.getMessage

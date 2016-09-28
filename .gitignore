@@ -28,6 +28,7 @@ src_managed/
 
 nohup.out
 viewsCore/.gitignore
+views/.gitignore
 
 #Cpauth DB
 db/
