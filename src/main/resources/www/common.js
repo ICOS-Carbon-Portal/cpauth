@@ -1,10 +1,10 @@
 
 function reportError(xhr){
-	showMessage(xhr.responseText || xhr.toString(), "alert-danger");
+	showMessage(xhr.responseText || xhr.statusText || "Unknown error", "alert-danger");
 }
 
 function reportSuccess(msg){
-	showMessage(msg, "alert-success", 1500);
+	showMessage(msg, "alert-success", 4000);
 }
 
 function showMessage(message, msgType, hideAfter){

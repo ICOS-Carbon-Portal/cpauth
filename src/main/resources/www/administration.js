@@ -15,14 +15,22 @@ $(function(){
 
 
 function createNewAccount() {
-	if (validateNewUserCredentials()) {
-		$.post("/password/createaccount", $('#new-account').serializeArray())
-			.done(function() {
-				resetNewUserCredentials();
-				reportSuccess('A new account has been created!');
-			})
-			.fail(reportError);
-	}
+	if (!validateNewUserCredentials()) return;
+
+	$.post('/password/createaccount', $('#new-account').serializeArray())
+		.pipe(function(){
+			return $.ajax({
+				method: 'PUT',
+				url: '/db/users/' + $('#mail').val(),
+				contentType: 'application/json',
+				data: '{profile: {}}'
+			});
+		})
+		.done(function() {
+			resetNewUserCredentials();
+			reportSuccess('A new account has been created!');
+		})
+		.fail(reportError);
 }
 
 function validateNewUserCredentials() {

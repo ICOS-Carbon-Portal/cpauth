@@ -118,7 +118,13 @@ function changePassword(){
 }
 
 function deleteAccount(){
-	$.post("/password/deleteownaccount")
+	$.ajax({
+			method: 'DELETE',
+			url: '/db/users/' + $('#email').html()
+		})
+		.pipe(function(){
+			return $.post("/password/deleteownaccount");
+		})
 		.fail(reportError)
 		.done(switchToLoggedOutState);
 }
