@@ -80,7 +80,7 @@ object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
 						.flatMap(_ => system.terminate())(ExecutionContext.Implicits.global)
 					Await.result(doneFuture, 3 seconds)
 				}
-				println(binding)
+				system.log.info(s"Started cpauth: $binding")
 		}
 
 }
