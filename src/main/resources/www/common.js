@@ -1,6 +1,14 @@
 
-function reportError(xhr){
-	showMessage(xhr.responseText || xhr.statusText || "Unknown error", "alert-danger");
+function reportError(xhr, fallbackMessage){
+	function makeMessage(xhr){
+		var defaultMsg = fallbackMessage || "Unknown error";
+		if(!xhr) return defaultMsg;
+		if(xhr.responseText) return xhr.responseText;
+		if(xhr.statusText) return xhr.statusText;
+		if(xhr.toString() == '[Object object]') return defaultMsg;
+		return xhr.toString();
+	}
+	showMessage(makeMessage(xhr), "alert-danger");
 }
 
 function reportSuccess(msg){
@@ -34,5 +42,11 @@ function fadeOutMessage(runAfter){
 function hideMessage(){
 	$("#message").hide();
 	$("#message").removeClass("alert-success alert-info alert-warning alert-danger");
+}
+
+function enterKeyHandler(innerFun){
+	return function(e){
+		if(e.which == 13) innerFun(e);
+	}
 }
 

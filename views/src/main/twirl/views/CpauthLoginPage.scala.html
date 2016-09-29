@@ -17,13 +17,13 @@
 
 		<ul class="nav nav-tabs" role="tablist">
 			<li role="presentation" class="active col-xs-12 col-sm-2">
-				<a href="#swamid" aria-controls="swamid" role="tab" data-toggle="tab">
+				<a href="#swamid" id="swamid-link" aria-controls="swamid" role="tab" data-toggle="tab">
 					University sign in
 				</a>
 			</li>
 
 			<li role="presentation" class="col-xs-12 col-sm-2">
-				<a href="#plain" aria-controls="plain" role="tab" data-toggle="tab">
+				<a href="#plain" id="plain-link" aria-controls="plain" role="tab" data-toggle="tab">
 					Password sign in
 				</a>
 			</li>
@@ -57,8 +57,6 @@
 			<div role="tabpanel" class="tab-pane" id="plain">
 				<div class="panel panel-default">
 					<div class="panel-body">
-
-						<div id="plain-fail" style="display: hidden"></div>
 
 						<form id="plain-login">
 							<input class="targetUrlRelay" type="hidden" name="targetUrl">

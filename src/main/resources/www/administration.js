@@ -1,15 +1,22 @@
 
 $(function(){
 
-	$('#new-butt').click(function() {
+	$('#new-link').click(function() {
 		hideMessage();
 		resetNewUserCredentials();
 	});
 
-	$('#list-accounts-butt').click(function(){
+	$('#edit-link').click(function(){
 		hideMessage();
 		populateAccountsList();
 	});
+
+	$('#new-account-button').click(createNewAccount);
+
+	$("#mail").keypress(enterKeyHandler(function(){
+		$("#password").focus();
+	}));
+	$("#password").keypress(enterKeyHandler(createNewAccount));
 
 });
 

@@ -55,12 +55,14 @@ function updateUserProfile(){
 
 
 function displayToken(token) {
-	$("#token").html(token);
+	$("#tokenValue").html(token.value);
+	$("#tokenExpiry").html(new Date(token.expiry).toISOString());
+	$("#tokenSource").html(token.source);
 }
 
 function selectToken() {
 	var doc = document;
-	var text = doc.getElementById("token");
+	var text = doc.getElementById("tokenValue");
 
 	if (doc.body.createTextRange) { // ms
 		var range = doc.body.createTextRange();
@@ -145,7 +147,7 @@ $(function(){
 		dateType: "text"
 	}).done(function(result){
 		displayToken(result);
-		$("#token").click(selectToken);
+		$("#tokenValue").click(selectToken);
 	});
 
 	$("#signOutButton").click(signOut);

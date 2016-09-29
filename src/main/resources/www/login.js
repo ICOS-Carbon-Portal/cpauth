@@ -5,6 +5,9 @@ var $idpInput, $idpBtn;
 function urlQueryAsObject() {
 	var query = location.search.substr(1);
 	var result = {};
+
+	if(!query) return result;
+
 	query.split("&").forEach(function(part) {
 		var item = part.split("=");
 		result[item[0]] = decodeURIComponent(item[1]);
@@ -15,32 +18,13 @@ function urlQueryAsObject() {
 
 function doPlainLogin() {
 	var $form = $('#plain-login').serializeArray();
+	hideMessage();
 
 	$.post("/password/login", $form)
 		.done(function() {
 			window.location = urlQueryAsObject().targetUrl || '/home/';
 		})
-		.fail(function(xhr){
-			var defaultMessage = xhr.status == '403'
-				? 'Authentication error! Maybe you have entered wrong email or password. Please try again!'
-				: 'An unexpected server error has occured.';
-			somePlainFail(xhr.responseText || defaultMessage);
-		});
-}
-
-function enterKeyHandler(innerFun){
-	return function(e){
-		if(e.which == 13) innerFun(e);
-	}
-}
-
-
-function somePlainFail(message) {
-	var $fail = $('#plain-fail');
-	$fail.html(message);
-	$fail.addClass('alert alert-danger');
-	$fail.attr('role', 'alert');
-	$fail.show();
+		.fail(reportError);
 }
 
 
@@ -136,6 +120,9 @@ $(function(){
 	$("#mail").keypress(enterKeyHandler(function(){
 		$("#password").focus();
 	}));
+
+	$('#swamid-link').click(hideMessage);
+	$('#plain-link').click(hideMessage);
 
 });
 

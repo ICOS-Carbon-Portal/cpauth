@@ -1,34 +1,32 @@
 package se.lu.nateko.cp.cpauth.routing
 
 import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
+import scala.concurrent.duration.DurationInt
 import scala.util.Failure
 import scala.util.Success
 import scala.util.Try
-import se.lu.nateko.cp.cpauth.core.Authenticator
-import se.lu.nateko.cp.cpauth.core.CookieToToken
-import se.lu.nateko.cp.cpauth.core.UserId
-import se.lu.nateko.cp.cpauth.core.PublicAuthConfig
-import scala.concurrent.Future
-import scala.concurrent.duration.DurationInt
 import akka.actor.Scheduler
-import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
 import akka.http.scaladsl.model.StatusCodes
-import akka.http.scaladsl.server.Route
-import akka.http.scaladsl.model.HttpResponse
-import akka.http.scaladsl.model.HttpEntity
-import akka.http.scaladsl.model.ContentTypes
 import akka.http.scaladsl.model.headers.HttpChallenge
 import akka.http.scaladsl.server.AuthenticationFailedRejection
+import akka.http.scaladsl.server.AuthorizationFailedRejection
+import akka.http.scaladsl.server.Directive
 import akka.http.scaladsl.server.Directive0
+import akka.http.scaladsl.server.Directive1
+import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.server.Route
+import akka.http.scaladsl.server.StandardRoute
 import akka.stream.ActorMaterializer
 import se.lu.nateko.cp.cpauth.HttpConfig
 import se.lu.nateko.cp.cpauth.Utils
-import se.lu.nateko.cp.cpauth.accounts.UsersIo
-import akka.http.scaladsl.server.Directive
-import akka.http.scaladsl.server.Directive1
-import akka.http.scaladsl.server.AuthorizationFailedRejection
-import akka.http.scaladsl.server.StandardRoute
 import se.lu.nateko.cp.cpauth.accounts.RestHeartClient
+import se.lu.nateko.cp.cpauth.accounts.UsersIo
+import se.lu.nateko.cp.cpauth.core.Authenticator
+import se.lu.nateko.cp.cpauth.core.CookieToToken
+import se.lu.nateko.cp.cpauth.core.PublicAuthConfig
+import se.lu.nateko.cp.cpauth.core.UserId
 
 trait CpauthDirectives {
 
@@ -74,7 +72,14 @@ trait CpauthDirectives {
 	}
 
 	def cpauthCookie: Route = cookie(publicAuthConfig.authCookieName)(cookie => {
-		complete(publicAuthConfig.authCookieName + "=" + cookie.value)
+		import spray.json._
+		attempt(CookieToToken.recoverToken(cookie.value)){token =>
+			complete(JsObject(
+				"value" -> JsString(publicAuthConfig.authCookieName + "=" + cookie.value),
+				"expiry" -> JsNumber(token.token.expiresOn),
+				"source" -> JsString(token.token.source.toString)
+			))
+		}
 	})
 
 	lazy val logout: Route = deleteCookie(publicAuthConfig.authCookieName, httpConfig.authDomain, "/"){
