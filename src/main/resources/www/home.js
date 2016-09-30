@@ -28,7 +28,18 @@ function displayUserInfo(uid){
 				$('#' + key).val(profile[key]);
 			});
 			document.getElementById("icosLicenceOk").checked = profile.icosLicenceOk;
-		}).fail(reportError);
+		})
+		.then(null, function(xhr){
+			return xhr.status == 404
+				? $.ajax({ //create user profile in RESTHeart if it does not exist
+					method: 'PUT',
+					url: '/db/users/' + uid.email,
+					contentType: 'application/json',
+					data: '{profile: {}}'
+				})
+				: $.Deferred().reject(xhr);
+		})
+		.fail(reportError);
 }
 
 
@@ -124,7 +135,7 @@ function deleteAccount(){
 			method: 'DELETE',
 			url: '/db/users/' + $('#email').html()
 		})
-		.pipe(function(){
+		.then(function(){
 			return $.post("/password/deleteownaccount");
 		})
 		.fail(reportError)
