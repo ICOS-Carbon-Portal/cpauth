@@ -27,13 +27,6 @@ trait PasswordRouting extends CpauthDirectives {
 		get{
 			path("accountslist"){
 				admin(onSuccess(userDb.listUsers) {users => complete(users)})
-			} ~
-			path("amilocal"){
-				user{uid =>
-					onSuccess(userDb.userExists(uid)){
-						isLocal => complete(JsBoolean(isLocal))
-					}
-				}
 			}
 		} ~
 		post{

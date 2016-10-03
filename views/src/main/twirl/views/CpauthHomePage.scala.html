@@ -10,62 +10,60 @@
 				</h3>
 			</div>
 			<div class="panel-body">
-				<table class="table">
-					<tbody>
-						<tr><th>User ID:</th><td id="email"></td>
-							<td style="text-align: center;vertical-align: middle">
-								<button type="button" class="btn btn-primary btn-lg" id="signOutButton">Sign out</button>
-							</td>
-						</tr>
-						<tr><th>First name:</th><td><input id="givenName" type="text" class="form-control" placeholder="First name"></td></tr>
-						<tr><th>Last name:</th><td><input id="surname" type="text" class="form-control" placeholder="Last name"></td></tr>
-						<tr>
-							<th>License acceptance:</th>
-							<td>
-								<div class="input-group">
-									<span class="input-group-addon">
-										<input id="icosLicenceOk" type="checkbox">
-									</span>
-									<input type="text" class="form-control" value="I accept the ICOS data license (CC BY 4.0)" readonly>
-								</div>
-							</td>
-						</tr>
-						<tr><th>ORCID id:</th><td><input id="orcid" type="text" class="form-control" placeholder="ORCID"></td></tr>
-						<tr><th>Affiliation:</th><td><input id="affiliation" type="text" class="form-control" placeholder="Affiliation"></td></tr>
-						<tr><th>Secondary affiliation:</th><td><input id="affiliation2" type="text" class="form-control" placeholder="Secondary affiliation"></td></tr>
-						<tr><th>Telephone (work):</th><td><input id="workPhone" type="tel" class="form-control" placeholder="+XX XXX XXXX"></td></tr>
-						<tr><th>Mobile phone:</th><td><input id="mobilePhone" type="tel" class="form-control" placeholder="+XX XXX XXXX"></td></tr>
-						<tr>
-							<th>Address:</th>
-							<td>
-								<table class="table">
-									<tbody>
-										<tr><th>Street address:</th><td><input id="streetAddress" type="text" class="form-control" placeholder="Street address (work)"></td></tr>
-										<tr><th>City:</th><td><input id="city" type="text" class="form-control" placeholder="City"></td></tr>
-										<tr><th>Zip code:</th><td><input id="zipCode" type="text" class="form-control" placeholder="Zip code"></td></tr>
-										<tr><th>Country:</th><td><input id="country" type="text" class="form-control" placeholder="Country"></td></tr>
-									</tbody>
-								</table>
-							</td>
-						</tr>
-						<tr><th>Gender:</th><td>
+				<div class="row">
+					<div class="col-md-10">
+						@ValueWidget("User ID"){
+							<input type="text" class="form-control" id="email" readonly>
+						}
+						@ValueWidget("License acceptance"){
+							<div class="input-group">
+								<span class="input-group-addon">
+									<input id="icosLicenceOk" type="checkbox">
+								</span>
+								<input type="text" class="form-control" value="I accept the ICOS data license (CC BY 4.0)" readonly>
+							</div>
+						}
+						@TextValueControl("First name", "givenName", "First name")
+						@TextValueControl("Last name", "surname", "Last name")
+						@TextValueControl("ORCID id", "orcid", "ORCID")
+						@TextValueControl("Affiliation", "affiliation", "Affiliation")
+						@TextValueControl("Secondary affiliation", "affiliation2", "Secondary affiliation")
+						@TextValueControl("Telephone (work)", "workPhone", "+XX XXX XXXX")
+						@TextValueControl("Mobile phone", "mobilePhone", "+XX XXX XXXX")
+						@ValueWidget("Address"){
+							@TextValueControl("Street address", "streetAddress", "Street address (work)")
+							@TextValueControl("City", "city", "City")
+							@TextValueControl("Zip code", "zipCode", "Zip code")
+							@TextValueControl("Country", "country", "Country")
+						}
+						@ValueWidget("Gender"){
 							<select id="gender" class="form-control">
 								<option value="">unspecified</option>
 								<option value="Female">Female</option>
 								<option value="Male">Male</option>
 							</select>
-						</td></tr>
-						<tr><th>Year of birth:</th><td><input id="birthYear" type="text" class="form-control" placeholder="nnnn" pattern="[12][09][0-9]{2}"></td></tr>
-						<tr>
-							<td></td><td></td>
-							<td style="text-align: center;vertical-align: middle">
-								<button type="button" class="btn btn-primary btn-lg" id="updateProfileButton">Update profile</button>
-							</td>
-						</tr>
-					</tbody>
-				</table>
+						}
+						@ValueWidget("Year of birth"){
+							<input id="birthYear" type="text" class="form-control" placeholder="nnnn" pattern="[12][09][0-9]{2}">
+						}
+					</div>
+					<div class="col-md-2">
+						<div class="row">
+							<div class="col-md-12">
+								<button type="button" class="btn btn-primary btn-lg" id="signOutButton">Sign out</button>
+							</div>
+						</div>
+						<div class="row" style="margin-top:20px">
+							<div class="col-md-12">
+								<button type="button" class="btn btn-primary btn-lg" id="updateProfileButton">Save profile</button>
+							</div>
+						</div>
+					</div>
+				</div>
 			</div>
 		</div>
+
+		@DangerousDeletionPanel("profile")("This operation will make Carbon Portal to forget all information about your user profile and activities")
 
 		<div id="forLocalsOnly" hidden>
 
@@ -91,37 +89,7 @@
 					</div>
 				</div>
 			</div>
-
-			<div class="panel panel-info">
-				<div class="panel-heading">
-					<h3 class="panel-title">
-						<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
-						You can delete your account here:
-					</h3>
-				</div>
-				<div class="panel-body">
-
-					<button type="button" class="btn btn-primary btn-lg" id="deleteAccountButton">Delete account</button>
-
-					<div id="deleteAccountConfirmation" hidden>
-						<br/>
-						<div class="panel panel-danger">
-							<div class="panel-heading">
-								<h3 class="panel-title">
-									<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-									ARE YOU SURE YOU WANT TO DELETE YOUR ACCOUNT?
-								</h3>
-							</div>
-							<div class="panel-body">
-								<button type="button" class="btn btn-primary btn-lg" id="cancelDeleteButton">NO! GO BACK TO SAFETY!</button>
-								<button type="button" class="btn btn-danger btn-lg" id="reallyDeleteButton">YES</button>
-							</div>
-						</div>
-					</div>
-
-				</div>
-			</div>
-			
+			@DangerousDeletionPanel("account")("This operation will delete your profile and remove your Carbon Portal username/password account")
 		</div>
 
 		<div class="panel panel-info">
@@ -168,5 +136,54 @@
 			</div>
 		</div>
 	</div>
+}
+
+@ValueWidget(title: String)(valueHtml: Html) = {
+	<div class="row" style="margin-bottom: 7px">
+		<div class="col-md-2"><strong>@{title}:</strong></div>
+		<div class="col-md-10">
+			@valueHtml
+		</div>
+	</div>
+}
+
+@TextValueControl(title: String, id: String, placeholder: String) = {
+	@ValueWidget(title){
+		<input id="@id" type="text" class="form-control" placeholder="@placeholder">
+	}
+}
+
+@DangerousDeletionPanel(deletedInfo: String)(explanation: String) = {
+	@defining(deletedInfo.capitalize){capitalized =>
+		<div class="panel panel-info">
+			<div class="panel-heading">
+				<h3 class="panel-title">
+					<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+					You can delete your @deletedInfo here:
+				</h3>
+			</div>
+			<div class="panel-body">
+				<div><p>@explanation</p></div>
+				<button type="button" class="btn btn-primary btn-lg" id="delete@{capitalized}Button">Delete @deletedInfo</button>
+
+				<div id="delete@{capitalized}Confirmation" hidden>
+					<br/>
+					<div class="panel panel-danger">
+						<div class="panel-heading">
+							<h3 class="panel-title">
+								<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+								ARE YOU SURE YOU WANT TO DELETE YOUR @{deletedInfo.toUpperCase}?
+							</h3>
+						</div>
+						<div class="panel-body">
+							<button type="button" class="btn btn-primary btn-lg" id="cancelDelete@{capitalized}Button">NO! GO BACK TO SAFETY!</button>
+							<button type="button" class="btn btn-danger btn-lg" id="reallyDelete@{capitalized}Button">YES</button>
+						</div>
+					</div>
+				</div>
+
+			</div>
+		</div>
+	}
 }
 

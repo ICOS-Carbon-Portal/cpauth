@@ -60,13 +60,13 @@ object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
 		get{
 			path("logout")(logout) ~
 			path("whoami"){
-				user(uinfo => complete(uinfo)) ~ complete(StatusCodes.Unauthorized)
+				user(userId => complete(userId)) ~ complete(StatusCodes.Unauthorized)
 			} ~
 			path("cpauthcookie"){
 				cpauthCookie
 			} ~
 			pathEndOrSingleSlash{
-				user(_ => redirect("/home/", StatusCodes.Found)) ~
+				token(_ => redirect("/home/", StatusCodes.Found)) ~
 				redirect("/login/", StatusCodes.Found)
 			}
 		}

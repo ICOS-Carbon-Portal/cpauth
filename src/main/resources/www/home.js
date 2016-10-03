@@ -17,18 +17,11 @@ var stringKeys = ['givenName', 'surname', 'orcid', 'affiliation', 'affiliation2'
 
 function displayUserInfo(uid){
 	switchToLoggedInState();
-	$("#email").html(uid.email);
+	$("#email").val(uid.email);
 
 	var keys = '{profile: 1}';
 
 	$.getJSON('/db/users/' + uid.email + '?keys=' + encodeURIComponent(keys))
-		.done(function(userInfo){
-			var profile = userInfo.profile;
-			stringKeys.forEach(function(key){
-				$('#' + key).val(profile[key]);
-			});
-			document.getElementById("icosLicenceOk").checked = profile.icosLicenceOk;
-		})
 		.then(null, function(xhr){
 			return xhr.status == 404
 				? $.ajax({ //create user profile in RESTHeart if it does not exist
@@ -36,15 +29,21 @@ function displayUserInfo(uid){
 					url: '/db/users/' + uid.email,
 					contentType: 'application/json',
 					data: '{profile: {}}'
-				})
+				}).then(function(){return {profile: {}};})
 				: $.Deferred().reject(xhr);
+		})
+		.done(function(userInfo){
+			var profile = userInfo.profile;
+			stringKeys.forEach(function(key){
+				$('#' + key).val(profile[key]);
+			});
+			document.getElementById("icosLicenceOk").checked = profile.icosLicenceOk;
 		})
 		.fail(reportError);
 }
 
 
-function updateUserProfile(){
-	var email = $("#email").html();
+function updateUserProfile(uid){
 
 	var payload = stringKeys.reduce(
 		function(seed, key){
@@ -56,7 +55,7 @@ function updateUserProfile(){
 
 	$.ajax({
 		method: "PATCH",
-		url: "/db/users/" + email,
+		url: "/db/users/" + uid.email,
 		contentType: 'application/json',
 		data: JSON.stringify({profile: payload})
 	}).done(function(){
@@ -66,7 +65,13 @@ function updateUserProfile(){
 
 
 function displayToken(token) {
+	if(token.source == 'Password'){
+		$("#forLocalsOnly").show();
+	}
+
 	$("#tokenValue").html(token.value);
+	$("#tokenValue").click(selectToken);
+
 	$("#tokenExpiry").html(new Date(token.expiry).toISOString());
 	$("#tokenSource").html(token.source);
 }
@@ -86,18 +91,6 @@ function selectToken() {
 		selection.removeAllRanges();
 		selection.addRange(range);
 	}
-}
-
-
-function showDeleteAccountConfirmation(){
-	$("#deleteAccountButton").hide();
-	$("#deleteAccountConfirmation").show();
-}
-
-
-function hideDeleteAccountConfirmation(){
-	$("#deleteAccountConfirmation").hide();
-	$("#deleteAccountButton").show();
 }
 
 
@@ -130,48 +123,68 @@ function changePassword(){
 		});
 }
 
-function deleteAccount(){
-	$.ajax({
-			method: 'DELETE',
-			url: '/db/users/' + $('#email').html()
-		})
+function deleteProfile(uid){
+	return $.ajax({
+		method: 'DELETE',
+		url: '/db/users/' + uid.email
+	});
+}
+
+function deleteAccount(uid){
+	deleteProfile(uid)
 		.then(function(){
 			return $.post("/password/deleteownaccount");
 		})
-		.fail(reportError)
-		.done(switchToLoggedOutState);
+		.then(switchToLoggedOutState, reportError);
 }
 
-$(function(){
-	$.getJSON('/whoami')
-		.done(displayUserInfo)
-		.fail(switchToLoggedOutState);
+function deleteProfileAndRefresh(uid){
+	deleteProfile(uid)
+		.then(displayUserInfo.bind(null, uid), reportError);
+}
 
-	$.getJSON('/password/amilocal')
-		.done(function(userIsLocal){
-			if(userIsLocal) $("#forLocalsOnly").show();
-		});
-
-	$.ajax({
-		type: "GET",
-		url: "../cpauthcookie",
-		dateType: "text"
-	}).done(function(result){
-		displayToken(result);
-		$("#tokenValue").click(selectToken);
+function setupDangerousEvents(deletedInfo, realDeletion){
+	$("#delete" + deletedInfo + "Button").click(function(){
+		$("#delete" + deletedInfo + "Button").hide();
+		$("#delete" + deletedInfo + "Confirmation").show();
 	});
 
+	function cancelDeletion(){
+		$("#delete" + deletedInfo + "Confirmation").hide();
+		$("#delete" + deletedInfo + "Button").show();
+	}
+
+	$("#cancelDelete" + deletedInfo + "Button").click(cancelDeletion);
+
+	$("#reallyDelete" + deletedInfo + "Button").click(function(){
+		realDeletion();
+		cancelDeletion();
+	});
+}
+
+function setupEvents(uid){
 	$("#signOutButton").click(signOut);
-	$("#updateProfileButton").click(updateUserProfile);
+	$("#updateProfileButton").click(updateUserProfile.bind(null, uid));
 	$("#changePasswordButton").click(changePassword);
-	$("#deleteAccountButton").click(showDeleteAccountConfirmation);
-	$("#cancelDeleteButton").click(hideDeleteAccountConfirmation);
-	$("#reallyDeleteButton").click(deleteAccount);
+
+	setupDangerousEvents('Account', deleteAccount.bind(null, uid));
+	setupDangerousEvents('Profile', deleteProfileAndRefresh.bind(null, uid));
 
 	$("#newPassword").keypress(enterKeyHandler(changePassword));
 	$("#oldPassword").keypress(enterKeyHandler(function(){
 		$("#newPassword").focus();
 	}));
+}
 
+$(function(){
+	$.getJSON('/whoami')
+		.done(function(uid){
+			displayUserInfo(uid);
+			setupEvents(uid);
+		})
+		.fail(switchToLoggedOutState);
+
+	$.getJSON("/cpauthcookie")
+		.done(displayToken);
 });
 

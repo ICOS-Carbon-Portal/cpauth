@@ -23,8 +23,8 @@ trait RestHeartRouting extends RestHeartDirectives{
 			}
 		} ~
 		path(config.dbName / config.usersCollection / Segment){ email =>
-			user{uid =>
-				(validateUser(email, uid) | ifUserIsAdmin(uid)){
+			token{token =>
+				(validateUser(email, token.userId) | ifUserIsAdmin(token)){
 					restheartProxy
 				} ~
 				forbid("Access to other users' documents is forbidden")

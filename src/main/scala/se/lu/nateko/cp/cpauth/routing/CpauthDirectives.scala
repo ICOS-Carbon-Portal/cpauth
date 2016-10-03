@@ -27,6 +27,8 @@ import se.lu.nateko.cp.cpauth.core.Authenticator
 import se.lu.nateko.cp.cpauth.core.CookieToToken
 import se.lu.nateko.cp.cpauth.core.PublicAuthConfig
 import se.lu.nateko.cp.cpauth.core.UserId
+import se.lu.nateko.cp.cpauth.core.AuthToken
+import se.lu.nateko.cp.cpauth.core.AuthSource
 
 trait CpauthDirectives {
 
@@ -49,18 +51,18 @@ trait CpauthDirectives {
 
 	def forbid(message: String): StandardRoute = complete((StatusCodes.Forbidden, message))
 
-	val user: Directive1[UserId] = Directive{inner =>
+	val token: Directive1[AuthToken] = Directive{inner =>
 		cookie(publicAuthConfig.authCookieName)(cookie => {
-			val userTry = for(
+			val tokenTry = for(
 				auth <- authenticator;
-				token <- CookieToToken.recoverToken(cookie.value);
-				uid <- auth.unwrapUserId(token)
-			) yield uid
+				signedToken <- CookieToToken.recoverToken(cookie.value);
+				token <- auth.unwrapToken(signedToken)
+			) yield token
 
-			val userFuture = Utils.slowFailureDown(Future.fromTry(userTry), 500 millis)
+			val tokenFuture = Utils.slowFailureDown(Future.fromTry(tokenTry), 500 millis)
 
-			onComplete(userFuture){
-				case Success(uid) => inner(Tuple1(uid))
+			onComplete(tokenFuture){
+				case Success(token) => inner(Tuple1(token))
 				case Failure(err) => reject(
 					new AuthenticationFailedRejection(
 						AuthenticationFailedRejection.CredentialsRejected,
@@ -70,6 +72,8 @@ trait CpauthDirectives {
 			}
 		})
 	}
+
+	val user: Directive1[UserId] = token.map(_.userId)
 
 	def cpauthCookie: Route = cookie(publicAuthConfig.authCookieName)(cookie => {
 		import spray.json._
@@ -86,11 +90,11 @@ trait CpauthDirectives {
 		complete(StatusCodes.OK)
 	}
 
-	val admin: Directive0 = user.tflatMap(uit => ifUserIsAdmin(uit._1)) |
+	val admin: Directive0 = token.tflatMap(uit => ifUserIsAdmin(uit._1)) |
 		complete((StatusCodes.Forbidden, "Need to be logged in as CPauth admin"))
 
-	def ifUserIsAdmin(uid: UserId): Directive0 = Directive{ inner =>
-		onComplete(userDb.userIsAdmin(uid)){
+	def ifUserIsAdmin(token: AuthToken): Directive0 = Directive{ inner =>
+		onComplete(userDb.userIsAdmin(token.userId).map(_ && token.source == AuthSource.Password)){
 			case Failure(err) => failWith(err)
 			case Success(false) => reject(AuthorizationFailedRejection)
 			case Success(true) => inner(())
