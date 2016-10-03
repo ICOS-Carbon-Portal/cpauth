@@ -32,7 +32,7 @@ lazy val cpauthCore = (project in file("core"))
 	.settings(publishingSettings: _*)
 	.settings(
 		name := "cpauth-core",
-		version := "0.4-SNAPSHOT",
+		version := "0.5-SNAPSHOT",
 		libraryDependencies ++= Seq(
 		)
 	)
