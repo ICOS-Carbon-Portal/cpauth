@@ -19,20 +19,21 @@ case class SignedToken(token: AuthToken, signature: Signature)
 
 class Authenticator(key: RSAPublicKey){
 
-	def unwrapUserId(token: SignedToken, trustedSources: AuthSource.ValueSet = AuthSource.values): Try[UserId] =
-		if(Instant.now.toEpochMilli >= token.token.expiresOn)
-			Exceptions.failure("Authentication token has expired")
-		else if(!trustedSources.contains(token.token.source))
+	def unwrapTrustedToken(token: SignedToken, trustedSources: AuthSource.ValueSet): Try[AuthToken] =
+		if(!trustedSources.contains(token.token.source))
 			Exceptions.failure(s"Authentication tokens originating from ${token.token.source} are not trusted by this application")
-		else unwrapToken(token).map(_.userId)
+		else unwrapToken(token)
 
 	def unwrapToken(token: SignedToken): Try[AuthToken] = {
 		val message = token.token.toString
 
-		Crypto.verifySignature(message, key, token.signature).flatMap(valid => {
-			if(valid) Success(token.token)
-			else Exceptions.failure("Authentication token's signature is invalid")
-		})
+		Crypto.verifySignature(message, key, token.signature).flatMap(valid =>
+			if(!valid)
+				Exceptions.failure("Authentication token's signature is invalid")
+			else if(Instant.now.toEpochMilli >= token.token.expiresOn)
+				Exceptions.failure("Authentication token has expired")
+			else Success(token.token)
+		)
 	}
 
 }

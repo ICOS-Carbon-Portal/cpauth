@@ -17,10 +17,10 @@ class AuthenticationTest extends FunSuite{
 			privateKeyPath = "/private1.der"
 		)).get.makeToken(user, AuthSource.Password)
 		
-		val unwrappedUser = Authenticator(pubAuthConfig).get.unwrapUserId(token)
+		val unwrappedToken = Authenticator(pubAuthConfig).get.unwrapToken(token)
 
-		assert(unwrappedUser.isSuccess)
-		assert(unwrappedUser.get === user)
+		assert(unwrappedToken.isSuccess)
+		assert(unwrappedToken.get.userId === user)
 	}
 
 	test("Expired token is rejected"){
@@ -29,11 +29,11 @@ class AuthenticationTest extends FunSuite{
 			privateKeyPath = "/private1.der"
 		)).get.makeToken(user, AuthSource.Password)
 		
-		val unwrappedUser = Authenticator(pubAuthConfig).get.unwrapUserId(token)
+		val unwrappedToken = Authenticator(pubAuthConfig).get.unwrapToken(token)
 
-		assert(unwrappedUser.isFailure)
+		assert(unwrappedToken.isFailure)
 
-		val errMessage: String = unwrappedUser.failed.get.getMessage
+		val errMessage: String = unwrappedToken.failed.get.getMessage
 		assert(errMessage.contains("expired"))
 	}
 
@@ -43,11 +43,11 @@ class AuthenticationTest extends FunSuite{
 			privateKeyPath = "/private1.der"
 		)).get.makeToken(user, AuthSource.Saml)
 
-		val unwrappedUser = Authenticator(pubAuthConfig).get.unwrapUserId(token, AuthSource.ValueSet(AuthSource.Password))
+		val unwrappedToken = Authenticator(pubAuthConfig).get.unwrapTrustedToken(token, AuthSource.ValueSet(AuthSource.Password))
 
-		assert(unwrappedUser.isFailure)
+		assert(unwrappedToken.isFailure)
 
-		val errMessage: String = unwrappedUser.failed.get.getMessage
+		val errMessage: String = unwrappedToken.failed.get.getMessage
 		assert(errMessage.contains("not trusted"))
 	}
 
@@ -60,10 +60,10 @@ class AuthenticationTest extends FunSuite{
 
 		val auth = Authenticator(pubAuthConfig).get
 
-		val unwrappedUser = auth.unwrapUserId(tokenMaker.makeToken(user, AuthSource.Password))
+		val unwrappedToken = auth.unwrapToken(tokenMaker.makeToken(user, AuthSource.Password))
 
-		assert(unwrappedUser.isFailure)
-		val errMessage: String = unwrappedUser.failed.get.getMessage
+		assert(unwrappedToken.isFailure)
+		val errMessage: String = unwrappedToken.failed.get.getMessage
 		assert(errMessage.contains("not correct"))
 	}
 }
