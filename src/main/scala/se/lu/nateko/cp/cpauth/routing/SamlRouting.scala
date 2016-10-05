@@ -15,10 +15,10 @@ import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
 import akka.http.scaladsl.model.headers.HttpCookie
 import akka.http.scaladsl.model.Uri
-import se.lu.nateko.cp.cpauth.CookieFactory
-import se.lu.nateko.cp.cpauth.Saml
+import se.lu.nateko.cp.cpauth.services.CookieFactory
+import se.lu.nateko.cp.cpauth.utils.Saml
 import se.lu.nateko.cp.cpauth.SamlConfig
-import se.lu.nateko.cp.cpauth.TargetUrlLookup
+import se.lu.nateko.cp.cpauth.utils.TargetUrlLookup
 
 trait SamlRouting extends CpauthDirectives{
 

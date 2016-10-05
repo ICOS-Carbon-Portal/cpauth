@@ -14,6 +14,7 @@ import akka.stream.ActorMaterializer
 import se.lu.nateko.cp.cpauth.routing.CpauthDirectives
 import akka.http.scaladsl.server.MissingCookieRejection
 import akka.http.scaladsl.model.headers.HttpCookie
+import se.lu.nateko.cp.cpauth.services.CookieFactory
 
 class CpauthDirectivesTest extends FunSpec with ScalatestRouteTest {
 	
@@ -39,7 +40,8 @@ class CpauthDirectivesTest extends FunSpec with ScalatestRouteTest {
 			baseUri = "http://127.0.0.1:8088",
 			dbName = "db",
 			usersCollection = "users"
-		)
+		),
+		mailing = null
 	)
 
 	val config = getConfig("/private1.der")
@@ -97,8 +99,11 @@ class CpauthDirectivesTest extends FunSpec with ScalatestRouteTest {
 			}
 		}
 
-		def makeCookie(uid: String, config: CpauthConfig): HttpCookie =
-			new CookieFactory(config).makeAuthenticationCookie(UserId(uid), AuthSource.Password).get
+		def makeCookie(uid: String, config: CpauthConfig): HttpCookie = {
+			val factory = new CookieFactory(config)
+			val token = factory.makeTokenBase64(UserId(uid), AuthSource.Password).get
+			factory.makeAuthCookie(token)
+		}
 
 		describe("when a properly signed CPauth cookie is present"){
 			val cookie = makeCookie("test1", config)

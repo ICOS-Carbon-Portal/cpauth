@@ -2,7 +2,7 @@ package se.lu.nateko.cp.cpauth.test
 
 import org.scalatest.FunSuite
 import se.lu.nateko.cp.cpauth.core._
-import se.lu.nateko.cp.cpauth.SignedTokenMaker
+import se.lu.nateko.cp.cpauth.utils.SignedTokenMaker
 import se.lu.nateko.cp.cpauth.PrivateAuthConfig
 
 class AuthenticationTest extends FunSuite{

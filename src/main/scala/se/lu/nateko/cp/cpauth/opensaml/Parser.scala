@@ -7,7 +7,7 @@ import org.w3c.dom.Document
 import java.io.StringReader
 import java.io.InputStream
 import org.opensaml.xml.XMLObject
-import se.lu.nateko.cp.cpauth.Utils
+import se.lu.nateko.cp.cpauth.utils.Utils
 
 object Parser {
 	

@@ -1,11 +1,9 @@
-package se.lu.nateko.cp.cpauth
+package se.lu.nateko.cp.cpauth.services
 
 import scala.util.Failure
 import scala.util.Success
 import scala.util.Try
-
 import org.opensaml.saml2.core.Response
-
 import akka.http.scaladsl.model.headers.HttpCookie
 import se.lu.nateko.cp.cpauth.core.CookieToToken
 import se.lu.nateko.cp.cpauth.core.Exceptions
@@ -19,6 +17,8 @@ import se.lu.nateko.cp.cpauth.opensaml.ResponseStatusController
 import se.lu.nateko.cp.cpauth.opensaml.StatementExtractor
 import se.lu.nateko.cp.cpauth.opensaml.ValidatedAssertion
 import se.lu.nateko.cp.cpauth.core.AuthSource
+import se.lu.nateko.cp.cpauth.CpauthConfig
+import se.lu.nateko.cp.cpauth.utils.SignedTokenMaker
 
 class CookieFactory(config: CpauthConfig) {
 	
@@ -34,6 +34,7 @@ class CookieFactory(config: CpauthConfig) {
 		maxAge = Some(31536000) //1 year in seconds
 	)
 
+
 	def makeAuthenticationCookie(
 		response: Response,
 		extractor: AssertionExtractor,
@@ -45,15 +46,20 @@ class CookieFactory(config: CpauthConfig) {
 		statements = StatementExtractor.extractAttributeStringValues(assertions);
 		userIdTry = getUserId(statements);
 		userId <- provideDebug(userIdTry, assertions);
-		cookie <- makeAuthenticationCookie(userId, AuthSource.Saml)
+		tokenBase64 <- makeTokenBase64(userId, AuthSource.Saml);
+		cookie = makeAuthCookie(tokenBase64)
 	) yield (cookie, userId, statements)
 
-	def makeAuthenticationCookie(userId: UserId, source: AuthSource.Value): Try[HttpCookie] = for(
+
+	def makeTokenBase64(userId: UserId, source: AuthSource.Value): Try[String] = for(
 		tokenMaker <- tokenMakerTry;
 		token = tokenMaker.makeToken(userId, source)
-	)yield HttpCookie(
+	) yield CookieToToken.constructCookieContent(token)
+
+
+	def makeAuthCookie(tokenBase64: String) = HttpCookie(
 		name = config.auth.pub.authCookieName,
-		value = CookieToToken.constructCookieContent(token),
+		value = tokenBase64,
 		domain = Some(config.http.authDomain),
 		path = Some("/"),
 		secure = true,
@@ -67,6 +73,7 @@ class CookieFactory(config: CpauthConfig) {
 			mail <- statements.getSingleValue(attrs.mail)
 		) yield UserId(email = mail)
 	}
+
 
 	private def provideDebug(uinfoTry: Try[UserId], assertions: => Iterable[ValidatedAssertion]): Try[UserId] = uinfoTry match {
 		case ok: Success[UserId] => ok

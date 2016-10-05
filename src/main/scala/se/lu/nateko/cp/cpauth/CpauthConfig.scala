@@ -30,10 +30,16 @@ case class SamlConfig(
 
 case class PrivateAuthConfig(authTokenValiditySeconds: Int, privateKeyPath: String)
 case class AuthConfig(priv: PrivateAuthConfig, pub: PublicAuthConfig)
-
 case class RestHeartConfig(baseUri: String, dbName: String, usersCollection: String)
+case class EmailConfig(smtpServer: String, fromAddress: String, logBccAddress: Option[String])
 
-case class CpauthConfig(http: HttpConfig, saml: SamlConfig, auth: AuthConfig, restheart: RestHeartConfig)
+case class CpauthConfig(
+	http: HttpConfig,
+	saml: SamlConfig,
+	auth: AuthConfig,
+	restheart: RestHeartConfig,
+	mailing: EmailConfig
+)
 
 
 object HttpConfig{
@@ -69,8 +75,9 @@ object ConfigReader extends DefaultJsonProtocol{
 		implicit val privAuthConfigFormat = jsonFormat2(PrivateAuthConfig)
 		implicit val authConfigFormat = jsonFormat2(AuthConfig)
 		implicit val restHeartConfigFormat = jsonFormat3(RestHeartConfig)
+		implicit val emailConfigFormat = jsonFormat3(EmailConfig)
 
-		implicit val cpauthConfigFormat = jsonFormat4(CpauthConfig)
+		implicit val cpauthConfigFormat = jsonFormat5(CpauthConfig)
 
 		val renderOpts = ConfigRenderOptions.concise.setJson(true)
 		val cpConfJson: String = applicationConfig.getValue("cpauth").render(renderOpts)

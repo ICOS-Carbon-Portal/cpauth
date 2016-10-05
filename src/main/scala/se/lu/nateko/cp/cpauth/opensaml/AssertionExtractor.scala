@@ -13,7 +13,7 @@ import org.opensaml.xml.schema.XSString
 import org.opensaml.xml.security.keyinfo.StaticKeyInfoCredentialResolver
 import org.opensaml.xml.security.x509.BasicX509Credential
 
-import se.lu.nateko.cp.cpauth.Utils.SafeJavaCollectionWrapper
+import se.lu.nateko.cp.cpauth.utils.Utils.SafeJavaCollectionWrapper
 import se.lu.nateko.cp.cpauth.SamlConfig
 import se.lu.nateko.cp.cpauth.core.CoreUtils
 import se.lu.nateko.cp.cpauth.core.Crypto

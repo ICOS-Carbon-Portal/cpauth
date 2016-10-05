@@ -5,7 +5,7 @@ import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.model.StatusCodes
 import play.twirl.api.Html
 import akka.http.scaladsl.model.Uri.apply
-import se.lu.nateko.cp.cpauth.TemplatePageMarshalling
+import se.lu.nateko.cp.cpauth.utils.TemplatePageMarshalling
 
 trait StaticRouting {
 

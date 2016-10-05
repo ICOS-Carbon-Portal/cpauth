@@ -20,7 +20,7 @@ import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.server.StandardRoute
 import akka.stream.ActorMaterializer
 import se.lu.nateko.cp.cpauth.HttpConfig
-import se.lu.nateko.cp.cpauth.Utils
+import se.lu.nateko.cp.cpauth.utils.Utils
 import se.lu.nateko.cp.cpauth.accounts.RestHeartClient
 import se.lu.nateko.cp.cpauth.accounts.UsersIo
 import se.lu.nateko.cp.cpauth.core.Authenticator

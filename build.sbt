@@ -80,7 +80,8 @@ lazy val cpauth = (project in file("."))
 			"org.joda"               %  "joda-convert"                       % "1.7",
 			"com.typesafe.slick"     %% "slick"                              % "3.1.1",
 			"com.typesafe.slick"     %% "slick-hikaricp"                     % "3.1.1",
-			"org.hsqldb"             %  "hsqldb"                             % "2.3.4"
+			"org.hsqldb"             %  "hsqldb"                             % "2.3.4",
+			"org.apache.commons"     % "commons-email"                       % "1.4"
 		),
 
 		fork := true,
@@ -88,7 +89,7 @@ lazy val cpauth = (project in file("."))
 		initialCommands in console := """
 			import se.lu.nateko.cp.cpauth._
 			import se.lu.nateko.cp.cpauth.accounts.Users
-			import se.lu.nateko.cp.cpauth.core.UserInfo""",
+			import se.lu.nateko.cp.cpauth.core.UserId""",
 
 		mainClass in assembly := cpauthMain,
 		mainClass in (Compile, run) := cpauthMain

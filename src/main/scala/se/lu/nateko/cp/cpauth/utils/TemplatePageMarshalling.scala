@@ -1,11 +1,9 @@
-package se.lu.nateko.cp.cpauth
+package se.lu.nateko.cp.cpauth.utils
 
 import akka.http.scaladsl.marshalling.Marshaller
 import akka.http.scaladsl.marshalling.Marshalling._
 import akka.http.scaladsl.marshalling.ToResponseMarshaller
 import akka.http.scaladsl.model._
-
-import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 import play.twirl.api.Html
 

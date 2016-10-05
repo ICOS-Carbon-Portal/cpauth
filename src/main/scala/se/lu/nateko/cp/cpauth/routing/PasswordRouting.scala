@@ -11,14 +11,17 @@ import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
 import akka.http.scaladsl.server.Directives._
-import se.lu.nateko.cp.cpauth.CookieFactory
-import se.lu.nateko.cp.cpauth.Utils
+import se.lu.nateko.cp.cpauth.services.CookieFactory
+import se.lu.nateko.cp.cpauth.utils.Utils
 import spray.json.JsBoolean
 import se.lu.nateko.cp.cpauth.core.AuthSource
+import se.lu.nateko.cp.cpauth.services.EmailSender
+import se.lu.nateko.cp.cpauth.services.PasswordLifecycleHandler
 
 trait PasswordRouting extends CpauthDirectives {
 
 	def cookieFactory: CookieFactory
+	def passwordHandler: PasswordLifecycleHandler
 
 	private def authUser(uid: UserId, password: String): Future[UserEntry] =
 		Utils.slowFailureDown(userDb.authenticateUser(uid, password), 500 millis)
@@ -27,6 +30,11 @@ trait PasswordRouting extends CpauthDirectives {
 		get{
 			path("accountslist"){
 				admin(onSuccess(userDb.listUsers) {users => complete(users)})
+			} ~
+			path("initpassreset" / Remaining){token =>
+				setCookie(cookieFactory.makeAuthCookie(token)){
+					redirect("/passwordreset/", StatusCodes.Found)
+				}
 			}
 		} ~
 		post{
@@ -35,8 +43,10 @@ trait PasswordRouting extends CpauthDirectives {
 
 					onSuccess(authUser(UserId(mail), password)){ uEntry =>
 
-						cookieFactory.makeAuthenticationCookie(uEntry.id, AuthSource.Password) match{
-							case Success(cookie) => setCookie(cookie)(complete(StatusCodes.OK))
+						cookieFactory.makeTokenBase64(uEntry.id, AuthSource.Password) match{
+							case Success(token) =>
+								val cookie = cookieFactory.makeAuthCookie(token)
+								setCookie(cookie)(complete(StatusCodes.OK))
 							case Failure(err) => failWith(err)
 						}
 					}
@@ -57,6 +67,11 @@ trait PasswordRouting extends CpauthDirectives {
 				user(uid =>
 					onSuccess(userDb.dropUser(uid))(logout)
 				)
+			} ~
+			path("initpassreset" / Segment){email =>
+				onSuccess(passwordHandler.sendResetEmail(UserId(email))){
+					complete(StatusCodes.OK)
+				}
 			} ~
 			admin{
 				path("createaccount"){

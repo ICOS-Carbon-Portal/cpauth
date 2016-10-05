@@ -19,6 +19,9 @@ import akka.http.scaladsl.Http
 import akka.stream.ActorMaterializer
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
 import se.lu.nateko.cp.cpauth.accounts.RestHeartClient
+import se.lu.nateko.cp.cpauth.utils.TargetUrlLookup
+import se.lu.nateko.cp.cpauth.utils.MapBasedUrlLookup
+import se.lu.nateko.cp.cpauth.services._
 
 
 object Main extends App with SamlRouting with PasswordRouting with DrupalRouting with StaticRouting with RestHeartRouting{
@@ -37,6 +40,10 @@ object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
 	val assExtractorTry = AssertionExtractor(samlConfig)
 	val idpLib: IdpLibrary = IdpLibrary.fromConfig(samlConfig)
 	val cookieFactory = new CookieFactory(config)
+	val passwordHandler = {
+		val emailSender = new EmailSender(config.mailing)
+		new PasswordLifecycleHandler(emailSender, cookieFactory, config.http)
+	}
 	val targetLookup: TargetUrlLookup = new MapBasedUrlLookup
 	val authenticator = Authenticator(publicAuthConfig)
 
