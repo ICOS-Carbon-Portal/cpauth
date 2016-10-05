@@ -7,6 +7,11 @@
 	<meta charset="utf-8"/>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 
+	<script	src="https://code.jquery.com/jquery-3.1.0.min.js"
+		integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s="
+		crossorigin="anonymous">
+	</script>
+		
 	@customHeader
 
 	<title>@title</title>
@@ -16,9 +21,9 @@
 		/** Body **/
 		body {
 			background-color: #fff !important;
-			font-size: 0.9rem;
-			line-height: 1.35rem;
-			color: #414042;
+			font-size: 14px;
+			line-height: 1.42857143;
+			color: #333;
 			font-family: "Open Sans",sans-serif !important;
 		}
 
@@ -48,32 +53,13 @@
 			background-color: rgba(240, 99, 34, 0.3);
 		}
 
-		#header .layout-container {
-			margin: 0px auto;
-		}
+		/** Menu **/
 
-		#header .region-header {
-			padding: 0px;
-		}
-
-		#header .region-header img {
-			padding-left: 115px;
-			padding-top: 17px;
-			padding-bottom: 17px;
-		}
-
-		#header .site-branding__logo {
-			margin-bottom: 0px;
-		}
-
-		#header .site-branding__text {
+		.hasImage {}
+		.hidden_menu {
 			display: none;
 		}
-
-		/** Menu **/
-		#cp_theme_d8_menu {
-			background-color: #414042;
-		}
+		
 
 		#cp_theme_d8_menu li {
 			list-style: none;
@@ -81,8 +67,30 @@
 			list-style-image: none;
 			list-style-type: none;
 		}
-
+		@@media all and (min-height: 500px) {
+			#filler {
+				background-color: #414042;
+				height: 150px;
+			}
+		}		
+		@@media all and (min-height: 800px) {
+			#filler {
+				background-color: #414042;
+				height: 340px;
+			}
+		}
 		@@media all and (min-width: 800px) {
+			#cp_theme_d8_menu {
+				background-color: #414042;
+				height: 37px;	
+			}
+			#header img {
+				height: 125x;
+				padding-left: 428px;
+				padding-top: 22px;
+				padding-bottom: 18px;
+			}			
+
 			#cp_theme_d8_menu ul {
 				padding: 0em 0em 0em 0em;
 				margin: 0;
@@ -91,6 +99,7 @@
 				list-style-type: none;
 				margin: 0em auto 0em auto;
 				max-width: 1290px;
+				
 			}
 
 			#cp_theme_d8_menu ul li {
@@ -110,6 +119,9 @@
 				text-decoration: none;
 				white-space: nowrap;
 				color: #ffffff;
+				height: 37px;
+				font-size: 14px;
+				line-height: 1.42857143;
 			}
 
 			#cp_theme_d8_menu ul li a:hover,
@@ -173,9 +185,28 @@
 			#cp_theme_d8_menu .is_topnode .open_menu {
 				display: none;
 			}
+
+			.layout-container {
+				max-width: 1290px;
+				margin: auto;;
+				padding: 0 15px;
+				word-wrap: break-word;
+				box-sizing: border-box;
+			}
 		}
 
 		@@media all and (max-width: 799px) {
+			#cp_theme_d8_menu {
+				background-color: #414042;	
+			}
+
+			#header img {
+				height: 125px;
+				padding-left: 122px;
+				padding-top: 22px;
+				padding-bottom: 18px;
+			}
+
 			#cp_theme_d8_menu ul {
 				padding: 0;
 				margin: 0;
@@ -190,7 +221,7 @@
 				display: none;
 			}
 
-			#cp_theme_d8_menu li.open ul {
+			#cp_theme_d8_menu li.open ul {	
 				display: block;
 			}
 
@@ -200,6 +231,8 @@
 				text-decoration: none;
 				white-space: nowrap;
 				color: #ffffff;
+				font-size: 14px;
+				line-height: 1.42857143;
 			}
 
 			#cp_theme_d8_menu li.is_topnode ul,
@@ -221,6 +254,22 @@
 				padding-right: 50px;
 				position: relative;
 				top: 0.8em;
+				max-width: 100%;
+				font-size: 14px;
+				line-height: 1.42857143;
+				color: #333;
+			}
+			#cp_theme_d8_menu a {
+				border-color: white;
+				border-bottom: dotted;
+				border-width: 1px;
+			}
+
+			
+			#cp_theme_d8_menu a:hover {
+				border-bottom: solid;
+				border-width: 1px;
+				border-color: white;
 			}
 		}
 
@@ -246,23 +295,177 @@
 			padding: 0em 0.4em 0em 0em;
 			color: #414042;
 		}
+		.container-fluid{
+			padding-right: 15px;
+			padding-left: 15px;
+			margin-right: auto;
+			margin-left: auto;
+		}
+		.content{
+			margin-top: 0;
+			color: rgba(255,255,255,0.65);
+			font-size: 0.857em;
+		}
+		.hidden_footer {
+			display: none;
+		}
+		.site-footer {
+			padding: 0;
+			background: #414042;
+			font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+		}
+		.site-footer__top {
+			display: flex;
+			flex-direction: row;
+			flex-wrap: wrap;
+			align-items: center;
+
+			display: -webkit-flex;
+			-webkit-flex-direction: row;
+			-webkit-flex-wrap: wrap;
+			-webkit-align-items: center;
+		}
+		.region-footer-first {
+			order:	1;
+		}
+		
+		.region-footer-second {
+			order:	2;
+		}
+
+		.region-footer-third {
+			order:	3;
+		}
+
+		.site-footer__top .region,
+		.region-footer-first, 
+		.region-footer-second,
+		.region-footer-third {
+			width: 33%;
+			padding: 0 0.65%;
+		}
+
+		.region-footer-first,
+		.region-footer-second,
+		.region-footer-third {
+			min-width: 235px;
+		}
+
+		.region-footer-first h3,
+		.region-footer-second h3,
+		.region-footer-third h3 {
+			font-size: 2.2rem;
+			color: #f2f2f2;
+		}
+
+		.region-footer-first p,
+		.region-footer-second p,
+		.region-footer-third p {
+			font-size: 1.5rem;
+			color: #f2f2f2;
+		}
+
+		.site-footer .content a,
+		.site-footer .content a.is-active {
+			color: #0A96F0;
+			text-decoration: none;
+			border: 0;
+		}
+
+		.site-footer .block {
+			border: 0;
+			padding: 0;
+			margin: 20px 0;
+			word-wrap: break-word;
+		}
+		
+		.region-footer-second a.footer-button {
+			background-color: #0A96F0;
+			font-size: 1.4rem;
+			color: #FFF;
+			text-decoration: none;
+			text-transform: uppercase;
+			display: inline-block;
+			border: medium none;
+			cursor: pointer;
+			padding: 1.6rem 6rem;
+			margin: 1rem 1rem 1rem 0px;
+			border-radius: 0.2rem;
+			background-clip: padding-box;
+		}
+
+		.region-footer-first a.footer-link {
+			color: #ffffff;
+			font-size: 1.5rem;
+			cursor: pointer;
+		}
+
+		.region-footer-second a.footer-link,
+		.region-footer-third a.footer-link {
+			color: #ffffff;
+			font-size: 1.4rem;
+			display: inline-block;
+			cursor: pointer;
+			padding: 0.5rem 0px;
+			margin-left: 1rem;
+			position: relative;
+			text-transform: uppercase;
+		}
+
+		.region-footer-first a.footer-link:hover,
+		.region-footer-second a.footer-link:hover,
+		.region-footer-third a.footer-link:hover {
+			color: #0A96F0;
+		}
+
+		.region-footer-second a.footer-link::after,
+		.region-footer-third a.footer-link::after {
+			border-style: solid;
+			border-color: transparent transparent transparent #ffffff;
+			-moz-border-top-colors: none;
+			-moz-border-right-colors: none;
+			-moz-border-bottom-colors: none;
+			-moz-border-left-colors: none;
+			border-image: none;
+			content: " ";
+			height: 0px;
+			width: 0px;
+			position: absolute;
+			pointer-events: none;
+			border-width: 0.7rem;
+			right: 100%;
+			top: 50%;
+			margin-top: -0.5rem;	
+		}
+		.inline-box {
+			display: inline-block;
+			height: 300px;
+		}
+		.padded-box{
+			padding: 0px, 100px, 0px, 100px;
+		}
+		.padded-top{
+			padding-top: 55px; 
+		}
+		
 	</style>
 
 </head>
 
 <body>
-	<header id="header" class="header">
-		<div class="tint">
+	<header id="header">
+		<div class="tint" >
 			<a href="https://www.icos-cp.eu/" title="Home">
 				<img src="https://www.icos-cp.eu/themes/cp_theme_d8/logo.svg" alt="Home">
 			</a>
 		</div>
 	</header>
 
-	<div id="cp_theme_d8_menu">
+	<div id="cp_theme_d8_menu"> <!-- Add class "hidden_menu" to remove both menu options and menu bar-->
+		<!--<div id="menu-hider" class="hidden_menu">  <!--Inculde this div to remove the menu options in the menu border, border will still show  -->
 		<ul>
 			<li><a href="/node/1">Home</a></li>
-			<li class="is_topnode"><a href="/node/2">Services</a>
+			<li id="rf" class="is_topnode"><a href="/node/2">Services</a>
 				<ul>
 					<li><a href="/node/45">Search, find, download</a></li>
 					<li><a href="/node/43">Station Labelling</a></li>
@@ -308,14 +511,101 @@
 				</ul>
 			</li>
 		</ul>
+		<!-- </div> This is for menu-hider div -->
 	</div>
-
 
 	<div class="container-fluid">
-
 		@body
-
 	</div>
+
+	<footer class="site-footer"> <!-- Add class hidden_footer to hide footer-->
+      		<div class="layout-container">
+                	<div class="site-footer__top">
+              			<div class="region region-footer-first">
+    					<div class="block">
+      						<div class="content">
+            						<div class="padded-box"><h3>ICOS Carbon Portal</h3>
+
+								<p>Lund University<br />
+								Geocentrum II<br />
+								Sölvegatan 12<br />
+								22362 Lund<br />
+								Sweden<br /><a class="footer-link" href="mailto:info@@icos-cp.eu">info@@icos-cp.eu</a></p>
+							</div>
+    						</div>
+  					</div>
+  				</div>
+              			<div class="region region-footer-second">
+    					<div class="block">
+      						<div class="content">
+            						<div class="padded-box">
+								<h3>ICOS RI</h3>
+								<p><a class="footer-button" href="https://www.icos-ri.eu">Visit ICOS RI</a></p>
+								<p>
+									<a class="footer-link" href="https://www.icos-ri.eu/data-license">ICOS Data License</a>
+									<a class="footer-link" href="https://www.icos-ri.eu/privacy-ethics">ICOS privacy policy and ethics statement</a>
+								</p>
+							</div>
+    						</div>
+  					</div>
+  				</div>
+              			<div class="region region-footer-third">
+    					<div class="block">
+      						<div class="content">
+            						<div class="padded-box">
+								<p>
+									<a class="footer-link" href="https://icos-atc.lsce.ipsl.fr/">Atmosphere Thematic Centre</a>
+									<a class="footer-link" href="http://www.icos-etc.eu/">Ecosystem Thematic Centre</a> 
+									<a class="footer-link" href="http://www.icos-otc.eu">Ocean Thematic Centre</a> 
+									<a class="footer-link" href="https://www.icos-cal.eu/">Central Analytical Laboratories</a>
+								</p>
+								<p>
+									<a href="http://creativecommons.org/licenses/by/4.0/" target="_blank"><img alt="creativecommons" data-entity-type="file" data-entity-uuid="723d407a-6fcd-41ff-a53a-580d70535dfb" src="https://www.icos-cp.eu/sites/default/files/inline-images/creativecommons.png" /></a> 
+									Except where otherwise noted, content on this site is licensed under a <a href="http://creativecommons.org/licenses/by/4.0/" target="_blank">Creative Commons Attribution 4.0 International License</a>.								</p>
+							</div>
+    						</div>
+  					</div>
+  				</div>
+          		</div>
+			<div id="filler"></div>
+              	</div>
+    	</footer>
+<script>
+	$(function() {
+    		if ($(window).width() < 800) {
+    			fixSmallsizeMenu();
+			if($('#menu-hider').hasClass('hidden_menu')){
+					$('#cp_theme_d8_menu').height('37px');
+				}		
+    		}
+    		
+    		$(window).resize(function () {
+    			if ($(window).width() < 800 && !$('#rf').hasClass('hasImage')) {
+        			fixSmallsizeMenu();	
+        			
+        		}
+			if ($(window).width() < 800 && $('#cp_theme_d8_menu').height() == 0) {			
+				if($('#menu-hider').hasClass('hidden_menu')){
+					$('#cp_theme_d8_menu').height('37px');
+				}
+			}
+    		});
+	});
+
+	function fixSmallsizeMenu() {
+		
+		$('#cp_theme_d8_menu .is_topnode').each(
+			function(index, value) {
+				$(value).prepend('<img src="https://www.icos-cp.eu/themes/cp_theme_d8/images/arrow-up-down.svg" class="open_menu" title="Open/Close" />');
+				$(value).addClass('hasImage');
+			});
+	
+		$('#cp_theme_d8_menu .is_topnode .open_menu').click(	    				
+			function(event) {
+				$(this).parent().toggleClass('open');
+			});
+	}
+</script>
 </body>
 </html>
 
