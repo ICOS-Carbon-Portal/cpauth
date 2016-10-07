@@ -40,14 +40,14 @@ object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
 	val assExtractorTry = AssertionExtractor(samlConfig)
 	val idpLib: IdpLibrary = IdpLibrary.fromConfig(samlConfig)
 	val cookieFactory = new CookieFactory(config)
+	val userDb = Users
 	val passwordHandler = {
 		val emailSender = new EmailSender(config.mailing)
-		new PasswordLifecycleHandler(emailSender, cookieFactory, config.http)
+		new PasswordLifecycleHandler(emailSender, cookieFactory, userDb, config.http)
 	}
 	val targetLookup: TargetUrlLookup = new MapBasedUrlLookup
 	val authenticator = Authenticator(publicAuthConfig)
 
-	val userDb = Users
 	system.registerOnTermination(Users.closeDb())
 
 	val cpauthExceptionHandler = ExceptionHandler{

@@ -6,10 +6,20 @@ import se.lu.nateko.cp.cpauth.core.AuthSource
 import scala.concurrent.ExecutionContext
 import se.lu.nateko.cp.cpauth.HttpConfig
 import java.net.URI
+import se.lu.nateko.cp.cpauth.accounts.UsersIo
+import se.lu.nateko.cp.cpauth.accounts.UserEntry
+import se.lu.nateko.cp.cpauth.utils.Utils
+import scala.concurrent.duration.DurationInt
+import akka.actor.Scheduler
 
-class PasswordLifecycleHandler(emailSender: EmailSender, cookieFactory: CookieFactory, config: HttpConfig) {
+class PasswordLifecycleHandler(
+	emailSender: EmailSender,
+	cookieFactory: CookieFactory,
+	userDb: UsersIo,
+	config: HttpConfig
+)(implicit ctxt: ExecutionContext, scheduler: Scheduler) {
 
-	def sendResetEmail(uid: UserId)(implicit ctxt: ExecutionContext): Future[Unit] = {
+	def sendResetEmail(uid: UserId): Future[Unit] = {
 
 		val tokenTry = cookieFactory.makeTokenBase64(uid, AuthSource.PasswordReset)
 
@@ -19,4 +29,14 @@ class PasswordLifecycleHandler(emailSender: EmailSender, cookieFactory: CookieFa
 			emailSender.send(Seq(uid.email), "Create/reset you Carbon Portal password", message)
 		})
 	}
+
+	def setPassword(uid: UserId, newPassword: String): Future[Unit] = ???
+
+	def changePassword(uid: UserId, oldPassword: String, newPassword: String): Future[Unit] = for(
+		userEntry <- authUser(uid, oldPassword);
+		_ <- userDb.updateUser(uid, userEntry, newPassword)
+	) yield ()
+
+	def authUser(uid: UserId, password: String): Future[UserEntry] =
+		Utils.slowFailureDown(userDb.authenticateUser(uid, password), 500 millis)
 }

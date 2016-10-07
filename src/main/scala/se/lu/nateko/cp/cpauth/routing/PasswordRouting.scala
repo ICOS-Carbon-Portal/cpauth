@@ -23,9 +23,6 @@ trait PasswordRouting extends CpauthDirectives {
 	def cookieFactory: CookieFactory
 	def passwordHandler: PasswordLifecycleHandler
 
-	private def authUser(uid: UserId, password: String): Future[UserEntry] =
-		Utils.slowFailureDown(userDb.authenticateUser(uid, password), 500 millis)
-
 	lazy val passwordRoute: Route = pathPrefix("password"){
 		get{
 			path("accountslist"){
@@ -39,9 +36,9 @@ trait PasswordRouting extends CpauthDirectives {
 		} ~
 		post{
 			path("login"){
-				formFields('mail, 'password)((mail, password) =>
-
-					onSuccess(authUser(UserId(mail), password)){ uEntry =>
+				formFields('mail, 'password){(mail, password) =>
+					val uEntryFuture = passwordHandler.authUser(UserId(mail), password)
+					onSuccess(uEntryFuture){ uEntry =>
 
 						cookieFactory.makeTokenBase64(uEntry.id, AuthSource.Password) match{
 							case Success(token) =>
@@ -50,18 +47,25 @@ trait PasswordRouting extends CpauthDirectives {
 							case Failure(err) => failWith(err)
 						}
 					}
-				)
+				}
 			} ~
 			path("changepassword"){
 				user(uid =>
 					formFields('oldPass, 'newPass)((oldPass, newPass) => {
-						val result = for(
-							userEntry <- authUser(uid, oldPass);
-							_ <- userDb.updateUser(uid, userEntry, newPass)
-						) yield ()
+						val result = passwordHandler.changePassword(uid, oldPass, newPass)
 						onSuccess(result)(complete(StatusCodes.OK))
 					})
 				)
+			} ~
+			path("setpassword"){
+				token{ authToken =>
+					if(authToken.source == AuthSource.PasswordReset){
+						formFields('newPass){newPass =>
+							val done = passwordHandler.setPassword(authToken.userId, newPass)
+							onSuccess(done)(complete(StatusCodes.OK))
+						}
+					} else complete(StatusCodes.Forbidden)
+				}
 			} ~
 			path("deleteownaccount"){
 				user(uid =>
