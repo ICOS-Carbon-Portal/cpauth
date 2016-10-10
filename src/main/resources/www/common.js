@@ -11,8 +11,8 @@ function reportError(xhr, fallbackMessage){
 	showMessage(makeMessage(xhr), "alert-danger");
 }
 
-function reportSuccess(msg){
-	showMessage(msg, "alert-success", 4000);
+function reportSuccess(msg, time){
+	showMessage(msg, "alert-success", time || 4000);
 }
 
 function showMessage(message, msgType, hideAfter){

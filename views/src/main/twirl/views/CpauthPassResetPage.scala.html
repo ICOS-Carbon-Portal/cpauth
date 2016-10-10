@@ -1,0 +1,33 @@
+@(email: String)
+@CpauthPage("Set Carbon Portal password", "Set password", "passwordreset"){
+}{
+	<div class="row">
+		<div class="panel panel-default">
+			<div class="panel-body">
+
+				<form id="password-reset"  autocomplete="off">
+
+					<div class="form-group">
+						<label for="mail">Email:</label>
+						<input name="mail" value="@email" class="form-control" readonly/>
+					</div>
+
+					<div class="form-group">
+						<label for="newPass">Password:</label>
+						<input id="newPass" name="newPass" type="password" class="form-control" placeholder="New password"  autocomplete="new-password"/>
+					</div>
+
+					<div class="form-group">
+						<label for="newPass2">Confirm password:</label>
+						<input id="newPass2" name="newPass2" type="password" class="form-control" placeholder="Confirm new password"  autocomplete="new-password"/>
+					</div>
+
+					<button type="button" class="btn btn-default" id="setPasswordButton">Set password!</button>
+
+				</form>
+
+			</div>
+		</div>
+	</div>
+}
+

@@ -17,11 +17,17 @@ import spray.json.JsBoolean
 import se.lu.nateko.cp.cpauth.core.AuthSource
 import se.lu.nateko.cp.cpauth.services.EmailSender
 import se.lu.nateko.cp.cpauth.services.PasswordLifecycleHandler
+import se.lu.nateko.cp.cpauth.utils.TemplatePageMarshalling
 
 trait PasswordRouting extends CpauthDirectives {
 
 	def cookieFactory: CookieFactory
 	def passwordHandler: PasswordLifecycleHandler
+
+	private[this] implicit val pageMarsh = TemplatePageMarshalling.marshaller
+
+	private[this] val forbidAndInformAboutPassReset =
+		complete(StatusCodes.Forbidden -> "You need special permissions to reset your password")
 
 	lazy val passwordRoute: Route = pathPrefix("password"){
 		get{
@@ -62,10 +68,15 @@ trait PasswordRouting extends CpauthDirectives {
 					if(authToken.source == AuthSource.PasswordReset){
 						formFields('newPass){newPass =>
 							val done = passwordHandler.setPassword(authToken.userId, newPass)
-							onSuccess(done)(complete(StatusCodes.OK))
+							onSuccess(done){
+								deleteCookie(cookieFactory.makeAuthCookie("")){
+									complete(StatusCodes.OK)
+								}
+							}
 						}
-					} else complete(StatusCodes.Forbidden)
-				}
+					} else reject
+				} ~
+				forbidAndInformAboutPassReset
 			} ~
 			path("deleteownaccount"){
 				user(uid =>
@@ -108,6 +119,14 @@ trait PasswordRouting extends CpauthDirectives {
 				}
 			}
 		}
+	} ~
+	path("passwordreset" ~ Slash){
+		token{ authToken =>
+			if(authToken.source == AuthSource.PasswordReset){
+				complete(views.html.CpauthPassResetPage(authToken.userId.email))
+			} else reject
+		} ~
+		forbidAndInformAboutPassReset
 	}
 
 }

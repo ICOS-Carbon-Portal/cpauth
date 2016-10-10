@@ -99,6 +99,25 @@ function suggestIdps(idpInfos){
 	});
 }
 
+function emailIsValid(email) {
+	var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+	return re.test(email);
+}
+
+function initPassReset() {
+	hideMessage();
+	var email = $('#newmail').val();
+
+	if(emailIsValid(email)){
+		$.post("/password/initpassreset/" + email)
+			.done(function() {
+				$('#newmail').val('')
+				reportSuccess('Email with instructions has been sent to ' + email, 60000);
+			})
+			.fail(reportError);
+	}else reportError('Email is invalid');
+}
+
 $(function(){
 	$idpInput = $("#idpUrlInput");
 	$idpBtn = $("#signonBtn");
@@ -120,9 +139,11 @@ $(function(){
 	$("#mail").keypress(enterKeyHandler(function(){
 		$("#password").focus();
 	}));
+	$("#choosePasswordButton").click(initPassReset);
 
 	$('#swamid-link').click(hideMessage);
 	$('#plain-link').click(hideMessage);
+	$('#create-link').click(hideMessage);
 
 });
 

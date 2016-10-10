@@ -9,10 +9,11 @@ import se.lu.nateko.cp.cpauth.utils.TemplatePageMarshalling
 
 trait StaticRouting {
 
-	private[this] val pages: PartialFunction[String, Html] = {
-		case "login" => views.html.CpauthLoginPage()
-		case "home" => views.html.CpauthHomePage()
-		case "administration" => views.html.CpauthAdminPage()
+	private[this] val pages: PartialFunction[String, Option[Html]] = {
+		case "login" => Some(views.html.CpauthLoginPage())
+		case "home" => Some(views.html.CpauthHomePage())
+		case "administration" => Some(views.html.CpauthAdminPage())
+		case "passwordreset" => None
 	}
 
 	private[this] implicit val pageMarsh = TemplatePageMarshalling.marshaller
@@ -24,16 +25,19 @@ trait StaticRouting {
 		path("home" ~ Slash){
 			complete(views.html.CpauthHomePage())
 		} ~
-		pathPrefix(Segment){page =>
-			if(pages.isDefinedAt(page)) {
+		pathPrefix(Segment){pageId =>
+			if(pages.isDefinedAt(pageId)) {
 				pathSingleSlash{
-					complete(pages(page))
+					pages(pageId) match{
+						case Some(page) => complete(page)
+						case None => reject
+					}
 				} ~
 				pathEnd{
-					redirect(s"/$page/", StatusCodes.Found)
+					redirect(s"/$pageId/", StatusCodes.Found)
 				} ~
-				path(s"$page.js"){
-					getFromResource(s"www/$page.js")
+				path(s"$pageId.js"){
+					getFromResource(s"www/$pageId.js")
 				} ~
 				path("common.js"){
 					getFromResource(s"www/common.js")

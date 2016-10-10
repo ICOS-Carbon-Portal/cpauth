@@ -30,7 +30,16 @@ class PasswordLifecycleHandler(
 		})
 	}
 
-	def setPassword(uid: UserId, newPassword: String): Future[Unit] = ???
+	def setPassword(uid: UserId, newPassword: String): Future[Unit] = {
+		userDb.userExists(uid).flatMap(exists =>
+			if(exists)
+				userDb.userIsAdmin(uid).flatMap(isAdmin =>
+					userDb.updateUser(uid, UserEntry(uid, isAdmin), newPassword)
+				)
+			else
+				userDb.addUser(UserEntry(uid, false), newPassword)
+		)
+	}
 
 	def changePassword(uid: UserId, oldPassword: String, newPassword: String): Future[Unit] = for(
 		userEntry <- authUser(uid, oldPassword);
