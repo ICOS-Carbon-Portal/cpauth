@@ -109,9 +109,14 @@ function initPassReset() {
 	var email = $('#newmail').val();
 
 	if(emailIsValid(email)){
+
+		reportSuccess('Please stand by, sending email...', 60000);
+		$('#choosePasswordButton').prop('disabled', true);
+
 		$.post("/password/initpassreset/" + email)
 			.done(function() {
 				$('#newmail').val('')
+				$('#choosePasswordButton').prop('disabled', false);
 				reportSuccess('Email with instructions has been sent to ' + email, 60000);
 			})
 			.fail(reportError);

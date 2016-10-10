@@ -43,6 +43,7 @@ object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
 	val userDb = Users
 	val passwordHandler = {
 		val emailSender = new EmailSender(config.mailing)
+		implicit val dispatcher = system.dispatchers.lookup("akka.stream.default-blocking-io-dispatcher")
 		new PasswordLifecycleHandler(emailSender, cookieFactory, userDb, config.http)
 	}
 	val targetLookup: TargetUrlLookup = new MapBasedUrlLookup
