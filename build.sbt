@@ -81,7 +81,8 @@ lazy val cpauth = (project in file("."))
 			"com.typesafe.slick"     %% "slick"                              % "3.1.1",
 			"com.typesafe.slick"     %% "slick-hikaricp"                     % "3.1.1",
 			"org.hsqldb"             %  "hsqldb"                             % "2.3.4",
-			"org.apache.commons"     % "commons-email"                       % "1.4"
+			"org.apache.commons"     % "commons-email"                       % "1.4",
+			"org.apache.oltu.oauth2" % "org.apache.oltu.oauth2.client"       % "1.0.2"
 		),
 
 		fork := true,

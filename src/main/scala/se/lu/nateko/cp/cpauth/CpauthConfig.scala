@@ -38,9 +38,15 @@ case class CpauthConfig(
 	saml: SamlConfig,
 	auth: AuthConfig,
 	restheart: RestHeartConfig,
-	mailing: EmailConfig
+	mailing: EmailConfig,
+	oauth: OAuthConfig
 )
 
+case class OAuthConfig(
+    facebook: FacebookConfig
+)
+
+case class FacebookConfig(clientId: String, clientSecret: String, redirectUri: String)
 
 object HttpConfig{
 
@@ -76,8 +82,10 @@ object ConfigReader extends DefaultJsonProtocol{
 		implicit val authConfigFormat = jsonFormat2(AuthConfig)
 		implicit val restHeartConfigFormat = jsonFormat3(RestHeartConfig)
 		implicit val emailConfigFormat = jsonFormat3(EmailConfig)
+		implicit val facebookConfigFormat = jsonFormat3(FacebookConfig)
+		implicit val oauthConfigFormat = jsonFormat1(OAuthConfig)
 
-		implicit val cpauthConfigFormat = jsonFormat5(CpauthConfig)
+		implicit val cpauthConfigFormat = jsonFormat6(CpauthConfig)
 
 		val renderOpts = ConfigRenderOptions.concise.setJson(true)
 		val cpConfJson: String = applicationConfig.getValue("cpauth").render(renderOpts)

@@ -22,9 +22,11 @@ import se.lu.nateko.cp.cpauth.accounts.RestHeartClient
 import se.lu.nateko.cp.cpauth.utils.TargetUrlLookup
 import se.lu.nateko.cp.cpauth.utils.MapBasedUrlLookup
 import se.lu.nateko.cp.cpauth.services._
+import se.lu.nateko.cp.cpauth.oauth.facebook.FacebookAuthenticationService
 
 
-object Main extends App with SamlRouting with PasswordRouting with DrupalRouting with StaticRouting with RestHeartRouting{
+object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
+    with StaticRouting with RestHeartRouting with OAuthRouting{
 
 	val config: CpauthConfig = ConfigReader.getDefault
 	val (httpConfig, publicAuthConfig, samlConfig) = (config.http, config.auth.pub, config.saml)
@@ -34,8 +36,11 @@ object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
 	implicit val scheduler = system.scheduler
 	implicit val materializer = ActorMaterializer(namePrefix = Some("cpauth_mat"))
 
+	def log = system.log
+
 	val http = Http()
 	val restHeart = new RestHeartClient(config.restheart, http)
+	val facebookAuth = new FacebookAuthenticationService(config.oauth.facebook, config.http.serviceHost)
 
 	val assExtractorTry = AssertionExtractor(samlConfig)
 	val idpLib: IdpLibrary = IdpLibrary.fromConfig(samlConfig)
@@ -64,6 +69,7 @@ object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
 		passwordRoute ~
 		drupalRoute ~
 		restheartRoute ~
+		oauthRoute ~
 		get{
 			path("logout")(logout) ~
 			path("whoami"){
@@ -87,7 +93,7 @@ object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
 						.flatMap(_ => system.terminate())(ExecutionContext.Implicits.global)
 					Await.result(doneFuture, 3 seconds)
 				}
-				system.log.info(s"Started cpauth: $binding")
+				log.info(s"Started cpauth: $binding")
 		}
 
 }

@@ -41,7 +41,8 @@ class CpauthDirectivesTest extends FunSpec with ScalatestRouteTest {
 			dbName = "db",
 			usersCollection = "users"
 		),
-		mailing = null
+		mailing = null,
+		oauth = null
 	)
 
 	val config = getConfig("/private1.der")
