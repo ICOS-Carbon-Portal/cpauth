@@ -28,6 +28,9 @@ trait StaticRouting {
 		path("home" ~ Slash){
 			complete(views.html.CpauthHomePage())
 		} ~
+		pathPrefix("images"){
+		  getFromResourceDirectory("www/images")
+		} ~
 		pathPrefix(Segment){pageId =>
 			if(pages.isDefinedAt(pageId)) {
 				pathSingleSlash{

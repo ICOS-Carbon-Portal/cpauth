@@ -14,7 +14,7 @@ trait OAuthRouting {
   def oauthRoute: Route = pathPrefix("oauth" / "facebook" / "auth"){
     parameter("code"){code =>
       val userInfo = facebookAuth.retrieveUserInfo(code)
-      complete(userInfo.email)
+      complete(userInfo.email + userInfo.givenName + userInfo.surname)
     }
 
     
