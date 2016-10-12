@@ -123,6 +123,17 @@ function initPassReset() {
 	}else reportError('Email is invalid');
 }
 
+function facebookUrl(targetUrl){
+	var config = document.oauthConfig.facebook;
+	var redirect_uri = document.location.origin + config.redirectPath;
+
+	return 'https://graph.facebook.com/oauth/authorize' +
+		'?scope=email%2C+public_profile' +
+		'&redirect_uri=' + encodeURIComponent(redirect_uri) +
+		'&client_id=' + config.clientId +
+		(targetUrl ? '&state=' + encodeURIComponent(targetUrl) : '');
+}
+
 $(function(){
 	$idpInput = $("#idpUrlInput");
 	$idpBtn = $("#signonBtn");
@@ -145,6 +156,8 @@ $(function(){
 		$("#password").focus();
 	}));
 	$("#choosePasswordButton").click(initPassReset);
+
+	$("#facebookLoginButton").attr('href', facebookUrl(targetUrl));
 
 	$('#swamid-link').click(hideMessage);
 	$('#plain-link').click(hideMessage);
