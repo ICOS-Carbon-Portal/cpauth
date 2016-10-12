@@ -23,6 +23,7 @@ import se.lu.nateko.cp.cpauth.utils.TargetUrlLookup
 import se.lu.nateko.cp.cpauth.utils.MapBasedUrlLookup
 import se.lu.nateko.cp.cpauth.services._
 import se.lu.nateko.cp.cpauth.oauth.facebook.FacebookAuthenticationService
+import akka.dispatch.Dispatcher
 
 
 object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
@@ -33,6 +34,7 @@ object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
 
 	implicit val system = ActorSystem("cpauth")
 	implicit val dispatcher = system.dispatcher
+	val blockingExeContext  = system.dispatchers.lookup("akka.stream.default-blocking-io-dispatcher")
 	implicit val scheduler = system.scheduler
 	implicit val materializer = ActorMaterializer(namePrefix = Some("cpauth_mat"))
 
