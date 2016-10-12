@@ -22,12 +22,12 @@ import se.lu.nateko.cp.cpauth.accounts.RestHeartClient
 import se.lu.nateko.cp.cpauth.utils.TargetUrlLookup
 import se.lu.nateko.cp.cpauth.utils.MapBasedUrlLookup
 import se.lu.nateko.cp.cpauth.services._
-import se.lu.nateko.cp.cpauth.oauth.facebook.FacebookAuthenticationService
+import se.lu.nateko.cp.cpauth.oauth.FacebookAuthenticationService
 import akka.dispatch.Dispatcher
 
 
 object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
-    with StaticRouting with RestHeartRouting with OAuthRouting{
+		with StaticRouting with RestHeartRouting with OAuthRouting{
 
 	val config: CpauthConfig = ConfigReader.getDefault
 	val (httpConfig, publicAuthConfig, samlConfig, oauthConfig) = (config.http, config.auth.pub, config.saml, config.oauth)
@@ -37,8 +37,6 @@ object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
 	val blockingExeContext  = system.dispatchers.lookup("akka.stream.default-blocking-io-dispatcher")
 	implicit val scheduler = system.scheduler
 	implicit val materializer = ActorMaterializer(namePrefix = Some("cpauth_mat"))
-
-	def log = system.log
 
 	val http = Http()
 	val restHeart = new RestHeartClient(config.restheart, http)
@@ -50,7 +48,7 @@ object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
 	val userDb = Users
 	val passwordHandler = {
 		val emailSender = new EmailSender(config.mailing)
-		implicit val dispatcher = system.dispatchers.lookup("akka.stream.default-blocking-io-dispatcher")
+		implicit val exeCtxt = blockingExeContext
 		new PasswordLifecycleHandler(emailSender, cookieFactory, userDb, config.http)
 	}
 	val targetLookup: TargetUrlLookup = new MapBasedUrlLookup
@@ -96,7 +94,7 @@ object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
 						.flatMap(_ => system.terminate())(ExecutionContext.Implicits.global)
 					Await.result(doneFuture, 3 seconds)
 				}
-				log.info(s"Started cpauth: $binding")
+				system.log.info(s"Started cpauth: $binding")
 		}
 
 }

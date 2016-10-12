@@ -24,6 +24,8 @@ trait UsersIo{
 	def setAdminRights(uid: UserId, isAdmin: Boolean): Future[Unit]
 }
 
+//TODO Rewrite as a class with dependency on execution context
+//TODO Get rid of Slick (overkill for the task)
 object Users extends UsersIo {
 
 	def hash(mail: String, pass: String): String = {

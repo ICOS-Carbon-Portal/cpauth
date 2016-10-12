@@ -11,7 +11,7 @@ import akka.http.scaladsl.server.Route
 import se.lu.nateko.cp.cpauth.accounts.RestHeartClient
 import se.lu.nateko.cp.cpauth.core.AuthSource
 import se.lu.nateko.cp.cpauth.core.UserId
-import se.lu.nateko.cp.cpauth.oauth.facebook.FacebookAuthenticationService
+import se.lu.nateko.cp.cpauth.oauth.FacebookAuthenticationService
 import se.lu.nateko.cp.cpauth.services.CookieFactory
 
 trait OAuthRouting {
