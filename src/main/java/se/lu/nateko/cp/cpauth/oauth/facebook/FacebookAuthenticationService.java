@@ -13,19 +13,19 @@ import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
 import org.apache.oltu.oauth2.common.message.types.GrantType;
 import org.apache.oltu.oauth2.common.utils.JSONUtils;
 
-import se.lu.nateko.cp.cpauth.FacebookConfig;
+import se.lu.nateko.cp.cpauth.OAuthProviderConfig;
 import se.lu.nateko.cp.cpauth.oauth.UserInfo;
 
 public class FacebookAuthenticationService  {
 
-	private final FacebookConfig config;
+	private final OAuthProviderConfig config;
 	private final String serviceHost;
 	
-	public FacebookAuthenticationService(FacebookConfig config, String serviceHost){
+	public FacebookAuthenticationService(OAuthProviderConfig config, String serviceHost){
 		this.config = config;
 		this.serviceHost = serviceHost;
 	}
-	
+/*
     public String generateService() throws OAuthSystemException {
 	    OAuthClientRequest request = OAuthClientRequest
 	        .authorizationProvider(OAuthProviderType.FACEBOOK)
@@ -35,17 +35,16 @@ public class FacebookAuthenticationService  {
 	        .buildQueryMessage();
 	
 	    return request.getLocationUri();
-   
     }	
-
+*/
     public UserInfo retrieveUserInfo(String code) throws OAuthSystemException, OAuthProblemException {	
-    	
+
     	OAuthClientRequest request = OAuthClientRequest
             	.tokenProvider(OAuthProviderType.FACEBOOK)
                 .setGrantType(GrantType.AUTHORIZATION_CODE)
                 .setClientId(this.config.clientId())
                 .setClientSecret(this.config.clientSecret())
-                .setRedirectURI("https://" + this.serviceHost + this.config.redirectUri())
+                .setRedirectURI("https://" + this.serviceHost + this.config.redirectPath())
                 .setCode(code)
                 .buildBodyMessage();
     	

@@ -1,10 +1,14 @@
-@(facebookUrl: String, twitterUrl: String)
+@(oauthConfigJson: String)
 @CpauthPage("Login to Carbon Portal", "Please sign in", "login"){
 	<script src="https://static.icos-cp.eu/constant/cookies.js/1.2.1/cookies.min.js"></script>
 	<script src="https://static.icos-cp.eu/constant/jquery/plugins/autocomplete/1.11.4/jquery-ui.min.js"></script>
 	<link rel="stylesheet" type="text/css" href="https://static.icos-cp.eu/constant/jquery/plugins/autocomplete/1.11.4/jquery-ui.min.css">
 	<link rel="stylesheet" type="text/css" href="https://static.icos-cp.eu/constant/jquery/plugins/autocomplete/1.11.4/jquery-ui.structure.min.css">
 	<link rel="stylesheet" type="text/css" href="https://static.icos-cp.eu/constant/jquery/plugins/autocomplete/1.11.4/jquery-ui.theme.min.css">
+
+	<script type="text/javascript">
+		document.oauthConfig = @Html(oauthConfigJson);
+	</script>
 }{
 	<h4>
 		<span class="label label-info">Carbon Portal uses cookies to handle your login session</span>
@@ -98,7 +102,9 @@
 				<div class="panel panel-default">
 					<div class="panel-body">
 						
-						<a type="button" class="btn btn-default" id="facebookLoginButton" href="@facebookUrl"><img src="/images/facebook_login.png" style="height:36px" /></a>
+						<a type="button" class="btn btn-default" id="facebookLoginButton">
+							<img src="/images/facebook_login.png" style="height:36px" />
+						</a>
 
 					</div>
 				</div>
@@ -126,4 +132,3 @@
 		</div>
 	</div>
 }
-

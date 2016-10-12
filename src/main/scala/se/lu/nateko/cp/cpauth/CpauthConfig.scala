@@ -42,11 +42,14 @@ case class CpauthConfig(
 	oauth: OAuthConfig
 )
 
-case class OAuthConfig(
-    facebook: FacebookConfig
-)
+case class OAuthConfig(facebook: OAuthProviderConfig){
+	def public = OAuthConfig(facebook.public)
+	def jsonString: String = public.toJson(ConfigReader.oauthConfigFormat).prettyPrint
+}
 
-case class FacebookConfig(clientId: String, clientSecret: String, redirectUri: String)
+case class OAuthProviderConfig(clientId: String, clientSecret: String, redirectPath: String){
+	def public = this.copy(clientSecret = "")
+}
 
 object HttpConfig{
 
@@ -68,24 +71,25 @@ object ConfigReader extends DefaultJsonProtocol{
 		else ConfigFactory.parseFile(confFile).withFallback(default)
 	}
 
+	implicit val samlSpConfigFormat = jsonFormat2(SamlSpConfig)
+	implicit val proxyConfigFormat = jsonFormat3(ProxyConfig)
+	implicit val samlAttrFormat = jsonFormat3(SamlAttrConfig)
+	//.apply needed because of the companion object that HttpConfig has
+	implicit val urlsConfigFormat = jsonFormat4(HttpConfig.apply)
+	implicit val samlConfigFormat = jsonFormat5(SamlConfig)
+
+	implicit val pubAuthConfigFormat = jsonFormat2(PublicAuthConfig)
+	implicit val privAuthConfigFormat = jsonFormat2(PrivateAuthConfig)
+	implicit val authConfigFormat = jsonFormat2(AuthConfig)
+	implicit val restHeartConfigFormat = jsonFormat3(RestHeartConfig)
+	implicit val emailConfigFormat = jsonFormat3(EmailConfig)
+	implicit val facebookConfigFormat = jsonFormat3(OAuthProviderConfig)
+	implicit val oauthConfigFormat = jsonFormat1(OAuthConfig)
+
+	implicit val cpauthConfigFormat = jsonFormat6(CpauthConfig)
+
 	def fromAppConfig(applicationConfig: Config): CpauthConfig = {
 
-		implicit val samlSpConfigFormat = jsonFormat2(SamlSpConfig)
-		implicit val proxyConfigFormat = jsonFormat3(ProxyConfig)
-		implicit val samlAttrFormat = jsonFormat3(SamlAttrConfig)
-		//.apply needed because of the companion object that HttpConfig has
-		implicit val urlsConfigFormat = jsonFormat4(HttpConfig.apply)
-		implicit val samlConfigFormat = jsonFormat5(SamlConfig)
-
-		implicit val pubAuthConfigFormat = jsonFormat2(PublicAuthConfig)
-		implicit val privAuthConfigFormat = jsonFormat2(PrivateAuthConfig)
-		implicit val authConfigFormat = jsonFormat2(AuthConfig)
-		implicit val restHeartConfigFormat = jsonFormat3(RestHeartConfig)
-		implicit val emailConfigFormat = jsonFormat3(EmailConfig)
-		implicit val facebookConfigFormat = jsonFormat3(FacebookConfig)
-		implicit val oauthConfigFormat = jsonFormat1(OAuthConfig)
-
-		implicit val cpauthConfigFormat = jsonFormat6(CpauthConfig)
 
 		val renderOpts = ConfigRenderOptions.concise.setJson(true)
 		val cpConfJson: String = applicationConfig.getValue("cpauth").render(renderOpts)
