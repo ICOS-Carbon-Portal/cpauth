@@ -34,7 +34,7 @@ object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
 
 	implicit val system = ActorSystem("cpauth")
 	implicit val dispatcher = system.dispatcher
-	val blockingExeContext  = system.dispatchers.lookup("akka.stream.default-blocking-io-dispatcher")
+	val blockingExeContext  = system.dispatchers.lookup("my-blocking-dispatcher")
 	implicit val scheduler = system.scheduler
 	implicit val materializer = ActorMaterializer(namePrefix = Some("cpauth_mat"))
 
