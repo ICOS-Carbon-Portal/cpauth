@@ -10,6 +10,7 @@ import akka.actor.Scheduler
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.model.headers.HttpChallenge
+import akka.http.scaladsl.model.headers.`Access-Control-Allow-Origin`
 import akka.http.scaladsl.server.AuthenticationFailedRejection
 import akka.http.scaladsl.server.AuthorizationFailedRejection
 import akka.http.scaladsl.server.Directive
@@ -85,6 +86,15 @@ trait CpauthDirectives {
 			))
 		}
 	})
+
+	lazy val whoami: Route =
+		user{userId =>
+			respondWithHeader(`Access-Control-Allow-Origin`.*){
+				import se.lu.nateko.cp.cpauth.CpauthJsonProtocol.userIdFormat
+				complete(userId)
+			}
+		} ~
+		complete(StatusCodes.Unauthorized)
 
 	lazy val logout: Route = deleteCookie(publicAuthConfig.authCookieName, httpConfig.authDomain, "/"){
 		complete(StatusCodes.OK)

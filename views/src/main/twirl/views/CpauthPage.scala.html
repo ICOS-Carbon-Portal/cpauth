@@ -5,12 +5,34 @@
 	@customHeader
 	<script src="common.js"></script>
 	<script src="@(scriptName).js"></script>
+	<style type="text/css">
+		.fixed-message {
+			position:fixed;
+			top:3px;
+			right: 15px;
+		}
+		#message{
+			z-index: 3;
+		}
+	</style>
+
+	<script type="text/javascript">
+		$(window).scroll(function() {
+			if ($('#message-container').offset().top < $(window).scrollTop()) {
+				$('#message').addClass('fixed-message');
+			} else {
+				$('#message').removeClass('fixed-message');
+			}
+		});
+	</script>
 }{
 	<div class="page-header">
 		<h1>ICOS Carbon Portal Authentication Service <small>@subheading</small></h1>
 	</div>
 
-	<div hidden id="message" class="alert" role="alert"></div>
+	<div id="message-container">
+		<div hidden id="message" class="alert" role="alert"></div>
+	</div>
 
 	@body
 }

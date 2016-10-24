@@ -1,7 +1,6 @@
 package se.lu.nateko.cp.cpauth
 
 import akka.actor.ActorSystem
-import se.lu.nateko.cp.cpauth.CpauthJsonProtocol._
 import se.lu.nateko.cp.cpauth.accounts.Users
 import se.lu.nateko.cp.cpauth.core.AuthenticationFailedException
 import se.lu.nateko.cp.cpauth.core.Authenticator
@@ -73,12 +72,8 @@ object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
 		oauthRoute ~
 		get{
 			path("logout")(logout) ~
-			path("whoami"){
-				user(userId => complete(userId)) ~ complete(StatusCodes.Unauthorized)
-			} ~
-			path("cpauthcookie"){
-				cpauthCookie
-			} ~
+			path("whoami"){whoami} ~
+			path("cpauthcookie"){cpauthCookie} ~
 			pathEndOrSingleSlash{
 				token(_ => redirect("/home/", StatusCodes.Found)) ~
 				redirect("/login/", StatusCodes.Found)
