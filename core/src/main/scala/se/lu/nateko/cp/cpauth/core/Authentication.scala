@@ -6,29 +6,36 @@ import scala.util.Success
 import java.security.interfaces.RSAPublicKey
 import java.time.Instant
 
-case class UserInfo(givenName: String, surname: String, mail: String)
+case class UserId(email: String)
 
-case class AuthToken(userInfo: UserInfo, expiresOn: Long)
+object AuthSource extends Enumeration{
+	type AuthSource = Value
+	val Password, PasswordReset, Saml, Orcid, Facebook = Value
+}
+
+case class AuthToken(userId: UserId, expiresOn: Long, source: AuthSource.Value)
 
 case class SignedToken(token: AuthToken, signature: Signature)
 
 class Authenticator(key: RSAPublicKey){
 
-	def unwrapUserInfo(token: SignedToken): Try[UserInfo] =
-		if(tokenIsOld(token.token))
-			Exceptions.failure("Authentication token has expired")
-		else signatureIsValid(token) match{
-			case Success(true) => Success(token.token.userInfo)
-			case Failure(err) => Failure(err)
-			case Success(false) => Exceptions.failure("Authentication token's signature is invalid")
-		}
+	def unwrapTrustedToken(token: SignedToken, trustedSources: AuthSource.ValueSet): Try[AuthToken] =
+		if(!trustedSources.contains(token.token.source))
+			Exceptions.failure(s"Authentication tokens originating from ${token.token.source} are not trusted by this application")
+		else unwrapToken(token)
 
-	private def signatureIsValid(token: SignedToken): Try[Boolean] = {
+	def unwrapToken(token: SignedToken): Try[AuthToken] = {
 		val message = token.token.toString
-		Crypto.verifySignature(message, key, token.signature)
+
+		Crypto.verifySignature(message, key, token.signature).flatMap(valid =>
+			if(!valid)
+				Exceptions.failure("Authentication token's signature is invalid")
+			else if(Instant.now.toEpochMilli >= token.token.expiresOn)
+				Exceptions.failure("Authentication token has expired")
+			else Success(token.token)
+		)
 	}
 
-	private def tokenIsOld(token: AuthToken): Boolean = Instant.now.toEpochMilli >= token.expiresOn
 }
 
 object Authenticator{

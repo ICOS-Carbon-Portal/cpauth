@@ -1,4 +1,4 @@
-package se.lu.nateko.cp.cpauth
+package se.lu.nateko.cp.cpauth.routing
 
 import java.net.URI
 import scala.util.Try
@@ -15,6 +15,10 @@ import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
 import akka.http.scaladsl.model.headers.HttpCookie
 import akka.http.scaladsl.model.Uri
+import se.lu.nateko.cp.cpauth.services.CookieFactory
+import se.lu.nateko.cp.cpauth.utils.Saml
+import se.lu.nateko.cp.cpauth.SamlConfig
+import se.lu.nateko.cp.cpauth.utils.TargetUrlLookup
 
 trait SamlRouting extends CpauthDirectives{
 
@@ -64,8 +68,15 @@ trait SamlRouting extends CpauthDirectives{
 					val cookieAndReqIdTry: Try[(HttpCookie, String)] = for(
 						extractor <- assExtractorTry;
 						response <- Try(Parser.fromBase64[Response](resp));
-						cookie <- cookieFactory.makeAuthenticationCookie(response, extractor, idpLib)
-					) yield (cookie, response.getInResponseTo)
+						(cookie, uid, statements) <- cookieFactory.makeAuthenticationCookie(response, extractor, idpLib)
+					) yield {
+						for( //side effect: creating new entry in RESTHeart if not present
+							givenName <- statements.getSingleValue(samlConfig.attributes.givenName);
+							surname <- statements.getSingleValue(samlConfig.attributes.surname)
+						) yield restHeart.createUserIfNew(uid, givenName, surname)
+
+						(cookie, response.getInResponseTo)
+					}
 
 					attempt(cookieAndReqIdTry){ case (cookie, reqId) =>
 						setCookie(cookie) {

@@ -3,7 +3,7 @@ package se.lu.nateko.cp.cpauth.test.opensaml
 import org.opensaml.saml2.core.Response
 import org.opensaml.xml.encryption.DecryptionException
 import org.scalatest.FunSuite
-import se.lu.nateko.cp.cpauth.Utils
+import se.lu.nateko.cp.cpauth.utils.Utils
 import se.lu.nateko.cp.cpauth.opensaml.AssertionExtractor
 import se.lu.nateko.cp.cpauth.opensaml.Parser
 

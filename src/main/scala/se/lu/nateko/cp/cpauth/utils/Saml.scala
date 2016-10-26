@@ -1,4 +1,4 @@
-package se.lu.nateko.cp.cpauth
+package se.lu.nateko.cp.cpauth.utils
 
 import java.net.URLEncoder
 import java.text.SimpleDateFormat
@@ -9,6 +9,7 @@ import java.net.URL
 import org.opensaml.saml2.core.NameIDType
 import java.util.TimeZone
 import akka.http.scaladsl.model.Uri
+import se.lu.nateko.cp.cpauth.SamlSpConfig
 
 object Saml {
 

@@ -11,6 +11,10 @@ import akka.http.scaladsl.testkit.ScalatestRouteTest
 import akka.http.scaladsl.server.AuthenticationFailedRejection
 import akka.http.scaladsl.model.headers.Cookie
 import akka.stream.ActorMaterializer
+import se.lu.nateko.cp.cpauth.routing.CpauthDirectives
+import akka.http.scaladsl.server.MissingCookieRejection
+import akka.http.scaladsl.model.headers.HttpCookie
+import se.lu.nateko.cp.cpauth.services.CookieFactory
 
 class CpauthDirectivesTest extends FunSpec with ScalatestRouteTest {
 	
@@ -31,7 +35,14 @@ class CpauthDirectivesTest extends FunSpec with ScalatestRouteTest {
 			loginPath = null,
 			serviceHost = "cpauth.icos-cp.eu",
 			servicePrivatePort = 0
-		)
+		),
+		restheart = RestHeartConfig(
+			baseUri = "http://127.0.0.1:8088",
+			dbName = "db",
+			usersCollection = "users"
+		),
+		mailing = null,
+		oauth = null
 	)
 
 	val config = getConfig("/private1.der")
@@ -43,6 +54,8 @@ class CpauthDirectivesTest extends FunSpec with ScalatestRouteTest {
 		val dispatcher = system.dispatcher
 		val scheduler = system.scheduler
 		val materializer = ActorMaterializer(namePrefix = Some("cpauth_dir_test"))
+		val userDb = null
+		val restHeart = null
 	}
 
 
@@ -72,7 +85,7 @@ class CpauthDirectivesTest extends FunSpec with ScalatestRouteTest {
 
 	describe("user directive"){
 
-		val route = dirs.user(uinfo => complete(uinfo.givenName))
+		val route = dirs.user(uid => complete(uid.email))
 
 		describe("when no CPauth cookie is present"){
 	
@@ -80,28 +93,32 @@ class CpauthDirectivesTest extends FunSpec with ScalatestRouteTest {
 				
 				Get("/any") ~> route ~> check{
 					val authRejections = rejections.collect{
-						case AuthenticationFailedRejection(AuthenticationFailedRejection.CredentialsMissing, _) => 1
+						case MissingCookieRejection(_) => 1
 					}
 					assert(authRejections.length === 1)
 				}
 			}
 		}
 
+		def makeCookie(uid: String, config: CpauthConfig): HttpCookie = {
+			val factory = new CookieFactory(config)
+			val token = factory.makeTokenBase64(UserId(uid), AuthSource.Password).get
+			factory.makeAuthCookie(token)
+		}
+
 		describe("when a properly signed CPauth cookie is present"){
-			val user = UserInfo("name", "surname", "mail")
-			val cookie = new CookieFactory(config).makeAuthenticationCookie(user).get
+			val cookie = makeCookie("test1", config)
 			
 			it("delegates to the inner route"){
 				Get("/any") ~> Cookie(cookie.pair()) ~> route ~> check{
-					assert(responseAs[String] === user.givenName)
+					assert(responseAs[String] === "test1")
 				}
 			}
 		}
 
 		describe("when the cookie has been signed with a wrong private key"){
-			val user = UserInfo("name", "surname", "mail")
 			val wrongConfig = getConfig("/saml/test_private_key.der")
-			val cookie = new CookieFactory(wrongConfig).makeAuthenticationCookie(user).get
+			val cookie = makeCookie("test2", wrongConfig)
 			
 			it("rejects the request with 'CredentialsRejected' rejection"){
 				Get("/any") ~> Cookie(cookie.pair()) ~> route ~> check{

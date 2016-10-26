@@ -1,16 +1,16 @@
-package se.lu.nateko.cp.cpauth
+package se.lu.nateko.cp.cpauth.utils
 
 import java.security.interfaces.RSAPrivateKey
 import scala.util.Try
-import org.apache.commons.codec.binary.Base64
 import org.joda.time.DateTime
 import se.lu.nateko.cp.cpauth.core._
+import se.lu.nateko.cp.cpauth.PrivateAuthConfig
 
 class SignedTokenMaker private(key: RSAPrivateKey, validity: Int){
 
-	def makeToken(userInfo: UserInfo): SignedToken = {
+	def makeToken(userId: UserId, source: AuthSource.Value): SignedToken = {
 		val expiryTime = new DateTime().getMillis + 1000 * validity
-		val token = AuthToken(userInfo, expiryTime)
+		val token = AuthToken(userId, expiryTime, source)
 		val signature = Crypto.signMessage(token.toString, key)
 		SignedToken(token, signature)
 	}

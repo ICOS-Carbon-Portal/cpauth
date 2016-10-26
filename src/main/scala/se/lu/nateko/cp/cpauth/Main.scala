@@ -1,13 +1,13 @@
 package se.lu.nateko.cp.cpauth
 
 import akka.actor.ActorSystem
-import se.lu.nateko.cp.cpauth.CpauthJsonProtocol._
 import se.lu.nateko.cp.cpauth.accounts.Users
+import se.lu.nateko.cp.cpauth.core.AuthenticationFailedException
 import se.lu.nateko.cp.cpauth.core.Authenticator
 import se.lu.nateko.cp.cpauth.core.CoreUtils
 import se.lu.nateko.cp.cpauth.opensaml.AssertionExtractor
 import se.lu.nateko.cp.cpauth.opensaml.IdpLibrary
-import se.lu.nateko.cp.cpauth.core.AuthenticationFailedException
+import se.lu.nateko.cp.cpauth.routing._
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
 import akka.http.scaladsl.server.Directives._
@@ -17,27 +17,42 @@ import scala.concurrent.ExecutionContext
 import akka.http.scaladsl.Http
 import akka.stream.ActorMaterializer
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
+import se.lu.nateko.cp.cpauth.accounts.RestHeartClient
+import se.lu.nateko.cp.cpauth.utils.TargetUrlLookup
+import se.lu.nateko.cp.cpauth.utils.MapBasedUrlLookup
+import se.lu.nateko.cp.cpauth.services._
+import se.lu.nateko.cp.cpauth.oauth.FacebookAuthenticationService
+import akka.dispatch.Dispatcher
 
 
-object Main extends App with SamlRouting with PasswordRouting with DrupalRouting with StaticRouting {
+object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
+		with StaticRouting with RestHeartRouting with OAuthRouting{
 
 	val config: CpauthConfig = ConfigReader.getDefault
-	val (httpConfig, publicAuthConfig, samlConfig) = (config.http, config.auth.pub, config.saml)
+	val (httpConfig, publicAuthConfig, samlConfig, oauthConfig) = (config.http, config.auth.pub, config.saml, config.oauth)
 
 	implicit val system = ActorSystem("cpauth")
 	implicit val dispatcher = system.dispatcher
+	val blockingExeContext  = system.dispatchers.lookup("my-blocking-dispatcher")
 	implicit val scheduler = system.scheduler
 	implicit val materializer = ActorMaterializer(namePrefix = Some("cpauth_mat"))
 
 	val http = Http()
+	val restHeart = new RestHeartClient(config.restheart, http)
+	val facebookAuth = new FacebookAuthenticationService(oauthConfig.facebook, httpConfig.serviceHost)
 
 	val assExtractorTry = AssertionExtractor(samlConfig)
 	val idpLib: IdpLibrary = IdpLibrary.fromConfig(samlConfig)
 	val cookieFactory = new CookieFactory(config)
+	val userDb = Users
+	val passwordHandler = {
+		val emailSender = new EmailSender(config.mailing)
+		implicit val exeCtxt = blockingExeContext
+		new PasswordLifecycleHandler(emailSender, cookieFactory, userDb, config.http)
+	}
 	val targetLookup: TargetUrlLookup = new MapBasedUrlLookup
 	val authenticator = Authenticator(publicAuthConfig)
 
-	val userDb = Users
 	system.registerOnTermination(Users.closeDb())
 
 	val cpauthExceptionHandler = ExceptionHandler{
@@ -53,16 +68,14 @@ object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
 		samlRoute ~
 		passwordRoute ~
 		drupalRoute ~
+		restheartRoute ~
+		oauthRoute ~
 		get{
 			path("logout")(logout) ~
-			path("whoami"){
-				user(uinfo => complete(uinfo)) ~ complete(StatusCodes.Unauthorized)
-			} ~
-			path("cpauthcookie"){
-				cpauthCookie
-			} ~
+			path("whoami"){whoami} ~
+			path("cpauthcookie"){cpauthCookie} ~
 			pathEndOrSingleSlash{
-				user(_ => redirect("/home/", StatusCodes.Found)) ~
+				token(_ => redirect("/home/", StatusCodes.Found)) ~
 				redirect("/login/", StatusCodes.Found)
 			}
 		}
@@ -76,7 +89,7 @@ object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
 						.flatMap(_ => system.terminate())(ExecutionContext.Implicits.global)
 					Await.result(doneFuture, 3 seconds)
 				}
-				println(binding)
+				system.log.info(s"Started cpauth: $binding")
 		}
 
 }

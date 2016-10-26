@@ -10,8 +10,9 @@ class CookieToTokenTest extends FunSuite{
 
 		val original = SignedToken(
 			AuthToken(
-				UserInfo("Вася", "Påpkin", "vasja.pupkin@mail.org"),
-				1503889594
+				UserId("vasja.pupkin@mail.org"),
+				1503889594,
+				AuthSource.Password
 			),
 			Signature(Array(14, 120, -34))
 		)

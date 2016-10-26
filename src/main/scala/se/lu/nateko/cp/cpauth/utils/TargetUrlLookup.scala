@@ -1,4 +1,4 @@
-package se.lu.nateko.cp.cpauth
+package se.lu.nateko.cp.cpauth.utils
 
 import scala.collection.concurrent
 import akka.http.scaladsl.model.Uri

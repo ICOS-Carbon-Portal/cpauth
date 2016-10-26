@@ -5,6 +5,9 @@ var $idpInput, $idpBtn;
 function urlQueryAsObject() {
 	var query = location.search.substr(1);
 	var result = {};
+
+	if(!query) return result;
+
 	query.split("&").forEach(function(part) {
 		var item = part.split("=");
 		result[item[0]] = decodeURIComponent(item[1]);
@@ -15,32 +18,13 @@ function urlQueryAsObject() {
 
 function doPlainLogin() {
 	var $form = $('#plain-login').serializeArray();
+	hideMessage();
 
 	$.post("/password/login", $form)
 		.done(function() {
 			window.location = urlQueryAsObject().targetUrl || '/home/';
 		})
-		.fail(function(xhr){
-			var defaultMessage = xhr.status == '403'
-				? 'Authentication error! Maybe you have entered wrong email or password. Please try again!'
-				: 'An unexpected server error has occured.';
-			somePlainFail(xhr.responseText || defaultMessage);
-		});
-}
-
-function enterKeyHandler(innerFun){
-	return function(e){
-		if(e.which == 13) innerFun(e);
-	}
-}
-
-
-function somePlainFail(message) {
-	var $fail = $('#plain-fail');
-	$fail.html(message);
-	$fail.addClass('alert alert-danger');
-	$fail.attr('role', 'alert');
-	$fail.show();
+		.fail(reportError);
 }
 
 
@@ -115,6 +99,41 @@ function suggestIdps(idpInfos){
 	});
 }
 
+function emailIsValid(email) {
+	var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+	return re.test(email);
+}
+
+function initPassReset() {
+	hideMessage();
+	var email = $('#newmail').val();
+
+	if(emailIsValid(email)){
+
+		reportSuccess('Please stand by, sending email...', 60000);
+		$('#choosePasswordButton').prop('disabled', true);
+
+		$.post("/password/initpassreset/" + email)
+			.done(function() {
+				$('#newmail').val('')
+				$('#choosePasswordButton').prop('disabled', false);
+				reportSuccess('Email with instructions has been sent to ' + email, 60000);
+			})
+			.fail(reportError);
+	}else reportError('Email is invalid');
+}
+
+function facebookUrl(targetUrl){
+	var config = document.oauthConfig.facebook;
+	var redirect_uri = document.location.origin + config.redirectPath;
+
+	return 'https://graph.facebook.com/oauth/authorize' +
+		'?scope=email%2C+public_profile' +
+		'&redirect_uri=' + encodeURIComponent(redirect_uri) +
+		'&client_id=' + config.clientId +
+		(targetUrl ? '&state=' + encodeURIComponent(targetUrl) : '');
+}
+
 $(function(){
 	$idpInput = $("#idpUrlInput");
 	$idpBtn = $("#signonBtn");
@@ -136,6 +155,13 @@ $(function(){
 	$("#mail").keypress(enterKeyHandler(function(){
 		$("#password").focus();
 	}));
+	$("#choosePasswordButton").click(initPassReset);
+
+	$("#facebookLoginButton").attr('href', facebookUrl(targetUrl));
+
+	$('#swamid-link').click(hideMessage);
+	$('#plain-link').click(hideMessage);
+	$('#create-link').click(hideMessage);
 
 });
 

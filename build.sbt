@@ -32,7 +32,7 @@ lazy val cpauthCore = (project in file("core"))
 	.settings(publishingSettings: _*)
 	.settings(
 		name := "cpauth-core",
-		version := "0.4-SNAPSHOT",
+		version := "0.5-SNAPSHOT",
 		libraryDependencies ++= Seq(
 		)
 	)
@@ -58,7 +58,7 @@ lazy val cpauthViews = (project in file("views"))
 	)
 
 
-val akkaVersion = "2.4.8"
+val akkaVersion = "2.4.10"
 val cpauthMain = Some("se.lu.nateko.cp.cpauth.Main")
 
 lazy val cpauth = (project in file("."))
@@ -80,7 +80,9 @@ lazy val cpauth = (project in file("."))
 			"org.joda"               %  "joda-convert"                       % "1.7",
 			"com.typesafe.slick"     %% "slick"                              % "3.1.1",
 			"com.typesafe.slick"     %% "slick-hikaricp"                     % "3.1.1",
-			"org.hsqldb"             %  "hsqldb"                             % "2.3.4"
+			"org.hsqldb"             %  "hsqldb"                             % "2.3.4",
+			"org.apache.commons"     % "commons-email"                       % "1.4",
+			"org.apache.oltu.oauth2" % "org.apache.oltu.oauth2.client"       % "1.0.2"
 		),
 
 		fork := true,
@@ -88,7 +90,7 @@ lazy val cpauth = (project in file("."))
 		initialCommands in console := """
 			import se.lu.nateko.cp.cpauth._
 			import se.lu.nateko.cp.cpauth.accounts.Users
-			import se.lu.nateko.cp.cpauth.core.UserInfo""",
+			import se.lu.nateko.cp.cpauth.core.UserId""",
 
 		mainClass in assembly := cpauthMain,
 		mainClass in (Compile, run) := cpauthMain

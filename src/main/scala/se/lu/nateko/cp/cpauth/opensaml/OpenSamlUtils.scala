@@ -1,6 +1,6 @@
 package se.lu.nateko.cp.cpauth.opensaml
 
-import se.lu.nateko.cp.cpauth.Utils
+import se.lu.nateko.cp.cpauth.utils.Utils
 
 object OpenSamlUtils {
 

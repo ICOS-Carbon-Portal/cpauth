@@ -12,10 +12,10 @@ import org.opensaml.saml2.metadata.EntityDescriptor
 import org.opensaml.saml2.metadata.IDPSSODescriptor
 import org.opensaml.saml2.metadata.provider.MetadataProviderException
 import org.opensaml.samlext.saml2mdui.UIInfo
-import se.lu.nateko.cp.cpauth.Utils.SafeJavaCollectionWrapper
+import se.lu.nateko.cp.cpauth.utils.Utils.SafeJavaCollectionWrapper
 import se.lu.nateko.cp.cpauth.SamlConfig
 import se.lu.nateko.cp.cpauth.core.Crypto
-import se.lu.nateko.cp.cpauth.Utils
+import se.lu.nateko.cp.cpauth.utils.Utils
 import org.opensaml.saml2.metadata.LocalizedString
 
 case class IdpInfo(name: String, id: String)

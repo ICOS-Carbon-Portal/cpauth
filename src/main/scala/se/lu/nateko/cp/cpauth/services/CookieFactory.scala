@@ -1,15 +1,13 @@
-package se.lu.nateko.cp.cpauth
+package se.lu.nateko.cp.cpauth.services
 
 import scala.util.Failure
 import scala.util.Success
 import scala.util.Try
-
 import org.opensaml.saml2.core.Response
-
 import akka.http.scaladsl.model.headers.HttpCookie
 import se.lu.nateko.cp.cpauth.core.CookieToToken
 import se.lu.nateko.cp.cpauth.core.Exceptions
-import se.lu.nateko.cp.cpauth.core.UserInfo
+import se.lu.nateko.cp.cpauth.core.UserId
 import se.lu.nateko.cp.cpauth.opensaml.AllStatements
 import se.lu.nateko.cp.cpauth.opensaml.AssertionExtractor
 import se.lu.nateko.cp.cpauth.opensaml.AssertionValidator
@@ -18,6 +16,9 @@ import se.lu.nateko.cp.cpauth.opensaml.OpenSamlUtils
 import se.lu.nateko.cp.cpauth.opensaml.ResponseStatusController
 import se.lu.nateko.cp.cpauth.opensaml.StatementExtractor
 import se.lu.nateko.cp.cpauth.opensaml.ValidatedAssertion
+import se.lu.nateko.cp.cpauth.core.AuthSource
+import se.lu.nateko.cp.cpauth.CpauthConfig
+import se.lu.nateko.cp.cpauth.utils.SignedTokenMaker
 
 class CookieFactory(config: CpauthConfig) {
 	
@@ -33,22 +34,32 @@ class CookieFactory(config: CpauthConfig) {
 		maxAge = Some(31536000) //1 year in seconds
 	)
 
-	def makeAuthenticationCookie(response: Response, extractor: AssertionExtractor, idpLib: IdpLibrary): Try[HttpCookie] = for(
+
+	def makeAuthenticationCookie(
+		response: Response,
+		extractor: AssertionExtractor,
+		idpLib: IdpLibrary
+	): Try[(HttpCookie, UserId, AllStatements)] = for(
 		goodResponse <- ResponseStatusController.ensureSuccess(response);
 		validator <- AssertionValidator(goodResponse, idpLib);
 		assertions = extractor.extractAssertions(goodResponse).map(validator.validate);
 		statements = StatementExtractor.extractAttributeStringValues(assertions);
-		userInfoTry = getUserInfo(statements);
-		userInfo <- provideDebug(userInfoTry, assertions);
-		cookie <- makeAuthenticationCookie(userInfo)
-	) yield cookie
+		userIdTry = getUserId(statements);
+		userId <- provideDebug(userIdTry, assertions);
+		tokenBase64 <- makeTokenBase64(userId, AuthSource.Saml);
+		cookie = makeAuthCookie(tokenBase64)
+	) yield (cookie, userId, statements)
 
-	def makeAuthenticationCookie(userInfo: UserInfo): Try[HttpCookie] = for(
+
+	def makeTokenBase64(userId: UserId, source: AuthSource.Value): Try[String] = for(
 		tokenMaker <- tokenMakerTry;
-		token = tokenMaker.makeToken(userInfo)
-	)yield HttpCookie(
+		token = tokenMaker.makeToken(userId, source)
+	) yield CookieToToken.constructCookieContent(token)
+
+
+	def makeAuthCookie(tokenBase64: String) = HttpCookie(
 		name = config.auth.pub.authCookieName,
-		value = CookieToToken.constructCookieContent(token),
+		value = tokenBase64,
 		domain = Some(config.http.authDomain),
 		path = Some("/"),
 		secure = true,
@@ -56,17 +67,16 @@ class CookieFactory(config: CpauthConfig) {
 	)
 
 
-	def getUserInfo(statements: AllStatements): Try[UserInfo] = {
+	def getUserId(statements: AllStatements): Try[UserId] = {
 		val attrs = config.saml.attributes
 		for(
-			givenName <- statements.getSingleValue(attrs.givenName);
-			surname <- statements.getSingleValue(attrs.surname);
 			mail <- statements.getSingleValue(attrs.mail)
-		) yield UserInfo(givenName = givenName, surname = surname, mail = mail)
+		) yield UserId(email = mail)
 	}
 
-	private def provideDebug(uinfoTry: Try[UserInfo], assertions: => Iterable[ValidatedAssertion]): Try[UserInfo] = uinfoTry match {
-		case ok: Success[UserInfo] => ok
+
+	private def provideDebug(uinfoTry: Try[UserId], assertions: => Iterable[ValidatedAssertion]): Try[UserId] = uinfoTry match {
+		case ok: Success[UserId] => ok
 		case Failure(err) => Exceptions.failure{
 			val assertionsAsString = assertions.map(_.assertion.getDOM).map(OpenSamlUtils.xmlToStr).mkString("\n")
 			err.getMessage + "\nReturned assertions were:\n" + assertionsAsString

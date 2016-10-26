@@ -1,4 +1,4 @@
-package se.lu.nateko.cp.cpauth
+package se.lu.nateko.cp.cpauth.utils
 
 import scala.collection.convert.WrapAsScala
 import java.util.zip.Deflater
@@ -6,8 +6,6 @@ import java.io.ByteArrayOutputStream
 import java.util.zip.DeflaterOutputStream
 import org.apache.commons.codec.binary.Base64
 import scala.concurrent.Future
-import scala.util.Success
-import scala.util.Failure
 import scala.concurrent.ExecutionContext
 import akka.pattern.Patterns.after
 import akka.actor.Scheduler

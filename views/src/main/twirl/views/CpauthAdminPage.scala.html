@@ -5,13 +5,13 @@
 		<ul class="nav nav-tabs" role="tablist">
 
 			<li role="presentation" class="col-xs-12 col-sm-2">
-				<a href="#new" aria-controls="new" role="tab" data-toggle="tab" id="new-butt">
+				<a href="#new" aria-controls="new" role="tab" data-toggle="tab" id="new-link">
 					Create a new account
 				</a>
 			</li>
 
 			<li role="presentation" class="col-xs-12 col-sm-2">
-				<a href="#edit" aria-controls="edit" role="tab" data-toggle="tab" id="list-accounts-butt">
+				<a href="#edit" aria-controls="edit" role="tab" data-toggle="tab" id="edit-link">
 					Edit accounts
 				</a>
 			</li>
@@ -22,41 +22,28 @@
 	</div>
 
 	<div class="row">
-
 		<div class="tab-content">
 
 			<div role="tabpanel" class="tab-pane active" id="new">
 				<div class="panel panel-default">
 					<div class="panel-body">
 
-						<div id="new-message-error" style="display: hidden"></div>
-
-						<form id="new-account">
-							<div class="form-group required">
-								<label for="givenName" class="control">Givenname:</label>
-								<input id="givenName" name="givenName" type="text" class="form-control" placeholder="Enter givenname" />
-							</div>
-							<div class="form-group required">
-								<label for="surname" class="control">Surname:</label>
-								<input id="surname" name="surname" type="text" class="form-control" placeholder="Enter surname" />
-							</div>
+						<form id="new-account" autocomplete="off">
 
 							<div class="form-group required">
 								<label for="mail" class="control">Email:</label>
-								<input id="mail" name="mail" type="email" class="form-control" placeholder="Enter email" />
+								<input id="mail" name="mail" type="email" class="form-control" placeholder="New user's email" autocomplete="off"/>
 							</div>
 
 							<div class="form-group required">
 								<label for="password" class="control">Password:</label>
-								<input id="password" name="password" type="password" class="form-control" placeholder="Password" />
+								<input id="password" name="password" type="password" class="form-control" placeholder="Password" autocomplete="new-password"/>
 							</div>
 
-							<button type="button" class="btn btn-default" onClick="createNewAccount()">Create!</button>
+							<button type="button" class="btn btn-default" id="new-account-button">Create!</button>
 
 						</form>
 
-						<br/>
-						<div id="new-message-success" style="display: hidden"></div>
 					</div>
 				</div>
 			</div>
@@ -64,10 +51,7 @@
 			<div role="tabpanel" class="tab-pane" id="edit">
 				<div class="panel panel-default">
 					<div class="panel-body">
-						<div id="edit-message-error" style="display: hidden"></div>
-
 						<div id="list-accounts"></div>
-
 					</div>
 				</div>
 			</div>

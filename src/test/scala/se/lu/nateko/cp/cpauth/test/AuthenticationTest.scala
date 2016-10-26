@@ -2,12 +2,12 @@ package se.lu.nateko.cp.cpauth.test
 
 import org.scalatest.FunSuite
 import se.lu.nateko.cp.cpauth.core._
-import se.lu.nateko.cp.cpauth.SignedTokenMaker
+import se.lu.nateko.cp.cpauth.utils.SignedTokenMaker
 import se.lu.nateko.cp.cpauth.PrivateAuthConfig
 
 class AuthenticationTest extends FunSuite{
 
-	val user = UserInfo("Vasja", "Pupkin", "vasja.pupkin@mail.org")
+	val user = UserId("vasja.pupkin@mail.org")
 	val pubAuthConfig = PublicAuthConfig(authCookieName = "", publicKeyPath = "/public1.pem")
 	
 	test("Properly formed fresh token validates successfully"){
@@ -15,26 +15,40 @@ class AuthenticationTest extends FunSuite{
 		val token = SignedTokenMaker(PrivateAuthConfig(
 			authTokenValiditySeconds = 10,
 			privateKeyPath = "/private1.der"
-		)).get.makeToken(user)
+		)).get.makeToken(user, AuthSource.Password)
 		
-		val unwrappedUser = Authenticator(pubAuthConfig).get.unwrapUserInfo(token)
+		val unwrappedToken = Authenticator(pubAuthConfig).get.unwrapToken(token)
 
-		assert(unwrappedUser.isSuccess)
-		assert(unwrappedUser.get === user)
+		assert(unwrappedToken.isSuccess)
+		assert(unwrappedToken.get.userId === user)
 	}
 
 	test("Expired token is rejected"){
 		val token = SignedTokenMaker(PrivateAuthConfig(
 			authTokenValiditySeconds = -1,
 			privateKeyPath = "/private1.der"
-		)).get.makeToken(user)
+		)).get.makeToken(user, AuthSource.Password)
 		
-		val unwrappedUser = Authenticator(pubAuthConfig).get.unwrapUserInfo(token)
+		val unwrappedToken = Authenticator(pubAuthConfig).get.unwrapToken(token)
 
-		assert(unwrappedUser.isFailure)
+		assert(unwrappedToken.isFailure)
 
-		val errMessage: String = unwrappedUser.failed.get.getMessage
+		val errMessage: String = unwrappedToken.failed.get.getMessage
 		assert(errMessage.contains("expired"))
+	}
+
+	test("Token originating from an untrusted source is rejected"){
+		val token = SignedTokenMaker(PrivateAuthConfig(
+			authTokenValiditySeconds = 10,
+			privateKeyPath = "/private1.der"
+		)).get.makeToken(user, AuthSource.Saml)
+
+		val unwrappedToken = Authenticator(pubAuthConfig).get.unwrapTrustedToken(token, AuthSource.ValueSet(AuthSource.Password))
+
+		assert(unwrappedToken.isFailure)
+
+		val errMessage: String = unwrappedToken.failed.get.getMessage
+		assert(errMessage.contains("not trusted"))
 	}
 
 	test("Token signed with a wrong key fails to authenticate"){
@@ -46,10 +60,10 @@ class AuthenticationTest extends FunSuite{
 
 		val auth = Authenticator(pubAuthConfig).get
 
-		val unwrappedUser = auth.unwrapUserInfo(tokenMaker.makeToken(user))
+		val unwrappedToken = auth.unwrapToken(tokenMaker.makeToken(user, AuthSource.Password))
 
-		assert(unwrappedUser.isFailure)
-		val errMessage: String = unwrappedUser.failed.get.getMessage
+		assert(unwrappedToken.isFailure)
+		val errMessage: String = unwrappedToken.failed.get.getMessage
 		assert(errMessage.contains("not correct"))
 	}
 }
