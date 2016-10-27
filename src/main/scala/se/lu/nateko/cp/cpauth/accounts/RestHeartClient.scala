@@ -96,6 +96,7 @@ class RestHeartClient(val config: RestHeartConfig, http: HttpExt)(implicit m: Ma
 			def getField(obj: JsObject, field: String): Try[String] = {
 				obj.fields.get(field) match {
 					case Some(JsString(v)) => Success(v)
+					case None => Success("")
 					case _ => Failure(new Exception(s"Expected a string property '$field'"))
 				}
 			}
