@@ -29,7 +29,7 @@ class RestHeartClient(val config: RestHeartConfig, http: HttpExt)(implicit m: Ma
 	import http.system.dispatcher
 
 	def getUserUri(uid: UserId): Uri = {
-		val email = uid.email.toLowerCase()
+		val email = uid.email
 		import config._
 		Uri(s"$baseUri/$dbName/$usersCollection/$email")
 	}
@@ -100,7 +100,12 @@ class RestHeartClient(val config: RestHeartConfig, http: HttpExt)(implicit m: Ma
 				}
 			}
 			Future.fromTry(for(
-				profile <- Try{userObj.fields("profile").asJsObject("Expected 'profile' to be a JSON object")};
+				profile <- Try{
+					val profile = userObj.fields.get("profile").getOrElse(
+						throw new Exception("User profile not found for " + uid.email)
+					)
+					profile.asJsObject("Expected 'profile' to be a JSON object")
+				};
 				givenName <- getField(profile, "givenName");
 				surname <- getField(profile, "surname")
 			) yield (givenName, surname))
