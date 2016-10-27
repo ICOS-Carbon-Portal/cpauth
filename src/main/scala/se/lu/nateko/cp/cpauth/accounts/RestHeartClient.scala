@@ -112,14 +112,4 @@ class RestHeartClient(val config: RestHeartConfig, http: HttpExt)(implicit m: Ma
 			) yield (givenName, surname))
 		}
 
-	def importOldUsers(users: Seq[(UserId, String, String)]): Future[Done] = {
-
-		val seed: Future[Done] = Future.successful(Done)
-		users.foldLeft(seed)(
-			(fut, user) => fut.flatMap{_ =>
-				val (uid, givenName, surname) = user
-				createUserIfNew(uid, givenName, surname)
-			}
-		)
-	}
 }

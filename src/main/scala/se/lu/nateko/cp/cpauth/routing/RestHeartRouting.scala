@@ -15,13 +15,6 @@ trait RestHeartRouting extends RestHeartDirectives{
 	def restheartRoute: Route = {
 		val config = restHeart.config
 
-		path(config.dbName / config.usersCollection / "importusers"){
-			(post & admin){
-				onSuccess(importUsersToRestheart()){_ =>
-					complete(StatusCodes.OK)
-				}
-			}
-		} ~
 		path(config.dbName / config.usersCollection / Segment){ email =>
 			token{token =>
 				(validateUser(email, token.userId) | ifUserIsAdmin(token)){
@@ -36,7 +29,4 @@ trait RestHeartRouting extends RestHeartDirectives{
 	private def validateUser(email: String, uid: UserId): Directive0 =
 		validate(email == uid.email, "Only admins can write to other users' documents")
 
-	private def importUsersToRestheart(): Future[Done] = {
-		userDb.listUsersOld.flatMap(restHeart.importOldUsers)
-	}
 }
