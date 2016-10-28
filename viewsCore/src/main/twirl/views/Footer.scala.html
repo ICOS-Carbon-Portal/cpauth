@@ -1,0 +1,63 @@
+@()
+<footer class="site-footer"> <!-- Add class hidden_footer to hide footer-->
+	<div class="layout-container">
+		<div class="site-footer__top">
+
+			<div class="region region-footer-first">
+				@paddedBoxContentBlock{
+					<h3>ICOS Carbon Portal</h3>
+
+					<p>Lund University<br />
+					Geocentrum II<br />
+					Sölvegatan 12<br />
+					22362 Lund<br />
+					Sweden<br />
+					<a class="footer-link" href="mailto:info@@icos-cp.eu">info@@icos-cp.eu</a></p>
+				}
+			</div>
+
+			<div class="region region-footer-second">
+				@paddedBoxContentBlock{
+					<h3>ICOS RI</h3>
+					<p><a class="footer-button" href="https://www.icos-ri.eu">Visit ICOS RI</a></p>
+					<p>
+						<a class="footer-link" href="https://www.icos-ri.eu/data-license">ICOS Data License</a>
+						<a class="footer-link" href="https://www.icos-ri.eu/privacy-ethics">ICOS privacy policy and ethics statement</a>
+					</p>
+				}
+			</div>
+
+			<div class="region region-footer-third">
+				@paddedBoxContentBlock{
+					<p>
+						<a class="footer-link" href="https://icos-atc.lsce.ipsl.fr/">Atmosphere Thematic Centre</a>
+						<a class="footer-link" href="http://www.icos-etc.eu/">Ecosystem Thematic Centre</a> 
+						<a class="footer-link" href="http://www.icos-otc.eu">Ocean Thematic Centre</a> 
+						<a class="footer-link" href="https://www.icos-cal.eu/">Central Analytical Laboratories</a>
+					</p>
+					<p>
+						@ccLink{<img alt="creativecommons" src="https://www.icos-cp.eu/sites/default/files/inline-images/creativecommons.png" />}
+						Except where otherwise noted, content on this site is licensed under a @ccLink{Creative Commons Attribution 4.0 International License}.
+					</p>
+				}
+			</div>
+
+		</div>
+		<div id="filler"></div>
+	</div>
+</footer>
+
+@ccLink(inner: Html) = {
+	<a href="http://creativecommons.org/licenses/by/4.0/" target="_blank">@inner</a>
+}
+
+@paddedBoxContentBlock(inner: Html) = {
+	<div class="block">
+		<div class="content">
+			<div class="padded-box">
+				@inner
+			</div>
+		</div>
+	</div>
+}
+
