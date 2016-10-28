@@ -102,9 +102,7 @@ class RestHeartClient(val config: RestHeartConfig, http: HttpExt)(implicit m: Ma
 			}
 			Future.fromTry(for(
 				profile <- Try{
-					val profile = userObj.fields.get("profile").getOrElse(
-						throw new Exception("User profile not found for " + uid.email)
-					)
+					val profile = userObj.fields.get("profile").getOrElse(JsObject())
 					profile.asJsObject("Expected 'profile' to be a JSON object")
 				};
 				givenName <- getField(profile, "givenName");
