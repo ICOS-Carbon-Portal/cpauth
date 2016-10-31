@@ -1,3 +1,5 @@
+@import views.CpMenu
+
 @(title: String)(customHeader: Html)(body: Html)
 <!DOCTYPE html>
 <html>
@@ -7,9 +9,18 @@
 	<meta charset="utf-8"/>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 
-	<script	src="https://code.jquery.com/jquery-3.1.0.min.js"
-		integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s="
-		crossorigin="anonymous">
+	<script>
+		window.addEventListener("load", function(){
+			var menuGroups = document.getElementsByClassName("open_menu");
+
+			for(var idx = 0; idx < menuGroups.length; idx++){
+				var elem = menuGroups[idx];
+
+				elem.addEventListener("click", function(){
+					elem.parentElement.classList.toggle('open');
+				});
+			}
+		});
 	</script>
 
 	@customHeader
@@ -30,10 +41,12 @@
 	</header>
 
 	<div id="cp_theme_d8_menu"> <!-- Add class "hidden_menu" to remove both menu options and menu bar-->
-		<!--<div id="menu-hider" class="hidden_menu">  <!--Inculde this div to remove the menu options in the menu border, border will still show  -->
-		<ul>
+		@MainMenu(CpMenu.default)
+		<!--<ul>
 			<li><a href="/node/1">Home</a></li>
-			<li id="rf" class="is_topnode"><a href="/node/2">Services</a>
+			<li id="rf" class="is_topnode">
+				<img src="https://www.icos-cp.eu/themes/cp_theme_d8/images/arrow-up-down.svg" class="open_menu" title="Open/Close" />
+				<a href="/node/2">Services</a>
 				<ul>
 					<li><a href="/node/45">Search, find, download</a></li>
 					<li><a href="/node/43">Station Labelling</a></li>
@@ -78,8 +91,7 @@
 					<li><a href="/node/40">Visit Carbon Portal</a></li>
 				</ul>
 			</li>
-		</ul>
-		<!-- </div> This is for menu-hider div -->
+		</ul> -->
 	</div>
 
 	<div class="container-fluid">
@@ -88,39 +100,6 @@
 
 	@Footer()
 
-	<script>
-		$(function() {
-			if ($(window).width() < 800) {
-				fixSmallsizeMenu();
-				if($('#menu-hider').hasClass('hidden_menu')){
-					$('#cp_theme_d8_menu').height('37px');
-				}
-			}
-
-			$(window).resize(function () {
-				if ($(window).width() < 800 && !$('#rf').hasClass('hasImage')) {
-					fixSmallsizeMenu();
-				}
-				if ($(window).width() < 800 && $('#cp_theme_d8_menu').height() == 0) {
-					if($('#menu-hider').hasClass('hidden_menu')){
-						$('#cp_theme_d8_menu').height('37px');
-					}
-				}
-			});
-		});
-
-		function fixSmallsizeMenu() {
-
-			$('#cp_theme_d8_menu .is_topnode').each(function(index, value) {
-				$(value).prepend('<img src="https://www.icos-cp.eu/themes/cp_theme_d8/images/arrow-up-down.svg" class="open_menu" title="Open/Close" />');
-				$(value).addClass('hasImage');
-			});
-
-			$('#cp_theme_d8_menu .is_topnode .open_menu').click(function(event) {
-				$(this).parent().toggleClass('open');
-			});
-		}
-	</script>
 </body>
 </html>
 
