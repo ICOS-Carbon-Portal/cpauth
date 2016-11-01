@@ -1,6 +1,6 @@
-@import views.CpMenu
+@import views.CpMenuItem
 
-@(title: String)(customHeader: Html)(body: Html)
+@(title: String, menu: Seq[CpMenuItem] = Nil)(customHeader: Html)(body: Html)
 <!DOCTYPE html>
 <html>
 <head>
@@ -9,25 +9,27 @@
 	<meta charset="utf-8"/>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 
-	<script>
-		window.addEventListener("load", function(){
-			var menuGroups = document.getElementsByClassName("open_menu");
+	@if(menu.nonEmpty){
+		<script>
+			window.addEventListener("load", function(){
+				var menuGroups = document.getElementsByClassName("open_menu");
 
-			for(var idx = 0; idx < menuGroups.length; idx++){
-				var elem = menuGroups[idx];
+				for(var idx = 0; idx < menuGroups.length; idx++){
+					var elem = menuGroups[idx];
 
-				elem.addEventListener("click", function(){
-					elem.parentElement.classList.toggle('open');
-				});
-			}
-		});
-	</script>
+					elem.addEventListener("click", function(event){
+						event.target.parentElement.classList.toggle('open');
+					});
+				}
+			});
+		</script>
+	}
 
 	@customHeader
 
 	<title>@title</title>
 
-	@MasterStyle()
+	@MasterStyle(menu.nonEmpty)
 
 </head>
 
@@ -40,58 +42,8 @@
 		</div>
 	</header>
 
-	<div id="cp_theme_d8_menu"> <!-- Add class "hidden_menu" to remove both menu options and menu bar-->
-		@MainMenu(CpMenu.default)
-		<!--<ul>
-			<li><a href="/node/1">Home</a></li>
-			<li id="rf" class="is_topnode">
-				<img src="https://www.icos-cp.eu/themes/cp_theme_d8/images/arrow-up-down.svg" class="open_menu" title="Open/Close" />
-				<a href="/node/2">Services</a>
-				<ul>
-					<li><a href="/node/45">Search, find, download</a></li>
-					<li><a href="/node/43">Station Labelling</a></li>
-					<li><a href="/node/44">Data upload</a></li>
-					<li><a href="/node/82">ICOS Stations map</a></li>
-					<li><a href="/node/83">ICOS Station table</a></li>
-					<li class="has_subnodes">
-						<a href="/node/9">Visualisations<img src="https://www.icos-cp.eu/themes/cp_theme_d8/images/arrow-down.svg"></a>
-						<ul>
-							<li class="has_subnodes">
-								<a href="/node/50">Spatial data<img src="https://www.icos-cp.eu/themes/cp_theme_d8/images/arrow-down.svg"></a>
-								<ul>
-									<li><a href="/node/52">Carbon Portal Service</a></li>
-									<li><a href="/node/51">THREDDS service</a></li>
-								</ul>
-							</li>
-							<li><a href="/node/49">Time series data</a></li>
-							<li><a href="/node/48">Flux estimates</a></li>
-							<li><a href="/node/47">Footprint tool</a></li>
-						</ul>
-					</li>
-					<li class="has_subnodes">
-						<a href="/node/10">Background info<img src="https://www.icos-cp.eu/themes/cp_theme_d8/images/arrow-down.svg"></a>
-						<ul>
-							<li><a href="/node/84">ICOS Data Flow</a></li>
-							<li><a href="/node/54">Prior flux maps</a></li>
-							<li><a href="/node/53">Inverse modelling</a></li>
-						</ul>
-					</li>
-				</ul>
-			</li>
-			<li><a href="/node/3">News &amp; Events</a></li>
-			<li><a href="/node/4">Documents</a></li>
-			<li class="is_topnode">
-				<a href="/node/6">About</a>
-				<ul>
-					<li><a href="/node/93">Carbon Portal</a></li>
-					<li><a href="/node/46">Feedback form</a></li>
-					<li><a href="/node/19">People</a></li>
-					<li><a href="/node/20">Structure</a></li>
-					<li><a href="/node/18">FAQ</a></li>
-					<li><a href="/node/40">Visit Carbon Portal</a></li>
-				</ul>
-			</li>
-		</ul> -->
+	<div id="cp_theme_d8_menu">
+		@MainMenu(menu)
 	</div>
 
 	<div class="container-fluid">
