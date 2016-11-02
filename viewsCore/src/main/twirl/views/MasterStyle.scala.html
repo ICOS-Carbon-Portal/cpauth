@@ -1,0 +1,341 @@
+@(includeMenu: Boolean)
+<style type="text/css">
+	/** Body **/
+	body {
+		background-color: #414042;
+		font-size: 14px;
+		line-height: 1.42857143;
+		color: #333;
+		font-family: "Open Sans",sans-serif !important;
+	}
+
+	#cp-main-content{
+		background: #fff;
+		padding-right: 15px;
+		padding-left: 15px;
+		margin-right: auto;
+		margin-left: auto;
+	}
+
+	/** Header **/
+	#cp-header {
+		background-size: cover;
+		line-height: 0;
+		background-image: url(https://www.icos-cp.eu/themes/cp_theme_d8/images/icos-cp_header_small.gif);
+	}
+
+	@@media all and (min-width: 513px) {
+		#cp-header {
+			background-image: url(https://www.icos-cp.eu/themes/cp_theme_d8/images/icos-cp_header_medium.gif);
+		}
+	}
+
+	@@media all and (min-width: 1025px) {
+		#cp-header {
+			background-image: url(https://www.icos-cp.eu/themes/cp_theme_d8/images/icos-cp_header.gif);
+		}
+	}
+
+	#cp-header .tint {
+		background-color: rgba(240, 99, 34, 0.3);
+	}
+
+	#cp-header img {
+		height: 125px;
+		padding-left: 122px;
+		padding-top: 22px;
+		padding-bottom: 18px;
+	}
+
+	/** Menu **/
+
+	#cp-main-menu {
+		background-color: #414042;
+		@if(!includeMenu){
+			height: 37px;
+		}
+	}
+	@if(includeMenu){
+		#cp-main-menu li {
+			list-style: none;
+			list-style: none;
+			list-style-image: none;
+			list-style-type: none;
+		}
+		@@media all and (min-width: 800px) {
+			#cp-main-menu {
+				height: 37px;
+			}
+			#cp-main-menu ul {
+				padding: 0em 0em 0em 0em;
+				margin: 0;
+				list-style: none;
+				list-style-image: none;
+				list-style-type: none;
+				margin: 0em auto 0em auto;
+				max-width: 1290px;
+			}
+
+			#cp-main-menu ul li {
+				display: block;
+				position: relative;
+				float: left;
+				background: #414042;
+			}
+
+			#cp-main-menu li ul {
+				display: none;
+			}
+
+			#cp-main-menu ul li a {
+				display: block;
+				padding: 0.6em;
+				text-decoration: none;
+				white-space: nowrap;
+				color: #ffffff;
+				height: 37px;
+				font-size: 14px;
+				line-height: 1.42857143;
+			}
+
+			#cp-main-menu ul li a:hover,
+			#cp-main-menu li:hover li a:hover {
+				color: #ffffff;
+			}
+
+			#cp-main-menu li:hover a {
+				background: #414042;
+			}
+
+			#cp-main-menu li:hover a:hover,
+			#cp-main-menu li:hover li a:hover {
+				background: #666468;
+			}
+
+			#cp-main-menu li:hover > ul {
+				display: block;
+				position: absolute;
+				z-index: 1000;
+			}
+
+			#cp-main-menu li:hover li {
+				float: none;
+			}
+
+			.cp-main-menu li ul li {
+				border-top: 0;
+			}
+
+			#cp-main-menu ul ul ul {
+				left: 100%;
+				top: 0;
+			}
+
+			#cp-main-menu ul:before,
+			#cp-main-menu ul:after {
+				content: " ";
+				display: table;
+			}
+
+			#cp-main-menu ul:after {
+				clear: both;
+			}
+
+			#cp-main-menu a:link {
+				border: 0;
+			}
+
+			#cp-main-menu a:focus {
+				outline: 0;
+			}
+
+			#cp-main-menu .has_subnodes img {
+				width: 1em;
+				margin-left: 2em;
+				margin-right: 1em;
+				margin-bottom: 0.2em;
+			}
+
+			#cp-main-menu .is_topnode .open_menu {
+				display: none;
+			}
+		}
+
+		@@media all and (max-width: 799px) {
+			#cp-main-menu ul {
+				padding: 0;
+				margin: 0;
+			}
+
+			#cp-main-menu ul li {
+				display: block;
+				background: #414042;
+			}
+
+			#cp-main-menu li ul {
+				display: none;
+			}
+
+			#cp-main-menu li.open ul {
+				display: block;
+			}
+
+			#cp-main-menu ul li a {
+				display: block;
+				padding: 1em;
+				text-decoration: none;
+				white-space: nowrap;
+				color: #ffffff;
+				font-size: 14px;
+				line-height: 1.42857143;
+			}
+
+			#cp-main-menu li.is_topnode ul,
+			#cp-main-menu li.has_subnodes ul {
+				margin-left: 2em;
+			}
+
+			#cp-main-menu .has_subnodes img {
+				width: 0.8em;
+				margin-left: 1em;
+				margin-bottom: 0.2em;
+			}
+
+			#cp-main-menu .is_topnode .open_menu {
+				float: right;
+				height: 1.6em;
+				cursor: pointer;
+				padding-left: 50px;
+				padding-right: 50px;
+				position: relative;
+				top: 0.8em;
+				max-width: 100%;
+				font-size: 14px;
+				line-height: 1.42857143;
+				color: #333;
+			}
+			#cp-main-menu a {
+				border-color: white;
+				border-bottom: dotted;
+				border-width: 1px;
+			}
+
+			#cp-main-menu a:hover {
+				border-bottom: solid;
+				border-width: 1px;
+				border-color: white;
+			}
+		}
+
+	} /* end of non-empty menu style */
+
+
+	/** Footer **/
+
+	#cp-site-footer {
+		max-width: 1290px;
+		margin: auto;
+		padding: 0 15px;
+		background: #414042;
+		font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+		word-wrap: break-word;
+		box-sizing: border-box;
+
+		display: flex;
+		flex-direction: row;
+		flex-wrap: wrap;
+
+		display: -webkit-flex;
+		-webkit-flex-direction: row;
+		-webkit-flex-wrap: wrap;
+	}
+	#cp-site-footer .footer-box {
+		border: 0;
+		padding: 0px, 100px, 0px, 100px;
+		margin: 35px 0 30px 0;
+		color: rgba(255,255,255,0.65);
+		font-size: 0.857em;
+		word-wrap: break-word;
+	}
+	#cp-site-footer .footer-box a,
+	#cp-site-footer .footer-box a.is-active {
+		color: #0A96F0;
+		text-decoration: none;
+		border: 0;
+	}
+
+	#cp-site-footer .region {
+		width: 33%;
+		padding: 0 0.65%;
+		min-width: 235px;
+	}
+
+	#cp-site-footer h3 {
+		font-size: 2.2rem;
+		color: #f2f2f2;
+	}
+
+	#cp-site-footer p {
+		margin-top: 1em;
+		font-size: 1.5rem;
+		color: #f2f2f2;
+	}
+
+	#cp-site-footer a.footer-button {
+		background-color: #BD7931;
+		font-size: 1.4rem;
+		color: #FFF;
+		text-decoration: none;
+		text-transform: uppercase;
+		display: inline-block;
+		border: medium none;
+		cursor: pointer;
+		padding: 1.6rem 6rem;
+		margin: 1rem 1rem 1rem 0px;
+		border-radius: 0.2rem;
+		background-clip: padding-box;
+	}
+
+	#cp-site-footer .region-footer-first a.footer-link {
+		color: #ffffff;
+		font-size: 1.5rem;
+		cursor: pointer;
+	}
+
+	#cp-site-footer .region-footer-second a.footer-link,
+	#cp-site-footer .region-footer-third a.footer-link {
+		color: #ffffff;
+		font-size: 1.4rem;
+		display: inline-block;
+		cursor: pointer;
+		padding: 0.5rem 0px;
+		margin-left: 1rem;
+		position: relative;
+		text-transform: uppercase;
+	}
+
+	#cp-site-footer a.footer-link:hover {
+		color: #0A96F0;
+	}
+
+	#cp-site-footer a.footer-link::after {
+		border-style: solid;
+		border-color: transparent transparent transparent #ffffff;
+		-moz-border-top-colors: none;
+		-moz-border-right-colors: none;
+		-moz-border-bottom-colors: none;
+		-moz-border-left-colors: none;
+		border-image: none;
+		content: " ";
+		height: 0px;
+		width: 0px;
+		position: absolute;
+		pointer-events: none;
+		border-width: 0.7rem;
+		right: 100%;
+		top: 50%;
+		margin-top: -0.5rem;
+	}
+
+</style>
+

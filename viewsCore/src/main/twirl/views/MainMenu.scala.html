@@ -1,0 +1,41 @@
+@import views.CpMenuItem
+@import java.net.URI
+
+@(menuItems: Seq[CpMenuItem])
+@subMenu(menuItems, true)
+
+@subMenu(menuItems: Seq[CpMenuItem], isTop: Boolean = false) = {
+	@if(!menuItems.isEmpty){
+		<ul>
+			@for(item <- menuItems){
+				@menuItem(item, isTop)
+			}
+		</ul>
+	}
+}
+
+@menuItem(item: CpMenuItem, isTop: Boolean) = {
+	<li class="@itemClass(item, isTop)">
+		@if(isTop && item.children.nonEmpty){
+			<img src="https://www.icos-cp.eu/themes/cp_theme_d8/images/arrow-up-down.svg" class="open_menu" title="Open/Close"/>
+		}
+		<a href="@link(item.ref)">
+			@item.label
+			@if(!isTop && item.children.nonEmpty){
+				<img src="https://www.icos-cp.eu/themes/cp_theme_d8/images/arrow-down.svg">
+			}
+		</a>
+		@subMenu(item.children)
+	</li>
+}
+
+@itemClass(item: CpMenuItem, isTop: Boolean) = @{
+	if(item.children.isEmpty) null
+	else if(isTop) "is_topnode"
+	else "has_subnodes"
+}
+
+@link(uri: URI) = @{
+	(if(uri.isAbsolute) "" else "https://www.icos-cp.eu") + uri.toString
+}
+

@@ -1,4 +1,6 @@
-@(title: String)(customHeader: Html)(body: Html)
+@import views.CpMenuItem
+
+@(title: String, menu: Seq[CpMenuItem] = Nil)(customHeader: Html)(body: Html)
 <!DOCTYPE html>
 <html>
 <head>
@@ -7,55 +9,51 @@
 	<meta charset="utf-8"/>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 
+	@if(menu.nonEmpty){
+		<script>
+			window.addEventListener("load", function(){
+				var menuGroups = document.getElementsByClassName("open_menu");
+
+				for(var idx = 0; idx < menuGroups.length; idx++){
+					var elem = menuGroups[idx];
+
+					elem.addEventListener("click", function(event){
+						event.target.parentElement.classList.toggle('open');
+					});
+				}
+			});
+		</script>
+	}
+
 	@customHeader
 
 	<title>@title</title>
 
-	<style type="text/css">
-
-		.header {
-			background-image: url('https://static.icos-cp.eu/images/icos-cp_header.gif');
-			background-repeat: no-repeat;
-			background-position: 0px 0px;
-			width: 100%;
-			height: 146.7px;
-			background-size: cover;
-		}
-		.tint {
-			background-color: rgba(240, 99, 34, 0.3);
-			height: 100%;
-		}
-		.header .logo_big {
-			border: 0px none;
-			padding: 0px 0px;
-			margin-left: 22%;
-			margin-top: 0px;
-		}
-		.header .logo_medium {
-			border: 0px none;
-			padding: 0px 0px;
-			margin-left: 280px;
-			margin-top: 0px;
-		}
-	</style>
+	@MasterStyle(menu.nonEmpty)
 
 </head>
 
 <body>
-	<div class="container-fluid">
-
-		<div class="row hidden-xs">
-			<div class="header">
-				<div class="tint">
-					<img src="https://static.icos-cp.eu/images/Icos_Logo_RGB_White_Carbon_Portal_80px.png" class="visible-lg-block logo_big" />
-					<img src="https://static.icos-cp.eu/images/Icos_Logo_RGB_White_Carbon_Portal_48px.png" class="visible-sm-block visible-md-block logo_medium" />
-				</div>
-			</div>
+	<header id="cp-header">
+		<div class="tint" >
+			<a href="https://www.icos-cp.eu/" title="Home">
+				<img src="https://www.icos-cp.eu/themes/cp_theme_d8/logo.svg" alt="Home">
+			</a>
 		</div>
+	</header>
 
-		@body
-
+	<div id="cp-main-menu">
+		@MainMenu(menu)
 	</div>
+
+	<div id="cp-main-content">
+		<div class="container-fluid">
+			@body
+		</div>
+	</div>
+
+	@Footer()
+
 </body>
 </html>
 
