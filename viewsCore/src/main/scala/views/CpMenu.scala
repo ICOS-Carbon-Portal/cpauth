@@ -18,7 +18,7 @@ object CpMenu {
 			group("Visualisations", "/node/9")(
 				item("Footprint tool", "https://data.icos-cp.eu/stilt/"),
 				group("Spatial data", "/node/50")(
-					item("Carbon Portal Service", "/node/52"),
+					item("Carbon Portal Service", "https://data.icos-cp.eu/netcdf/"),
 					item("THREDDS service", "/node/51")
 				),
 				item("Time series data", "/node/49"),
