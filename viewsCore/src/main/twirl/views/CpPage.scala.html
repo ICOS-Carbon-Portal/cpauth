@@ -34,7 +34,7 @@
 </head>
 
 <body>
-	<header id="header">
+	<header id="cp-header">
 		<div class="tint" >
 			<a href="https://www.icos-cp.eu/" title="Home">
 				<img src="https://www.icos-cp.eu/themes/cp_theme_d8/logo.svg" alt="Home">
@@ -42,12 +42,14 @@
 		</div>
 	</header>
 
-	<div id="cp_theme_d8_menu">
+	<div id="cp-main-menu">
 		@MainMenu(menu)
 	</div>
 
-	<div class="container-fluid">
-		@body
+	<div id="cp-main-content">
+		<div class="container-fluid">
+			@body
+		</div>
 	</div>
 
 	@Footer()
