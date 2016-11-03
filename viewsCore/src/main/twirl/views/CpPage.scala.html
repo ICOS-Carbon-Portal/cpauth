@@ -1,6 +1,7 @@
 @import views.CpMenuItem
+@import views.CpMenu
 
-@(title: String, menu: Seq[CpMenuItem] = Nil)(customHeader: Html)(body: Html)
+@(title: String, menu: Seq[CpMenuItem] = CpMenu.default)(customHeader: Html)(body: Html)
 <!DOCTYPE html>
 <html>
 <head>

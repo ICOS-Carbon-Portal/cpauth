@@ -1,7 +1,5 @@
-@import views.CpMenu
-
 @(title: String, subheading: String, scriptName: String)(customHeader: Html)(body: Html)
-@CpPage(title, CpMenu.default){
+@CpPage(title){
 	<script src="https://static.icos-cp.eu/constant/jquery/1.11.2/jquery.min.js"></script>
 	<script src="https://static.icos-cp.eu/constant/bootstrap/3.3.4/js/bootstrap.min.js"></script>
 	@customHeader

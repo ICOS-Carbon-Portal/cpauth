@@ -1,6 +1,7 @@
 @import views.CpMenuItem
+@import views.CpMenu
 
-@(title: String, menu: Seq[CpMenuItem] = Nil)(customHeader: Html)(body: Html)
+@(title: String, menu: Seq[CpMenuItem] = CpMenu.default)(customHeader: Html)(body: Html)
 @CpPage(title, menu){
 	<link rel="shortcut icon" type="image/png" href="https://static.icos-cp.eu/images/favicon.png"/>
 	@customHeader
