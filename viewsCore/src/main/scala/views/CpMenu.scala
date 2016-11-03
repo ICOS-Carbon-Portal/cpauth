@@ -1,10 +1,13 @@
 package views
 
 import java.net.URI
+import se.lu.nateko.cp.viewscore.MenuProvider
 
 object CpMenu {
 
-	def default = Seq(
+	val cpHome = "https://www.icos-cp.eu"
+
+	val fallback = Seq(
 		item("Home", "/node/1"),
 		group("Services", "/node/2")(
 			item("ICOS email lists", "https://lists.icos-cp.eu/lists/"),
@@ -48,6 +51,8 @@ object CpMenu {
 			item("My CP", "https://cpauth.icos-cp.eu/home/")
 		)
 	)
+
+	def default = MenuProvider.menu.getOrElse(fallback)
 
 	def item(label: String, url: String) = CpMenuItem(label, new URI(url))
 

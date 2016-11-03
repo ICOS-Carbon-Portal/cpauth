@@ -1,4 +1,5 @@
 @import views.CpMenuItem
+@import views.CpMenu.cpHome
 @import java.net.URI
 
 @(menuItems: Seq[CpMenuItem])
@@ -36,6 +37,6 @@
 }
 
 @link(uri: URI) = @{
-	(if(uri.isAbsolute) "" else "https://www.icos-cp.eu") + uri.toString
+	(if(uri.isAbsolute) "" else cpHome) + uri.toString
 }
 
