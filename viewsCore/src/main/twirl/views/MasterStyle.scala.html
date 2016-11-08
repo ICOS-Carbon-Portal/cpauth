@@ -11,6 +11,7 @@
 
 	#cp-main-content{
 		background: #fff;
+		padding-bottom: 40px;
 	}
 
 	/** Header **/
@@ -18,6 +19,16 @@
 		background-size: cover;
 		line-height: 0;
 		background-image: url(https://www.icos-cp.eu/themes/cp_theme_d8/images/icos-cp_header_small.gif);
+	}
+
+	#cp-header img {
+		padding-left: 115px;
+		padding-top: 22px;
+		padding-bottom: 17px;
+	}
+
+	#cp-header .tint {
+		background-color: rgba(240, 99, 34, 0.3);
 	}
 
 	@@media all and (min-width: 513px) {
@@ -32,15 +43,12 @@
 		}
 	}
 
-	#cp-header .tint {
-		background-color: rgba(240, 99, 34, 0.3);
-	}
-
-	#cp-header img {
-		height: 125px;
-		padding-left: 122px;
-		padding-top: 22px;
-		padding-bottom: 18px;
+	@@media all and (min-width: 1290px) {
+		#cp-header img {
+			display: block;
+			padding-right: 889px;
+			margin: 0 auto;
+		}
 	}
 
 	/** Menu **/
