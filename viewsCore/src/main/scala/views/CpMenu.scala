@@ -3,13 +3,17 @@ package views
 import java.net.URI
 import se.lu.nateko.cp.viewscore.MenuProvider
 
+sealed trait CpMenuItem
+case class CpMenuGroup(label: String, children: Seq[CpMenuItem]) extends CpMenuItem
+case class CpMenuLeaf(label: String, ref: URI) extends CpMenuItem
+
 object CpMenu {
 
 	val cpHome = "https://www.icos-cp.eu"
 	val riHome = "https://www.icos-ri.eu"
 
 	val landingPage = Seq(
-		group("Home", cpHome)(
+		group("Home")(
 			item("Carbon Portal", cpHome),
 			item("ICOS", riHome)
 		),
@@ -20,9 +24,9 @@ object CpMenu {
 
 	def default = MenuProvider.menu.getOrElse(fallback)
 
-	def item(label: String, url: String) = CpMenuItem(label, new URI(url))
+	def item(label: String, url: String): CpMenuItem = CpMenuLeaf(label, new URI(url))
 
-	def group(label: String, url: String)(subItems: CpMenuItem*) =
-		CpMenuItem(label, new URI(url), subItems)
+	def group(label: String)(first: CpMenuItem, rest: CpMenuItem*): CpMenuItem =
+		CpMenuGroup(label, first +: rest)
 }
 

@@ -1,4 +1,6 @@
 @import views.CpMenuItem
+@import views.CpMenuLeaf
+@import views.CpMenuGroup
 @import views.CpMenu.cpHome
 @import java.net.URI
 
@@ -17,23 +19,31 @@
 
 @menuItem(item: CpMenuItem, isTop: Boolean) = {
 	<li class="@itemClass(item, isTop)">
-		@if(isTop && item.children.nonEmpty){
-			<img src="https://www.icos-cp.eu/themes/cp_theme_d8/images/arrow-up-down.svg" class="open_menu" title="Open/Close"/>
-		}
-		<a href="@link(item.ref)">
-			@item.label
-			@if(!isTop && item.children.nonEmpty){
-				<img src="https://www.icos-cp.eu/themes/cp_theme_d8/images/arrow-down.svg">
+		@item match{
+			case CpMenuGroup(label, children) => {
+				@if(isTop){
+					<img src="https://www.icos-cp.eu/themes/cp_theme_d8/images/arrow-up-down.svg" class="open_menu" title="Open/Close"/>
+				}
+				<a>
+					@label
+					@if(!isTop){
+						<img src="https://www.icos-cp.eu/themes/cp_theme_d8/images/arrow-down.svg">
+					}
+				</a>
+				@subMenu(children)
 			}
-		</a>
-		@subMenu(item.children)
+			case CpMenuLeaf(label, ref) => {
+				<a href="@link(ref)">@label</a>
+			}
+		}
 	</li>
 }
 
 @itemClass(item: CpMenuItem, isTop: Boolean) = @{
-	if(item.children.isEmpty) null
-	else if(isTop) "is_topnode"
-	else "has_subnodes"
+	item match {
+		case CpMenuLeaf(_, _) => null
+		case CpMenuGroup(_, _) => if(isTop) "is_topnode" else "has_subnodes"
+	}
 }
 
 @link(uri: URI) = @{

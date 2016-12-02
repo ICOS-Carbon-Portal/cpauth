@@ -15,6 +15,9 @@ import org.w3c.dom.Node
 
 import javax.xml.parsers.DocumentBuilderFactory
 import views.CpMenuItem
+import views.CpMenuGroup
+import views.CpMenuLeaf
+
 
 object MenuFetcher {
 
@@ -63,12 +66,13 @@ object MenuFetcher {
 
 	private def parseMenuItem(liNode: Node): CpMenuItem = {
 		val anchor = children("a", liNode).headOption.getOrElse(throw new Exception("Missing <a> tag in <li>"))
-
-		val ref = anchor.getAttributes.getNamedItem("href").getTextContent
 		val label = anchor.getTextContent
 
 		val childItems = parseMenu(liNode).get
-		CpMenuItem(label, new URI(ref), childItems)
+		if(childItems.isEmpty) {
+			val ref = anchor.getAttributes.getNamedItem("href").getTextContent
+			CpMenuLeaf(label, new URI(ref))
+		}else CpMenuGroup(label, childItems)
 	}
 
 	private def children(name: String, node: Node): IndexedSeq[Node] = {
