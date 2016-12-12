@@ -1,3 +1,5 @@
+// Idp = Identity Provider
+
 package se.lu.nateko.cp.cpauth.opensaml
 
 import java.net.URI
@@ -25,6 +27,7 @@ class IdpProps(val name: String, val key: PublicKey, val ssoRedirect: URL)
 trait IdpLibrary{
 
 	protected val map: Map[URI, IdpProps]
+	protected val whitelist: Seq[URI]
 
 	def getIdpProps(idpId: URI): Try[IdpProps] = map.get(idpId) match {
 		case None => Failure(new MetadataProviderException("Unknown Identity Provider: " + idpId))
@@ -34,6 +37,8 @@ trait IdpLibrary{
 	def getInfos: Iterable[IdpInfo] = map.map{
 		case (id, props) => IdpInfo(props.name, id.toString)
 	}
+
+	def isWhitelisted(idpId: URI): Boolean = whitelist.contains(idpId)
 
 }
 
@@ -45,10 +50,10 @@ object IdpLibrary {
 
 	def fromConfig(config: SamlConfig): IdpLibrary = {
 		val idpMetaStream = getClass.getResourceAsStream(config.idpMetadataFilePath)
-		fromMetaStream(idpMetaStream)
+		fromMetaStream(idpMetaStream, config.idpWhitelist)
 	}
 
-	def fromMetaStream(metadata: java.io.InputStream): IdpLibrary = {
+	def fromMetaStream(metadata: java.io.InputStream, wlst: Seq[URI] = Nil): IdpLibrary = {
 
 		val entsDescr = Parser.fromStream[EntitiesDescriptor](metadata)
 		val entDescrs = entsDescr.getEntityDescriptors.toSafeIterable
@@ -70,6 +75,7 @@ object IdpLibrary {
 
 		new IdpLibrary{
 			override val map = Map(urisToProps.toSeq: _*)
+	        override val whitelist = wlst
 		}
 	}
 

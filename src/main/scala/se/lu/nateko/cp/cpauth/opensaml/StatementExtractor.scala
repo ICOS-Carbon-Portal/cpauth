@@ -12,6 +12,8 @@ import org.slf4j.LoggerFactory
 
 class AllStatements(nameValues: Map[String, Seq[String]]){
 
+	import StatementExtractor.fail
+
 	def getSingleValue(attributes: Seq[String]): Try[String] =
 		attributes.flatMap(attr => nameValues.get(attr).toSeq.flatten).distinct.toList match {
 
@@ -24,19 +26,22 @@ class AllStatements(nameValues: Map[String, Seq[String]]){
 
 		}
 
-	private def fail(msg: String) = Failure(new Exception(msg) with NoStackTrace)
+
 }
 
 object StatementExtractor {
 
 	private[this] val log = LoggerFactory.getLogger(getClass)
 
-	def extractAttributeStringValues(assertions: Iterable[ValidatedAssertion]): AllStatements = {
+	def fail(msg: String) = Failure(new Exception(msg) with NoStackTrace)
+
+	def extractAttributeStringValues(assertions: Iterable[ValidatedAssertion]): Try[AllStatements] = Try{
 		val nameValues = assertions.collect{
 			case ValidatedAssertion(validated, None) => validated
 			case ValidatedAssertion(validated, Some(validationError)) =>
-				log.warn("Assertion validation error: " + validationError)
-				validated
+	            val s = "Assertion validation error: " + validationError
+				log.warn(s)
+				throw new Exception(s) with NoStackTrace
 		}.flatMap(extractAttributeStringValues)
 			.groupBy{case (name, value) => name}
 			.mapValues(nameValuePairs => nameValuePairs.map{case (name, value) => value}.toSeq)

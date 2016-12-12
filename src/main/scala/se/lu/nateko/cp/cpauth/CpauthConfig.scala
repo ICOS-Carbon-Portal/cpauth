@@ -1,5 +1,6 @@
 package se.lu.nateko.cp.cpauth
 
+import java.net.URI
 import com.typesafe.config.Config
 import spray.json.DefaultJsonProtocol
 import spray.json._
@@ -8,10 +9,11 @@ import com.typesafe.config.ConfigFactory
 import se.lu.nateko.cp.cpauth.core.PublicAuthConfig
 
 case class HttpConfig(
-		serviceHost: String,
-		servicePrivatePort: Int,
-		loginPath: String,
-		drupalProxying: Map[String, ProxyConfig]){
+
+	serviceHost: String,
+	servicePrivatePort: Int,
+	loginPath: String,
+	drupalProxying: Map[String, ProxyConfig]){
 	def serviceUrl: String = "https://" + serviceHost
 	def authDomain: String = HttpConfig.cookieDomainFromHost(serviceHost)
 }
@@ -25,7 +27,8 @@ case class SamlConfig(
 	idpCookieName: String,
 	privateKeyPath: String,
 	spConfig: SamlSpConfig,
-	attributes: SamlAttrConfig
+	attributes: SamlAttrConfig,
+	idpWhitelist: Seq[URI]
 )
 
 case class PrivateAuthConfig(authTokenValiditySeconds: Int, privateKeyPath: String)
@@ -62,6 +65,19 @@ object HttpConfig{
 
 object ConfigReader extends DefaultJsonProtocol{
 
+	implicit object urlFormat extends RootJsonFormat[URI] {
+		def write(uri: URI): JsValue = JsString(uri.toString)
+
+		def read(value: JsValue): URI = value match{
+			case JsString(uri) => try{
+				new URI(uri)
+			}catch{
+				case err: Throwable => deserializationError(s"Could not parse URI from $uri", err)
+			}
+			case _ => deserializationError("URI string expected")
+		}
+	}
+
 	def getDefault: CpauthConfig = fromAppConfig(getAppConfig)
 
 	def getAppConfig: Config = {
@@ -76,7 +92,7 @@ object ConfigReader extends DefaultJsonProtocol{
 	implicit val samlAttrFormat = jsonFormat3(SamlAttrConfig)
 	//.apply needed because of the companion object that HttpConfig has
 	implicit val urlsConfigFormat = jsonFormat4(HttpConfig.apply)
-	implicit val samlConfigFormat = jsonFormat5(SamlConfig)
+	implicit val samlConfigFormat = jsonFormat6(SamlConfig)
 
 	implicit val pubAuthConfigFormat = jsonFormat2(PublicAuthConfig)
 	implicit val privAuthConfigFormat = jsonFormat2(PrivateAuthConfig)
