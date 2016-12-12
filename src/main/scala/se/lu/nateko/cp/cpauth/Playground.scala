@@ -3,14 +3,10 @@ package se.lu.nateko.cp.cpauth
 import org.opensaml.saml2.core.Response
 import se.lu.nateko.cp.cpauth.opensaml.AssertionValidator
 import se.lu.nateko.cp.cpauth.opensaml.AssertionExtractor
-import se.lu.nateko.cp.cpauth.opensaml.AssertionExtractor._
 import scala.util.Try
 import se.lu.nateko.cp.cpauth.opensaml.IdpLibrary
 import se.lu.nateko.cp.cpauth.opensaml.ValidatedAssertion
 import se.lu.nateko.cp.cpauth.opensaml.StatementExtractor
-import org.opensaml.saml2.core.Assertion
-import se.lu.nateko.cp.cpauth.opensaml.Parser
-import se.lu.nateko.cp.cpauth.core.CoreUtils
 import se.lu.nateko.cp.cpauth.opensaml.ResponseStatusController
 import org.opensaml.xml.XMLObject
 import scala.collection.JavaConverters.asScalaBufferConverter

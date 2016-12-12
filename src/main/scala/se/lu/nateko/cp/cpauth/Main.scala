@@ -4,7 +4,6 @@ import akka.actor.ActorSystem
 import se.lu.nateko.cp.cpauth.accounts.Users
 import se.lu.nateko.cp.cpauth.core.AuthenticationFailedException
 import se.lu.nateko.cp.cpauth.core.Authenticator
-import se.lu.nateko.cp.cpauth.core.CoreUtils
 import se.lu.nateko.cp.cpauth.opensaml.AssertionExtractor
 import se.lu.nateko.cp.cpauth.opensaml.IdpLibrary
 import se.lu.nateko.cp.cpauth.routing._
@@ -22,7 +21,6 @@ import se.lu.nateko.cp.cpauth.utils.TargetUrlLookup
 import se.lu.nateko.cp.cpauth.utils.MapBasedUrlLookup
 import se.lu.nateko.cp.cpauth.services._
 import se.lu.nateko.cp.cpauth.oauth.FacebookAuthenticationService
-import akka.dispatch.Dispatcher
 
 
 object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
