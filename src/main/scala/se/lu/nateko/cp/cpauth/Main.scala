@@ -4,7 +4,6 @@ import akka.actor.ActorSystem
 import se.lu.nateko.cp.cpauth.accounts.Users
 import se.lu.nateko.cp.cpauth.core.AuthenticationFailedException
 import se.lu.nateko.cp.cpauth.core.Authenticator
-import se.lu.nateko.cp.cpauth.core.CoreUtils
 import se.lu.nateko.cp.cpauth.opensaml.AssertionExtractor
 import se.lu.nateko.cp.cpauth.opensaml.IdpLibrary
 import se.lu.nateko.cp.cpauth.routing._
@@ -22,12 +21,10 @@ import se.lu.nateko.cp.cpauth.utils.TargetUrlLookup
 import se.lu.nateko.cp.cpauth.utils.MapBasedUrlLookup
 import se.lu.nateko.cp.cpauth.services._
 import se.lu.nateko.cp.cpauth.oauth.FacebookAuthenticationService
-import akka.dispatch.Dispatcher
 
 
 object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
 		with StaticRouting with RestHeartRouting with OAuthRouting{
-
 	val config: CpauthConfig = ConfigReader.getDefault
 	val (httpConfig, publicAuthConfig, samlConfig, oauthConfig) = (config.http, config.auth.pub, config.saml, config.oauth)
 
@@ -83,13 +80,13 @@ object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
 
 	http.bindAndHandle(route, "127.0.0.1", httpConfig.servicePrivatePort)
 		.onSuccess{
-			case binding =>
-				sys.addShutdownHook{
-					val doneFuture = binding.unbind()
-						.flatMap(_ => system.terminate())(ExecutionContext.Implicits.global)
-					Await.result(doneFuture, 3 seconds)
-				}
-				system.log.info(s"Started cpauth: $binding")
-		}
+		case binding =>
+			sys.addShutdownHook{
+				val doneFuture = binding.unbind()
+					.flatMap(_ => system.terminate())(ExecutionContext.Implicits.global)
+				Await.result(doneFuture, 3 seconds)
+			}
+			system.log.info(s"Started cpauth: $binding")
+	}
 
 }

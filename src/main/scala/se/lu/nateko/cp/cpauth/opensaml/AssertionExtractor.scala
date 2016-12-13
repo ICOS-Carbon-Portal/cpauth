@@ -9,7 +9,6 @@ import org.opensaml.saml2.core.EncryptedAssertion
 import org.opensaml.saml2.core.Response
 import org.opensaml.saml2.encryption.Decrypter
 import org.opensaml.xml.encryption.InlineEncryptedKeyResolver
-import org.opensaml.xml.schema.XSString
 import org.opensaml.xml.security.keyinfo.StaticKeyInfoCredentialResolver
 import org.opensaml.xml.security.x509.BasicX509Credential
 

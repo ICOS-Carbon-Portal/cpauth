@@ -43,7 +43,7 @@ class CookieFactory(config: CpauthConfig) {
 		goodResponse <- ResponseStatusController.ensureSuccess(response);
 		validator <- AssertionValidator(goodResponse, idpLib);
 		assertions = extractor.extractAssertions(goodResponse).map(validator.validate);
-		statements = StatementExtractor.extractAttributeStringValues(assertions);
+		statements <- StatementExtractor.extractAttributeStringValues(assertions);
 		userIdTry = getUserId(statements);
 		userId <- provideDebug(userIdTry, assertions);
 		tokenBase64 <- makeTokenBase64(userId, AuthSource.Saml);
