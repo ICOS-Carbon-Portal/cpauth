@@ -19,6 +19,7 @@ import se.lu.nateko.cp.cpauth.SamlConfig
 import se.lu.nateko.cp.cpauth.core.Crypto
 import se.lu.nateko.cp.cpauth.utils.Utils
 import org.opensaml.saml2.metadata.LocalizedString
+import org.opensaml.xml.security.credential.UsageType
 
 case class IdpInfo(name: String, id: String)
 
@@ -84,9 +85,13 @@ object IdpLibrary {
 		key <- Crypto.publicKeyFromX509Cert(cert)
 	) yield key
 	
-	private def idpToCertInBase64(idp: IDPSSODescriptor): Try[String] = Try(
-		idp.getKeyDescriptors.get(0).getKeyInfo.getX509Datas.get(0).getX509Certificates.get(0).getValue
-	)
+	private def idpToCertInBase64(idp: IDPSSODescriptor): Try[String] = Try{
+		import scala.collection.JavaConversions.collectionAsScalaIterable
+		val keyDescriptor = idp.getKeyDescriptors
+			.find(kd => kd.getUse == UsageType.SIGNING)
+			.getOrElse(idp.getKeyDescriptors.get(0))
+		keyDescriptor.getKeyInfo.getX509Datas.get(0).getX509Certificates.get(0).getValue
+	}
 	
 	private def idpToSsoRedirect(idp: IDPSSODescriptor): Try[URL] = Try{
 		val redirectSss = idp.getSingleSignOnServices.toSafeIterable.find{
