@@ -1,4 +1,3 @@
-
 lazy val commonSettings = Seq(
 	organization := "se.lu.nateko.cp",
 	scalaVersion := "2.11.8",
@@ -78,8 +77,6 @@ lazy val cpauth = (project in file("."))
 //			"xalan"                  %  "serializer"                         % "2.7.2", //for DOM serialization to strings during debug
 			"net.jcip"               %  "jcip-annotations"                   % "1.0",
 			"org.joda"               %  "joda-convert"                       % "1.7",
-			"com.typesafe.slick"     %% "slick"                              % "3.1.1",
-			"com.typesafe.slick"     %% "slick-hikaricp"                     % "3.1.1",
 			"org.hsqldb"             %  "hsqldb"                             % "2.3.4",
 			"org.apache.commons"     % "commons-email"                       % "1.4",
 			"org.apache.oltu.oauth2" % "org.apache.oltu.oauth2.client"       % "1.0.2"
@@ -96,4 +93,3 @@ lazy val cpauth = (project in file("."))
 		mainClass in (Compile, run) := cpauthMain
 
 	)
-
