@@ -15,6 +15,18 @@ import se.lu.nateko.cp.cpauth.core.UserId
 import se.lu.nateko.cp.cpauth.core.AuthenticationFailedException
 
 
+trait UsersIo{
+	def addUser(userEntry: UserEntry, password: String): Future[Unit]
+	def userExists(uid: UserId): Future[Boolean]
+	def authenticateUser(uid: UserId, password: String): Future[UserEntry]
+	def dropUser(uid: UserId): Future[Unit]
+	def updateUser(oldUid: UserId, userEntry: UserEntry, newPass: String): Future[Unit]
+	def listUsers: Future[Seq[UserEntry]]
+	def userIsAdmin(uid: UserId): Future[Boolean]
+	def setAdminRights(uid: UserId, isAdmin: Boolean): Future[Unit]
+}
+
+
 class JdbcUsers(getConnection: () => Connection)
 			   (implicit ctxt: ExecutionContext) extends UsersIo {
 

@@ -1,7 +1,8 @@
 package se.lu.nateko.cp.cpauth
 
 import akka.actor.ActorSystem
-import se.lu.nateko.cp.cpauth.accounts.Users
+import java.sql.DriverManager
+import se.lu.nateko.cp.cpauth.accounts.JdbcUsers
 import se.lu.nateko.cp.cpauth.core.AuthenticationFailedException
 import se.lu.nateko.cp.cpauth.core.Authenticator
 import se.lu.nateko.cp.cpauth.opensaml.AssertionExtractor
@@ -41,7 +42,12 @@ object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
 	val assExtractorTry = AssertionExtractor(samlConfig)
 	val idpLib: IdpLibrary = IdpLibrary.fromConfig(samlConfig)
 	val cookieFactory = new CookieFactory(config)
-	val userDb = Users
+
+	val userDb = new JdbcUsers( () => {
+		Class.forName("org.hsqldb.jdbc.JDBCDataSource")
+		DriverManager.getConnection("jdbc:hsqldb:mem:test")
+	})
+
 	val passwordHandler = {
 		val emailSender = new EmailSender(config.mailing)
 		implicit val exeCtxt = blockingExeContext
@@ -49,8 +55,6 @@ object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
 	}
 	val targetLookup: TargetUrlLookup = new MapBasedUrlLookup
 	val authenticator = Authenticator(publicAuthConfig)
-
-	system.registerOnTermination(Users.closeDb())
 
 	val cpauthExceptionHandler = ExceptionHandler{
 		case AuthenticationFailedException =>
