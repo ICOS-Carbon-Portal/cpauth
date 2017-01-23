@@ -19,7 +19,6 @@ trait UsersIo{
 	def dropUser(uid: UserId): Future[Unit]
 	def updateUser(oldUid: UserId, userEntry: UserEntry, newPass: String): Future[Unit]
 	def listUsers: Future[Seq[UserEntry]]
-	def listUsersOld: Future[Seq[(UserId, String, String)]]
 	def userIsAdmin(uid: UserId): Future[Boolean]
 	def setAdminRights(uid: UserId, isAdmin: Boolean): Future[Unit]
 }
@@ -107,15 +106,6 @@ object Users extends UsersIo {
 
 		db.run(q.result).map(_.map({
 			case (mail, isAdmin) => UserEntry(UserId(mail), isAdmin)
-		}))
-	}
-
-	def listUsersOld: Future[Seq[(UserId, String, String)]] = {
-		val q = for(user <- users) yield
-			(user.givenName, user.surname, user.mail)
-
-		db.run(q.result).map(_.map({
-			case (givenName, surname, mail) => (UserId(mail), givenName, surname)
 		}))
 	}
 
