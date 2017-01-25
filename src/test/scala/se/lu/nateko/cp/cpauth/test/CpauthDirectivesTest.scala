@@ -17,7 +17,7 @@ import akka.http.scaladsl.model.headers.HttpCookie
 import se.lu.nateko.cp.cpauth.services.CookieFactory
 
 class CpauthDirectivesTest extends FunSpec with ScalatestRouteTest {
-	
+
 	def getConfig(privKeyPath: String) = CpauthConfig(
 		auth = AuthConfig(
 			priv = PrivateAuthConfig(
@@ -30,6 +30,7 @@ class CpauthDirectivesTest extends FunSpec with ScalatestRouteTest {
 			)
 		),
 		saml = null,
+		database = null,
 		http = HttpConfig(
 			drupalProxying = null,
 			loginPath = null,
@@ -70,7 +71,7 @@ class CpauthDirectivesTest extends FunSpec with ScalatestRouteTest {
 				assert(responseAs[String] === "blabla")
 			}
 		}
-		
+
 		it("returns a 'Bad Request' HTTP response with exception's message as body, in case attempt fails"){
 			val route = dirs.attempt(Exceptions.failure[String]("error message")){ s =>
 				complete((StatusCodes.OK, s))
@@ -88,9 +89,9 @@ class CpauthDirectivesTest extends FunSpec with ScalatestRouteTest {
 		val route = dirs.user(uid => complete(uid.email))
 
 		describe("when no CPauth cookie is present"){
-	
+
 			it("rejects the request with 'CredentialsMissing' rejection"){
-				
+
 				Get("/any") ~> route ~> check{
 					val authRejections = rejections.collect{
 						case MissingCookieRejection(_) => 1
@@ -108,7 +109,7 @@ class CpauthDirectivesTest extends FunSpec with ScalatestRouteTest {
 
 		describe("when a properly signed CPauth cookie is present"){
 			val cookie = makeCookie("test1", config)
-			
+
 			it("delegates to the inner route"){
 				Get("/any") ~> Cookie(cookie.pair()) ~> route ~> check{
 					assert(responseAs[String] === "test1")
@@ -119,7 +120,7 @@ class CpauthDirectivesTest extends FunSpec with ScalatestRouteTest {
 		describe("when the cookie has been signed with a wrong private key"){
 			val wrongConfig = getConfig("/saml/test_private_key.der")
 			val cookie = makeCookie("test2", wrongConfig)
-			
+
 			it("rejects the request with 'CredentialsRejected' rejection"){
 				Get("/any") ~> Cookie(cookie.pair()) ~> route ~> check{
 					val authRejections = rejections.collect{

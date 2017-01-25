@@ -43,9 +43,12 @@ object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
 	val idpLib: IdpLibrary = IdpLibrary.fromConfig(samlConfig)
 	val cookieFactory = new CookieFactory(config)
 
+	Class.forName(config.database.driver)
 	val userDb = new JdbcUsers( () => {
-		Class.forName("org.hsqldb.jdbc.JDBCDataSource")
-		DriverManager.getConnection("jdbc:hsqldb:mem:test")
+		DriverManager.getConnection(
+			config.database.url,
+			config.database.user,
+			config.database.password)
 	})
 
 	val passwordHandler = {

@@ -31,6 +31,13 @@ case class SamlConfig(
 	idpWhitelist: Seq[URI]
 )
 
+case class DatabaseConfig(
+	driver: String,
+	url: String,
+	user: String,
+	password: String
+)
+
 case class PrivateAuthConfig(authTokenValiditySeconds: Int, privateKeyPath: String)
 case class AuthConfig(priv: PrivateAuthConfig, pub: PublicAuthConfig)
 case class RestHeartConfig(baseUri: String, dbName: String, usersCollection: String)
@@ -39,6 +46,7 @@ case class EmailConfig(smtpServer: String, fromAddress: String, logBccAddress: O
 case class CpauthConfig(
 	http: HttpConfig,
 	saml: SamlConfig,
+	database: DatabaseConfig,
 	auth: AuthConfig,
 	restheart: RestHeartConfig,
 	mailing: EmailConfig,
@@ -93,6 +101,7 @@ object ConfigReader extends DefaultJsonProtocol{
 	//.apply needed because of the companion object that HttpConfig has
 	implicit val urlsConfigFormat = jsonFormat4(HttpConfig.apply)
 	implicit val samlConfigFormat = jsonFormat6(SamlConfig)
+	implicit val databaseConfigFormat = jsonFormat4(DatabaseConfig)
 
 	implicit val pubAuthConfigFormat = jsonFormat2(PublicAuthConfig)
 	implicit val privAuthConfigFormat = jsonFormat2(PrivateAuthConfig)
@@ -102,7 +111,7 @@ object ConfigReader extends DefaultJsonProtocol{
 	implicit val facebookConfigFormat = jsonFormat3(OAuthProviderConfig)
 	implicit val oauthConfigFormat = jsonFormat1(OAuthConfig)
 
-	implicit val cpauthConfigFormat = jsonFormat6(CpauthConfig)
+	implicit val cpauthConfigFormat = jsonFormat7(CpauthConfig)
 
 	def fromAppConfig(applicationConfig: Config): CpauthConfig = {
 
