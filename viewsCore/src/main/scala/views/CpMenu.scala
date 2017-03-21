@@ -17,7 +17,7 @@ object CpMenu {
 			item("Carbon Portal", cpHome),
 			item("ICOS", riHome)
 		),
-		item("License", cpHome + "/license")
+		item("License", "https://data.icos-cp.eu/licence")
 	)
 
 	val fallback = Seq("Home", "Services", "News & Events", "Documents", "About").map(item(_, cpHome))
