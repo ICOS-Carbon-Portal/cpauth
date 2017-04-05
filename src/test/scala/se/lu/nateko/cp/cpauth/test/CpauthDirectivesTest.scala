@@ -1,19 +1,18 @@
 package se.lu.nateko.cp.cpauth.test
 
 import org.scalatest.FunSpec
+
+import akka.http.scaladsl.model.StatusCodes
+import akka.http.scaladsl.model.headers.Cookie
+import akka.http.scaladsl.model.headers.HttpCookie
+import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.testkit.ScalatestRouteTest
+import akka.stream.ActorMaterializer
 import se.lu.nateko.cp.cpauth._
 import se.lu.nateko.cp.cpauth.core._
-import scala.util.Try
-import scala.concurrent.ExecutionContext
-import akka.http.scaladsl.server.Directives._
-import akka.http.scaladsl.model.StatusCodes
-import akka.http.scaladsl.testkit.ScalatestRouteTest
-import akka.http.scaladsl.server.AuthenticationFailedRejection
-import akka.http.scaladsl.model.headers.Cookie
-import akka.stream.ActorMaterializer
+import se.lu.nateko.cp.cpauth.routing.BadCpauthCookieRejection
+import se.lu.nateko.cp.cpauth.routing.CpauthCookieMissingRejection
 import se.lu.nateko.cp.cpauth.routing.CpauthDirectives
-import akka.http.scaladsl.server.MissingCookieRejection
-import akka.http.scaladsl.model.headers.HttpCookie
 import se.lu.nateko.cp.cpauth.services.CookieFactory
 
 class CpauthDirectivesTest extends FunSpec with ScalatestRouteTest {
@@ -94,7 +93,7 @@ class CpauthDirectivesTest extends FunSpec with ScalatestRouteTest {
 
 				Get("/any") ~> route ~> check{
 					val authRejections = rejections.collect{
-						case MissingCookieRejection(_) => 1
+						case CpauthCookieMissingRejection => 1
 					}
 					assert(authRejections.length === 1)
 				}
@@ -124,7 +123,7 @@ class CpauthDirectivesTest extends FunSpec with ScalatestRouteTest {
 			it("rejects the request with 'CredentialsRejected' rejection"){
 				Get("/any") ~> Cookie(cookie.pair()) ~> route ~> check{
 					val authRejections = rejections.collect{
-						case AuthenticationFailedRejection(AuthenticationFailedRejection.CredentialsRejected, _) => 1
+						case bad: BadCpauthCookieRejection => 1
 					}
 					assert(authRejections.length === 1)
 				}
