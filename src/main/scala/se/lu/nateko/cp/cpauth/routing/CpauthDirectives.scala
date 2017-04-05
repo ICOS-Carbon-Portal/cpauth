@@ -30,6 +30,9 @@ import se.lu.nateko.cp.cpauth.core.PublicAuthConfig
 import se.lu.nateko.cp.cpauth.core.UserId
 import se.lu.nateko.cp.cpauth.core.AuthToken
 import se.lu.nateko.cp.cpauth.core.AuthSource
+import akka.http.javadsl.server.CustomRejection
+import akka.http.scaladsl.server.MissingCookieRejection
+import akka.http.scaladsl.server.RejectionHandler
 
 trait CpauthDirectives {
 
@@ -53,25 +56,23 @@ trait CpauthDirectives {
 	def forbid(message: String): StandardRoute = complete((StatusCodes.Forbidden, message))
 
 	val token: Directive1[AuthToken] = Directive{inner =>
-		cookie(publicAuthConfig.authCookieName)(cookie => {
-			val tokenTry = for(
-				auth <- authenticator;
-				signedToken <- CookieToToken.recoverToken(cookie.value);
-				token <- auth.unwrapToken(signedToken)
-			) yield token
+		cancelRejections(classOf[MissingCookieRejection]){
+			cookie(publicAuthConfig.authCookieName)(cookie => {
+				val tokenTry = for(
+					auth <- authenticator;
+					signedToken <- CookieToToken.recoverToken(cookie.value);
+					token <- auth.unwrapToken(signedToken)
+				) yield token
 
-			val tokenFuture = Utils.slowFailureDown(Future.fromTry(tokenTry), 500 millis)
+				val tokenFuture = Utils.slowFailureDown(Future.fromTry(tokenTry), 500 millis)
 
-			onComplete(tokenFuture){
-				case Success(token) => inner(Tuple1(token))
-				case Failure(err) => reject(
-					new AuthenticationFailedRejection(
-						AuthenticationFailedRejection.CredentialsRejected,
-						HttpChallenge("https", "")
-					)
-				)
-			}
-		})
+				onComplete(tokenFuture){
+					case Success(token) => inner(Tuple1(token))
+					case Failure(err) => reject(new BadCpauthCookieRejection(err))
+				}
+			}) ~
+			reject(CpauthCookieMissingRejection)
+		}
 	}
 
 	val user: Directive1[UserId] = token.map(_.userId)
@@ -87,11 +88,20 @@ trait CpauthDirectives {
 		}
 	})
 
+	val authRejectionHandler = RejectionHandler.newBuilder()
+		.handle{
+			case CpauthCookieMissingRejection => complete((StatusCodes.Unauthorized, "Authentication cookie missing"))
+			case bad: BadCpauthCookieRejection => complete((StatusCodes.Unauthorized, bad.message))
+		}
+		.result()
+
 	lazy val whoami: Route =
-		user{userId =>
-			respondWithHeader(`Access-Control-Allow-Origin`.*){
-				import se.lu.nateko.cp.cpauth.CpauthJsonProtocol.userIdFormat
-				complete(userId)
+		handleRejections(authRejectionHandler){
+			user{userId =>
+				respondWithHeader(`Access-Control-Allow-Origin`.*){
+					import se.lu.nateko.cp.cpauth.CpauthJsonProtocol.userIdFormat
+					complete(userId)
+				}
 			}
 		} ~
 		complete(StatusCodes.Unauthorized)
@@ -110,4 +120,9 @@ trait CpauthDirectives {
 			case Success(true) => inner(())
 		}
 	}
+}
+
+case object CpauthCookieMissingRejection extends CustomRejection
+class BadCpauthCookieRejection(err: Throwable) extends CustomRejection{
+	val message = err.getMessage + err.getStackTrace.map(_.toString).mkString("\n", "\n", "")
 }
