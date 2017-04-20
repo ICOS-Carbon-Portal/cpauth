@@ -9,7 +9,7 @@ import akka.http.scaladsl.server.Route
 import se.lu.nateko.cp.cpauth.accounts.RestHeartClient
 import se.lu.nateko.cp.cpauth.core.AuthSource
 import se.lu.nateko.cp.cpauth.core.UserId
-import se.lu.nateko.cp.cpauth.oauth.{FacebookAuthenticationService, OrcidIdAuthenticationService}
+import se.lu.nateko.cp.cpauth.oauth.{FacebookAuthenticationService, OrcidAuthenticationService}
 import se.lu.nateko.cp.cpauth.services.CookieFactory
 
 trait OAuthRouting {
@@ -17,8 +17,9 @@ trait OAuthRouting {
 	def facebookAuth: FacebookAuthenticationService
 	def cookieFactory: CookieFactory
 	def blockingExeContext: ExecutionContext
+	def dispatcher: ExecutionContext
 	def restHeart: RestHeartClient
-	def orcidIdAuthenticationService: OrcidIdAuthenticationService
+	def orcidIdAuthenticationService: OrcidAuthenticationService
 
 	def oauthRoute: Route = pathPrefix("oauth" / "facebook"){
 
@@ -59,10 +60,10 @@ trait OAuthRouting {
 		}
 	}
 
+	//TODO Remove code duplication with oauthRoute
 	def orcididRoute: Route = pathPrefix("oauth" / "orcidid"){
 
 		parameters('code, 'state ?){(code, targetUrl) =>
-
 			onSuccess(cpauthTokenFromOrcidId(code: String)){token =>
 
 				setCookie(cookieFactory.makeAuthCookie(token)){
@@ -81,21 +82,17 @@ trait OAuthRouting {
 	}
 
 	private[this] def cpauthTokenFromOrcidId(code: String): Future[String] = {
-		implicit val exeCtxt = blockingExeContext
+		implicit val exeCtxt = dispatcher
 
-		Future{
-			val userInfo = orcidIdAuthenticationService.retrieveUserInfo(code)
-			val uid = UserId(userInfo.email)
-
-			//Silent side effect: creating user profile if it does not already exist
-			//restHeart.createUserIfNew(uid, userInfo.givenName, userInfo.surname)
-
-			uid
-		}.flatMap{uid =>
-			Future.fromTry(
-				cookieFactory.makeTokenBase64(uid, AuthSource.OrcidId)
-			)
-		}
+		orcidIdAuthenticationService.retrieveUserInfo(code)
+			.map(userInfo => {
+				UserId(userInfo.email)
+			})
+			.flatMap{uid =>
+				Future.fromTry(
+					cookieFactory.makeTokenBase64(uid, AuthSource.Orcid)
+				)
+			}
 	}
 
 }

@@ -10,7 +10,7 @@ case class UserId(email: String)
 
 object AuthSource extends Enumeration{
 	type AuthSource = Value
-	val Password, PasswordReset, Saml, OrcidId, Facebook = Value
+	val Password, PasswordReset, Saml, Orcid, Facebook = Value
 }
 
 case class AuthToken(userId: UserId, expiresOn: Long, source: AuthSource.Value)

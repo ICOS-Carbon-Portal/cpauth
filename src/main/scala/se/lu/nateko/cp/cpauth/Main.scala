@@ -22,7 +22,7 @@ import se.lu.nateko.cp.cpauth.utils.TargetUrlLookup
 import se.lu.nateko.cp.cpauth.utils.MapBasedUrlLookup
 import se.lu.nateko.cp.cpauth.services._
 import se.lu.nateko.cp.cpauth.oauth.FacebookAuthenticationService
-import se.lu.nateko.cp.cpauth.oauth.OrcidIdAuthenticationService
+import se.lu.nateko.cp.cpauth.oauth.OrcidAuthenticationService
 
 
 object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
@@ -39,7 +39,7 @@ object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
 	val http = Http()
 	val restHeart = new RestHeartClient(config.restheart, http)
 	val facebookAuth = new FacebookAuthenticationService(oauthConfig.facebook, httpConfig.serviceHost)
-	val orcidIdAuthenticationService = new OrcidIdAuthenticationService(oauthConfig.orcidid, httpConfig.serviceHost)
+	val orcidIdAuthenticationService = new OrcidAuthenticationService(oauthConfig.orcidid)
 
 	val assExtractorTry = AssertionExtractor(samlConfig)
 	val idpLib: IdpLibrary = IdpLibrary.fromConfig(samlConfig)
