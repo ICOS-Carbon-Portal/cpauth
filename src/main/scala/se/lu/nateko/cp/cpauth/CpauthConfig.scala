@@ -53,8 +53,9 @@ case class CpauthConfig(
 	oauth: OAuthConfig
 )
 
-case class OAuthConfig(facebook: OAuthProviderConfig){
-	def public = OAuthConfig(facebook.public)
+case class OAuthConfig(facebook: OAuthProviderConfig, orcidid: OAuthProviderConfig){
+	def public = OAuthConfig(facebook.public, orcidid.public)
+
 	def jsonString: String = public.toJson(ConfigReader.oauthConfigFormat).prettyPrint
 }
 
@@ -109,7 +110,7 @@ object ConfigReader extends DefaultJsonProtocol{
 	implicit val restHeartConfigFormat = jsonFormat3(RestHeartConfig)
 	implicit val emailConfigFormat = jsonFormat3(EmailConfig)
 	implicit val facebookConfigFormat = jsonFormat3(OAuthProviderConfig)
-	implicit val oauthConfigFormat = jsonFormat1(OAuthConfig)
+	implicit val oauthConfigFormat = jsonFormat2(OAuthConfig)
 
 	implicit val cpauthConfigFormat = jsonFormat7(CpauthConfig)
 

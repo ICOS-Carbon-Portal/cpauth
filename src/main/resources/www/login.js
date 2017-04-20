@@ -134,6 +134,16 @@ function facebookUrl(targetUrl){
 		(targetUrl ? '&state=' + encodeURIComponent(targetUrl) : '');
 }
 
+function orcididUrl(targetUrl){
+	var config = document.oauthConfig.orcidid;
+	return 'https://orcid.org/oauth/authorize?client_id=' 
+		+ config.clientId 
+		+ '&response_type=code&scope=/authenticate&redirect_uri=' 
+		+ encodeURIComponent(config.redirectPath)
+		+ (targetUrl ? '&state=' 
+		+ encodeURIComponent(targetUrl) : '');
+}
+
 $(function(){
 	$idpInput = $("#idpUrlInput");
 	$idpBtn = $("#signonBtn");
@@ -158,6 +168,7 @@ $(function(){
 	$("#choosePasswordButton").click(initPassReset);
 
 	$("#facebookLoginButton").attr('href', facebookUrl(targetUrl));
+	$("#orcididLoginButton").attr('href', orcididUrl(targetUrl));
 
 	$('#swamid-link').click(hideMessage);
 	$('#plain-link').click(hideMessage);
