@@ -125,12 +125,12 @@ function initPassReset() {
 
 function facebookUrl(targetUrl){
 	var config = document.oauthConfig.facebook;
-	var redirect_uri = document.location.origin + config.redirectPath;
 
-	return 'https://graph.facebook.com/oauth/authorize' +
+	return 'https://www.facebook.com/v2.9/dialog/oauth' +
 		'?scope=email%2C+public_profile' +
-		'&redirect_uri=' + encodeURIComponent(redirect_uri) +
+		'&redirect_uri=' + encodeURIComponent(config.redirectPath) +
 		'&client_id=' + config.clientId +
+		'&display=popup&response_type=code' +
 		(targetUrl ? '&state=' + encodeURIComponent(targetUrl) : '');
 }
 

@@ -78,8 +78,7 @@ lazy val cpauth = (project in file("."))
 			"net.jcip"               %  "jcip-annotations"                   % "1.0",
 			"org.joda"               %  "joda-convert"                       % "1.7",
 			"org.hsqldb"             %  "hsqldb"                             % "2.3.4",
-			"org.apache.commons"     % "commons-email"                       % "1.4",
-			"org.apache.oltu.oauth2" % "org.apache.oltu.oauth2.client"       % "1.0.2"
+			"org.apache.commons"     % "commons-email"                       % "1.4"
 		),
 
 		fork := true,

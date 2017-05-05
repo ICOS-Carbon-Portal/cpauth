@@ -1,38 +1,40 @@
 package se.lu.nateko.cp.cpauth.accounts
 
 import scala.concurrent.Future
+import scala.util.Success
+import scala.util.Try
 
 import akka.Done
 import akka.http.scaladsl.HttpExt
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
 import akka.http.scaladsl.marshalling.Marshal
+import akka.http.scaladsl.model.ContentTypes
+import akka.http.scaladsl.model.HttpMethod
 import akka.http.scaladsl.model.HttpMethods
 import akka.http.scaladsl.model.HttpRequest
 import akka.http.scaladsl.model.HttpResponse
 import akka.http.scaladsl.model.RequestEntity
+import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.model.Uri
+import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.stream.Materializer
 import se.lu.nateko.cp.cpauth.RestHeartConfig
 import se.lu.nateko.cp.cpauth.core.UserId
-import spray.json.{JsObject, JsValue, JsString}
-import scala.concurrent.duration.DurationInt
-import akka.http.scaladsl.unmarshalling.Unmarshal
-import scala.util.Try
-import scala.util.Success
-import scala.util.Failure
-import akka.http.scaladsl.model.ContentTypes
-import akka.http.scaladsl.model.HttpMethod
-import akka.http.scaladsl.model.StatusCodes
+import se.lu.nateko.cp.cpauth.utils.SprayJsonUtils._
+import se.lu.nateko.cp.cpauth.utils.Utils
+import spray.json._
 
 class RestHeartClient(val config: RestHeartConfig, http: HttpExt)(implicit m: Materializer) {
-
 	import http.system.dispatcher
 
-	def getUserUri(uid: UserId): Uri = {
-		val email = uid.email
+	val usersCollUri: Uri = {
 		import config._
-		Uri(s"$baseUri/$dbName/$usersCollection/$email")
+		Uri(s"$baseUri/$dbName/$usersCollection")
 	}
+
+	private val KeepIdsOnly = "keys" -> "{\"_id\": 1}"
+
+	def getUserUri(uid: UserId): Uri = usersCollUri.withPath(usersCollUri.path / uid.email)
 
 	def createUserIfNew(uid: UserId, givenName: String, surname: String): Future[Done] =
 		userExists(uid).flatMap{exists =>
@@ -65,8 +67,9 @@ class RestHeartClient(val config: RestHeartConfig, http: HttpExt)(implicit m: Ma
 	}
 
 	def userExists(uid: UserId): Future[Boolean] = {
-		val query = Uri.Query("keys" -> "{\"_id\": 1}")
+		val query = Uri.Query(KeepIdsOnly)
 		val req = HttpRequest(uri = getUserUri(uid).withQuery(query))
+
 		http.singleRequest(req).flatMap{resp =>
 			if(resp.status.isSuccess()) Future.successful(true)
 			else if(resp.status == StatusCodes.NotFound) Future.successful(false)
@@ -86,28 +89,50 @@ class RestHeartClient(val config: RestHeartConfig, http: HttpExt)(implicit m: Ma
 		val uri = getUserUri(uid).withQuery(query)
 		for(
 			resp <- http.singleRequest(HttpRequest(uri = uri));
-			userObj <- Unmarshal(resp.entity.withContentType(ContentTypes.`application/json`)).to[JsValue]
-		) yield userObj.asJsObject("Expected a JSON object, got a JSON value")
+			userVal <- Unmarshal(resp.entity.withContentType(ContentTypes.`application/json`)).to[JsValue];
+			userObj <- Future.fromTry(ensure[JsObject](userVal))
+		) yield userObj
 	}
 
 	def getGivenAndSurName(uid: UserId): Future[(String, String)] =
 		getUserProps(uid, Seq("profile.givenName", "profile.surname")).flatMap{userObj =>
 
-			def getField(obj: JsObject, field: String): Try[String] = {
-				obj.fields.get(field) match {
-					case Some(JsString(v)) => Success(v)
-					case None => Success("")
-					case _ => Failure(new Exception(s"Expected a string property '$field'"))
-				}
-			}
-			Future.fromTry(for(
-				profile <- Try{
-					val profile = userObj.fields.get("profile").getOrElse(JsObject())
-					profile.asJsObject("Expected 'profile' to be a JSON object")
-				};
-				givenName <- getField(profile, "givenName");
-				surname <- getField(profile, "surname")
-			) yield (givenName, surname))
+			val profileVal = getFieldOpt[JsValue](userObj, "profile").getOrElse(JsObject.empty);
+
+			Future.fromTry(
+				for(
+					profile <- ensure[JsObject](profileVal);
+					givenName <- getStringField(profile, "givenName");
+					surname <- getStringField(profile, "surname")
+				) yield (givenName, surname)
+			)
 		}
+
+	def findUsers(filter: Map[String, String]): Future[Seq[UserId]] = {
+
+		val filterParam: String = filter.map{
+			case (path, value) => s""""$path": "$value""""
+		}.mkString("{", ", ", "}")
+
+		val uri = usersCollUri.withQuery(Uri.Query("filter" -> filterParam, KeepIdsOnly))
+		for(
+			resp <- http.singleRequest(HttpRequest(uri = uri));
+			usersListResp <- Unmarshal(resp.entity.withContentType(ContentTypes.`application/json`)).to[JsValue];
+			users <- Future.fromTry(parseFilteredUsersList(usersListResp))
+		) yield users
+	}
+
+	private def parseFilteredUsersList(v: JsValue): Try[Seq[UserId]] = {
+		for(
+			obj <- ensure[JsObject](v);
+			returned <- getField[JsNumber](obj, "_returned")
+		) yield
+			if(returned.value == 0) Success(Nil)
+			else for(
+				arr <- getField[JsArray](obj, "_embedded");
+				uidObjs <- getElements[JsObject](arr);
+				ids <- Utils.tryseq(uidObjs.map(getStringField(_, "_id")))
+			) yield ids.map(UserId)
+	}.flatten
 
 }

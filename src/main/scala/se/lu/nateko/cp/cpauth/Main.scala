@@ -32,13 +32,12 @@ object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
 
 	implicit val system = ActorSystem("cpauth")
 	implicit val dispatcher = system.dispatcher
-	val blockingExeContext  = system.dispatchers.lookup("my-blocking-dispatcher")
 	implicit val scheduler = system.scheduler
 	implicit val materializer = ActorMaterializer(namePrefix = Some("cpauth_mat"))
 
 	val http = Http()
 	val restHeart = new RestHeartClient(config.restheart, http)
-	val facebookAuth = new FacebookAuthenticationService(oauthConfig.facebook, httpConfig.serviceHost)
+	val facebookAuth = new FacebookAuthenticationService(oauthConfig.facebook)
 	val orcidIdAuthenticationService = new OrcidAuthenticationService(oauthConfig.orcidid)
 
 	val assExtractorTry = AssertionExtractor(samlConfig)
@@ -55,7 +54,7 @@ object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
 
 	val passwordHandler = {
 		val emailSender = new EmailSender(config.mailing)
-		implicit val exeCtxt = blockingExeContext
+		implicit val exeCtxt = system.dispatchers.lookup("my-blocking-dispatcher")
 		new PasswordLifecycleHandler(emailSender, cookieFactory, userDb, config.http)
 	}
 	val targetLookup: TargetUrlLookup = new MapBasedUrlLookup
@@ -75,8 +74,8 @@ object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
 		passwordRoute ~
 		drupalRoute ~
 		restheartRoute ~
-		oauthRoute ~
-		orcididRoute ~
+		facebookRoute ~
+		orcidRoute ~
 		get{
 			path("logout")(logout) ~
 			path("whoami"){whoami} ~

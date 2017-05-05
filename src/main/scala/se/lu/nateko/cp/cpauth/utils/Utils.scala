@@ -10,6 +10,10 @@ import scala.concurrent.ExecutionContext
 import akka.pattern.Patterns.after
 import akka.actor.Scheduler
 import scala.concurrent.duration.FiniteDuration
+import scala.util.Try
+import scala.collection.mutable.Buffer
+import scala.util.Failure
+import scala.util.Success
 
 object Utils {
 
@@ -60,4 +64,17 @@ object Utils {
 			case err => after(time, scheduler, ex, Future.failed(err))
 		}
 
+	def tryseq[T](tries: Iterable[Try[T]]): Try[Seq[T]] = {
+		val successes = Buffer.empty[T]
+		var error: Option[Failure[Seq[T]]] = None
+		val iter = tries.iterator
+
+		while(error.isEmpty && iter.hasNext){
+			iter.next() match{
+				case Success(t) => successes += t
+				case Failure(err) => error = Some(Failure(err))
+			}
+		}
+		error.getOrElse(Success(successes))
+	}
 }
