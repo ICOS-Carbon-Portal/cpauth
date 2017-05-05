@@ -125,13 +125,23 @@ function initPassReset() {
 
 function facebookUrl(targetUrl){
 	var config = document.oauthConfig.facebook;
-	var redirect_uri = document.location.origin + config.redirectPath;
 
-	return 'https://graph.facebook.com/oauth/authorize' +
+	return 'https://www.facebook.com/v2.9/dialog/oauth' +
 		'?scope=email%2C+public_profile' +
-		'&redirect_uri=' + encodeURIComponent(redirect_uri) +
+		'&redirect_uri=' + encodeURIComponent(config.redirectPath) +
 		'&client_id=' + config.clientId +
+		'&display=popup&response_type=code' +
 		(targetUrl ? '&state=' + encodeURIComponent(targetUrl) : '');
+}
+
+function orcididUrl(targetUrl){
+	var config = document.oauthConfig.orcidid;
+	return 'https://orcid.org/oauth/authorize?client_id=' 
+		+ config.clientId 
+		+ '&response_type=code&scope=/authenticate&redirect_uri=' 
+		+ encodeURIComponent(config.redirectPath)
+		+ (targetUrl ? '&state=' 
+		+ encodeURIComponent(targetUrl) : '');
 }
 
 $(function(){
@@ -158,6 +168,7 @@ $(function(){
 	$("#choosePasswordButton").click(initPassReset);
 
 	$("#facebookLoginButton").attr('href', facebookUrl(targetUrl));
+	$("#orcididLoginButton").attr('href', orcididUrl(targetUrl));
 
 	$('#swamid-link').click(hideMessage);
 	$('#plain-link').click(hideMessage);
