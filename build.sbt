@@ -1,6 +1,6 @@
 lazy val commonSettings = Seq(
 	organization := "se.lu.nateko.cp",
-	scalaVersion := "2.11.8",
+	scalaVersion := "2.11.11",
 
 	libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.0" % "test",
 
@@ -57,7 +57,8 @@ lazy val cpauthViews = (project in file("views"))
 	)
 
 
-val akkaVersion = "2.4.10"
+val akkaVersion = "2.4.18"
+val akkaHttpVersion = "10.0.6"
 val cpauthMain = Some("se.lu.nateko.cp.cpauth.Main")
 
 lazy val cpauth = (project in file("."))
@@ -67,9 +68,10 @@ lazy val cpauth = (project in file("."))
 		name := "Carbon Portal Authentication Service",
 		version := "0.4",
 		libraryDependencies ++= Seq(
-			"com.typesafe.akka"      %% "akka-http-spray-json-experimental"  % akkaVersion,
+			"com.typesafe.akka"      %% "akka-http-spray-json"               % akkaHttpVersion,
+			"com.typesafe.akka"      %% "akka-http-testkit"                  % akkaHttpVersion % "test",
 			"com.typesafe.akka"      %% "akka-slf4j"                         % akkaVersion,
-			"com.typesafe.akka"      %% "akka-http-testkit"                  % akkaVersion % "test",
+			"com.typesafe.akka"      %% "akka-stream"                        % akkaVersion,
 			"ch.qos.logback"         %  "logback-classic"                    % "1.1.3",
 			"org.opensaml"           %  "opensaml"                           % "2.6.6",
 			"org.scala-lang.modules" %% "scala-xml"                          % "1.0.5",
