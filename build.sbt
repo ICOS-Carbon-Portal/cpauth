@@ -1,6 +1,8 @@
-lazy val commonSettings = Seq(
+val defaultScala = "2.11.11"
+
+val commonSettings = Seq(
 	organization := "se.lu.nateko.cp",
-	scalaVersion := "2.11.11",
+	scalaVersion := defaultScala,
 
 	libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.0" % "test",
 
@@ -15,7 +17,8 @@ lazy val commonSettings = Seq(
 	)
 )
 
-lazy val publishingSettings = Seq(
+val publishingSettings = Seq(
+	crossScalaVersions := Seq(defaultScala, "2.12.2"),
 	publishTo := {
 		val nexus = "https://repo.icos-cp.eu/content/repositories/"
 		if (isSnapshot.value)
@@ -85,3 +88,4 @@ lazy val cpauth = (project in file("."))
 		mainClass in (Compile, run) := cpauthMain
 
 	)
+
