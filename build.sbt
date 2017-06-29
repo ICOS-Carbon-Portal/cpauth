@@ -47,23 +47,14 @@ lazy val viewsCore = (project in file("viewsCore"))
 	)
 
 
-lazy val cpauthViews = (project in file("views"))
-	.dependsOn(viewsCore)
-	.settings(commonSettings: _*)
-	.enablePlugins(SbtTwirl)
-	.settings(
-		name := "cpauth-views",
-		version := "0.1"
-	)
-
-
 val akkaVersion = "2.4.18"
 val akkaHttpVersion = "10.0.6"
 val cpauthMain = Some("se.lu.nateko.cp.cpauth.Main")
 
 lazy val cpauth = (project in file("."))
-	.dependsOn(cpauthCore, cpauthViews)
+	.dependsOn(cpauthCore, viewsCore)
 	.settings(commonSettings: _*)
+	.enablePlugins(SbtTwirl)
 	.settings(
 		name := "Carbon Portal Authentication Service",
 		version := "0.4",
