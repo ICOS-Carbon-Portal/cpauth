@@ -7,13 +7,16 @@ val commonSettings = Seq(
 	libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.0" % "test",
 
 	scalacOptions ++= Seq(
-		"-unchecked",
-		"-deprecation",
-		"-Xlint",
-		"-Ywarn-dead-code",
-		"-language:_",
 		"-target:jvm-1.8",
-		"-encoding", "UTF-8"
+		"-encoding", "UTF-8",
+		"-unchecked",
+		"-feature",
+		"-deprecation",
+		"-Xfuture",
+		"-Yno-adapted-args",
+		"-Ywarn-dead-code",
+		"-Ywarn-numeric-widen",
+		"-Ywarn-unused"
 	)
 )
 
@@ -46,7 +49,8 @@ lazy val viewsCore = (project in file("viewsCore"))
 	.enablePlugins(SbtTwirl)
 	.settings(
 		name := "views-core",
-		version := "0.2-SNAPSHOT"
+		version := "0.2-SNAPSHOT",
+		scalacOptions += "-Ywarn-unused-import:false"
 	)
 
 
@@ -76,6 +80,8 @@ lazy val cpauth = (project in file("."))
 			"org.hsqldb"             %  "hsqldb"                             % "2.3.4",
 			"org.apache.commons"     % "commons-email"                       % "1.4"
 		),
+
+		scalacOptions += "-language:postfixOps",
 
 		fork := true,
 

@@ -1,7 +1,6 @@
 package se.lu.nateko.cp.cpauth.core
 
 import scala.util.Try
-import scala.util.Failure
 import scala.util.Success
 import java.security.interfaces.RSAPublicKey
 import java.time.Instant
