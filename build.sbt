@@ -4,7 +4,7 @@ val commonSettings = Seq(
 	organization := "se.lu.nateko.cp",
 	scalaVersion := defaultScala,
 
-	libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.0" % "test",
+	libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.1" % "test",
 
 	scalacOptions ++= Seq(
 		"-target:jvm-1.8",
@@ -21,7 +21,7 @@ val commonSettings = Seq(
 )
 
 val publishingSettings = Seq(
-	crossScalaVersions := Seq(defaultScala, "2.12.2"),
+	crossScalaVersions := Seq(defaultScala, "2.12.3"),
 	publishTo := {
 		val nexus = "https://repo.icos-cp.eu/content/repositories/"
 		if (isSnapshot.value)
@@ -49,13 +49,13 @@ lazy val viewsCore = (project in file("viewsCore"))
 	.enablePlugins(SbtTwirl)
 	.settings(
 		name := "views-core",
-		version := "0.2-SNAPSHOT",
+		version := "0.3.1-SNAPSHOT",
 		scalacOptions += "-Ywarn-unused-import:false"
 	)
 
 
-val akkaVersion = "2.4.18"
-val akkaHttpVersion = "10.0.6"
+val akkaVersion = "2.4.19"
+val akkaHttpVersion = "10.0.9"
 val cpauthMain = Some("se.lu.nateko.cp.cpauth.Main")
 
 lazy val cpauth = (project in file("."))
@@ -64,7 +64,7 @@ lazy val cpauth = (project in file("."))
 	.enablePlugins(SbtTwirl)
 	.settings(
 		name := "Carbon Portal Authentication Service",
-		version := "0.4",
+		version := "0.4.1",
 		libraryDependencies ++= Seq(
 			"com.typesafe.akka"      %% "akka-http-spray-json"               % akkaHttpVersion,
 			"com.typesafe.akka"      %% "akka-http-testkit"                  % akkaHttpVersion % "test",
