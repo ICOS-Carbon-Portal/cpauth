@@ -27,8 +27,7 @@ case class SamlConfig(
 	idpCookieName: String,
 	privateKeyPath: String,
 	spConfig: SamlSpConfig,
-	attributes: SamlAttrConfig,
-	idpWhitelist: Seq[URI]
+	attributes: SamlAttrConfig
 )
 
 case class DatabaseConfig(
@@ -101,7 +100,7 @@ object ConfigReader extends DefaultJsonProtocol{
 	implicit val samlAttrFormat = jsonFormat3(SamlAttrConfig)
 	//.apply needed because of the companion object that HttpConfig has
 	implicit val urlsConfigFormat = jsonFormat4(HttpConfig.apply)
-	implicit val samlConfigFormat = jsonFormat6(SamlConfig)
+	implicit val samlConfigFormat = jsonFormat5(SamlConfig)
 	implicit val databaseConfigFormat = jsonFormat4(DatabaseConfig)
 
 	implicit val pubAuthConfigFormat = jsonFormat2(PublicAuthConfig)

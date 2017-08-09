@@ -23,12 +23,11 @@ import org.opensaml.xml.security.credential.UsageType
 
 case class IdpInfo(name: String, id: String)
 
-class IdpProps(val name: String, val key: PublicKey, val ssoRedirect: URL)
+class IdpProps(val name: String, val keys: Seq[PublicKey], val ssoRedirect: URL)
 
 trait IdpLibrary{
 
 	protected val map: Map[URI, IdpProps]
-	protected val whitelist: Seq[URI]
 
 	def getIdpProps(idpId: URI): Try[IdpProps] = map.get(idpId) match {
 		case None => Failure(new MetadataProviderException("Unknown Identity Provider: " + idpId))
@@ -38,8 +37,6 @@ trait IdpLibrary{
 	def getInfos: Iterable[IdpInfo] = map.map{
 		case (id, props) => IdpInfo(props.name, id.toString)
 	}
-
-	def isWhitelisted(idpId: URI): Boolean = whitelist.contains(idpId)
 
 }
 
@@ -51,10 +48,10 @@ object IdpLibrary {
 
 	def fromConfig(config: SamlConfig): IdpLibrary = {
 		val idpMetaStream = getClass.getResourceAsStream(config.idpMetadataFilePath)
-		fromMetaStream(idpMetaStream, config.idpWhitelist)
+		fromMetaStream(idpMetaStream)
 	}
 
-	def fromMetaStream(metadata: java.io.InputStream, wlst: Seq[URI] = Nil): IdpLibrary = {
+	def fromMetaStream(metadata: java.io.InputStream): IdpLibrary = {
 
 		val entsDescr = Parser.fromStream[EntitiesDescriptor](metadata)
 		val entDescrs = entsDescr.getEntityDescriptors.toSafeIterable
@@ -65,10 +62,10 @@ object IdpLibrary {
 
 			for{
 				id <- getId(ed);
-				key <- idpToPublicKey(idp);
+				keys <- idpToPublicKeys(idp);
 				redirect <- idpToSsoRedirect(idp);
 				name <- entityDescrToName(ed).orElse(idpToName(idp, id.toString))
-			} yield (id, new IdpProps(name, key, redirect))
+			} yield (id, new IdpProps(name, keys, redirect))
 
 		}).collect{
 			case Success(uriToProps) => uriToProps
@@ -76,21 +73,21 @@ object IdpLibrary {
 
 		new IdpLibrary{
 			override val map = Map(urisToProps.toSeq: _*)
-			override val whitelist = wlst
 		}
 	}
 
-	private def idpToPublicKey(idp: IDPSSODescriptor): Try[PublicKey] = for(
-		cert <- idpToCertInBase64(idp);
-		key <- Crypto.publicKeyFromX509Cert(cert)
-	) yield key
+	private def idpToPublicKeys(idp: IDPSSODescriptor): Try[Seq[PublicKey]] = for(
+		certs <- idpToCertsInBase64(idp);
+		keys <- Utils.tryseq(certs.map(Crypto.publicKeyFromX509Cert))
+	) yield keys
 	
-	private def idpToCertInBase64(idp: IDPSSODescriptor): Try[String] = Try{
+	private def idpToCertsInBase64(idp: IDPSSODescriptor): Try[Seq[String]] = Try{
 		import scala.collection.JavaConverters._
-		val keyDescriptor = idp.getKeyDescriptors.asScala
-			.find(kd => kd.getUse == UsageType.SIGNING)
-			.getOrElse(idp.getKeyDescriptors.get(0))
-		keyDescriptor.getKeyInfo.getX509Datas.get(0).getX509Certificates.get(0).getValue
+		idp.getKeyDescriptors.asScala
+			.filter(_.getUse != UsageType.ENCRYPTION)
+			.map(
+				_.getKeyInfo.getX509Datas.get(0).getX509Certificates.get(0).getValue
+			)
 	}
 	
 	private def idpToSsoRedirect(idp: IDPSSODescriptor): Try[URL] = Try{

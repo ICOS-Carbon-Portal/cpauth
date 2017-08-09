@@ -10,16 +10,16 @@ import java.net.URI
 case class ValidatedAssertion(assertion: Assertion, error: Option[String])
 
 
-class AssertionValidator(pubKey: PublicKey, whiteListed: Boolean = false) {
+class AssertionValidator(pubKeys: Seq[PublicKey]) {
 
-	def validate(assertion: Assertion): ValidatedAssertion = {
+	def validate(assertion: Assertion, response: Response): ValidatedAssertion = {
 
-		val error = if(assertion.isSigned)
-				SignatureValidator.getValidationError(assertion.getDOM, pubKey)
-		else if (! whiteListed)
+		val error = if(response.isSigned)
+			SignatureValidator.getValidationError(response.getDOM, pubKeys)
+		else if(assertion.isSigned)
+			SignatureValidator.getValidationError(assertion.getDOM, pubKeys)
+		else
 			Some("Assertion is not signed!")
-	    else
-	        None
 
 		ValidatedAssertion(assertion, error)
 
@@ -35,6 +35,6 @@ object AssertionValidator{
 
 		idpProp <- idpLib.getIdpProps(idpId)
 
-	} yield new AssertionValidator(idpProp.key, idpLib.isWhitelisted(idpId))
+	} yield new AssertionValidator(idpProp.keys)
 
 }

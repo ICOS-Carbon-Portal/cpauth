@@ -42,7 +42,7 @@ class CookieFactory(config: CpauthConfig) {
 	): Try[(HttpCookie, UserId, AllStatements)] = for(
 		goodResponse <- ResponseStatusController.ensureSuccess(response);
 		validator <- AssertionValidator(goodResponse, idpLib);
-		assertions = extractor.extractAssertions(goodResponse).map(validator.validate);
+		assertions = extractor.extractAssertions(goodResponse).map(validator.validate(_, goodResponse));
 		statements <- StatementExtractor.extractAttributeStringValues(assertions);
 		userIdTry = getUserId(statements);
 		userId <- provideDebug(userIdTry, assertions);

@@ -25,7 +25,7 @@ object Playground {
 		validator <- AssertionValidator(goodResponse, idpLib);
 		extractor <- extractorTry
 	) yield {
-			extractor.extractAssertions(goodResponse).map(validator.validate)
+			extractor.extractAssertions(goodResponse).map(validator.validate(_, goodResponse))
 				.flatMap(getAssertionSummary).toSeq.sortBy(s => s).mkString("\n")
 	}
 
