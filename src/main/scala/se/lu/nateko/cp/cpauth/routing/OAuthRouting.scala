@@ -60,7 +60,7 @@ trait OAuthRouting {
 	}
 
 	private def oauthRoute(uidProvider: String => Future[UserId], source: AuthSource.AuthSource): Route = {
-		parameters('code, 'state ?){(code, targetUrl) =>
+		parameters(('code, 'state.?)){(code, targetUrl) =>
 			val tokenFut: Future[String] = uidProvider(code).flatMap{uid =>
 				Future.fromTry(
 					cookieFactory.makeTokenBase64(uid, source)

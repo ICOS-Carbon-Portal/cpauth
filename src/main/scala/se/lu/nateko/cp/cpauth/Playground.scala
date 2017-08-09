@@ -48,7 +48,7 @@ object Playground {
 			Seq(xmlObj.getClass)
 	}
 
-	def makeLongLifeCookie(fname: String, lname: String, email: String): String = {
+	def makeLongLifeCookie(email: String): String = {
 		val validity = 3600 * 24 * 365 * 30 //30 years in seconds
 		val defConf = ConfigReader.getDefault
 		val privAuthConf = defConf.auth.priv.copy(authTokenValiditySeconds = validity)

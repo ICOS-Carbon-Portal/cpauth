@@ -16,7 +16,7 @@ class JdbcUsersTest extends FunSuite with ScalaFutures {
 	}
 
 	test("Simple test of all operations") {
-		val jdu = new se.lu.nateko.cp.cpauth.accounts.JdbcUsers(getConnection)
+		val jdu = new se.lu.nateko.cp.cpauth.accounts.JdbcUsers(() => getConnection())
 		val uid = UserId("ordinaryuser")
 		val ue  = UserEntry(uid, false)
 

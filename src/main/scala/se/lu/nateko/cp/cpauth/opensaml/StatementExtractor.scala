@@ -38,13 +38,13 @@ object StatementExtractor {
 	def extractAttributeStringValues(assertions: Iterable[ValidatedAssertion]): Try[AllStatements] = Try{
 		val nameValues = assertions.collect{
 			case ValidatedAssertion(validated, None) => validated
-			case ValidatedAssertion(validated, Some(validationError)) =>
-	            val s = "Assertion validation error: " + validationError
+			case ValidatedAssertion(_, Some(validationError)) =>
+				val s = "Assertion validation error: " + validationError
 				log.warn(s)
 				throw new Exception(s) with NoStackTrace
 		}.flatMap(extractAttributeStringValues)
-			.groupBy{case (name, value) => name}
-			.mapValues(nameValuePairs => nameValuePairs.map{case (name, value) => value}.toSeq)
+			.groupBy{case (name, _) => name}
+			.mapValues(nameValuePairs => nameValuePairs.map{case (_, value) => value}.toSeq)
 
 		new AllStatements(nameValues)
 	}

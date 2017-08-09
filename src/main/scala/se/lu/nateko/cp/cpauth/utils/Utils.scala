@@ -1,6 +1,5 @@
 package se.lu.nateko.cp.cpauth.utils
 
-import scala.collection.convert.WrapAsScala
 import java.util.zip.Deflater
 import java.io.ByteArrayOutputStream
 import java.util.zip.DeflaterOutputStream
@@ -39,11 +38,12 @@ object Utils {
 			.getLevel
 
 	implicit class SafeJavaCollectionWrapper[T](val list: java.util.Collection[T]) extends AnyVal {
+		import scala.collection.JavaConverters._
 
 		def toSafeIterable: Iterable[T] =
 			if(list == null)
 				Iterable.empty[T]
-			else WrapAsScala.iterableAsScalaIterable(list)
+			else list.asScala
 	}
 
 	def compressAndBase64ForSaml(s: String): String = {

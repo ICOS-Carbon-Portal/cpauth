@@ -76,7 +76,7 @@ object IdpLibrary {
 
 		new IdpLibrary{
 			override val map = Map(urisToProps.toSeq: _*)
-	        override val whitelist = wlst
+			override val whitelist = wlst
 		}
 	}
 
@@ -86,8 +86,8 @@ object IdpLibrary {
 	) yield key
 	
 	private def idpToCertInBase64(idp: IDPSSODescriptor): Try[String] = Try{
-		import scala.collection.JavaConversions.collectionAsScalaIterable
-		val keyDescriptor = idp.getKeyDescriptors
+		import scala.collection.JavaConverters._
+		val keyDescriptor = idp.getKeyDescriptors.asScala
 			.find(kd => kd.getUse == UsageType.SIGNING)
 			.getOrElse(idp.getKeyDescriptors.get(0))
 		keyDescriptor.getKeyInfo.getX509Datas.get(0).getX509Certificates.get(0).getValue

@@ -1,4 +1,4 @@
-val defaultScala = "2.11.11"
+val defaultScala = "2.12.3"
 
 val commonSettings = Seq(
 	organization := "se.lu.nateko.cp",
@@ -21,7 +21,7 @@ val commonSettings = Seq(
 )
 
 val publishingSettings = Seq(
-	crossScalaVersions := Seq(defaultScala, "2.12.3"),
+	crossScalaVersions := Seq(defaultScala, "2.11.11"),
 	publishTo := {
 		val nexus = "https://repo.icos-cp.eu/content/repositories/"
 		if (isSnapshot.value)
@@ -64,7 +64,7 @@ lazy val cpauth = (project in file("."))
 	.enablePlugins(SbtTwirl)
 	.settings(
 		name := "Carbon Portal Authentication Service",
-		version := "0.4.1",
+		version := "0.4.2",
 		libraryDependencies ++= Seq(
 			"com.typesafe.akka"      %% "akka-http-spray-json"               % akkaHttpVersion,
 			"com.typesafe.akka"      %% "akka-http-testkit"                  % akkaHttpVersion % "test",
@@ -80,8 +80,6 @@ lazy val cpauth = (project in file("."))
 			"org.hsqldb"             %  "hsqldb"                             % "2.3.4",
 			"org.apache.commons"     % "commons-email"                       % "1.4"
 		),
-
-		scalacOptions += "-language:postfixOps",
 
 		fork := true,
 

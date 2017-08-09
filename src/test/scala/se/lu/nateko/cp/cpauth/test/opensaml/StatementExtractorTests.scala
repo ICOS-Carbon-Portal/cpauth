@@ -2,7 +2,6 @@ package se.lu.nateko.cp.cpauth.test.opensaml
 
 import org.opensaml.saml2.core.Assertion
 import org.scalatest.FunSuite
-import scala.collection.JavaConverters._
 
 import se.lu.nateko.cp.cpauth.opensaml.Parser
 import se.lu.nateko.cp.cpauth.opensaml.StatementExtractor

@@ -35,7 +35,7 @@ trait SamlRouting extends CpauthDirectives{
 	def samlRoute: Route = pathPrefix("saml"){
 		get{
 			path("login") {
-				parameter('idpUrl, 'targetUrl ?){ (idp, target) =>
+				parameter(('idpUrl, 'targetUrl.?)){ (idp, target) =>
 
 					val idpPropTry = for(
 						idpUri <- Try(new URI(idp));

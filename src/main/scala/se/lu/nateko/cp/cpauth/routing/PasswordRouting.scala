@@ -4,18 +4,13 @@ import scala.util.Success
 import scala.util.Failure
 import se.lu.nateko.cp.cpauth.core.UserId
 import se.lu.nateko.cp.cpauth.CpauthJsonProtocol._
-import scala.concurrent.Future
 import se.lu.nateko.cp.cpauth.accounts.UserEntry
-import scala.concurrent.duration._
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
 import akka.http.scaladsl.server.Directives._
 import se.lu.nateko.cp.cpauth.services.CookieFactory
-import se.lu.nateko.cp.cpauth.utils.Utils
-import spray.json.JsBoolean
 import se.lu.nateko.cp.cpauth.core.AuthSource
-import se.lu.nateko.cp.cpauth.services.EmailSender
 import se.lu.nateko.cp.cpauth.services.PasswordLifecycleHandler
 import se.lu.nateko.cp.cpauth.utils.TemplatePageMarshalling
 
@@ -42,7 +37,7 @@ trait PasswordRouting extends CpauthDirectives {
 		} ~
 		post{
 			path("login"){
-				formFields('mail, 'password){(mail, password) =>
+				formFields(('mail, 'password)){(mail, password) =>
 					val uEntryFuture = passwordHandler.authUser(UserId(mail), password)
 					onSuccess(uEntryFuture){ uEntry =>
 
@@ -57,7 +52,7 @@ trait PasswordRouting extends CpauthDirectives {
 			} ~
 			path("changepassword"){
 				user(uid =>
-					formFields('oldPass, 'newPass)((oldPass, newPass) => {
+					formFields(('oldPass, 'newPass))((oldPass, newPass) => {
 						val result = passwordHandler.changePassword(uid, oldPass, newPass)
 						onSuccess(result)(complete(StatusCodes.OK))
 					})
@@ -90,7 +85,7 @@ trait PasswordRouting extends CpauthDirectives {
 			} ~
 			admin{
 				path("createaccount"){
-					formFields('mail, 'password){(mail, password) =>
+					formFields(('mail, 'password)){(mail, password) =>
 						val uid = UserId(mail)
 						onSuccess(userDb.userExists(uid)) {
 							case true => complete((StatusCodes.Forbidden, "User already exists"))

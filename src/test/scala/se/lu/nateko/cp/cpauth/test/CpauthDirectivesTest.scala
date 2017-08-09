@@ -123,7 +123,7 @@ class CpauthDirectivesTest extends FunSpec with ScalatestRouteTest {
 			it("rejects the request with 'CredentialsRejected' rejection"){
 				Get("/any") ~> Cookie(cookie.pair()) ~> route ~> check{
 					val authRejections = rejections.collect{
-						case bad: BadCpauthCookieRejection => 1
+						case _: BadCpauthCookieRejection => 1
 					}
 					assert(authRejections.length === 1)
 				}

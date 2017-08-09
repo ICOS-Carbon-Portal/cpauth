@@ -47,5 +47,5 @@ class PasswordLifecycleHandler(
 	) yield ()
 
 	def authUser(uid: UserId, password: String): Future[UserEntry] =
-		Utils.slowFailureDown(userDb.authenticateUser(uid, password), 500 millis)
+		Utils.slowFailureDown(userDb.authenticateUser(uid, password), 500.millis)
 }

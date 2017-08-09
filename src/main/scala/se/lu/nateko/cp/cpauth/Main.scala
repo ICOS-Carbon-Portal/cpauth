@@ -23,6 +23,8 @@ import se.lu.nateko.cp.cpauth.utils.MapBasedUrlLookup
 import se.lu.nateko.cp.cpauth.services._
 import se.lu.nateko.cp.cpauth.oauth.FacebookAuthenticationService
 import se.lu.nateko.cp.cpauth.oauth.OrcidAuthenticationService
+import scala.util.Success
+import scala.util.Failure
 
 
 object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
@@ -87,15 +89,17 @@ object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
 		}
 	}
 
-	http.bindAndHandle(route, "127.0.0.1", httpConfig.servicePrivatePort)
-		.onSuccess{
-		case binding =>
+	http.bindAndHandle(route, "127.0.0.1", httpConfig.servicePrivatePort).onComplete{
+		case Success(binding) =>
 			sys.addShutdownHook{
 				val doneFuture = binding.unbind()
 					.flatMap(_ => system.terminate())(ExecutionContext.Implicits.global)
-				Await.result(doneFuture, 3 seconds)
+				Await.result(doneFuture, 3.seconds)
 			}
 			system.log.info(s"Started cpauth: $binding")
+		case Failure(err) =>
+			system.log.error(err, "Could not start 'cpauth' service")
+			system.terminate()
 	}
 
 }
