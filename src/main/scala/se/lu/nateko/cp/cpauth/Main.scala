@@ -85,7 +85,8 @@ object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
 			pathEndOrSingleSlash{
 				token(_ => redirect("/home/", StatusCodes.Found)) ~
 				redirect("/login/", StatusCodes.Found)
-			}
+			} ~
+			path("buildInfo"){complete(BuildInfo.toString)}
 		}
 	}
 

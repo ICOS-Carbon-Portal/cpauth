@@ -61,7 +61,7 @@ val cpauthMain = Some("se.lu.nateko.cp.cpauth.Main")
 lazy val cpauth = (project in file("."))
 	.dependsOn(cpauthCore, viewsCore)
 	.settings(commonSettings: _*)
-	.enablePlugins(SbtTwirl)
+	.enablePlugins(SbtTwirl, IcosCpSbtDeployPlugin)
 	.settings(
 		name := "Carbon Portal Authentication Service",
 		version := "0.4.2",
@@ -82,6 +82,9 @@ lazy val cpauth = (project in file("."))
 		),
 
 		fork := true,
+
+		cpDeployTarget := "cpauth",
+		cpDeployBuildInfoPackage := "se.lu.nateko.cp.cpauth",
 
 		initialCommands in console := """
 			import se.lu.nateko.cp.cpauth._
