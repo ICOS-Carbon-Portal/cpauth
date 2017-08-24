@@ -58,6 +58,8 @@ val akkaVersion = "2.4.19"
 val akkaHttpVersion = "10.0.9"
 val cpauthMain = Some("se.lu.nateko.cp.cpauth.Main")
 
+lazy val fetchIdpList = taskKey[Unit]("Fetches SAML IdP list from SWAMID")
+
 lazy val cpauth = (project in file("."))
 	.dependsOn(cpauthCore, viewsCore)
 	.settings(commonSettings: _*)
@@ -85,6 +87,18 @@ lazy val cpauth = (project in file("."))
 
 		cpDeployTarget := "cpauth",
 		cpDeployBuildInfoPackage := "se.lu.nateko.cp.cpauth",
+
+		fetchIdpList := {
+			val url = new java.net.URL("http://mds.swamid.se/md/swamid-idp-transitive.xml")
+			val file = new java.io.File("./src/main/resources/swamid-idps.xml")
+			IO.download(url, file)
+		},
+
+		assembly := (Def.taskDyn{
+			val original = assembly.taskValue
+			fetchIdpList.value
+			Def.task(original.value)
+		}).value,
 
 		initialCommands in console := """
 			import se.lu.nateko.cp.cpauth._
