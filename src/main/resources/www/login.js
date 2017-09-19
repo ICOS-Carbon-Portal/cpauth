@@ -117,7 +117,7 @@ function initPassReset() {
 			.done(function() {
 				$('#newmail').val('')
 				$('#choosePasswordButton').prop('disabled', false);
-				reportSuccess('Email with instructions has been sent to ' + email, 60000);
+				reportSuccess('Email with instructions is being sent to ' + email + '. Be sure to check your spam folder as well!', 60000);
 			})
 			.fail(reportError);
 	}else reportError('Email is invalid');
