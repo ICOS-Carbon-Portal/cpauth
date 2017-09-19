@@ -1,7 +1,7 @@
 @import views.CpMenuItem
 @import views.CpMenu
 
-@(title: String, menu: Seq[CpMenuItem] = CpMenu.default)(customHeader: Html)(body: Html)
+@(title: String, menu: Seq[CpMenuItem] = CpMenu.default, cpauthHostOpt: Option[String] = None)(customHeader: Html)(body: Html)
 <!DOCTYPE html>
 <html>
 <head>
@@ -11,7 +11,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 
 	@if(menu.nonEmpty){
-		<script>
+		<script type="application/javascript">
 			window.addEventListener("load", function(){
 				var menuGroups = document.getElementsByClassName("open_menu");
 
@@ -21,6 +21,43 @@
 					elem.addEventListener("click", function(event){
 						event.target.parentElement.classList.toggle('open');
 					});
+				}
+
+				@for(cpauthHost <- cpauthHostOpt){
+
+					function ajaxGet(url, action){
+						var xhr = new XMLHttpRequest();
+						xhr.open("GET", url);
+						xhr.send(null);
+
+						xhr.onreadystatechange = function () {
+							if (xhr.readyState === 4 && xhr.status === 200) {
+								action(xhr);
+							}
+						};
+					}
+
+					ajaxGet('/whoami', function(xhr){
+						var response = JSON.parse(xhr.response);
+
+						if (response.email) {
+							document.getElementById("logOutBtn").addEventListener('click', function(){
+								ajaxGet('/logout', function(){
+									window.location.reload(false);
+								});
+							});
+							document.getElementById("accountBtn").addEventListener('click', function(){
+								window.location = 'https://@(cpauthHost)/';
+							});
+							document.getElementById("loggedIn").style.display = 'inline';
+						} else {
+							document.getElementById("logInBtn").addEventListener('click', function(){
+								window.location = 'https://@(cpauthHost)/login/?targetUrl=' + encodeURIComponent(window.location.href);
+							});
+							document.getElementById("loggedOut").style.display = 'inline';
+						}
+					});
+
 				}
 			});
 		</script>
@@ -45,6 +82,29 @@
 
 	<div id="cp-main-menu">
 		@MainMenu(menu)
+		@for(cpauthHost <- cpauthHostOpt){
+			<ul>
+				<li style="float: right;top: -37px;right: 0;margin: 3px 5px;background-color: inherit;">
+					<span id="loggedOut" style="display: none;">
+						<button id="logInBtn" class="btn btn-primary btn-sm">
+							<span class="glyphicon glyphicon-log-in" style="margin-right: 5px;"></span>
+							Log in
+						</button>
+					</span>
+
+					<span id="loggedIn" style="display: none;">
+						<button id="logOutBtn" class="btn btn-primary btn-sm">
+							<span class="glyphicon glyphicon-log-out" style="margin-right: 5px;"></span>
+							Log out
+						</button>
+						<button id="accountBtn" class="btn btn-primary btn-sm">
+							<span class="glyphicon glyphicon-user" style="margin-right: 5px;"></span>
+							Carbon Portal Account
+						</button>
+					</span>
+				</li>
+			</ul>
+		}
 	</div>
 
 	<div id="cp-main-content">

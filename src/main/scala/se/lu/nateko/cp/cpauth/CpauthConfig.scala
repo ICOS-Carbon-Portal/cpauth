@@ -103,7 +103,7 @@ object ConfigReader extends DefaultJsonProtocol{
 	implicit val samlConfigFormat = jsonFormat5(SamlConfig)
 	implicit val databaseConfigFormat = jsonFormat4(DatabaseConfig)
 
-	implicit val pubAuthConfigFormat = jsonFormat2(PublicAuthConfig)
+	implicit val pubAuthConfigFormat = jsonFormat4(PublicAuthConfig)
 	implicit val privAuthConfigFormat = jsonFormat2(PrivateAuthConfig)
 	implicit val authConfigFormat = jsonFormat2(AuthConfig)
 	implicit val restHeartConfigFormat = jsonFormat3(RestHeartConfig)

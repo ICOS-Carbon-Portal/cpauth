@@ -18,7 +18,6 @@ import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.server.StandardRoute
 import akka.stream.ActorMaterializer
-import se.lu.nateko.cp.cpauth.HttpConfig
 import se.lu.nateko.cp.cpauth.utils.Utils
 import se.lu.nateko.cp.cpauth.accounts.RestHeartClient
 import se.lu.nateko.cp.cpauth.accounts.UsersIo
@@ -35,7 +34,6 @@ import akka.http.scaladsl.server.RejectionHandler
 trait CpauthDirectives {
 
 	def publicAuthConfig: PublicAuthConfig
-	def httpConfig: HttpConfig
 	def authenticator: Try[Authenticator]
 	def userDb: UsersIo
 	def restHeart: RestHeartClient
@@ -104,7 +102,7 @@ trait CpauthDirectives {
 		} ~
 		complete(StatusCodes.Unauthorized)
 
-	lazy val logout: Route = deleteCookie(publicAuthConfig.authCookieName, httpConfig.authDomain, "/"){
+	lazy val logout: Route = deleteCookie(publicAuthConfig.authCookieName, publicAuthConfig.authCookieDomain, "/"){
 		complete(StatusCodes.OK)
 	}
 

@@ -37,7 +37,7 @@ lazy val cpauthCore = (project in file("core"))
 	.settings(publishingSettings: _*)
 	.settings(
 		name := "cpauth-core",
-		version := "0.5-SNAPSHOT",
+		version := "0.5.1-SNAPSHOT",
 		libraryDependencies ++= Seq(
 		)
 	)
@@ -49,7 +49,7 @@ lazy val viewsCore = (project in file("viewsCore"))
 	.enablePlugins(SbtTwirl)
 	.settings(
 		name := "views-core",
-		version := "0.3.1-SNAPSHOT",
+		version := "0.3.2-SNAPSHOT",
 		scalacOptions += "-Ywarn-unused-import:false"
 	)
 
