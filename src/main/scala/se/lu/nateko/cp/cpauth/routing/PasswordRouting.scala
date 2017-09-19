@@ -79,8 +79,18 @@ trait PasswordRouting extends CpauthDirectives {
 				)
 			} ~
 			path("initpassreset" / Segment){email =>
-				onSuccess(passwordHandler.sendResetEmail(UserId(email))){
-					complete(StatusCodes.OK)
+				val emailFut = passwordHandler.sendResetEmail(UserId(email))
+
+				emailFut.value match{
+					case Some(Failure(err)) =>
+						throw err
+					case _ =>
+						extractLog{log =>
+							emailFut.failed.foreach{
+								log.error(_, s"Email sending to $email failed")
+							}
+							complete(StatusCodes.OK)
+						}
 				}
 			} ~
 			admin{
