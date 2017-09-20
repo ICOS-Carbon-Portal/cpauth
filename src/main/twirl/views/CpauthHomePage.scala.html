@@ -21,14 +21,16 @@
 				<div class="row">
 					<div class="col-md-10">
 						@ValueWidget("User ID"){
-							<input type="text" class="form-control" id="email" readonly>
+							<span id="email" class="form-control"></span>
 						}
 						@ValueWidget("License acceptance"){
 							<div class="input-group">
 								<span class="input-group-addon">
 									<input id="icosLicenceOk" type="checkbox">
 								</span>
-								<input type="text" class="form-control" value="I accept the ICOS data license (CC BY 4.0)" readonly>
+								<span class="form-control">
+									I accept the <a href="https://data.icos-cp.eu/licence">ICOS data license</a> (CC BY 4.0)
+								</span>
 							</div>
 						}
 						@TextValueControl("First name", "givenName", "First name")
@@ -71,7 +73,7 @@
 			</div>
 		</div>
 
-		@DangerousDeletionPanel("profile")("This operation will make Carbon Portal to forget all information about your user profile and activities")
+		@DangerousDeletionPanel("profile")("This operation will make Carbon Portal forget all information about your user profile and activities")
 
 		<div id="forLocalsOnly" hidden>
 

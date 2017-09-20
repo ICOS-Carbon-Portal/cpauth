@@ -17,7 +17,7 @@ var stringKeys = ['givenName', 'surname', 'orcid', 'affiliation', 'affiliation2'
 
 function displayUserInfo(uid){
 	switchToLoggedInState();
-	$("#email").val(uid.email);
+	$("#email").html(uid.email);
 
 	var keys = '{profile: 1}';
 
@@ -57,6 +57,7 @@ function updateUserProfile(uid){
 		method: "PATCH",
 		url: "/db/users/" + uid.email,
 		contentType: 'application/json',
+		dataType: 'xml',
 		data: JSON.stringify({profile: payload})
 	}).done(function(){
 		reportSuccess('Profile updated');
