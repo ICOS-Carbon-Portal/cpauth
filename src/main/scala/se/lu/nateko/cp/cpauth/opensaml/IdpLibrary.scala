@@ -46,9 +46,13 @@ object IdpLibrary {
 	Utils.setRootLoggingLevelToInfo()
 
 
-	def fromConfig(config: SamlConfig): IdpLibrary = {
+	def fromConfig(config: SamlConfig): Try[IdpLibrary] = {
 		val idpMetaStream = getClass.getResourceAsStream(config.idpMetadataFilePath)
-		fromMetaStream(idpMetaStream)
+
+		if(idpMetaStream == null)
+			Failure(new Exception(config.idpMetadataFilePath + " file is missing!"))
+		else
+			Success(fromMetaStream(idpMetaStream))
 	}
 
 	def fromMetaStream(metadata: java.io.InputStream): IdpLibrary = {

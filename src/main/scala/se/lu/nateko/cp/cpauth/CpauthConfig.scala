@@ -1,6 +1,7 @@
 package se.lu.nateko.cp.cpauth
 
 import java.net.URI
+import scala.util.Try
 import com.typesafe.config.Config
 import spray.json.DefaultJsonProtocol
 import spray.json._
@@ -86,7 +87,7 @@ object ConfigReader extends DefaultJsonProtocol{
 		}
 	}
 
-	def getDefault: CpauthConfig = fromAppConfig(getAppConfig)
+	def getDefault: Try[CpauthConfig] = Try(fromAppConfig(getAppConfig))
 
 	def getAppConfig: Config = {
 		val default = ConfigFactory.load
