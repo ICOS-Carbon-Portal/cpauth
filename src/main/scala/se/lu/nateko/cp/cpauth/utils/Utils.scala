@@ -77,4 +77,15 @@ object Utils {
 		}
 		error.getOrElse(Success(successes))
 	}
+
+	implicit class CrasheableTry[T](val inner: Try[T]) extends AnyVal{
+		import scala.concurrent.Await
+		import scala.concurrent.duration.Duration
+		def getOrCrash(message: String)(implicit system: akka.actor.ActorSystem): T = inner.recover{
+			case err =>
+				system.log.error(err, message)
+				Await.ready(system.terminate(), Duration.Inf)
+				sys.exit(1)
+		}.get
+	}
 }

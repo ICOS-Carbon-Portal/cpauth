@@ -8,11 +8,11 @@ import se.lu.nateko.cp.cpauth.core.Authenticator
 import se.lu.nateko.cp.cpauth.opensaml.AssertionExtractor
 import se.lu.nateko.cp.cpauth.opensaml.IdpLibrary
 import se.lu.nateko.cp.cpauth.routing._
-import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.ExceptionHandler
 import akka.http.scaladsl.model.StatusCodes
+import scala.concurrent.Await
 import scala.concurrent.ExecutionContext
 import akka.http.scaladsl.Http
 import akka.stream.ActorMaterializer
@@ -25,17 +25,20 @@ import se.lu.nateko.cp.cpauth.oauth.FacebookAuthenticationService
 import se.lu.nateko.cp.cpauth.oauth.OrcidAuthenticationService
 import scala.util.Success
 import scala.util.Failure
+import utils.Utils.CrasheableTry
 
 
 object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
 		with StaticRouting with RestHeartRouting with OAuthRouting{
-	val config: CpauthConfig = ConfigReader.getDefault
-	val (httpConfig, publicAuthConfig, samlConfig, oauthConfig) = (config.http, config.auth.pub, config.saml, config.oauth)
 
 	implicit val system = ActorSystem("cpauth")
 	implicit val dispatcher = system.dispatcher
 	implicit val scheduler = system.scheduler
 	implicit val materializer = ActorMaterializer(namePrefix = Some("cpauth_mat"))
+
+	val config: CpauthConfig = ConfigReader.getDefault.getOrCrash("Problem reading/parsing config file")
+
+	val (httpConfig, publicAuthConfig, samlConfig, oauthConfig) = (config.http, config.auth.pub, config.saml, config.oauth)
 
 	val http = Http()
 	val restHeart = new RestHeartClient(config.restheart, http)
@@ -43,7 +46,7 @@ object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
 	val orcidIdAuthenticationService = new OrcidAuthenticationService(oauthConfig.orcidid)
 
 	val assExtractorTry = AssertionExtractor(samlConfig)
-	val idpLib: IdpLibrary = IdpLibrary.fromConfig(samlConfig)
+	val idpLib: IdpLibrary = IdpLibrary.fromConfig(samlConfig).getOrCrash("Try running 'fetchIdpList' in SBT.")
 	val cookieFactory = new CookieFactory(config)
 
 	Class.forName(config.database.driver)

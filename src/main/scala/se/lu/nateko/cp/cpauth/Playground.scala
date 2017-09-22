@@ -50,7 +50,7 @@ object Playground {
 
 	def makeLongLifeCookie(email: String): String = {
 		val validity = 3600 * 24 * 365 * 30 //30 years in seconds
-		val defConf = ConfigReader.getDefault
+		val defConf = ConfigReader.getDefault.get
 		val privAuthConf = defConf.auth.priv.copy(authTokenValiditySeconds = validity)
 		val conf = defConf.copy(auth = defConf.auth.copy(priv = privAuthConf))
 		val factory = new CookieFactory(conf)
