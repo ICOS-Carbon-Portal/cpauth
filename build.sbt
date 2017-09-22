@@ -100,10 +100,7 @@ lazy val cpauth = (project in file("."))
 			Def.task(original.value)
 		}).value,
 
-		initialCommands in console := """
-			import se.lu.nateko.cp.cpauth._
-			import se.lu.nateko.cp.cpauth.accounts.Users
-			import se.lu.nateko.cp.cpauth.core.UserId""",
+		//initialCommands in console := """""",
 
 		mainClass in assembly := cpauthMain,
 		mainClass in (Compile, run) := cpauthMain

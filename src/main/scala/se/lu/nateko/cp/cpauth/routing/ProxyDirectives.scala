@@ -36,7 +36,7 @@ object ProxyDirectives{
 	import akka.http.scaladsl.model.headers._
 
 	private val headersBlackList: Set[String] = {
-		Set(`Content-Type`, `Content-Length`, Server, Date, `Transfer-Encoding`, `Timeout-Access`)
+		Set(`Content-Type`, `Content-Length`, Server, Date, `Transfer-Encoding`, `Timeout-Access`, `Access-Control-Allow-Origin`)
 			.map(_.lowercaseName)
 	}
 
