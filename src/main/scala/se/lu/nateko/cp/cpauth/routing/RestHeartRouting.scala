@@ -8,7 +8,6 @@ import akka.http.scaladsl.server.Route
 import se.lu.nateko.cp.cpauth.core.UserId
 
 trait RestHeartRouting extends RestHeartDirectives{
-	import RestHeartRouting._
 
 	def restheartRoute: Route = {
 		val config = restHeart.config
@@ -41,12 +40,10 @@ trait RestHeartRouting extends RestHeartDirectives{
 	private def validateUser(email: String, uid: UserId): Directive0 =
 		validate(email == uid.email, "Only admins can write to other users' documents")
 
-}
+	val echoOriginToAllowOrigin: Directive0 = headerValueByType[Origin](()).flatMap{origin =>
+		if(origin.value.endsWith(publicAuthConfig.authCookieDomain))
+			respondWithHeader(`Access-Control-Allow-Origin`(origin.value))
+		else pass
+	}.recover(_ => pass)
 
-object RestHeartRouting{
-	def echoOriginToAllowOrigin(inner: Route) = headerValueByType[Origin](){origin =>
-		respondWithHeader(`Access-Control-Allow-Origin`(origin.value)) {
-			inner
-		}
-	} ~ inner
 }

@@ -8,7 +8,12 @@ import se.lu.nateko.cp.cpauth.PrivateAuthConfig
 class AuthenticationTest extends FunSuite{
 
 	val user = UserId("vasja.pupkin@mail.org")
-	val pubAuthConfig = PublicAuthConfig(authCookieName = "", publicKeyPath = "/public1.pem")
+	val pubAuthConfig = PublicAuthConfig(
+		authCookieName = "",
+		authCookieDomain = ".icos-cp.eu",
+		cpauthHost = "cpauth.icos-cp.eu",
+		publicKeyPath = "/public1.pem"
+	)
 	
 	test("Properly formed fresh token validates successfully"){
 

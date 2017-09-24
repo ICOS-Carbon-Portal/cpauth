@@ -25,6 +25,8 @@ class CpauthDirectivesTest extends FunSpec with ScalatestRouteTest {
 			),
 			pub = PublicAuthConfig(
 				authCookieName = "",
+				authCookieDomain = ".icos-cp.eu",
+				cpauthHost = "cpauth.icos-cp.eu",
 				publicKeyPath = "/public1.pem"
 			)
 		),
