@@ -16,12 +16,18 @@ class EmailSender(config: EmailConfig) {
 		try{
 			val message: Message = {
 				val properties = new Properties()
+				properties.put("mail.smtp.auth", "true")
+				properties.put("mail.smtp.starttls.enable", "true")
 				properties.put("mail.smtp.host", config.smtpServer)
-				val session = Session.getDefaultInstance(properties, null)
+				properties.put("mail.smtp.port", "587")
+				val session = Session.getDefaultInstance(properties, new Authenticator{
+					override def getPasswordAuthentication = new PasswordAuthentication(config.username, config.password)
+				})
 				new MimeMessage(session)
 			}
 
 			message.setFrom(new InternetAddress(config.fromAddress))
+			message.setReplyTo(Array(new InternetAddress("do_not_reply@icos-cp.eu")))
 			message.setSentDate(new Date())
 			message.setSubject(subject)
 			message.setContent(body.body, "text/html; charset=utf-8")

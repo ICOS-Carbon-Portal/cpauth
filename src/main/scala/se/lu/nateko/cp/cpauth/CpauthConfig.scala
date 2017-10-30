@@ -41,7 +41,13 @@ case class DatabaseConfig(
 case class PrivateAuthConfig(authTokenValiditySeconds: Int, privateKeyPath: String)
 case class AuthConfig(priv: PrivateAuthConfig, pub: PublicAuthConfig)
 case class RestHeartConfig(baseUri: String, dbName: String, usersCollection: String)
-case class EmailConfig(smtpServer: String, fromAddress: String, logBccAddress: Option[String])
+case class EmailConfig(
+	smtpServer: String,
+	username: String,
+	password: String,
+	fromAddress: String,
+	logBccAddress: Option[String]
+)
 
 case class CpauthConfig(
 	http: HttpConfig,
@@ -108,7 +114,7 @@ object ConfigReader extends DefaultJsonProtocol{
 	implicit val privAuthConfigFormat = jsonFormat2(PrivateAuthConfig)
 	implicit val authConfigFormat = jsonFormat2(AuthConfig)
 	implicit val restHeartConfigFormat = jsonFormat3(RestHeartConfig)
-	implicit val emailConfigFormat = jsonFormat3(EmailConfig)
+	implicit val emailConfigFormat = jsonFormat5(EmailConfig)
 	implicit val facebookConfigFormat = jsonFormat3(OAuthProviderConfig)
 	implicit val oauthConfigFormat = jsonFormat2(OAuthConfig)
 
