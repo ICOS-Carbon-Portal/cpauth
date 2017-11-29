@@ -1,0 +1,69 @@
+@(title: String)(customHeader: Html)(body: Html)
+<!DOCTYPE html>
+<html>
+
+<head>
+  <link rel="stylesheet" href="https://static.icos-cp.eu/constant/bootstrap/3.3.4/css/bootstrap.min.css">
+
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  @customHeader
+
+  <title>@title</title>
+
+  <style>
+    .header-image {
+      margin: 0 auto;
+      display: block;
+      max-width: 100%;
+    }
+
+    .page {
+      margin: 0 auto;
+      max-width: 960px;
+    }
+
+    .footer {
+      margin-top: 20px;
+      font-family: 'SourceSansPro';
+      font-size: 13px;
+      color: #bababa;
+      font-style: normal;
+      letter-spacing: 0px;
+      line-height: 1.3;
+      word-spacing: 0px;
+      text-align: center;
+      text-transform: none;
+      text-decoration: none;
+      font-weight: normal;
+    }
+  </style>
+
+</head>
+
+<body>
+  <header class="header">
+    <a href="www.fieldsites.se" title="Home">
+			<img class="header-image" src="https://h24-original.s3.amazonaws.com/231546/21700452-WUIvp.png" alt="Home">
+		</a>
+  </header>
+
+  <div class="page">
+    <div id="main-content">
+      <div class="container-fluid">
+        @body
+      </div>
+    </div>
+
+    <div class="footer">
+      <p>SITES (Swedish Infrastructure for Ecosystem Science) är en nationellt samordnad infrastruktur för terrester och limnisk fältforskning. Finansieras gemensamt av Vetenskapsrådet och de ansvariga huvudmännen, deltar gör Abisko naturvetenskpliga station,
+        Erkenlaboratoriet samt forskningsstationerna vid Tarfala, Svartberget, Röbäcksdalen, Grimsö, Lönnstorp, Asa och Skogaryd. Värd och koordinator är Sveriges lantbruksuniversitet • Org nr: 202100-2817 • info@@fieldsites.se</p>
+      <p>&nbsp;</p>
+      <p>Copyright © @{java.time.Year.now.getValue}</p>
+    </div>
+  </div>
+
+</body>
+
+</html>
