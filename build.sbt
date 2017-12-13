@@ -1,4 +1,4 @@
-val defaultScala = "2.12.3"
+val defaultScala = "2.12.4"
 
 val commonSettings = Seq(
 	organization := "se.lu.nateko.cp",
@@ -89,9 +89,10 @@ lazy val cpauth = (project in file("."))
 		cpDeployBuildInfoPackage := "se.lu.nateko.cp.cpauth",
 
 		fetchIdpList := {
+			import java.nio.file.{StandardCopyOption, Files, Paths}
 			val url = new java.net.URL("http://mds.swamid.se/md/swamid-idp-transitive.xml")
-			val file = new java.io.File("./src/main/resources/swamid-idps.xml")
-			IO.download(url, file)
+			val file = Paths.get("./src/main/resources/swamid-idps.xml")
+			Files.copy(url.openStream(), file, StandardCopyOption.REPLACE_EXISTING)
 		},
 
 		assembly := (Def.taskDyn{
