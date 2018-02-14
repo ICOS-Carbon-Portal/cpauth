@@ -49,7 +49,7 @@ lazy val viewsCore = (project in file("viewsCore"))
 	.enablePlugins(SbtTwirl)
 	.settings(
 		name := "views-core",
-		version := "0.3.2-SNAPSHOT",
+		version := "0.3.3-SNAPSHOT",
 		scalacOptions += "-Ywarn-unused-import:false"
 	)
 
@@ -107,4 +107,3 @@ lazy val cpauth = (project in file("."))
 		mainClass in (Compile, run) := cpauthMain
 
 	)
-
