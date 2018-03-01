@@ -1,7 +1,6 @@
-package views
+package se.lu.nateko.cp.viewscore
 
 import java.net.URI
-import se.lu.nateko.cp.viewscore.MenuProvider
 
 sealed trait CpMenuItem
 case class CpMenuGroup(label: String, children: Seq[CpMenuItem]) extends CpMenuItem

@@ -3,7 +3,6 @@ package se.lu.nateko.cp.viewscore
 import java.util.concurrent.ScheduledThreadPoolExecutor
 import java.util.concurrent.TimeUnit
 import scala.util.Success
-import views.CpMenuItem
 
 object MenuProvider {
 

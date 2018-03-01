@@ -1,4 +1,6 @@
-@(includeMenu: Boolean)
+@import se.lu.nateko.cp.viewscore.IcosStyleConfig
+
+@(includeMenu: Boolean, styleConf: IcosStyleConfig)
 <style type="text/css">
 	/** Body **/
 	body {
@@ -18,7 +20,7 @@
 	#cp-header {
 		background-size: cover;
 		line-height: 0;
-		background-image: url(https://www.icos-cp.eu/themes/cp_theme_d8/images/icos-cp_header_small.gif);
+		background-image: url(@{styleConf.headerImageSmall});
 	}
 
 	#cp-header img {
@@ -33,13 +35,13 @@
 
 	@@media all and (min-width: 513px) {
 		#cp-header {
-			background-image: url(https://www.icos-cp.eu/themes/cp_theme_d8/images/icos-cp_header_medium.gif);
+			background-image: url(@{styleConf.headerImageMedium});
 		}
 	}
 
 	@@media all and (min-width: 1025px) {
 		#cp-header {
-			background-image: url(https://www.icos-cp.eu/themes/cp_theme_d8/images/icos-cp_header.gif);
+			background-image: url(@{styleConf.headerImage});
 		}
 	}
 

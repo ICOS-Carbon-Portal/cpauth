@@ -1,5 +1,4 @@
-@import views.CpMenuItem
-@import views.CpMenu
+@import se.lu.nateko.cp.viewscore._
 
 @(title: String, menu: Seq[CpMenuItem] = CpMenu.default, cpauthHostOpt: Option[String] = None)(customHeader: Html)(body: Html)
 @CpPage(title, menu, cpauthHostOpt){

@@ -14,9 +14,6 @@ import scala.util.Try
 import org.w3c.dom.Node
 
 import javax.xml.parsers.DocumentBuilderFactory
-import views.CpMenuItem
-import views.CpMenuGroup
-import views.CpMenuLeaf
 
 
 object MenuFetcher {
@@ -29,7 +26,7 @@ object MenuFetcher {
 	) yield menu
 
 	private def getPageStream(): Try[InputStream] = Try{
-		new URL(views.CpMenu.cpHome).openStream()
+		new URL(CpMenu.cpHome).openStream()
 	}
 
 	private def findMenu(in: InputStream): Try[String] = {
