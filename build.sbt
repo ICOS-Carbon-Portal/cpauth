@@ -21,7 +21,6 @@ val commonSettings = Seq(
 )
 
 val publishingSettings = Seq(
-	crossScalaVersions := Seq(defaultScala, "2.11.11"),
 	publishTo := {
 		val nexus = "https://repo.icos-cp.eu/content/repositories/"
 		if (isSnapshot.value)
@@ -37,7 +36,7 @@ lazy val cpauthCore = (project in file("core"))
 	.settings(publishingSettings: _*)
 	.settings(
 		name := "cpauth-core",
-		version := "0.5.1-SNAPSHOT",
+		version := "0.6.0-SNAPSHOT",
 		libraryDependencies ++= Seq(
 		)
 	)
@@ -54,8 +53,8 @@ lazy val viewsCore = (project in file("viewsCore"))
 	)
 
 
-val akkaVersion = "2.4.19"
-val akkaHttpVersion = "10.0.9"
+val akkaVersion = "2.5.11"
+val akkaHttpVersion = "10.1.0"
 val cpauthMain = Some("se.lu.nateko.cp.cpauth.Main")
 
 lazy val fetchIdpList = taskKey[Unit]("Fetches SAML IdP list from SWAMID")
@@ -65,8 +64,8 @@ lazy val cpauth = (project in file("."))
 	.settings(commonSettings: _*)
 	.enablePlugins(SbtTwirl, IcosCpSbtDeployPlugin)
 	.settings(
-		name := "Carbon Portal Authentication Service",
-		version := "0.4.2",
+		name := "cpauth",
+		version := "0.5.0",
 		libraryDependencies ++= Seq(
 			"com.typesafe.akka"      %% "akka-http-spray-json"               % akkaHttpVersion,
 			"com.typesafe.akka"      %% "akka-http-testkit"                  % akkaHttpVersion % "test",

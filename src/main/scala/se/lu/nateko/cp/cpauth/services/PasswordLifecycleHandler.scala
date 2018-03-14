@@ -11,6 +11,7 @@ import se.lu.nateko.cp.cpauth.accounts.UserEntry
 import se.lu.nateko.cp.cpauth.utils.Utils
 import scala.concurrent.duration.DurationInt
 import akka.actor.Scheduler
+import se.lu.nateko.cp.cpauth.Envri.Envri
 
 class PasswordLifecycleHandler(
 	emailSender: EmailSender,
@@ -19,7 +20,7 @@ class PasswordLifecycleHandler(
 	config: HttpConfig
 )(implicit ctxt: ExecutionContext, scheduler: Scheduler) {
 
-	def sendResetEmail(uid: UserId): Future[Unit] = {
+	def sendResetEmail(uid: UserId)(implicit envri: Envri): Future[Unit] = {
 
 		val tokenTry = cookieFactory.makeTokenBase64(uid, AuthSource.PasswordReset)
 

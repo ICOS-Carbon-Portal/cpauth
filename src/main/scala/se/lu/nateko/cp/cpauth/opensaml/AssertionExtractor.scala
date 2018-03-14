@@ -16,6 +16,8 @@ import se.lu.nateko.cp.cpauth.utils.Utils.SafeJavaCollectionWrapper
 import se.lu.nateko.cp.cpauth.SamlConfig
 import se.lu.nateko.cp.cpauth.core.CoreUtils
 import se.lu.nateko.cp.cpauth.core.Crypto
+import se.lu.nateko.cp.cpauth.Envri.Envri
+
 //import org.apache.xml.serializer.dom3.LSSerializerImpl
 
 class AssertionExtractor(key: RSAPrivateKey){
@@ -50,7 +52,7 @@ object AssertionExtractor {
 
 	OpenSamlUtils.bootstrapOpenSaml()
 
-	def apply(conf: SamlConfig): Try[AssertionExtractor] = fromPrivateKeyAt(conf.privateKeyPath)
+	def apply(conf: SamlConfig)(implicit envri: Envri): Try[AssertionExtractor] = fromPrivateKeyAt(conf.privateKeyPath)
 
 	def fromPrivateKeyAt(path: String): Try[AssertionExtractor] = {
 		val keyBytes = CoreUtils.getResourceBytes(path)

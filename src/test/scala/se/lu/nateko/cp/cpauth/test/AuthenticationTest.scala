@@ -4,14 +4,17 @@ import org.scalatest.FunSuite
 import se.lu.nateko.cp.cpauth.core._
 import se.lu.nateko.cp.cpauth.utils.SignedTokenMaker
 import se.lu.nateko.cp.cpauth.PrivateAuthConfig
+import se.lu.nateko.cp.cpauth.Envri
 
 class AuthenticationTest extends FunSuite{
+	import Envri.ICOS
+	implicit val envri = ICOS
 
 	val user = UserId("vasja.pupkin@mail.org")
 	val pubAuthConfig = PublicAuthConfig(
 		authCookieName = "",
 		authCookieDomain = ".icos-cp.eu",
-		cpauthHost = "cpauth.icos-cp.eu",
+		authHost = "cpauth.icos-cp.eu",
 		publicKeyPath = "/public1.pem"
 	)
 	
@@ -19,7 +22,7 @@ class AuthenticationTest extends FunSuite{
 
 		val token = SignedTokenMaker(PrivateAuthConfig(
 			authTokenValiditySeconds = 10,
-			privateKeyPath = "/private1.der"
+			privateKeyPaths = Map(ICOS -> "/private1.der")
 		)).get.makeToken(user, AuthSource.Password)
 		
 		val unwrappedToken = Authenticator(pubAuthConfig).get.unwrapToken(token)
@@ -31,7 +34,7 @@ class AuthenticationTest extends FunSuite{
 	test("Expired token is rejected"){
 		val token = SignedTokenMaker(PrivateAuthConfig(
 			authTokenValiditySeconds = -1,
-			privateKeyPath = "/private1.der"
+			privateKeyPaths = Map(ICOS -> "/private1.der")
 		)).get.makeToken(user, AuthSource.Password)
 		
 		val unwrappedToken = Authenticator(pubAuthConfig).get.unwrapToken(token)
@@ -45,7 +48,7 @@ class AuthenticationTest extends FunSuite{
 	test("Token originating from an untrusted source is rejected"){
 		val token = SignedTokenMaker(PrivateAuthConfig(
 			authTokenValiditySeconds = 10,
-			privateKeyPath = "/private1.der"
+			privateKeyPaths = Map(ICOS -> "/private1.der")
 		)).get.makeToken(user, AuthSource.Saml)
 
 		val unwrappedToken = Authenticator(pubAuthConfig).get.unwrapTrustedToken(token, AuthSource.ValueSet(AuthSource.Password))
@@ -60,7 +63,7 @@ class AuthenticationTest extends FunSuite{
 
 		val tokenMaker = SignedTokenMaker(PrivateAuthConfig(
 			authTokenValiditySeconds = 10,
-			privateKeyPath = "/saml/test_private_key.der"
+			privateKeyPaths = Map(ICOS -> "/saml/test_private_key.der")
 		)).get
 
 		val auth = Authenticator(pubAuthConfig).get

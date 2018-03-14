@@ -23,20 +23,21 @@ import se.lu.nateko.cp.cpauth.core.UserId
 import se.lu.nateko.cp.cpauth.utils.SprayJsonUtils._
 import se.lu.nateko.cp.cpauth.utils.Utils
 import spray.json._
+import se.lu.nateko.cp.cpauth.Envri.Envri
 
 class RestHeartClient(val config: RestHeartConfig, http: HttpExt)(implicit m: Materializer) {
 	import http.system.dispatcher
 
-	val usersCollUri: Uri = {
+	def usersCollUri(implicit envri: Envri): Uri = {
 		import config._
 		Uri(s"$baseUri/$dbName/$usersCollection")
 	}
 
 	private val KeepIdsOnly = "keys" -> "{\"_id\": 1}"
 
-	def getUserUri(uid: UserId): Uri = usersCollUri.withPath(usersCollUri.path / uid.email)
+	def getUserUri(uid: UserId)(implicit envri: Envri): Uri = usersCollUri.withPath(usersCollUri.path / uid.email)
 
-	def createUserIfNew(uid: UserId, givenName: String, surname: String): Future[Done] =
+	def createUserIfNew(uid: UserId, givenName: String, surname: String)(implicit envri: Envri): Future[Done] =
 		userExists(uid).flatMap{exists =>
 			if(exists) Future.successful(Done)
 			else {
@@ -48,7 +49,7 @@ class RestHeartClient(val config: RestHeartConfig, http: HttpExt)(implicit m: Ma
 			}
 		}
 
-	private def createUser(uid: UserId, payload: JsObject): Future[Done] =
+	private def createUser(uid: UserId, payload: JsObject)(implicit envri: Envri): Future[Done] =
 		writeUser(uid, payload, HttpMethods.PUT).flatMap{resp =>
 			if(resp.status.isSuccess()) {
 				Future.successful(Done)
@@ -57,7 +58,7 @@ class RestHeartClient(val config: RestHeartConfig, http: HttpExt)(implicit m: Ma
 			)
 		}
 
-	private def writeUser(uid: UserId, payload: JsObject, verb: HttpMethod): Future[HttpResponse] = {
+	private def writeUser(uid: UserId, payload: JsObject, verb: HttpMethod)(implicit envri: Envri): Future[HttpResponse] = {
 		val uri = getUserUri(uid)
 		for(
 			entity <- Marshal(payload).to[RequestEntity];
@@ -66,7 +67,7 @@ class RestHeartClient(val config: RestHeartConfig, http: HttpExt)(implicit m: Ma
 		) yield resp
 	}
 
-	def userExists(uid: UserId): Future[Boolean] = {
+	def userExists(uid: UserId)(implicit envri: Envri): Future[Boolean] = {
 		val query = Uri.Query(KeepIdsOnly)
 		val req = HttpRequest(uri = getUserUri(uid).withQuery(query))
 
@@ -79,7 +80,7 @@ class RestHeartClient(val config: RestHeartConfig, http: HttpExt)(implicit m: Ma
 		}
 	}
 
-	def getUserProps(uid: UserId, projections: Seq[String] = Nil): Future[JsObject] = {
+	def getUserProps(uid: UserId, projections: Seq[String] = Nil)(implicit envri: Envri): Future[JsObject] = {
 		val query = if(projections.isEmpty)
 			Uri.Query.Empty
 		else {
@@ -94,7 +95,7 @@ class RestHeartClient(val config: RestHeartConfig, http: HttpExt)(implicit m: Ma
 		) yield userObj
 	}
 
-	def getGivenAndSurName(uid: UserId): Future[(String, String)] =
+	def getGivenAndSurName(uid: UserId)(implicit envri: Envri): Future[(String, String)] =
 		getUserProps(uid, Seq("profile.givenName", "profile.surname")).flatMap{userObj =>
 
 			val profileVal = getFieldOpt[JsValue](userObj, "profile").getOrElse(JsObject.empty);
@@ -108,7 +109,7 @@ class RestHeartClient(val config: RestHeartConfig, http: HttpExt)(implicit m: Ma
 			)
 		}
 
-	def findUsers(filter: Map[String, String]): Future[Seq[UserId]] = {
+	def findUsers(filter: Map[String, String])(implicit envri: Envri): Future[Seq[UserId]] = {
 
 		val filterParam: String = filter.map{
 			case (path, value) => s""""$path": "$value""""

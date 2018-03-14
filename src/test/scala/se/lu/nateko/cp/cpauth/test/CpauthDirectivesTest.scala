@@ -16,32 +16,34 @@ import se.lu.nateko.cp.cpauth.routing.CpauthDirectives
 import se.lu.nateko.cp.cpauth.services.CookieFactory
 
 class CpauthDirectivesTest extends FunSpec with ScalatestRouteTest {
+	import Envri.ICOS
+	implicit val envri = ICOS
 
 	def getConfig(privKeyPath: String) = CpauthConfig(
 		auth = AuthConfig(
 			priv = PrivateAuthConfig(
 				authTokenValiditySeconds = 1000,
-				privateKeyPath = privKeyPath
+				privateKeyPaths = Map(ICOS -> privKeyPath)
 			),
-			pub = PublicAuthConfig(
+			pub = Map(ICOS -> PublicAuthConfig(
 				authCookieName = "",
 				authCookieDomain = ".icos-cp.eu",
-				cpauthHost = "cpauth.icos-cp.eu",
+				authHost = "cpauth.icos-cp.eu",
 				publicKeyPath = "/public1.pem"
-			)
+			))
 		),
 		saml = null,
 		database = null,
 		http = HttpConfig(
 			drupalProxying = null,
 			loginPath = null,
-			serviceHost = "cpauth.icos-cp.eu",
+			serviceHosts = Map(ICOS -> "cpauth.icos-cp.eu"),
 			servicePrivatePort = 0
 		),
 		restheart = RestHeartConfig(
 			baseUri = "http://127.0.0.1:8088",
 			dbName = "db",
-			usersCollection = "users"
+			usersCollections = Map(ICOS -> "users")
 		),
 		mailing = null,
 		oauth = null
@@ -51,11 +53,11 @@ class CpauthDirectivesTest extends FunSpec with ScalatestRouteTest {
 
 	val dirs = new CpauthDirectives{
 		val httpConfig = config.http
-		val publicAuthConfig = config.auth.pub
-		val authenticator = Authenticator(config.auth.pub)
+		val publicAuthConfigs = config.auth.pub
 		val dispatcher = system.dispatcher
 		val scheduler = system.scheduler
 		val materializer = ActorMaterializer(namePrefix = Some("cpauth_dir_test"))
+		val hostToEnvri = config.http.serviceHosts.map(_.swap)
 		val userDb = null
 		val restHeart = null
 	}
@@ -93,7 +95,7 @@ class CpauthDirectivesTest extends FunSpec with ScalatestRouteTest {
 
 			it("rejects the request with 'CredentialsMissing' rejection"){
 
-				Get("/any") ~> route ~> check{
+				Get("https://cpauth.icos-cp.eu/any") ~> route ~> check{
 					val authRejections = rejections.collect{
 						case CpauthCookieMissingRejection => 1
 					}
@@ -112,7 +114,7 @@ class CpauthDirectivesTest extends FunSpec with ScalatestRouteTest {
 			val cookie = makeCookie("test1", config)
 
 			it("delegates to the inner route"){
-				Get("/any") ~> Cookie(cookie.pair()) ~> route ~> check{
+				Get("https://cpauth.icos-cp.eu/any") ~> Cookie(cookie.pair()) ~> route ~> check{
 					assert(responseAs[String] === "test1")
 				}
 			}
@@ -123,7 +125,7 @@ class CpauthDirectivesTest extends FunSpec with ScalatestRouteTest {
 			val cookie = makeCookie("test2", wrongConfig)
 
 			it("rejects the request with 'CredentialsRejected' rejection"){
-				Get("/any") ~> Cookie(cookie.pair()) ~> route ~> check{
+				Get("https://cpauth.icos-cp.eu/any") ~> Cookie(cookie.pair()) ~> route ~> check{
 					val authRejections = rejections.collect{
 						case _: BadCpauthCookieRejection => 1
 					}

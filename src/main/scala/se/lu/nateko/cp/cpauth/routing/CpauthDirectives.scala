@@ -30,17 +30,28 @@ import se.lu.nateko.cp.cpauth.core.AuthSource
 import akka.http.javadsl.server.CustomRejection
 import akka.http.scaladsl.server.MissingCookieRejection
 import akka.http.scaladsl.server.RejectionHandler
+import se.lu.nateko.cp.cpauth.Envri.Envri
 
 trait CpauthDirectives {
 
-	def publicAuthConfig: PublicAuthConfig
-	def authenticator: Try[Authenticator]
+	def publicAuthConfigs: Map[Envri, PublicAuthConfig]
 	def userDb: UsersIo
 	def restHeart: RestHeartClient
+	def hostToEnvri: Map[String, Envri]
 
 	implicit def dispatcher: ExecutionContext
 	implicit def materializer: ActorMaterializer
 	implicit def scheduler: Scheduler
+
+	def publicAuthConfig(implicit envri: Envri) = publicAuthConfigs(envri)
+	def authenticator(implicit envri: Envri): Try[Authenticator] = Authenticator(publicAuthConfig)
+
+	val extractEnvri: Directive1[Envri] = extractHost.flatMap{h =>
+		hostToEnvri.get(h) match{
+			case None => complete(StatusCodes.BadRequest -> s"Unexpected host $h, cannot find corresponding ENVRI")
+			case Some(envri) => provide(envri)
+		}
+	}
 
 	def attempt[T](thunk: => T)(f: T => Route): Route = attempt(Try(thunk))(f)
 
@@ -52,7 +63,7 @@ trait CpauthDirectives {
 	def forbid(message: String): StandardRoute = complete((StatusCodes.Forbidden, message))
 
 	val token: Directive1[AuthToken] = Directive{inner =>
-		cancelRejections(classOf[MissingCookieRejection]){
+		(cancelRejections(classOf[MissingCookieRejection]) & extractEnvri){implicit envri =>
 			cookie(publicAuthConfig.authCookieName)(cookie => {
 				val tokenTry = for(
 					auth <- authenticator;
@@ -73,16 +84,18 @@ trait CpauthDirectives {
 
 	val user: Directive1[UserId] = token.map(_.userId)
 
-	def cpauthCookie: Route = cookie(publicAuthConfig.authCookieName)(cookie => {
-		import spray.json._
-		attempt(CookieToToken.recoverToken(cookie.value)){token =>
-			complete(JsObject(
-				"value" -> JsString(publicAuthConfig.authCookieName + "=" + cookie.value),
-				"expiry" -> JsNumber(token.token.expiresOn),
-				"source" -> JsString(token.token.source.toString)
-			))
-		}
-	})
+	def cpauthCookie: Route = extractEnvri{implicit envri =>
+		cookie(publicAuthConfig.authCookieName)(cookie => {
+			import spray.json._
+			attempt(CookieToToken.recoverToken(cookie.value)){token =>
+				complete(JsObject(
+					"value" -> JsString(publicAuthConfig.authCookieName + "=" + cookie.value),
+					"expiry" -> JsNumber(token.token.expiresOn),
+					"source" -> JsString(token.token.source.toString)
+				))
+			}
+		})
+	}
 
 	val authRejectionHandler = RejectionHandler.newBuilder()
 		.handle{
@@ -102,8 +115,10 @@ trait CpauthDirectives {
 		} ~
 		complete(StatusCodes.Unauthorized)
 
-	lazy val logout: Route = deleteCookie(publicAuthConfig.authCookieName, publicAuthConfig.authCookieDomain, "/"){
-		complete(StatusCodes.OK)
+	lazy val logout: Route = extractEnvri{implicit envri => 
+		deleteCookie(publicAuthConfig.authCookieName, publicAuthConfig.authCookieDomain, "/"){
+			complete(StatusCodes.OK)
+		}
 	}
 
 	val admin: Directive0 = token.tflatMap(uit => ifUserIsAdmin(uit._1)) |
@@ -116,9 +131,11 @@ trait CpauthDirectives {
 			case Success(true) => inner(())
 		}
 	}
+
 }
 
 case object CpauthCookieMissingRejection extends CustomRejection
+
 class BadCpauthCookieRejection(err: Throwable) extends CustomRejection{
 	val message = err.getMessage + err.getStackTrace.map(_.toString).mkString("\n", "\n", "")
 }

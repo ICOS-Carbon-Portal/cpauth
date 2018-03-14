@@ -14,6 +14,7 @@ import se.lu.nateko.cp.cpauth.core.UserId
 import se.lu.nateko.cp.cpauth.core.AuthSource
 import se.lu.nateko.cp.cpauth.utils.Utils
 import se.lu.nateko.cp.cpauth.services.CookieFactory
+import se.lu.nateko.cp.cpauth.Envri.Envri
 
 
 object Playground {
@@ -48,7 +49,7 @@ object Playground {
 			Seq(xmlObj.getClass)
 	}
 
-	def makeLongLifeCookie(email: String): String = {
+	def makeLongLifeCookie(email: String)(implicit envri: Envri): String = {
 		val validity = 3600 * 24 * 365 * 30 //30 years in seconds
 		val defConf = ConfigReader.getDefault.get
 		val privAuthConf = defConf.auth.priv.copy(authTokenValiditySeconds = validity)

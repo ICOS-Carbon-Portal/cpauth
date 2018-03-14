@@ -5,6 +5,7 @@ import scala.util.Try
 import org.joda.time.DateTime
 import se.lu.nateko.cp.cpauth.core._
 import se.lu.nateko.cp.cpauth.PrivateAuthConfig
+import se.lu.nateko.cp.cpauth.Envri.Envri
 
 class SignedTokenMaker private(key: RSAPrivateKey, validity: Int){
 
@@ -19,7 +20,7 @@ class SignedTokenMaker private(key: RSAPrivateKey, validity: Int){
 
 object SignedTokenMaker {
 
-	def apply(config: PrivateAuthConfig): Try[SignedTokenMaker] = {
+	def apply(config: PrivateAuthConfig)(implicit envri: Envri): Try[SignedTokenMaker] = {
 		val keyBytes = CoreUtils.getResourceBytes(config.privateKeyPath)
 		for(
 			key <- Crypto.rsaPrivateFromDerBytes(keyBytes)

@@ -4,8 +4,6 @@ import akka.actor.ActorSystem
 import java.sql.DriverManager
 import se.lu.nateko.cp.cpauth.accounts.JdbcUsers
 import se.lu.nateko.cp.cpauth.core.AuthenticationFailedException
-import se.lu.nateko.cp.cpauth.core.Authenticator
-import se.lu.nateko.cp.cpauth.opensaml.AssertionExtractor
 import se.lu.nateko.cp.cpauth.opensaml.IdpLibrary
 import se.lu.nateko.cp.cpauth.routing._
 import scala.concurrent.duration.DurationInt
@@ -21,8 +19,6 @@ import se.lu.nateko.cp.cpauth.accounts.RestHeartClient
 import se.lu.nateko.cp.cpauth.utils.TargetUrlLookup
 import se.lu.nateko.cp.cpauth.utils.MapBasedUrlLookup
 import se.lu.nateko.cp.cpauth.services._
-import se.lu.nateko.cp.cpauth.oauth.FacebookAuthenticationService
-import se.lu.nateko.cp.cpauth.oauth.OrcidAuthenticationService
 import scala.util.Success
 import scala.util.Failure
 import utils.Utils.CrasheableTry
@@ -38,14 +34,12 @@ object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
 
 	val config: CpauthConfig = ConfigReader.getDefault.getOrCrash("Problem reading/parsing config file")
 
-	val (httpConfig, publicAuthConfig, samlConfig, oauthConfig) = (config.http, config.auth.pub, config.saml, config.oauth)
+	val (httpConfig, publicAuthConfigs, samlConfig, oauthConfig) = (config.http, config.auth.pub, config.saml, config.oauth)
 
+	val hostToEnvri = httpConfig.serviceHosts.map(_.swap)
 	val http = Http()
 	val restHeart = new RestHeartClient(config.restheart, http)
-	val facebookAuth = new FacebookAuthenticationService(oauthConfig.facebook)
-	val orcidIdAuthenticationService = new OrcidAuthenticationService(oauthConfig.orcidid)
 
-	val assExtractorTry = AssertionExtractor(samlConfig)
 	val idpLib: IdpLibrary = IdpLibrary.fromConfig(samlConfig).getOrCrash("Try running 'fetchIdpList' in SBT.")
 	val cookieFactory = new CookieFactory(config)
 
@@ -63,7 +57,6 @@ object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
 		new PasswordLifecycleHandler(emailSender, cookieFactory, userDb, config.http)
 	}
 	val targetLookup: TargetUrlLookup = new MapBasedUrlLookup
-	val authenticator = Authenticator(publicAuthConfig)
 
 	val cpauthExceptionHandler = ExceptionHandler{
 		case AuthenticationFailedException =>

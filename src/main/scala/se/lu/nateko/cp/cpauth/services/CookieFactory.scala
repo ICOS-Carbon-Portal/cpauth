@@ -19,16 +19,17 @@ import se.lu.nateko.cp.cpauth.opensaml.ValidatedAssertion
 import se.lu.nateko.cp.cpauth.core.AuthSource
 import se.lu.nateko.cp.cpauth.CpauthConfig
 import se.lu.nateko.cp.cpauth.utils.SignedTokenMaker
+import se.lu.nateko.cp.cpauth.Envri.Envri
 
 class CookieFactory(config: CpauthConfig) {
 	
-	private[this] val tokenMakerTry = SignedTokenMaker(config.auth.priv)
+	private[this] def tokenMakerTry(implicit envri: Envri) = SignedTokenMaker(config.auth.priv)
 
-	def getLastIdpCookie(idpId: String): HttpCookie = HttpCookie(
+	def getLastIdpCookie(idpId: String)(implicit envri: Envri): HttpCookie = HttpCookie(
 		name = config.saml.idpCookieName,
 		value = idpId,
 		secure = false,
-		domain = Some(config.http.serviceHost),
+		domain = Some(config.http.serviceHost(envri)),
 		path = Some(config.http.loginPath),
 		httpOnly = false, //needs to be accessed by Javascript on the client
 		maxAge = Some(31536000) //1 year in seconds
@@ -39,7 +40,7 @@ class CookieFactory(config: CpauthConfig) {
 		response: Response,
 		extractor: AssertionExtractor,
 		idpLib: IdpLibrary
-	): Try[(HttpCookie, UserId, AllStatements)] = for(
+	)(implicit envri: Envri): Try[(HttpCookie, UserId, AllStatements)] = for(
 		goodResponse <- ResponseStatusController.ensureSuccess(response);
 		validator <- AssertionValidator(goodResponse, idpLib);
 		assertions = extractor.extractAssertions(goodResponse).map(validator.validate(_, goodResponse));
@@ -51,14 +52,14 @@ class CookieFactory(config: CpauthConfig) {
 	) yield (cookie, userId, statements)
 
 
-	def makeTokenBase64(userId: UserId, source: AuthSource.Value): Try[String] = for(
+	def makeTokenBase64(userId: UserId, source: AuthSource.Value)(implicit envri: Envri): Try[String] = for(
 		tokenMaker <- tokenMakerTry;
 		token = tokenMaker.makeToken(userId, source)
 	) yield CookieToToken.constructCookieContent(token)
 
 
-	def makeAuthCookie(tokenBase64: String) = HttpCookie(
-		name = config.auth.pub.authCookieName,
+	def makeAuthCookie(tokenBase64: String)(implicit envri: Envri) = HttpCookie(
+		name = config.auth.pub(envri).authCookieName,
 		value = tokenBase64,
 		domain = Some(config.http.authDomain),
 		path = Some("/"),

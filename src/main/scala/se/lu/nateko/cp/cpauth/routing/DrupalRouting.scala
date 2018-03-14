@@ -11,12 +11,15 @@ import akka.http.scaladsl.model.HttpEntity
 import akka.http.scaladsl.model.Uri.Query
 import akka.http.scaladsl.server.Directives._
 import se.lu.nateko.cp.cpauth.HttpConfig
+import se.lu.nateko.cp.cpauth.Envri
 
 trait DrupalRouting extends CpauthDirectives with ProxyDirectives{
 
 	def httpConfig: HttpConfig
 	implicit val system: ActorSystem
 	implicit val timeout = Timeout(60.seconds)
+	//We only need Drupal proxying for ICOS
+	private implicit val drupalEnvri = Envri.ICOS
 
 	val drupalRoute = get{
 		headerValue{

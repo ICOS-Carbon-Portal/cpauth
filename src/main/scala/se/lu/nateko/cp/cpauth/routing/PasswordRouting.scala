@@ -24,7 +24,7 @@ trait PasswordRouting extends CpauthDirectives {
 	private[this] val forbidAndInformAboutPassReset =
 		complete(StatusCodes.Forbidden -> "You need special permissions to reset your password")
 
-	lazy val passwordRoute: Route = pathPrefix("password"){
+	lazy val passwordRoute: Route = (pathPrefix("password") & extractEnvri){implicit envri =>
 		get{
 			path("accountslist"){
 				admin(onSuccess(userDb.listUsers) {users => complete(users)})

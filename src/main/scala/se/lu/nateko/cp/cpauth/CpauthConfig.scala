@@ -3,20 +3,32 @@ package se.lu.nateko.cp.cpauth
 import java.net.URI
 import scala.util.Try
 import com.typesafe.config.Config
-import spray.json.DefaultJsonProtocol
 import spray.json._
 import com.typesafe.config.ConfigRenderOptions
 import com.typesafe.config.ConfigFactory
 import se.lu.nateko.cp.cpauth.core.PublicAuthConfig
+import Envri.Envri
+import OAuthProvider.OAuthProvider
+
+object Envri extends Enumeration{
+	type Envri = Value
+	val ICOS, SITES = Value
+}
+
+object OAuthProvider extends Enumeration{
+	type OAuthProvider = Value
+	val facebook, orcidid = Value
+}
 
 case class HttpConfig(
 
-	serviceHost: String,
+	serviceHosts: Map[Envri, String],
 	servicePrivatePort: Int,
 	loginPath: String,
 	drupalProxying: Map[String, ProxyConfig]){
-	def serviceUrl: String = "https://" + serviceHost
-	def authDomain: String = HttpConfig.cookieDomainFromHost(serviceHost)
+	def serviceHost(implicit envri: Envri) = serviceHosts(envri)
+	def serviceUrl(implicit envri: Envri): String = "https://" + serviceHost
+	def authDomain(implicit envri: Envri): String = HttpConfig.cookieDomainFromHost(serviceHost)
 }
 
 case class SamlSpConfig(url: String, consumerServiceUrl: String)
@@ -26,10 +38,13 @@ case class SamlAttrConfig(mail: Seq[String], givenName: Seq[String], surname: Se
 case class SamlConfig(
 	idpMetadataFilePath: String,
 	idpCookieName: String,
-	privateKeyPath: String,
-	spConfig: SamlSpConfig,
+	privateKeyPaths: Map[Envri, String],
+	spConfigs: Map[Envri, SamlSpConfig],
 	attributes: SamlAttrConfig
-)
+){
+	def spConfig(implicit envri: Envri) = spConfigs(envri)
+	def privateKeyPath(implicit envri: Envri) = privateKeyPaths(envri)
+}
 
 case class DatabaseConfig(
 	driver: String,
@@ -38,9 +53,13 @@ case class DatabaseConfig(
 	password: String
 )
 
-case class PrivateAuthConfig(authTokenValiditySeconds: Int, privateKeyPath: String)
-case class AuthConfig(priv: PrivateAuthConfig, pub: PublicAuthConfig)
-case class RestHeartConfig(baseUri: String, dbName: String, usersCollection: String)
+case class PrivateAuthConfig(authTokenValiditySeconds: Int, privateKeyPaths: Map[Envri, String]){
+	def privateKeyPath(implicit envri: Envri) = privateKeyPaths(envri)
+}
+case class AuthConfig(priv: PrivateAuthConfig, pub: Map[Envri, PublicAuthConfig])
+case class RestHeartConfig(baseUri: String, dbName: String, usersCollections: Map[Envri, String]){
+	def usersCollection(implicit envri: Envri) = usersCollections(envri)
+}
 case class EmailConfig(
 	smtpServer: String,
 	username: String,
@@ -56,13 +75,16 @@ case class CpauthConfig(
 	auth: AuthConfig,
 	restheart: RestHeartConfig,
 	mailing: EmailConfig,
-	oauth: OAuthConfig
+	oauth: CpauthConfig.OAuthConfig
 )
 
-case class OAuthConfig(facebook: OAuthProviderConfig, orcidid: OAuthProviderConfig){
-	def public = OAuthConfig(facebook.public, orcidid.public)
+object CpauthConfig{
+	type EnvriOAuthConfig = Map[OAuthProvider, OAuthProviderConfig]
+	type OAuthConfig = Map[Envri, EnvriOAuthConfig]
 
-	def jsonString: String = public.toJson(ConfigReader.oauthConfigFormat).prettyPrint
+	def oauthJson(conf: EnvriOAuthConfig): String = {
+		conf.toJson(ConfigReader.envriOAuthConfigFormat).prettyPrint
+	}
 }
 
 case class OAuthProviderConfig(clientId: String, clientSecret: String, redirectPath: String){
@@ -79,6 +101,9 @@ object HttpConfig{
 }
 
 object ConfigReader extends DefaultJsonProtocol{
+
+	implicit val envriFormat = CpauthJsonProtocol.enumFormat(Envri)
+	implicit val oAuthProviderFormat = CpauthJsonProtocol.enumFormat(OAuthProvider)
 
 	implicit object urlFormat extends RootJsonFormat[URI] {
 		def write(uri: URI): JsValue = JsString(uri.toString)
@@ -115,10 +140,9 @@ object ConfigReader extends DefaultJsonProtocol{
 	implicit val authConfigFormat = jsonFormat2(AuthConfig)
 	implicit val restHeartConfigFormat = jsonFormat3(RestHeartConfig)
 	implicit val emailConfigFormat = jsonFormat5(EmailConfig)
-	implicit val facebookConfigFormat = jsonFormat3(OAuthProviderConfig)
-	implicit val oauthConfigFormat = jsonFormat2(OAuthConfig)
+	implicit val oauthProviderConfigFormat = jsonFormat3(OAuthProviderConfig)
 
-	implicit val cpauthConfigFormat = jsonFormat7(CpauthConfig)
+	implicit val cpauthConfigFormat = jsonFormat7(CpauthConfig.apply)
 
 	def fromAppConfig(applicationConfig: Config): CpauthConfig = {
 
@@ -129,4 +153,6 @@ object ConfigReader extends DefaultJsonProtocol{
 		cpConfJson.parseJson.convertTo[CpauthConfig]
 	}
 
+	implicit val envriOAuthConfigFormat = implicitly[JsonFormat[CpauthConfig.EnvriOAuthConfig]]
+	
 }

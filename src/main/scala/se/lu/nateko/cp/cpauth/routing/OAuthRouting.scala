@@ -12,24 +12,28 @@ import se.lu.nateko.cp.cpauth.core.UserId
 import se.lu.nateko.cp.cpauth.oauth.FacebookAuthenticationService
 import se.lu.nateko.cp.cpauth.oauth.OrcidAuthenticationService
 import se.lu.nateko.cp.cpauth.services.CookieFactory
+import se.lu.nateko.cp.cpauth.Envri.Envri
+import se.lu.nateko.cp.cpauth.CpauthConfig
+import akka.actor.ActorSystem
+import se.lu.nateko.cp.cpauth.OAuthProvider
 
-trait OAuthRouting {
+trait OAuthRouting extends CpauthDirectives{
 
-	def facebookAuth: FacebookAuthenticationService
+	def oauthConfig: CpauthConfig.OAuthConfig
 	def cookieFactory: CookieFactory
 	implicit def dispatcher: ExecutionContext
+	implicit def system: ActorSystem
 	def restHeart: RestHeartClient
-	def orcidIdAuthenticationService: OrcidAuthenticationService
 
-	def facebookRoute: Route = pathPrefix("oauth" / "facebook"){
+	def facebookRoute: Route = (pathPrefix("oauth" / "facebook") & extractEnvri){implicit envri =>
 		oauthRoute(cpauthTokenFromFacebook, AuthSource.Facebook)
 	}
 
-	def orcidRoute: Route = pathPrefix("oauth" / "orcidid"){
+	def orcidRoute: Route = (pathPrefix("oauth" / "orcidid") & extractEnvri){implicit envri =>
 		oauthRoute(cpauthTokenFromOrcidId, AuthSource.Orcid)
 	}
 
-	private def cpauthTokenFromFacebook(code: String): Future[UserId] = {
+	private def cpauthTokenFromFacebook(code: String)(implicit envri: Envri): Future[UserId] = {
 		facebookAuth.retrieveUserInfo(code).map{userInfo =>
 			val uid = UserId(userInfo.email)
 
@@ -40,7 +44,7 @@ trait OAuthRouting {
 		}
 	}
 
-	private def cpauthTokenFromOrcidId(code: String): Future[UserId] = {
+	private def cpauthTokenFromOrcidId(code: String)(implicit envri: Envri): Future[UserId] = {
 		orcidIdAuthenticationService.retrieveUserInfo(code)
 			.flatMap(userInfo => userInfo.email match {
 				case Some(email) =>
@@ -59,7 +63,7 @@ trait OAuthRouting {
 			})
 	}
 
-	private def oauthRoute(uidProvider: String => Future[UserId], source: AuthSource.AuthSource): Route = {
+	private def oauthRoute(uidProvider: String => Future[UserId], source: AuthSource.AuthSource)(implicit envri: Envri): Route = {
 		parameters(('code, 'state.?)){(code, targetUrl) =>
 			val tokenFut: Future[String] = uidProvider(code).flatMap{uid =>
 				Future.fromTry(
@@ -67,7 +71,6 @@ trait OAuthRouting {
 				)
 			}
 			onSuccess(tokenFut){token =>
-
 				setCookie(cookieFactory.makeAuthCookie(token)){
 
 					targetUrl match{
@@ -82,5 +85,13 @@ trait OAuthRouting {
 			}
 		}
 	}
+
+	private def facebookAuth(implicit envri: Envri) = new FacebookAuthenticationService(
+		oauthConfig(envri)(OAuthProvider.facebook)
+	)
+
+	private def orcidIdAuthenticationService(implicit envri: Envri) = new OrcidAuthenticationService(
+		oauthConfig(envri)(OAuthProvider.orcidid)
+	)
 
 }

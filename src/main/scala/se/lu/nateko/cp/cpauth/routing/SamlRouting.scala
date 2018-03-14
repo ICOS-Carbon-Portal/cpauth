@@ -19,6 +19,7 @@ import se.lu.nateko.cp.cpauth.services.CookieFactory
 import se.lu.nateko.cp.cpauth.utils.Saml
 import se.lu.nateko.cp.cpauth.SamlConfig
 import se.lu.nateko.cp.cpauth.utils.TargetUrlLookup
+import se.lu.nateko.cp.cpauth.Envri.Envri
 
 trait SamlRouting extends CpauthDirectives{
 
@@ -26,13 +27,13 @@ trait SamlRouting extends CpauthDirectives{
 	def idpLib: IdpLibrary
 	def cookieFactory: CookieFactory
 	def targetLookup: TargetUrlLookup
-	def assExtractorTry: Try[AssertionExtractor]
-
 	implicit val system: ActorSystem
+
+	private def assExtractorTry(implicit envri: Envri): Try[AssertionExtractor] = AssertionExtractor(samlConfig)
 
 	lazy val idpInfos: Seq[IdpInfo] = idpLib.getInfos.toSeq.sortBy(_.name)
 
-	def samlRoute: Route = pathPrefix("saml"){
+	def samlRoute: Route = (pathPrefix("saml") & extractEnvri){implicit envri =>
 		get{
 			path("login") {
 				parameter(('idpUrl, 'targetUrl.?)){ (idp, target) =>
