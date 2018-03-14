@@ -31,7 +31,7 @@ case class HttpConfig(
 	def authDomain(implicit envri: Envri): String = HttpConfig.cookieDomainFromHost(serviceHost)
 }
 
-case class SamlSpConfig(url: String, consumerServiceUrl: String)
+case class SamlSpConfig(url: String, consumerServiceUrl: String, spMetaPath: String)
 case class ProxyConfig(ipv4Host: String, path: Option[String], port: Int)
 case class SamlAttrConfig(mail: Seq[String], givenName: Seq[String], surname: Seq[String])
 
@@ -127,7 +127,7 @@ object ConfigReader extends DefaultJsonProtocol{
 		else ConfigFactory.parseFile(confFile).withFallback(default)
 	}
 
-	implicit val samlSpConfigFormat = jsonFormat2(SamlSpConfig)
+	implicit val samlSpConfigFormat = jsonFormat3(SamlSpConfig)
 	implicit val proxyConfigFormat = jsonFormat3(ProxyConfig)
 	implicit val samlAttrFormat = jsonFormat3(SamlAttrConfig)
 	//.apply needed because of the companion object that HttpConfig has
