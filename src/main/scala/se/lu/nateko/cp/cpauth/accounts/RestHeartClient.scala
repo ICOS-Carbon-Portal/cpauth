@@ -12,21 +12,25 @@ import akka.http.scaladsl.model.ContentTypes
 import akka.http.scaladsl.model.HttpMethod
 import akka.http.scaladsl.model.HttpMethods
 import akka.http.scaladsl.model.HttpRequest
-import akka.http.scaladsl.model.HttpResponse
 import akka.http.scaladsl.model.RequestEntity
+import akka.http.scaladsl.model.StatusCode
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.model.Uri
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.stream.Materializer
+import se.lu.nateko.cp.cpauth.Envri.Envri
 import se.lu.nateko.cp.cpauth.RestHeartConfig
 import se.lu.nateko.cp.cpauth.core.UserId
 import se.lu.nateko.cp.cpauth.utils.SprayJsonUtils._
 import se.lu.nateko.cp.cpauth.utils.Utils
 import spray.json._
-import se.lu.nateko.cp.cpauth.Envri.Envri
 
 class RestHeartClient(val config: RestHeartConfig, http: HttpExt)(implicit m: Materializer) {
 	import http.system.dispatcher
+
+	def init: Future[Done] = Future.sequence(
+		config.usersCollections.keys.map(envri => createUsersCollIfNotExists(envri))
+	).map(_ => Done)
 
 	def usersCollUri(implicit envri: Envri): Uri = {
 		import config._
@@ -39,7 +43,7 @@ class RestHeartClient(val config: RestHeartConfig, http: HttpExt)(implicit m: Ma
 
 	def createUserIfNew(uid: UserId, givenName: String, surname: String)(implicit envri: Envri): Future[Done] =
 		userExists(uid).flatMap{exists =>
-			if(exists) Future.successful(Done)
+			if(exists) ok
 			else {
 				val payload = JsObject("profile" -> JsObject(
 					"givenName" -> JsString(givenName),
@@ -50,32 +54,31 @@ class RestHeartClient(val config: RestHeartConfig, http: HttpExt)(implicit m: Ma
 		}
 
 	private def createUser(uid: UserId, payload: JsObject)(implicit envri: Envri): Future[Done] =
-		writeUser(uid, payload, HttpMethods.PUT).flatMap{resp =>
-			if(resp.status.isSuccess()) {
-				Future.successful(Done)
-			} else Future.failed(
-				new Exception(s"Could not create user ${uid.email}, got response ${resp.status.defaultMessage()}")
+		writeUser(uid, payload, HttpMethods.PUT).flatMap{status =>
+			if(status.isSuccess()) ok
+			else fail(
+				s"Could not create user ${uid.email}, got response ${status.defaultMessage()}"
 			)
 		}
 
-	private def writeUser(uid: UserId, payload: JsObject, verb: HttpMethod)(implicit envri: Envri): Future[HttpResponse] = {
+	private def writeUser(uid: UserId, payload: JsObject, verb: HttpMethod)(implicit envri: Envri): Future[StatusCode] = {
 		val uri = getUserUri(uid)
 		for(
 			entity <- Marshal(payload).to[RequestEntity];
 			req = HttpRequest(method = verb, uri = uri, entity = entity);
-			resp <- http.singleRequest(req)
-		) yield resp
+			status <- requestDiscardResp(req)
+		) yield status
 	}
 
 	def userExists(uid: UserId)(implicit envri: Envri): Future[Boolean] = {
 		val query = Uri.Query(KeepIdsOnly)
 		val req = HttpRequest(uri = getUserUri(uid).withQuery(query))
 
-		http.singleRequest(req).flatMap{resp =>
-			if(resp.status.isSuccess()) Future.successful(true)
-			else if(resp.status == StatusCodes.NotFound) Future.successful(false)
-			else Future.failed(
-				new Exception(s"Failed checking user ${uid.email}, got response " + resp.status.defaultMessage())
+		requestDiscardResp(req).flatMap{status =>
+			if(status.isSuccess()) Future.successful(true)
+			else if(status == StatusCodes.NotFound) Future.successful(false)
+			else fail(
+				s"Failed checking user ${uid.email}, got response " + status.defaultMessage()
 			)
 		}
 	}
@@ -136,4 +139,33 @@ class RestHeartClient(val config: RestHeartConfig, http: HttpExt)(implicit m: Ma
 			) yield ids.map(UserId)
 	}.flatten
 
+	private def createUsersCollIfNotExists(implicit envri: Envri): Future[Done] = {
+		val collUri = usersCollUri
+		val uri = collUri.withPath(collUri.path / "_indexes")
+
+		requestDiscardResp(HttpRequest(uri = uri)).flatMap{
+			case StatusCodes.OK => ok
+
+			case StatusCodes.NotFound =>
+				requestDiscardResp(HttpRequest(HttpMethods.PUT, uri = collUri)).flatMap{
+					case StatusCodes.Created => ok
+					case status => fail(
+						s"Could not create users collection for $envri, got response $status"
+					)
+				}
+			case status => fail(
+				s"Got Unexpected status $status when trying to check if users collection exists for $envri"
+			)
+		}
+	}
+
+	private def requestDiscardResp(req: HttpRequest): Future[StatusCode] =
+		http.singleRequest(req).map{resp =>
+			resp.discardEntityBytes()
+			resp.status
+		}
+
+	private val ok = Future.successful(Done)
+
+	private def fail[T](msg: String) = Future.failed[T](new Exception(msg))
 }

@@ -10,7 +10,7 @@ import se.lu.nateko.cp.cpauth.Envri.Envri
 
 trait RestHeartRouting extends RestHeartDirectives{
 
-	def restheartRoute: Route = extractEnvri{implicit envri =>
+	val restheartRoute: Route = extractEnvri{implicit envri =>
 		val config = restHeart.config
 
 		path(config.dbName / config.usersCollection / Segment){ email =>

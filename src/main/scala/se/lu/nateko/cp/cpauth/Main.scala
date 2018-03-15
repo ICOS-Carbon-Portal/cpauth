@@ -86,7 +86,9 @@ object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
 		}
 	}
 
-	http.bindAndHandle(route, "127.0.0.1", httpConfig.servicePrivatePort).onComplete{
+	restHeart.init.flatMap{_ =>
+		http.bindAndHandle(route, "127.0.0.1", httpConfig.servicePrivatePort)
+	}.onComplete{
 		case Success(binding) =>
 			sys.addShutdownHook{
 				val doneFuture = binding.unbind()
