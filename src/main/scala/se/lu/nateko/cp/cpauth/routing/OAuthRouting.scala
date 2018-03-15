@@ -25,11 +25,11 @@ trait OAuthRouting extends CpauthDirectives{
 	implicit def system: ActorSystem
 	def restHeart: RestHeartClient
 
-	def facebookRoute: Route = (pathPrefix("oauth" / "facebook") & extractEnvri){implicit envri =>
+	val facebookRoute: Route = (pathPrefix("oauth" / "facebook") & extractEnvri){implicit envri =>
 		oauthRoute(cpauthTokenFromFacebook, AuthSource.Facebook)
 	}
 
-	def orcidRoute: Route = (pathPrefix("oauth" / "orcidid") & extractEnvri){implicit envri =>
+	val orcidRoute: Route = (pathPrefix("oauth" / "orcidid") & extractEnvri){implicit envri =>
 		oauthRoute(cpauthTokenFromOrcidId, AuthSource.Orcid)
 	}
 

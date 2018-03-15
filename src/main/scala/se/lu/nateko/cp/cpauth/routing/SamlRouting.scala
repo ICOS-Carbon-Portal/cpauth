@@ -33,7 +33,7 @@ trait SamlRouting extends CpauthDirectives{
 
 	lazy val idpInfos: Seq[IdpInfo] = idpLib.getInfos.toSeq.sortBy(_.name)
 
-	def samlRoute: Route = (pathPrefix("saml") & extractEnvri){implicit envri =>
+	val samlRoute: Route = (pathPrefix("saml") & extractEnvri){implicit envri =>
 		get{
 			path("login") {
 				parameter(('idpUrl, 'targetUrl.?)){ (idp, target) =>

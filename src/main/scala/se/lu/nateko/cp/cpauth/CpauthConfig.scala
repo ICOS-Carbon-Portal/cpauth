@@ -83,7 +83,7 @@ object CpauthConfig{
 	type OAuthConfig = Map[Envri, EnvriOAuthConfig]
 
 	def oauthJson(conf: EnvriOAuthConfig): String = {
-		conf.toJson(ConfigReader.envriOAuthConfigFormat).prettyPrint
+		conf.mapValues(_.public).toJson(ConfigReader.envriOAuthConfigFormat).prettyPrint
 	}
 }
 

@@ -28,9 +28,6 @@ trait StaticRouting extends CpauthDirectives{
 		path("favicon.ico"){
 			getFromResource("favicon.ico")
 		} ~
-//		path("home" ~ Slash){
-//			complete(views.html.CpauthHomePage())
-//		} ~
 		pathPrefix("images"){
 		  getFromResourceDirectory("www/images")
 		} ~
@@ -38,9 +35,7 @@ trait StaticRouting extends CpauthDirectives{
 			if(pages.isDefinedAt(pageId)) {
 				(pathSingleSlash & extractEnvri){envri =>
 					pages(pageId) match{
-						case Some(pageFactory) => extractEnvri{envri =>
-							complete(pageFactory(envri))
-						}
+						case Some(pageFactory) => complete(pageFactory(envri))
 						case None => reject
 					}
 				} ~
