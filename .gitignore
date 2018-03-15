@@ -34,7 +34,7 @@ views/.gitignore
 db/
 
 #Security-specific
-src/main/resources/crypto/private/
+privateKeys/
 
 #Large volatile files
 src/main/resources/swamid-idps.xml

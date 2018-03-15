@@ -1,11 +1,16 @@
 package se.lu.nateko.cp.cpauth.utils
 
+import java.nio.file.Files
+import java.nio.file.Paths
 import java.security.interfaces.RSAPrivateKey
+
 import scala.util.Try
+
 import org.joda.time.DateTime
-import se.lu.nateko.cp.cpauth.core._
-import se.lu.nateko.cp.cpauth.PrivateAuthConfig
+
 import se.lu.nateko.cp.cpauth.Envri.Envri
+import se.lu.nateko.cp.cpauth.PrivateAuthConfig
+import se.lu.nateko.cp.cpauth.core._
 
 class SignedTokenMaker private(key: RSAPrivateKey, validity: Int){
 
@@ -21,7 +26,7 @@ class SignedTokenMaker private(key: RSAPrivateKey, validity: Int){
 object SignedTokenMaker {
 
 	def apply(config: PrivateAuthConfig)(implicit envri: Envri): Try[SignedTokenMaker] = {
-		val keyBytes = CoreUtils.getResourceBytes(config.privateKeyPath)
+		val keyBytes = Files.readAllBytes(Paths.get(config.privateKeyPath))
 		for(
 			key <- Crypto.rsaPrivateFromDerBytes(keyBytes)
 		) yield new SignedTokenMaker(key, config.authTokenValiditySeconds)

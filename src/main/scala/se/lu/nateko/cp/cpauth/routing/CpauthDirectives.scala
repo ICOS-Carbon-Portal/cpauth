@@ -57,7 +57,7 @@ trait CpauthDirectives {
 
 	def attempt[T](attempt: Try[T])(f: T => Route): Route = attempt match {
 		case Success(t) => f(t)
-		case Failure(err) => complete((StatusCodes.BadRequest, err.getMessage))
+		case Failure(err) => complete(StatusCodes.BadRequest -> err.getMessage)
 	}
 
 	def forbid(message: String): StandardRoute = complete((StatusCodes.Forbidden, message))

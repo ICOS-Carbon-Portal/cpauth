@@ -1,5 +1,7 @@
 package se.lu.nateko.cp.cpauth.opensaml
 
+import java.nio.file.Files
+import java.nio.file.Paths
 import java.security.interfaces.RSAPrivateKey
 
 import scala.util.Try
@@ -12,11 +14,10 @@ import org.opensaml.xml.encryption.InlineEncryptedKeyResolver
 import org.opensaml.xml.security.keyinfo.StaticKeyInfoCredentialResolver
 import org.opensaml.xml.security.x509.BasicX509Credential
 
-import se.lu.nateko.cp.cpauth.utils.Utils.SafeJavaCollectionWrapper
-import se.lu.nateko.cp.cpauth.SamlConfig
-import se.lu.nateko.cp.cpauth.core.CoreUtils
-import se.lu.nateko.cp.cpauth.core.Crypto
 import se.lu.nateko.cp.cpauth.Envri.Envri
+import se.lu.nateko.cp.cpauth.SamlConfig
+import se.lu.nateko.cp.cpauth.core.Crypto
+import se.lu.nateko.cp.cpauth.utils.Utils.SafeJavaCollectionWrapper
 
 //import org.apache.xml.serializer.dom3.LSSerializerImpl
 
@@ -55,7 +56,7 @@ object AssertionExtractor {
 	def apply(conf: SamlConfig)(implicit envri: Envri): Try[AssertionExtractor] = fromPrivateKeyAt(conf.privateKeyPath)
 
 	def fromPrivateKeyAt(path: String): Try[AssertionExtractor] = {
-		val keyBytes = CoreUtils.getResourceBytes(path)
+		val keyBytes = Files.readAllBytes(Paths.get(path))
 		val privateKey = Crypto.rsaPrivateFromDerBytes(keyBytes)
 		privateKey.map(key => new AssertionExtractor(key))
 	}
