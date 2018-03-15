@@ -49,7 +49,7 @@ class CpauthDirectivesTest extends FunSpec with ScalatestRouteTest {
 		oauth = null
 	)
 
-	val config = getConfig("/private1.der")
+	val config = getConfig("src/test/resources/private1.der")
 
 	val dirs = new CpauthDirectives{
 		val httpConfig = config.http
@@ -121,7 +121,7 @@ class CpauthDirectivesTest extends FunSpec with ScalatestRouteTest {
 		}
 
 		describe("when the cookie has been signed with a wrong private key"){
-			val wrongConfig = getConfig("/saml/test_private_key.der")
+			val wrongConfig = getConfig("src/test/resources/saml/test_private_key.der")
 			val cookie = makeCookie("test2", wrongConfig)
 
 			it("rejects the request with 'CredentialsRejected' rejection"){

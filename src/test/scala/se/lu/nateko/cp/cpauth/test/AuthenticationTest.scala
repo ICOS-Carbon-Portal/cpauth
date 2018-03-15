@@ -17,12 +17,15 @@ class AuthenticationTest extends FunSuite{
 		authHost = "cpauth.icos-cp.eu",
 		publicKeyPath = "/public1.pem"
 	)
-	
+
+	val private1 = "src/test/resources/private1.der"
+	val samlPrivate = "src/test/resources/saml/test_private_key.der"
+
 	test("Properly formed fresh token validates successfully"){
 
 		val token = SignedTokenMaker(PrivateAuthConfig(
 			authTokenValiditySeconds = 10,
-			privateKeyPaths = Map(ICOS -> "/private1.der")
+			privateKeyPaths = Map(ICOS -> private1)
 		)).get.makeToken(user, AuthSource.Password)
 		
 		val unwrappedToken = Authenticator(pubAuthConfig).get.unwrapToken(token)
@@ -34,7 +37,7 @@ class AuthenticationTest extends FunSuite{
 	test("Expired token is rejected"){
 		val token = SignedTokenMaker(PrivateAuthConfig(
 			authTokenValiditySeconds = -1,
-			privateKeyPaths = Map(ICOS -> "/private1.der")
+			privateKeyPaths = Map(ICOS -> private1)
 		)).get.makeToken(user, AuthSource.Password)
 		
 		val unwrappedToken = Authenticator(pubAuthConfig).get.unwrapToken(token)
@@ -48,7 +51,7 @@ class AuthenticationTest extends FunSuite{
 	test("Token originating from an untrusted source is rejected"){
 		val token = SignedTokenMaker(PrivateAuthConfig(
 			authTokenValiditySeconds = 10,
-			privateKeyPaths = Map(ICOS -> "/private1.der")
+			privateKeyPaths = Map(ICOS -> private1)
 		)).get.makeToken(user, AuthSource.Saml)
 
 		val unwrappedToken = Authenticator(pubAuthConfig).get.unwrapTrustedToken(token, AuthSource.ValueSet(AuthSource.Password))
@@ -63,7 +66,7 @@ class AuthenticationTest extends FunSuite{
 
 		val tokenMaker = SignedTokenMaker(PrivateAuthConfig(
 			authTokenValiditySeconds = 10,
-			privateKeyPaths = Map(ICOS -> "/saml/test_private_key.der")
+			privateKeyPaths = Map(ICOS -> samlPrivate)
 		)).get
 
 		val auth = Authenticator(pubAuthConfig).get
