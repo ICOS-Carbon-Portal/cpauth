@@ -1,19 +1,30 @@
 package se.lu.nateko.cp.cpauth.routing
 
-import akka.http.scaladsl.model.{HttpMethods, StatusCodes}
+import akka.http.scaladsl.model.{ HttpMethods, StatusCodes }
+import akka.http.scaladsl.model.HttpRequest
+import akka.http.scaladsl.model.Uri.Path
 import akka.http.scaladsl.model.headers._
 import akka.http.scaladsl.server.Directive0
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
-import se.lu.nateko.cp.cpauth.core.UserId
 import se.lu.nateko.cp.cpauth.Envri.Envri
+import se.lu.nateko.cp.cpauth.core.UserId
 
 trait RestHeartRouting extends RestHeartDirectives{
 
 	val restheartRoute: Route = extractEnvri{implicit envri =>
+
 		val config = restHeart.config
 
-		path(config.dbName / config.usersCollection / Segment){ email =>
+		def injectUsersCollection(req: HttpRequest) = req.copy(
+			uri = {
+				val oldPathPart = req.uri.path.tail.tail.tail.tail
+				val newPath = Path./(config.dbName) / config.usersCollection ++ oldPathPart
+				req.uri.withPath(newPath)
+			}
+		)
+
+		path("db" / "users" / Segment){ email =>
 			options{
 				echoOriginToAllowOrigin(envri){
 					respondWithHeaders(
@@ -24,17 +35,18 @@ trait RestHeartRouting extends RestHeartDirectives{
 						complete(StatusCodes.OK)
 					}
 				}
-			} ~ {
-				token { token =>
-					(validateUser(email, token.userId) | ifUserIsAdmin(token)) {
-						echoOriginToAllowOrigin(envri){
+			} ~
+			token { token =>
+				(validateUser(email, token.userId) | ifUserIsAdmin(token)) {
+					echoOriginToAllowOrigin(envri){
+						mapRequest(injectUsersCollection){
 							restheartProxy
 						}
-					} ~
-					forbid("Access to other users' documents is forbidden")
+					}
 				} ~
-				forbid("Must be logged in with Carbon Portal for this operation")
-			}
+				forbid("Access to other users' documents is forbidden")
+			} ~
+			forbid("Must be logged in with Carbon Portal for this operation")
 		}
 	}
 
