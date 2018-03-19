@@ -3,12 +3,15 @@ package se.lu.nateko.cp.cpauth.services
 import scala.concurrent.Future
 import se.lu.nateko.cp.cpauth.core.UserId
 import se.lu.nateko.cp.cpauth.core.AuthSource
+
 import scala.concurrent.ExecutionContext
-import se.lu.nateko.cp.cpauth.HttpConfig
+import se.lu.nateko.cp.cpauth.{AuthConfig, HttpConfig}
 import java.net.URI
+
 import se.lu.nateko.cp.cpauth.accounts.UsersIo
 import se.lu.nateko.cp.cpauth.accounts.UserEntry
 import se.lu.nateko.cp.cpauth.utils.Utils
+
 import scala.concurrent.duration.DurationInt
 import akka.actor.Scheduler
 import se.lu.nateko.cp.cpauth.Envri.Envri
@@ -17,7 +20,8 @@ class PasswordLifecycleHandler(
 	emailSender: EmailSender,
 	cookieFactory: CookieFactory,
 	userDb: UsersIo,
-	config: HttpConfig
+	httpConf: HttpConfig,
+	authConf: AuthConfig
 )(implicit ctxt: ExecutionContext, scheduler: Scheduler) {
 
 	def sendResetEmail(uid: UserId)(implicit envri: Envri): Future[Unit] = {
@@ -25,7 +29,7 @@ class PasswordLifecycleHandler(
 		val tokenTry = cookieFactory.makeTokenBase64(uid, AuthSource.PasswordReset)
 
 		Future.fromTry(tokenTry).map(token => {
-			val link = new URI("https", config.serviceHost, "/password/initpassreset/" + token, null)
+			val link = new URI("https", httpConf.serviceHost, "/password/initpassreset/" + token, null)
 			val message = views.html.CpauthPassResetEmail(uid.email, link)
 			emailSender.send(Seq(uid.email), "Create/reset you Carbon Portal password", message)
 		})
@@ -47,6 +51,12 @@ class PasswordLifecycleHandler(
 		_ <- userDb.updateUser(uid, userEntry, newPassword)
 	) yield ()
 
-	def authUser(uid: UserId, password: String): Future[UserEntry] =
-		Utils.slowFailureDown(userDb.authenticateUser(uid, password), 500.millis)
+	def authUser(uid: UserId, password: String): Future[UserEntry] = {
+		val entryFut =
+			if(authConf.masterAdminUser == uid.email && password == authConf.masterAdminPass) {
+				Future.successful(UserEntry(uid, true))
+			} else
+				userDb.authenticateUser(uid, password)
+		Utils.slowFailureDown(entryFut, 500.millis)
+	}
 }

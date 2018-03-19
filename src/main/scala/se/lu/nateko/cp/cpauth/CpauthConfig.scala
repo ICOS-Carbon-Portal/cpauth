@@ -56,7 +56,13 @@ case class DatabaseConfig(
 case class PrivateAuthConfig(authTokenValiditySeconds: Int, privateKeyPaths: Map[Envri, String]){
 	def privateKeyPath(implicit envri: Envri) = privateKeyPaths(envri)
 }
-case class AuthConfig(priv: PrivateAuthConfig, pub: Map[Envri, PublicAuthConfig])
+case class AuthConfig(
+	priv: PrivateAuthConfig,
+	pub: Map[Envri, PublicAuthConfig],
+	masterAdminUser: String,
+	masterAdminPass: String
+)
+
 case class RestHeartConfig(baseUri: String, dbName: String, usersCollections: Map[Envri, String]){
 	def usersCollection(implicit envri: Envri) = usersCollections(envri)
 }
@@ -137,7 +143,7 @@ object ConfigReader extends DefaultJsonProtocol{
 
 	implicit val pubAuthConfigFormat = jsonFormat4(PublicAuthConfig)
 	implicit val privAuthConfigFormat = jsonFormat2(PrivateAuthConfig)
-	implicit val authConfigFormat = jsonFormat2(AuthConfig)
+	implicit val authConfigFormat = jsonFormat4(AuthConfig)
 	implicit val restHeartConfigFormat = jsonFormat3(RestHeartConfig)
 	implicit val emailConfigFormat = jsonFormat5(EmailConfig)
 	implicit val oauthProviderConfigFormat = jsonFormat3(OAuthProviderConfig)

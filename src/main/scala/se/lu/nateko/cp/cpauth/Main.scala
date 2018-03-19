@@ -54,7 +54,7 @@ object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
 	val passwordHandler = {
 		val emailSender = new EmailSender(config.mailing)
 		implicit val exeCtxt = system.dispatchers.lookup("my-blocking-dispatcher")
-		new PasswordLifecycleHandler(emailSender, cookieFactory, userDb, config.http)
+		new PasswordLifecycleHandler(emailSender, cookieFactory, userDb, config.http, config.auth)
 	}
 	val targetLookup: TargetUrlLookup = new MapBasedUrlLookup
 
