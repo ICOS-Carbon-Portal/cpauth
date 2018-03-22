@@ -18,23 +18,23 @@ import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.server.StandardRoute
 import akka.stream.ActorMaterializer
+import se.lu.nateko.cp.cpauth.AuthConfig
+import se.lu.nateko.cp.cpauth.Envri.Envri
 import se.lu.nateko.cp.cpauth.utils.Utils
 import se.lu.nateko.cp.cpauth.accounts.RestHeartClient
 import se.lu.nateko.cp.cpauth.accounts.UsersIo
 import se.lu.nateko.cp.cpauth.core.Authenticator
 import se.lu.nateko.cp.cpauth.core.CookieToToken
-import se.lu.nateko.cp.cpauth.core.PublicAuthConfig
 import se.lu.nateko.cp.cpauth.core.UserId
 import se.lu.nateko.cp.cpauth.core.AuthToken
 import se.lu.nateko.cp.cpauth.core.AuthSource
 import akka.http.javadsl.server.CustomRejection
 import akka.http.scaladsl.server.MissingCookieRejection
 import akka.http.scaladsl.server.RejectionHandler
-import se.lu.nateko.cp.cpauth.Envri.Envri
 
 trait CpauthDirectives {
 
-	def publicAuthConfigs: Map[Envri, PublicAuthConfig]
+	def authConfig: AuthConfig
 	def userDb: UsersIo
 	def restHeart: RestHeartClient
 	def hostToEnvri: Map[String, Envri]
@@ -43,7 +43,7 @@ trait CpauthDirectives {
 	implicit def materializer: ActorMaterializer
 	implicit def scheduler: Scheduler
 
-	def publicAuthConfig(implicit envri: Envri) = publicAuthConfigs(envri)
+	def publicAuthConfig(implicit envri: Envri) = authConfig.pub(envri)
 	def authenticator(implicit envri: Envri): Try[Authenticator] = Authenticator(publicAuthConfig)
 
 	val extractEnvri: Directive1[Envri] = extractHost.flatMap{h =>
@@ -125,7 +125,12 @@ trait CpauthDirectives {
 		complete((StatusCodes.Forbidden, "Need to be logged in as admin"))
 
 	def ifUserIsAdmin(token: AuthToken): Directive0 = Directive{ inner =>
-		onComplete(userDb.userIsAdmin(token.userId).map(_ && token.source == AuthSource.Password)){
+
+		val isAdminFut = if(token.userId.email == authConfig.masterAdminUser)
+			Future.successful(true)
+		else userDb.userIsAdmin(token.userId)
+
+		onComplete(isAdminFut.map(_ && token.source == AuthSource.Password)){
 			case Failure(err) => failWith(err)
 			case Success(false) => reject(AuthorizationFailedRejection)
 			case Success(true) => inner(())

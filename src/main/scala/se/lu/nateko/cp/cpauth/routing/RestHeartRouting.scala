@@ -54,7 +54,7 @@ trait RestHeartRouting extends RestHeartDirectives{
 		validate(email == uid.email, "Only admins can write to other users' documents")
 
 	def echoOriginToAllowOrigin(implicit envri: Envri): Directive0 = headerValueByType[Origin](()).flatMap{origin =>
-		if(origin.value.endsWith(publicAuthConfigs(envri).authCookieDomain))
+		if(origin.value.endsWith(authConfig.pub(envri).authCookieDomain))
 			respondWithHeader(`Access-Control-Allow-Origin`(origin.value))
 		else pass
 	}.recover(_ => pass)

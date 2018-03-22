@@ -56,7 +56,7 @@ class CpauthDirectivesTest extends FunSpec with ScalatestRouteTest {
 
 	val dirs = new CpauthDirectives{
 		val httpConfig = config.http
-		val publicAuthConfigs = config.auth.pub
+		val authConfig = config.auth
 		val dispatcher = system.dispatcher
 		val scheduler = system.scheduler
 		val materializer = ActorMaterializer(namePrefix = Some("cpauth_dir_test"))

@@ -25,7 +25,8 @@ case class HttpConfig(
 	extraHosts: Map[Envri, String],
 	servicePrivatePort: Int,
 	loginPath: String,
-	drupalProxying: Map[String, ProxyConfig]){
+	drupalProxying: Map[String, ProxyConfig]
+){
 	def serviceHost(implicit envri: Envri) = serviceHosts(envri)
 	def serviceUrl(implicit envri: Envri): String = "https://" + serviceHost
 	def authDomain(implicit envri: Envri): String = HttpConfig.cookieDomainFromHost(serviceHost)

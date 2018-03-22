@@ -34,7 +34,7 @@ object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
 
 	val config: CpauthConfig = ConfigReader.getDefault.getOrCrash("Problem reading/parsing config file")
 
-	val (httpConfig, publicAuthConfigs, samlConfig, oauthConfig) = (config.http, config.auth.pub, config.saml, config.oauth)
+	val (httpConfig, authConfig, samlConfig, oauthConfig) = (config.http, config.auth, config.saml, config.oauth)
 
 	val hostToEnvri = (httpConfig.serviceHosts.toSeq ++ httpConfig.extraHosts).map(_.swap).toMap
 	val http = Http()
