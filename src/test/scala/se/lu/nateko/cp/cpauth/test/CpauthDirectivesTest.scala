@@ -40,6 +40,7 @@ class CpauthDirectivesTest extends FunSpec with ScalatestRouteTest {
 			drupalProxying = null,
 			loginPath = null,
 			serviceHosts = Map(ICOS -> "cpauth.icos-cp.eu"),
+			extraHosts = Map.empty,
 			servicePrivatePort = 0
 		),
 		restheart = RestHeartConfig(

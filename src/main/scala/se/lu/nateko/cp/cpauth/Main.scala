@@ -36,7 +36,7 @@ object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
 
 	val (httpConfig, publicAuthConfigs, samlConfig, oauthConfig) = (config.http, config.auth.pub, config.saml, config.oauth)
 
-	val hostToEnvri = httpConfig.serviceHosts.map(_.swap)
+	val hostToEnvri = (httpConfig.serviceHosts.toSeq ++ httpConfig.extraHosts).map(_.swap).toMap
 	val http = Http()
 	val restHeart = new RestHeartClient(config.restheart, http)
 
