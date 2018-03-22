@@ -1,5 +1,7 @@
-@(email: String)
-@CpauthPage("Set Carbon Portal password", "Set password", "passwordreset"){
+@import se.lu.nateko.cp.cpauth.Envri.Envri
+
+@(email: String)(implicit envri: Envri)
+@CpauthPage("Set your password", "Set password", "passwordreset"){
 }{
 	<div class="row">
 		<div class="panel panel-default">
@@ -9,7 +11,7 @@
 
 					<div class="form-group">
 						<label for="mail">Email:</label>
-						<input name="mail" value="@email" class="form-control" readonly/>
+						<input id="mail" name="mail" value="@email" class="form-control" readonly/>
 					</div>
 
 					<div class="form-group">

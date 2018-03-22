@@ -1,0 +1,19 @@
+package se.lu.nateko.cp.cpauth.views
+
+trait LoginStrings {
+	def title: String
+	def subheading: String
+	def cookieNotice: String
+}
+
+object IcosLoginStrings extends LoginStrings {
+	val title = "Login to Carbon Portal"
+	val subheading = "Please sign in"
+	val cookieNotice = "<span class=\"label label-info\">Carbon Portal uses cookies to handle your login session</span><br/><span class=\"label label-info\">By using our services, you agree to our use of cookies</span>"
+}
+
+object SitesLoginStrings extends LoginStrings {
+	val title = "Sign in"
+	val subheading = ""
+	val cookieNotice = "<small>SITES uses cookies to handle your login session. By using our services, you agree to our use of cookies.</small>"
+}

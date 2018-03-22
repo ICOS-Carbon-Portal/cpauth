@@ -1,6 +1,7 @@
 package se.lu.nateko.cp.cpauth.routing
 
 import java.net.URI
+
 import scala.util.Try
 import se.lu.nateko.cp.cpauth.opensaml.IdpLibrary
 import se.lu.nateko.cp.cpauth.opensaml.IdpInfo
@@ -16,9 +17,8 @@ import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
 import akka.http.scaladsl.model.headers.HttpCookie
 import akka.http.scaladsl.model.Uri
 import se.lu.nateko.cp.cpauth.services.CookieFactory
-import se.lu.nateko.cp.cpauth.utils.Saml
+import se.lu.nateko.cp.cpauth.utils.{Saml, TargetUrlLookup, TemplatePageMarshalling}
 import se.lu.nateko.cp.cpauth.SamlConfig
-import se.lu.nateko.cp.cpauth.utils.TargetUrlLookup
 import se.lu.nateko.cp.cpauth.Envri.Envri
 
 trait SamlRouting extends CpauthDirectives{
@@ -28,6 +28,8 @@ trait SamlRouting extends CpauthDirectives{
 	def cookieFactory: CookieFactory
 	def targetLookup: TargetUrlLookup
 	implicit val system: ActorSystem
+
+	private[this] implicit val pageMarsh = TemplatePageMarshalling.marshaller
 
 	private def assExtractorTry(implicit envri: Envri): Try[AssertionExtractor] = AssertionExtractor(samlConfig)
 
@@ -61,7 +63,11 @@ trait SamlRouting extends CpauthDirectives{
 			(path("cpauth") & extractEnvri){implicit envri =>
 				getFromResource(samlConfig.spConfig.spMetaPath)
 			} ~
-			path("privacyStatement"){ getFromResource("privacyStatement.html")} ~
+			path("privacyStatement"){
+				extractEnvri{implicit envri =>
+					complete(views.html.CpauthPrivacyStatement())
+				}
+			} ~
 			path("idps"){ complete(idpInfos) }
 		} ~
 		post{

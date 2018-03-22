@@ -1,5 +1,9 @@
-@(oauthConfigJson: String)
-@CpauthPage("Login to Carbon Portal", "Please sign in", "login"){
+@import se.lu.nateko.cp.cpauth.Envri
+@import se.lu.nateko.cp.cpauth.Envri.Envri
+@import se.lu.nateko.cp.cpauth.views.ViewStrings.loginStrings
+
+@(oauthConfigJson: String)(implicit envri: Envri)
+@CpauthPage(loginStrings.title, loginStrings.subheading, "login"){
 	<script src="https://static.icos-cp.eu/constant/cookies.js/1.2.1/cookies.min.js"></script>
 	<script src="https://static.icos-cp.eu/constant/jquery/plugins/autocomplete/1.11.4/jquery-ui.min.js"></script>
 	<link rel="stylesheet" type="text/css" href="https://static.icos-cp.eu/constant/jquery/plugins/autocomplete/1.11.4/jquery-ui.min.css">
@@ -11,9 +15,7 @@
 	</script>
 }{
 	<h4>
-		<span class="label label-info">Carbon Portal uses cookies to handle your login session</span>
-		<br/>
-		<span class="label label-info">By using our services, you agree to our use of cookies</span>
+		@Html(loginStrings.cookieNotice)
 	</h4>
 
 	<br/>
@@ -22,25 +24,25 @@
 
 		<ul class="nav nav-tabs" role="tablist">
 
-			<li role="presentation" class="active col-xs-12 col-sm-2">
+			<li role="presentation" class="active">
 				<a href="#swamid" id="swamid-link" aria-controls="swamid" role="tab" data-toggle="tab">
 					University sign in
 				</a>
 			</li>
 
-			<li role="presentation" class="col-xs-12 col-sm-2">
+			<li role="presentation">
 				<a href="#plain" id="plain-link" aria-controls="plain" role="tab" data-toggle="tab">
 					Password sign in
 				</a>
 			</li>
-			
-			<li role="presentation" class="col-xs-12 col-sm-2">
+
+			<li role="presentation">
 				<a href="#social-sign-in" id="social-sign-in-link" aria-controls="social-sign-in" role="tab" data-toggle="tab">
 					Social sign in
 				</a>
 			</li>
 
-			<li role="presentation" class="col-xs-12 col-sm-2">
+			<li role="presentation">
 				<a href="#create" id="create-link" aria-controls="create" role="tab" data-toggle="tab">
 					Create account / forgot password
 				</a>
@@ -93,11 +95,11 @@
 							<button type="button" class="btn btn-default" id="passwordLoginButton">Login!</button>
 
 						</form>
-						
+
 					</div>
 				</div>
 			</div>
-			
+
 			<div role="tabpanel" class="tab-pane" id="social-sign-in">
 				<div class="panel panel-default">
 					<div class="panel-body">
@@ -107,7 +109,9 @@
 								<tr>
 									<td>
 										<a type="button" id="orcididLoginButton" style="display: inline-block; float: left; margin-right: 7px"><img src="/images/orcidid_login.png"/></a>
+										@if(envri == Envri.ICOS){
 										<span>To be able to login with your existing ORCID ID account, you need to make your email information public in the ORCID account settings. Alternatively, if you already have a Carbon Portal account that you can access using other sign-in mechanism (e.g. username/password), you can specify you ORCID ID in your CP user profile (About -> My CP, when logged in). Then you will be able to sign in to that CP account from here, using your ORCID account instead.</span>
+										}
 									</td>
 								</tr>
 
@@ -144,16 +148,17 @@
 		</div>
 	</div></div> <!-- col, row -->
 
+@if(envri == Envri.ICOS){
 	<div class="row"><div class="col-md-12">
 		<div class="panel panel-default">
 			<div class="panel-body">
 				<p>When you sign in here, you get access to the services at Carbon Portal for which you are authorized, and to your personal account settings.</p>
 				<p>Your login will be active for about one day on the same device where you logged in.</p>
-				<p>Data search and download are of course accessible for everybody and can be performed without signing in, but after signing in you need to set your acceptance of the ICOS data license only once! More info on the ICOS data license: <a href="https://www.icos-cp.eu/license" target="_blank">https://www.icos-cp.eu/license</a>.</p>
+				<p>Data search and download are of course accessible for everybody and can be performed without signing in, but after signing in you need to set your acceptance of the ICOS data licence only once! More info on the ICOS data licence: <a href="https://data.icos-cp.eu/licence" target="_blank">https://data.icos-cp.eu/licence</a>.</p>
 				<p>You can sign in with your institutional login through eduGAIN (preferred) or, if that does not work, through the social or password login. For the password login you should first create an account here, using the tab on the right. Please be aware that the email address with which you sign in will be the user id that identifies you to our services.</p>
 				<p>P.S. At the moment the Carbon Portal login will not work for <a href="https://docs.icos-cp.eu/" target="_blank">Alfresco DMS</a>, we are working on that.</p>
 			</div>
 		</div>
 	</div></div> <!-- col, row -->
 }
-
+}

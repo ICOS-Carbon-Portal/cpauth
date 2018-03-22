@@ -115,14 +115,14 @@ trait CpauthDirectives {
 		} ~
 		complete(StatusCodes.Unauthorized)
 
-	lazy val logout: Route = extractEnvri{implicit envri => 
+	lazy val logout: Route = extractEnvri{implicit envri =>
 		deleteCookie(publicAuthConfig.authCookieName, publicAuthConfig.authCookieDomain, "/"){
 			complete(StatusCodes.OK)
 		}
 	}
 
 	val admin: Directive0 = token.tflatMap(uit => ifUserIsAdmin(uit._1)) |
-		complete((StatusCodes.Forbidden, "Need to be logged in as CPauth admin"))
+		complete((StatusCodes.Forbidden, "Need to be logged in as admin"))
 
 	def ifUserIsAdmin(token: AuthToken): Directive0 = Directive{ inner =>
 		onComplete(userDb.userIsAdmin(token.userId).map(_ && token.source == AuthSource.Password)){

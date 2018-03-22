@@ -1,16 +1,20 @@
-@CpauthPage("Manage Carbon Portal accounts", "Manage all accounts here", "administration"){
+@import se.lu.nateko.cp.cpauth.Envri
+@import se.lu.nateko.cp.cpauth.Envri.Envri
+
+@()(implicit envri: Envri)
+@CpauthPage(adminPageTitle, "Manage all accounts here", "administration"){
 }{
 	<div class="row"><div class="col-md-12">
 
 		<ul class="nav nav-tabs" role="tablist">
 
-			<li role="presentation" class="col-xs-12 col-sm-2">
+			<li role="presentation" class="active">
 				<a href="#new" aria-controls="new" role="tab" data-toggle="tab" id="new-link">
 					Create a new account
 				</a>
 			</li>
 
-			<li role="presentation" class="col-xs-12 col-sm-2">
+			<li role="presentation">
 				<a href="#edit" aria-controls="edit" role="tab" data-toggle="tab" id="edit-link">
 					Edit accounts
 				</a>
@@ -60,3 +64,4 @@
 	</div></div> <!-- col, row -->
 }
 
+@adminPageTitle = @{ if(envri == Envri.SITES) "Account Management" else "Manage Carbon Portal accounts" }

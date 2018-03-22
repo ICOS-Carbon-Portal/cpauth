@@ -16,9 +16,9 @@ trait StaticRouting extends CpauthDirectives{
 		oauthConfig.get(envri).map(CpauthConfig.oauthJson).getOrElse("{}")
 
 	private[this] val pages: PartialFunction[String, Option[Envri => Html]] = {
-		case "login" => Some(envri => views.html.CpauthLoginPage(oauthInfoForLoginPage(envri)))
-		case "home" => Some(_ => views.html.CpauthHomePage())
-		case "administration" => Some(_ => views.html.CpauthAdminPage())
+		case "login" => Some(implicit envri => views.html.CpauthLoginPage(oauthInfoForLoginPage(envri)))
+		case "home" => Some(implicit envri => views.html.CpauthHomePage())
+		case "administration" => Some(implicit envri => views.html.CpauthAdminPage())
 		case "passwordreset" => None
 	}
 

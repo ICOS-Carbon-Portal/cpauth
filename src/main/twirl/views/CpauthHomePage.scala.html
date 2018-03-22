@@ -1,6 +1,12 @@
-@CpauthPage("Welcome to Carbon Portal", "Manage your account here", "home"){
+@import se.lu.nateko.cp.cpauth.Envri
+@import se.lu.nateko.cp.cpauth.Envri.Envri
+@import se.lu.nateko.cp.cpauth.views.ViewStrings.homeStrings
+
+@()(implicit envri: Envri)
+@CpauthPage(homeStrings.title, homeStrings.subheading, "home"){
 }{
 	<div id="hello" hidden>
+		@if(envri == Envri.ICOS){
 		<div class="panel panel-default">
 			<div class="panel-body">
 				<p>Here you can see and edit your personal data. All information is voluntary, remains your property and you are in control, please see our privacy policy! We will use the information only to improve our services to you. In the future, you will access and manage here the links to your stored searches and downloads and, in case of updates of the data that you downloaded, you'll be able to opt in here to receive notifications of updates.</p>
@@ -10,6 +16,7 @@
 				<p>The API token at the end of the page enables technical users to perform automated operations, such as data uploads and batch-downloads.</p>
 			</div>
 		</div>
+		}
 		<div class="panel panel-info">
 			<div class="panel-heading">
 				<h3 class="panel-title">
@@ -29,7 +36,7 @@
 									<input id="icosLicenceOk" type="checkbox">
 								</span>
 								<span class="form-control">
-									I accept the <a href="https://data.icos-cp.eu/licence">ICOS data license</a> (CC BY 4.0)
+									I accept the <a href="@homeStrings.licenceUrl">@envri data license</a> (CC BY 4.0)
 								</span>
 							</div>
 						}
@@ -60,12 +67,12 @@
 					<div class="col-md-2">
 						<div class="row">
 							<div class="col-md-12">
-								<button type="button" class="btn btn-primary btn-lg" id="signOutButton">Sign out</button>
+								<button type="button" class="btn btn-primary" id="signOutButton">Sign out</button>
 							</div>
 						</div>
 						<div class="row" style="margin-top:20px">
 							<div class="col-md-12">
-								<button type="button" class="btn btn-primary btn-lg" id="updateProfileButton">Save profile</button>
+								<button type="button" class="btn btn-primary" id="updateProfileButton">Save profile</button>
 							</div>
 						</div>
 					</div>
@@ -73,7 +80,7 @@
 			</div>
 		</div>
 
-		@DangerousDeletionPanel("profile")("This operation will make Carbon Portal forget all information about your user profile and activities")
+		@DangerousDeletionPanel("profile")("This operation will delete all information about your user profile and activities")
 
 		<div id="forLocalsOnly" hidden>
 
@@ -81,7 +88,7 @@
 				<div class="panel-heading">
 					<h3 class="panel-title">
 						<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
-						You can change your password here:
+						Change your password
 					</h3>
 				</div>
 				<div class="panel-body">
@@ -99,14 +106,14 @@
 					</div>
 				</div>
 			</div>
-			@DangerousDeletionPanel("account")("This operation will delete your profile and remove your Carbon Portal username/password account")
+			@DangerousDeletionPanel("account")("This operation will delete your profile and remove your account")
 		</div>
 
 		<div class="panel panel-info">
 			<div class="panel-heading">
 				<h3 class="panel-title">
 					<span class="glyphicon glyphicon-user" aria-hidden="true"></span>
-					Your API token:
+					API token
 				</h3>
 			</div>
 			<div class="panel-body">
@@ -142,7 +149,7 @@
 				</h3>
 			</div>
 			<div class="panel-body">
-				<h4>Sign in here: <a href="https://cpauth.icos-cp.eu/login/">https://cpauth.icos-cp.eu/login/</a></h4>
+				<h4>Sign in here: <a href="@homeStrings.loginUrl">@homeStrings.loginUrl</a></h4>
 			</div>
 		</div>
 	</div>
@@ -169,12 +176,12 @@
 			<div class="panel-heading">
 				<h3 class="panel-title">
 					<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
-					You can delete your @deletedInfo here:
+					Delete your @deletedInfo
 				</h3>
 			</div>
 			<div class="panel-body">
 				<div><p>@explanation</p></div>
-				<button type="button" class="btn btn-primary btn-lg" id="delete@{capitalized}Button">Delete @deletedInfo</button>
+				<button type="button" class="btn btn-primary" id="delete@{capitalized}Button">Delete @deletedInfo</button>
 
 				<div id="delete@{capitalized}Confirmation" hidden>
 					<br/>
@@ -186,8 +193,8 @@
 							</h3>
 						</div>
 						<div class="panel-body">
-							<button type="button" class="btn btn-primary btn-lg" id="cancelDelete@{capitalized}Button">NO! GO BACK TO SAFETY!</button>
-							<button type="button" class="btn btn-danger btn-lg" id="reallyDelete@{capitalized}Button">YES</button>
+							<button type="button" class="btn btn-primary" id="cancelDelete@{capitalized}Button">NO! GO BACK TO SAFETY!</button>
+							<button type="button" class="btn btn-danger" id="reallyDelete@{capitalized}Button">YES</button>
 						</div>
 					</div>
 				</div>

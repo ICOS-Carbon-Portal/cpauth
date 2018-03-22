@@ -1,19 +1,23 @@
 @import java.net.URI
+@import se.lu.nateko.cp.cpauth.Envri
+@import se.lu.nateko.cp.cpauth.Envri.Envri
 
-@(email: String, link: URI)
-@CpEmail("Labeling application submited"){
+@(email: String, link: URI)(implicit envri: Envri)
+@CpEmail("Labeling application submitted"){
 	<table  style="font-size: 12pt">
 		<tr>
 			<td style="padding-bottom:20px;">Dear @{email},</td>
 		</tr>
 		<tr>
-			<td>Carbon Portal has received a request to create an account for you, or initiate a password reset for you.</td>
+			<td>@name has received a request to create an account for you, or initiate a password reset for you.</td>
 		</tr>
 		<tr>
 			<td>If you are not interested in any of these procedures, you can safely ignore this email.</td>
 		</tr>
 		<tr>
-			<td>Otherwise, please click <a target="_blank" href="@{link.toString}">here</a> to create/reset your password with the Carbon Portal authentication service.</td>
+			<td>Otherwise, please click <a target="_blank" href="@{link.toString}">here</a> to create/reset your password with the @name authentication service.</td>
 		</tr>
 	</table>
 }
+
+@name = @{ if(envri == Envri.SITES) "SITES" else "Carbon Portal" }

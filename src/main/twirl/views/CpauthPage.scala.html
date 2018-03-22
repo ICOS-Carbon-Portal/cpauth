@@ -1,5 +1,8 @@
-@(title: String, subheading: String, scriptName: String)(customHeader: Html)(body: Html)
-@CpPage(title){
+@import se.lu.nateko.cp.cpauth.Envri
+@import se.lu.nateko.cp.cpauth.Envri.Envri
+
+@(title: String, subheading: String, scriptName: String)(customHeader: Html)(body: Html)(implicit envri: Envri)
+@template{
 	<script src="https://static.icos-cp.eu/constant/jquery/1.11.2/jquery.min.js"></script>
 	<script src="https://static.icos-cp.eu/constant/bootstrap/3.3.4/js/bootstrap.min.js"></script>
 	@customHeader
@@ -27,7 +30,11 @@
 	</script>
 }{
 	<div class="page-header">
+		@if(envri == Envri.SITES) {
+		<h1>@title</h1>
+		} else {
 		<h1>ICOS Carbon Portal Authentication Service <small>@subheading</small></h1>
+		}
 	</div>
 
 	<div id="message-container">
@@ -37,3 +44,6 @@
 	@body
 }
 
+@template = @{
+	if(envri == Envri.SITES) SitesPage(title) _ else CpCommonPage(title) _
+}

@@ -128,7 +128,9 @@ trait PasswordRouting extends CpauthDirectives {
 	path("passwordreset" ~ Slash){
 		token{ authToken =>
 			if(authToken.source == AuthSource.PasswordReset){
-				complete(views.html.CpauthPassResetPage(authToken.userId.email))
+				extractEnvri{implicit envri =>
+					complete(views.html.CpauthPassResetPage(authToken.userId.email))
+				}
 			} else reject
 		} ~
 		forbidAndInformAboutPassReset
