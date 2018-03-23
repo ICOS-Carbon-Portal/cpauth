@@ -3,7 +3,7 @@
 @import se.lu.nateko.cp.cpauth.Envri.Envri
 
 @(email: String, link: URI)(implicit envri: Envri)
-@CpEmail("Labeling application submitted"){
+@template{
 	<table  style="font-size: 12pt">
 		<tr>
 			<td style="padding-bottom:20px;">Dear @{email},</td>
@@ -21,3 +21,5 @@
 }
 
 @name = @{ if(envri == Envri.SITES) "SITES" else "Carbon Portal" }
+@title = @{ "Create/reset your " + name + " password" }
+@template = @{ if(envri == Envri.SITES) SitesEmail(title) _ else CpEmail(title) _ }

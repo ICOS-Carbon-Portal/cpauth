@@ -5,7 +5,7 @@ import se.lu.nateko.cp.cpauth.core.UserId
 import se.lu.nateko.cp.cpauth.core.AuthSource
 
 import scala.concurrent.ExecutionContext
-import se.lu.nateko.cp.cpauth.{AuthConfig, HttpConfig}
+import se.lu.nateko.cp.cpauth.{AuthConfig, Envri, HttpConfig}
 import java.net.URI
 
 import se.lu.nateko.cp.cpauth.accounts.UsersIo
@@ -31,7 +31,8 @@ class PasswordLifecycleHandler(
 		Future.fromTry(tokenTry).map(token => {
 			val link = new URI("https", httpConf.serviceHost, "/password/initpassreset/" + token, null)
 			val message = views.html.CpauthPassResetEmail(uid.email, link)
-			emailSender.send(Seq(uid.email), "Create/reset you Carbon Portal password", message)
+			val name = if (envri == Envri.SITES) "SITES" else "Carbon Portal"
+			emailSender.send(Seq(uid.email), "Create/reset your " + name + " password", message)
 		})
 	}
 
