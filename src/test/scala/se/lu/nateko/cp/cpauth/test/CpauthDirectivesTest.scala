@@ -45,8 +45,8 @@ class CpauthDirectivesTest extends FunSpec with ScalatestRouteTest {
 		),
 		restheart = RestHeartConfig(
 			baseUri = "http://127.0.0.1:8088",
-			dbName = "db",
-			usersCollections = Map(ICOS -> "users")
+			dbNames = Map(ICOS -> "db"),
+			usersCollection = "users"
 		),
 		mailing = null,
 		oauth = null

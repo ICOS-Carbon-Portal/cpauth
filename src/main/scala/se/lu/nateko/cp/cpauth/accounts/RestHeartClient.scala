@@ -29,12 +29,17 @@ class RestHeartClient(val config: RestHeartConfig, http: HttpExt)(implicit m: Ma
 	import http.system.dispatcher
 
 	def init: Future[Done] = Future.sequence(
-		config.usersCollections.keys.map(envri => createUsersCollIfNotExists(envri))
+		config.dbNames.keys.map(envri => createUsersCollIfNotExists(envri))
 	).map(_ => Done)
 
-	def usersCollUri(implicit envri: Envri): Uri = {
+	def dbUri(implicit envri: Envri): Uri = {
 		import config._
-		Uri(s"$baseUri/$dbName/$usersCollection")
+		Uri(s"$baseUri/$dbName")
+	}
+
+	def usersCollUri(implicit envri: Envri): Uri = {
+		val db = dbUri
+		db.withPath(db.path / config.usersCollection)
 	}
 
 	private val KeepIdsOnly = "keys" -> "{\"_id\": 1}"
@@ -139,25 +144,28 @@ class RestHeartClient(val config: RestHeartConfig, http: HttpExt)(implicit m: Ma
 			) yield ids.map(UserId)
 	}.flatten
 
-	private def createUsersCollIfNotExists(implicit envri: Envri): Future[Done] = {
-		val collUri = usersCollUri
-		val uri = collUri.withPath(collUri.path / "_indexes")
+	private def createUsersCollIfNotExists(implicit envri: Envri): Future[Done] =
+		createIfNotExists("Mongo db", dbUri, dbUri).flatMap{_ =>
+			val collUri = usersCollUri
+			val checkUri = collUri.withPath(collUri.path / "_indexes")
+			createIfNotExists("users collection", checkUri, collUri)
+		}
 
-		requestDiscardResp(HttpRequest(uri = uri)).flatMap{
+	private def createIfNotExists(thing: String, checkUri: Uri, putUri: Uri)(implicit envri: Envri): Future[Done] =
+		requestDiscardResp(HttpRequest(uri = checkUri)).flatMap{
 			case StatusCodes.OK => ok
 
 			case StatusCodes.NotFound =>
-				requestDiscardResp(HttpRequest(HttpMethods.PUT, uri = collUri)).flatMap{
+				requestDiscardResp(HttpRequest(HttpMethods.PUT, uri = putUri)).flatMap{
 					case StatusCodes.Created => ok
 					case status => fail(
-						s"Could not create users collection for $envri, got response $status"
+						s"Could not create $thing for $envri, got response $status"
 					)
 				}
 			case status => fail(
-				s"Got Unexpected status $status when trying to check if users collection exists for $envri"
+				s"Got Unexpected status $status when trying to check if $thing exists for $envri"
 			)
 		}
-	}
 
 	private def requestDiscardResp(req: HttpRequest): Future[StatusCode] =
 		http.singleRequest(req).map{resp =>

@@ -64,8 +64,8 @@ case class AuthConfig(
 	masterAdminPass: String
 )
 
-case class RestHeartConfig(baseUri: String, dbName: String, usersCollections: Map[Envri, String]){
-	def usersCollection(implicit envri: Envri) = usersCollections(envri)
+case class RestHeartConfig(baseUri: String, dbNames: Map[Envri, String], usersCollection: String){
+	def dbName(implicit envri: Envri) = dbNames(envri)
 }
 case class EmailConfig(
 	smtpServer: String,
