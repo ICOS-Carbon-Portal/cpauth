@@ -40,7 +40,6 @@ class CpauthDirectivesTest extends FunSpec with ScalatestRouteTest {
 			drupalProxying = null,
 			loginPath = null,
 			serviceHosts = Map(ICOS -> "cpauth.icos-cp.eu"),
-			extraHosts = Map.empty,
 			servicePrivatePort = 0
 		),
 		restheart = RestHeartConfig(
@@ -60,7 +59,7 @@ class CpauthDirectivesTest extends FunSpec with ScalatestRouteTest {
 		val dispatcher = system.dispatcher
 		val scheduler = system.scheduler
 		val materializer = ActorMaterializer(namePrefix = Some("cpauth_dir_test"))
-		val hostToEnvri = config.http.serviceHosts.map(_.swap)
+		def hostToEnvri(host: String) = config.http.serviceHosts.map(_.swap).get(host)
 		val userDb = null
 		val restHeart = null
 	}

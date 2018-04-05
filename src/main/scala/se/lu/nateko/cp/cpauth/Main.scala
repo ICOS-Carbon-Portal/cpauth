@@ -35,8 +35,6 @@ object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
 	val config: CpauthConfig = ConfigReader.getDefault.getOrCrash("Problem reading/parsing config file")
 
 	val (httpConfig, authConfig, samlConfig, oauthConfig) = (config.http, config.auth, config.saml, config.oauth)
-
-	val hostToEnvri = (httpConfig.serviceHosts.toSeq ++ httpConfig.extraHosts).map(_.swap).toMap
 	val http = Http()
 	val restHeart = new RestHeartClient(config.restheart, http)
 
@@ -101,4 +99,14 @@ object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
 			system.terminate()
 	}
 
+	private val host2ToEnvri = httpConfig.serviceHosts.map{
+		case (envri, host) => (host2SecondLevel(host), envri)
+	}
+
+	def hostToEnvri(host: String) = host2ToEnvri.get(host2SecondLevel(host))
+
+	private def host2SecondLevel(host: String): String = host.count(_ == '.') match{
+		case 0 => host
+		case x => host.split('.').drop(x - 1).mkString(".")
+	}
 }

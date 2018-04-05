@@ -37,7 +37,7 @@ trait CpauthDirectives {
 	def authConfig: AuthConfig
 	def userDb: UsersIo
 	def restHeart: RestHeartClient
-	def hostToEnvri: Map[String, Envri]
+	def hostToEnvri(host: String): Option[Envri]
 
 	implicit def dispatcher: ExecutionContext
 	implicit def materializer: ActorMaterializer
@@ -47,7 +47,7 @@ trait CpauthDirectives {
 	def authenticator(implicit envri: Envri): Try[Authenticator] = Authenticator(publicAuthConfig)
 
 	val extractEnvri: Directive1[Envri] = extractHost.flatMap{h =>
-		hostToEnvri.get(h) match{
+		hostToEnvri(h) match{
 			case None => complete(StatusCodes.BadRequest -> s"Unexpected host $h, cannot find corresponding ENVRI")
 			case Some(envri) => provide(envri)
 		}

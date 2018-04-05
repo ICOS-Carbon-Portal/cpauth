@@ -61,7 +61,7 @@ class CookieFactory(config: CpauthConfig) {
 	def makeAuthCookie(tokenBase64: String)(implicit envri: Envri) = HttpCookie(
 		name = config.auth.pub(envri).authCookieName,
 		value = tokenBase64,
-		domain = Some(config.http.authDomain),
+		domain = Some(config.auth.pub(envri).authCookieDomain),
 		path = Some("/"),
 		secure = true,
 		httpOnly = true

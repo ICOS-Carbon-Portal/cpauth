@@ -22,14 +22,12 @@ object OAuthProvider extends Enumeration{
 
 case class HttpConfig(
 	serviceHosts: Map[Envri, String],
-	extraHosts: Map[Envri, String],
 	servicePrivatePort: Int,
 	loginPath: String,
 	drupalProxying: Map[String, ProxyConfig]
 ){
 	def serviceHost(implicit envri: Envri) = serviceHosts(envri)
 	def serviceUrl(implicit envri: Envri): String = "https://" + serviceHost
-	def authDomain(implicit envri: Envri): String = HttpConfig.cookieDomainFromHost(serviceHost)
 }
 
 case class SamlSpConfig(url: String, consumerServiceUrl: String, spMetaPath: String)
@@ -98,15 +96,6 @@ case class OAuthProviderConfig(clientId: String, clientSecret: String, redirectP
 	def public = this.copy(clientSecret = "")
 }
 
-object HttpConfig{
-
-	def cookieDomainFromHost(host: String): String = host.count(_ == '.') match{
-		case 0 => host
-		case x => host.split('.').drop(x - 1).mkString(".", ".", "")
-	}
-
-}
-
 object ConfigReader extends DefaultJsonProtocol{
 
 	implicit val envriFormat = CpauthJsonProtocol.enumFormat(Envri)
@@ -137,8 +126,7 @@ object ConfigReader extends DefaultJsonProtocol{
 	implicit val samlSpConfigFormat = jsonFormat3(SamlSpConfig)
 	implicit val proxyConfigFormat = jsonFormat3(ProxyConfig)
 	implicit val samlAttrFormat = jsonFormat3(SamlAttrConfig)
-	//.apply needed because of the companion object that HttpConfig has
-	implicit val urlsConfigFormat = jsonFormat5(HttpConfig.apply)
+	implicit val urlsConfigFormat = jsonFormat4(HttpConfig)
 	implicit val samlConfigFormat = jsonFormat5(SamlConfig)
 	implicit val databaseConfigFormat = jsonFormat4(DatabaseConfig)
 
