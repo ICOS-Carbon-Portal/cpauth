@@ -48,7 +48,7 @@ lazy val viewsCore = (project in file("viewsCore"))
 	.enablePlugins(SbtTwirl)
 	.settings(
 		name := "views-core",
-		version := "0.3.5-SNAPSHOT",
+		version := "0.3.6-SNAPSHOT",
 		scalacOptions += "-Ywarn-unused-import:false"
 	)
 
