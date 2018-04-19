@@ -26,10 +26,9 @@ trait RestHeartRouting extends RestHeartDirectives{
 
 		path("db" / "users" / Segment){ email =>
 			options{
-				echoOriginToAllowOrigin(envri){
+				addAccessControlHeaders(envri){
 					respondWithHeaders(
 						`Access-Control-Allow-Methods`(HttpMethods.GET, HttpMethods.POST, HttpMethods.PUT, HttpMethods.PATCH),
-						`Access-Control-Allow-Credentials`(true),
 						`Access-Control-Allow-Headers`("Content-Type")
 					){
 						complete(StatusCodes.OK)
@@ -38,7 +37,7 @@ trait RestHeartRouting extends RestHeartDirectives{
 			} ~
 			token { token =>
 				(validateUser(email, token.userId) | ifUserIsAdmin(token)) {
-					echoOriginToAllowOrigin(envri){
+					addAccessControlHeaders(envri){
 						mapRequest(injectUsersCollection){
 							restheartProxy
 						}
@@ -52,11 +51,5 @@ trait RestHeartRouting extends RestHeartDirectives{
 
 	private def validateUser(email: String, uid: UserId): Directive0 =
 		validate(email == uid.email, "Only admins can write to other users' documents")
-
-	def echoOriginToAllowOrigin(implicit envri: Envri): Directive0 = headerValueByType[Origin](()).flatMap{origin =>
-		if(origin.value.endsWith(authConfig.pub(envri).authCookieDomain))
-			respondWithHeader(`Access-Control-Allow-Origin`(origin.value))
-		else pass
-	}.recover(_ => pass)
 
 }

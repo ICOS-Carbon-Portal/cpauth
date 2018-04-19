@@ -8,8 +8,8 @@ import scala.util.Success
 import scala.util.Try
 import akka.actor.Scheduler
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
-import akka.http.scaladsl.model.StatusCodes
-import akka.http.scaladsl.model.headers.`Access-Control-Allow-Origin`
+import akka.http.scaladsl.model.{HttpMethods, StatusCodes}
+import akka.http.scaladsl.model.headers._
 import akka.http.scaladsl.server.AuthorizationFailedRejection
 import akka.http.scaladsl.server.Directive
 import akka.http.scaladsl.server.Directive0
@@ -104,20 +104,31 @@ trait CpauthDirectives {
 		}
 		.result()
 
-	lazy val whoami: Route =
-		handleRejections(authRejectionHandler){
-			user{userId =>
-				respondWithHeader(`Access-Control-Allow-Origin`.*){
+	lazy val whoami: Route =  extractEnvri { implicit envri =>
+		addAccessControlHeaders(envri) {
+			(get & handleRejections(authRejectionHandler)) {
+				user { userId =>
 					import se.lu.nateko.cp.cpauth.CpauthJsonProtocol.userIdFormat
 					complete(userId)
 				}
-			}
-		} ~
-		complete(StatusCodes.Unauthorized)
+			} ~
+			options {
+				respondWithHeaders(
+					`Access-Control-Allow-Methods`(HttpMethods.GET, HttpMethods.POST, HttpMethods.PUT, HttpMethods.PATCH),
+					`Access-Control-Allow-Headers`("Content-Type")
+				) {
+					complete(StatusCodes.OK)
+				}
+			} ~
+			complete(StatusCodes.Unauthorized)
+		}
+	}
 
 	lazy val logout: Route = extractEnvri{implicit envri =>
-		deleteCookie(publicAuthConfig.authCookieName, publicAuthConfig.authCookieDomain, "/"){
-			complete(StatusCodes.OK)
+		addAccessControlHeaders(envri) {
+			deleteCookie(publicAuthConfig.authCookieName, publicAuthConfig.authCookieDomain, "/") {
+				complete(StatusCodes.OK)
+			}
 		}
 	}
 
@@ -137,6 +148,16 @@ trait CpauthDirectives {
 		}
 	}
 
+	def addAccessControlHeaders(implicit envri: Envri): Directive0 = headerValueByType[Origin](()).flatMap{origin =>
+		if (origin.value.endsWith(authConfig.pub(envri).authCookieDomain)) {
+			respondWithHeaders(
+				`Access-Control-Allow-Origin`(origin.value),
+				`Access-Control-Allow-Credentials`(true)
+			)
+		} else {
+			pass
+		}
+	}.recover(_ => pass)
 }
 
 case object CpauthCookieMissingRejection extends CustomRejection
