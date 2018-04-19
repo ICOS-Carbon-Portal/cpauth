@@ -9,6 +9,7 @@ import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
 import akka.http.scaladsl.server.Directives._
+import play.twirl.api.Html
 import se.lu.nateko.cp.cpauth.services.CookieFactory
 import se.lu.nateko.cp.cpauth.core.AuthSource
 import se.lu.nateko.cp.cpauth.services.PasswordLifecycleHandler
@@ -19,7 +20,7 @@ trait PasswordRouting extends CpauthDirectives {
 	def cookieFactory: CookieFactory
 	def passwordHandler: PasswordLifecycleHandler
 
-	private[this] implicit val pageMarsh = TemplatePageMarshalling.marshaller
+	private[this] implicit val pageMarsh = TemplatePageMarshalling.marshaller[Html]
 
 	private[this] val forbidAndInformAboutPassReset =
 		complete(StatusCodes.Forbidden -> "You need special permissions to reset your password")

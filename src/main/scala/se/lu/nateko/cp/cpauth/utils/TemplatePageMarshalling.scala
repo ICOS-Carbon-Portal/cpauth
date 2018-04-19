@@ -5,21 +5,26 @@ import akka.http.scaladsl.marshalling.Marshalling._
 import akka.http.scaladsl.marshalling.ToResponseMarshaller
 import akka.http.scaladsl.model._
 import scala.concurrent.Future
-import play.twirl.api.Html
+import play.twirl.api._
 
 object TemplatePageMarshalling {
 
-	private def getHtml(html: Html, charset: HttpCharset) = HttpResponse(
-		entity = HttpEntity(
-			ContentType.WithCharset(MediaTypes.`text/html`, charset),
-			html.body
-		)
-	)
+	def marshaller[F <: BufferedContent[F]]: ToResponseMarshaller[F] = Marshaller(
+		implicit exeCtxt => content => Future{
 
-	def marshaller: ToResponseMarshaller[Html] = Marshaller(
-		implicit exeCtxt => html => Future.successful(
-			WithOpenCharset(MediaTypes.`text/html`, getHtml(html, _)) :: Nil
-		)
+			val mediaType = content match {
+				case _: Html => MediaTypes.`text/html`
+				case _: JavaScript => MediaTypes.`application/javascript`
+				case _ =>
+					throw new Exception(s"Unsupported template type ${content.getClass.getName}")
+			}
+
+			val responseMaker = (charset: HttpCharset) => HttpResponse(
+				entity = HttpEntity(ContentType.WithCharset(mediaType, charset), content.body)
+			)
+
+			WithOpenCharset(mediaType, responseMaker) :: Nil
+		}
 	)
 
 }

@@ -1,4 +1,5 @@
 @import se.lu.nateko.cp.viewscore._
+@import views.js.MainMenuJS
 
 @(
 	title: String,
@@ -15,7 +16,9 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 
 	@if(menu.nonEmpty){
-		@MainMenuJS(cpauthHostOpt)
+	<script type="application/javascript">
+		@Html(MainMenuJS(cpauthHostOpt).body)
+	</script>
 	}
 
 	@customHeader

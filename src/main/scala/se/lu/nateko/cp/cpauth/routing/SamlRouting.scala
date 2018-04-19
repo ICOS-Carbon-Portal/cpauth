@@ -16,6 +16,7 @@ import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
 import akka.http.scaladsl.model.headers.HttpCookie
 import akka.http.scaladsl.model.Uri
+import play.twirl.api.Html
 import se.lu.nateko.cp.cpauth.services.CookieFactory
 import se.lu.nateko.cp.cpauth.utils.{Saml, TargetUrlLookup, TemplatePageMarshalling}
 import se.lu.nateko.cp.cpauth.SamlConfig
@@ -29,7 +30,7 @@ trait SamlRouting extends CpauthDirectives{
 	def targetLookup: TargetUrlLookup
 	implicit val system: ActorSystem
 
-	private[this] implicit val pageMarsh = TemplatePageMarshalling.marshaller
+	private[this] implicit val pageMarsh = TemplatePageMarshalling.marshaller[Html]
 
 	private def assExtractorTry(implicit envri: Envri): Try[AssertionExtractor] = AssertionExtractor(samlConfig)
 
