@@ -114,8 +114,7 @@ trait CpauthDirectives {
 			} ~
 			options {
 				respondWithHeaders(
-					`Access-Control-Allow-Methods`(HttpMethods.GET, HttpMethods.POST, HttpMethods.PUT, HttpMethods.PATCH),
-					`Access-Control-Allow-Headers`("Content-Type")
+					`Access-Control-Allow-Methods`(HttpMethods.GET)
 				) {
 					complete(StatusCodes.OK)
 				}
