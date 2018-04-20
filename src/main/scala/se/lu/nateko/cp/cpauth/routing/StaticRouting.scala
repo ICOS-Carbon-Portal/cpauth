@@ -5,7 +5,7 @@ import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.model.StatusCodes
 import play.twirl.api._
 import se.lu.nateko.cp.cpauth.utils.TemplatePageMarshalling
-import se.lu.nateko.cp.cpauth.{CpauthConfig, HttpConfig}
+import se.lu.nateko.cp.cpauth.CpauthConfig
 import se.lu.nateko.cp.cpauth.Envri.Envri
 
 trait StaticRouting extends CpauthDirectives{
@@ -23,18 +23,10 @@ trait StaticRouting extends CpauthDirectives{
 	}
 
 	private[this] implicit val htmlMarsh = TemplatePageMarshalling.marshaller[Html]
-	private[this] implicit val jsMarsh = TemplatePageMarshalling.marshaller[JavaScript]
-
-	def httpConfig: HttpConfig
 
 	lazy val staticRoute: Route =
 		path("favicon.ico"){
 			getFromResource("favicon.ico")
-		} ~
-		path("menu.js") {
-			(extractEnvri) { implicit envri =>
-				complete(views.js.MainMenuJS(Some(httpConfig.serviceHost)))
-			}
 		} ~
 		pathPrefix("images"){
 		  getFromResourceDirectory("www/images")

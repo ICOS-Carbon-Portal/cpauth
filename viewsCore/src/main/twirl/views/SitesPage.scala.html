@@ -1,3 +1,5 @@
+@import views.js.MainMenuJS
+
 @(title: String)(customHeader: Html)(body: Html)
 <!DOCTYPE html>
 <html>
@@ -12,7 +14,9 @@
 
   @SitesStyle()
 
-  <script src="/menu.js"></script>
+  <script type="application/javascript">
+  @Html(MainMenuJS(Some("auth.fieldsites.se")).body)
+  </script>
 
   @customHeader
 
