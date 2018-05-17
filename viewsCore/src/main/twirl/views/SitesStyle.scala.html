@@ -1,17 +1,36 @@
 @()
-<style>
+<style type="text/css">
 	body {
 		font-family: "SourceSansPro", sans-serif;
 		font-size: 16px;
 	}
 
 	.header {
-		background: url(https://static.icos-cp.eu/images/sites-header.png) no-repeat center;
+		position: relative;
 		width: 1400px;
 		max-width: 100%;
 		height: 175px;
 		margin: 0 auto;
+		background: url(https://static.icos-cp.eu/images/sites-header-background.jpg) #61AB43 no-repeat center top;
+		border-top: 22px solid #818185;
+	}
+
+	.logo {
+		background: white;
+		width: 144px;
+		height: 108px;
+		margin-top: -22px;
 		position: relative;
+		margin-left: 10%;
+		max-width: 30%;
+	}
+
+	.logo img {
+		width: 90%;
+		height: auto;
+		position: absolute;
+		bottom: 13px;
+		left: 7px;
 	}
 
 	.menu {
