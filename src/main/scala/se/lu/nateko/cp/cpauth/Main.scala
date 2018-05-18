@@ -25,7 +25,7 @@ import utils.Utils.CrasheableTry
 
 
 object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
-		with StaticRouting with RestHeartRouting with OAuthRouting{
+		with StaticRouting with RestHeartRouting with OAuthRouting with PortalUsageLogRouting {
 
 	implicit val system = ActorSystem("cpauth")
 	implicit val dispatcher = system.dispatcher
@@ -49,12 +49,14 @@ object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
 			config.database.password)
 	})
 
+	val emailSender = new EmailSender(config.mailing)
 	val passwordHandler = {
-		val emailSender = new EmailSender(config.mailing)
 		implicit val exeCtxt = system.dispatchers.lookup("my-blocking-dispatcher")
 		new PasswordLifecycleHandler(emailSender, cookieFactory, userDb, config.http, config.auth)
 	}
 	val targetLookup: TargetUrlLookup = new MapBasedUrlLookup
+
+	val usageLogger = new PortalUsageLogger(config.restheart, config.geoip, emailSender)
 
 	val cpauthExceptionHandler = ExceptionHandler{
 		case AuthenticationFailedException =>
@@ -66,6 +68,7 @@ object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
 
 	val route = handleExceptions(cpauthExceptionHandler){
 		staticRoute ~
+		usageLogRouting ~
 		samlRoute ~
 		passwordRoute ~
 		drupalRoute ~

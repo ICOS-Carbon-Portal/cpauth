@@ -45,10 +45,13 @@ class CpauthDirectivesTest extends FunSpec with ScalatestRouteTest {
 		restheart = RestHeartConfig(
 			baseUri = "http://127.0.0.1:8088",
 			dbNames = Map(ICOS -> "db"),
-			usersCollection = "users"
+			usersCollection = "users",
+			usageCollection = "portaluse",
+			ipsToIgnore = Nil
 		),
 		mailing = null,
-		oauth = null
+		oauth = null,
+		geoip = null
 	)
 
 	val config = getConfig("src/test/resources/private1.der")

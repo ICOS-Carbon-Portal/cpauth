@@ -29,7 +29,9 @@ class RestHeartClient(val config: RestHeartConfig, http: HttpExt)(implicit m: Ma
 	import http.system.dispatcher
 
 	def init: Future[Done] = Future.sequence(
-		config.dbNames.keys.map(envri => createUsersCollIfNotExists(envri))
+		config.dbNames.keys.map{implicit envri =>
+			createUsersCollIfNotExists.zip(createPortalUsageCollIfNotExists)
+		}
 	).map(_ => Done)
 
 	def dbUri(implicit envri: Envri): Uri = {
@@ -42,6 +44,10 @@ class RestHeartClient(val config: RestHeartConfig, http: HttpExt)(implicit m: Ma
 		db.withPath(db.path / config.usersCollection)
 	}
 
+	def portalUsageCollUri(implicit envri: Envri): Uri = {
+		val db = dbUri
+		db.withPath(db.path / config.usageCollection)
+	}
 	private val KeepIdsOnly = "keys" -> "{\"_id\": 1}"
 
 	def getUserUri(uid: UserId)(implicit envri: Envri): Uri = usersCollUri.withPath(usersCollUri.path / uid.email)
@@ -144,14 +150,25 @@ class RestHeartClient(val config: RestHeartConfig, http: HttpExt)(implicit m: Ma
 			) yield ids.map(UserId)
 	}.flatten
 
+	private def createDbIfNotExists(implicit envri: Envri): Future[Done] =
+		createIfNotExists("Mongo db", dbUri, dbUri)
+
+	private def createCollIfNotExists(collUri: Uri, thing: String): Future[Done] = {
+		val checkUri = collUri.withPath(collUri.path / "_indexes")
+		createIfNotExists(thing, checkUri, collUri)
+	}
+
 	private def createUsersCollIfNotExists(implicit envri: Envri): Future[Done] =
-		createIfNotExists("Mongo db", dbUri, dbUri).flatMap{_ =>
-			val collUri = usersCollUri
-			val checkUri = collUri.withPath(collUri.path / "_indexes")
-			createIfNotExists("users collection", checkUri, collUri)
+		createDbIfNotExists.flatMap{_ =>
+			createCollIfNotExists(usersCollUri, "users collection")
 		}
 
-	private def createIfNotExists(thing: String, checkUri: Uri, putUri: Uri)(implicit envri: Envri): Future[Done] =
+	private def createPortalUsageCollIfNotExists(implicit envri: Envri): Future[Done] =
+		createDbIfNotExists.flatMap{_ =>
+			createCollIfNotExists(portalUsageCollUri, "portal usage collection")
+		}
+
+	private def createIfNotExists(thing: String, checkUri: Uri, putUri: Uri): Future[Done] =
 		requestDiscardResp(HttpRequest(uri = checkUri)).flatMap{
 			case StatusCodes.OK => ok
 
@@ -159,11 +176,11 @@ class RestHeartClient(val config: RestHeartConfig, http: HttpExt)(implicit m: Ma
 				requestDiscardResp(HttpRequest(HttpMethods.PUT, uri = putUri)).flatMap{
 					case StatusCodes.Created => ok
 					case status => fail(
-						s"Could not create $thing for $envri, got response $status"
+						s"Could not create $thing at $putUri, got response $status"
 					)
 				}
 			case status => fail(
-				s"Got Unexpected status $status when trying to check if $thing exists for $envri"
+				s"Got Unexpected status $status when trying to check if $thing exists at $checkUri"
 			)
 		}
 

@@ -12,7 +12,13 @@ class EmailSender(config: EmailConfig) {
 
 	private val log = LoggerFactory.getLogger(getClass)
 
-	def send(to: Seq[String], subject: String, body: Html, cc: Seq[String] = Nil): Unit = {
+	def send(to: Seq[String], subject: String, body: Html, cc: Seq[String] = Nil): Unit =
+		privateSend(to, subject, body.body, "text/html; charset=utf-8", cc)
+
+	def sendText(to: Seq[String], subject: String, body: String, cc: Seq[String] = Nil): Unit =
+		privateSend(to, subject, body, "text/plain; charset=utf-8", cc)
+
+	private def privateSend(to: Seq[String], subject: String, body: String, mimeType: String, cc: Seq[String]): Unit = {
 		try{
 			val message: Message = {
 				val properties = new Properties()
@@ -30,7 +36,7 @@ class EmailSender(config: EmailConfig) {
 			message.setReplyTo(Array(new InternetAddress("do_not_reply@icos-cp.eu")))
 			message.setSentDate(new Date())
 			message.setSubject(subject)
-			message.setContent(body.body, "text/html; charset=utf-8")
+			message.setContent(body, mimeType)
 
 			to.foreach(r => message.addRecipient(Message.RecipientType.TO, new InternetAddress(r)))
 			cc.foreach(r => message.addRecipient(Message.RecipientType.CC, new InternetAddress(r)))
@@ -45,5 +51,4 @@ class EmailSender(config: EmailConfig) {
 				throw err
 		}
 	}
-
 }

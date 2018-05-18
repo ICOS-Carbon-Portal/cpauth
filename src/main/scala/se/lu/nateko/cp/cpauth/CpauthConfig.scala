@@ -62,9 +62,18 @@ case class AuthConfig(
 	masterAdminPass: String
 )
 
-case class RestHeartConfig(baseUri: String, dbNames: Map[Envri, String], usersCollection: String){
+case class RestHeartConfig(
+	baseUri: String,
+	dbNames: Map[Envri, String],
+	usersCollection: String,
+	usageCollection: String,
+	ipsToIgnore: Seq[String]
+){
 	def dbName(implicit envri: Envri) = dbNames(envri)
 }
+
+case class CpGeoConfig(baseUri: String, maxAgeDays: Int)
+
 case class EmailConfig(
 	smtpServer: String,
 	username: String,
@@ -80,7 +89,8 @@ case class CpauthConfig(
 	auth: AuthConfig,
 	restheart: RestHeartConfig,
 	mailing: EmailConfig,
-	oauth: CpauthConfig.OAuthConfig
+	oauth: CpauthConfig.OAuthConfig,
+	geoip: CpGeoConfig
 )
 
 object CpauthConfig{
@@ -133,11 +143,12 @@ object ConfigReader extends DefaultJsonProtocol{
 	implicit val pubAuthConfigFormat = jsonFormat4(PublicAuthConfig)
 	implicit val privAuthConfigFormat = jsonFormat2(PrivateAuthConfig)
 	implicit val authConfigFormat = jsonFormat4(AuthConfig)
-	implicit val restHeartConfigFormat = jsonFormat3(RestHeartConfig)
+	implicit val restHeartConfigFormat = jsonFormat5(RestHeartConfig)
 	implicit val emailConfigFormat = jsonFormat5(EmailConfig)
 	implicit val oauthProviderConfigFormat = jsonFormat3(OAuthProviderConfig)
+	implicit val geoConfigFormat = jsonFormat2(CpGeoConfig)
 
-	implicit val cpauthConfigFormat = jsonFormat7(CpauthConfig.apply)
+	implicit val cpauthConfigFormat = jsonFormat8(CpauthConfig.apply)
 
 	def fromAppConfig(applicationConfig: Config): CpauthConfig = {
 
