@@ -9,11 +9,12 @@ import akka.stream.ActorMaterializer
 
 import scala.concurrent.Future
 import se.lu.nateko.cp.cpauth.CpGeoConfig
-import spray.json.{ JsNumber, JsObject, JsString, JsValue}
+import spray.json.{JsNumber, JsObject, JsString, JsValue}
 
+import scala.util.Failure
 import scala.util.control.NoStackTrace
 
-class CpGeoClient(conf: CpGeoConfig)(implicit system: ActorSystem) {
+class CpGeoClient(conf: CpGeoConfig, errorEmailer: ErrorEmailer)(implicit system: ActorSystem) {
 	import CpGeoClient.{GeoError, QuotaError}
 
 	implicit val materializer = ActorMaterializer()
@@ -48,7 +49,8 @@ class CpGeoClient(conf: CpGeoConfig)(implicit system: ActorSystem) {
 				case None =>
 					js
 			}
-
+		}.andThen{
+			case Failure(err) => errorEmailer.enqueue(err)
 		}
 	}
 

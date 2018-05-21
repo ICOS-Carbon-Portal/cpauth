@@ -13,7 +13,7 @@ import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
 
 import scala.concurrent.Future
 
-class RestHeartLogClient(conf: RestHeartConfig)(implicit system: ActorSystem) {
+abstract class RestHeartLogClient(conf: RestHeartConfig, logCollection: String)(implicit system: ActorSystem) {
 
 	import system.dispatcher
 
@@ -22,7 +22,7 @@ class RestHeartLogClient(conf: RestHeartConfig)(implicit system: ActorSystem) {
 
 	def log(logEntry: JsObject)(implicit envri: Envri): Future[Done] = {
 
-		val restheartLogUri = baseUrl.withPath(baseUrl.path / conf.dbName / conf.usageCollection)
+		val restheartLogUri = baseUrl.withPath(baseUrl.path / conf.dbName / logCollection)
 
 		val requestFut = Marshal(logEntry).to[RequestEntity].map{ent =>
 			HttpRequest(
@@ -42,3 +42,6 @@ class RestHeartLogClient(conf: RestHeartConfig)(implicit system: ActorSystem) {
 		}
 	}
 }
+
+class PortalUseLogClient(conf: RestHeartConfig)(implicit system: ActorSystem) extends RestHeartLogClient(conf, conf.usageCollection)
+class ObjectDownloadsLogClient(conf: RestHeartConfig)(implicit system: ActorSystem) extends RestHeartLogClient(conf, conf.downloadsCollection)
