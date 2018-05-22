@@ -28,21 +28,25 @@ trait PortalLogRouting extends CpauthDirectives{
 						}
 					}
 				} ~
-				  options{
-					  respondWithHeaders(
-						  `Access-Control-Allow-Origin`.*,
-						  `Access-Control-Allow-Methods`(HttpMethods.POST),
-						  `Access-Control-Allow-Headers`("Content-Type")
-					  ){
-						  complete(StatusCodes.OK)
-					  }
-				  }
+				options{
+					respondWithHeaders(
+						`Access-Control-Allow-Origin`.*,
+						`Access-Control-Allow-Methods`(HttpMethods.POST),
+						`Access-Control-Allow-Headers`("Content-Type")
+					){
+						complete(StatusCodes.OK)
+					}
+				} ~
+				complete(StatusCodes.BadRequest -> "Expecting only HTTP POST or OPTIONS on this path")
 			} ~
 			path("dobjdls"){
-				entity(as[JsValue]){js =>
-					downloadsLogger.log(js.asJsObject)
-					complete(StatusCodes.OK)
-				}
+				post{
+					entity(as[JsValue]){js =>
+						downloadsLogger.log(js.asJsObject)
+						complete(StatusCodes.OK)
+					}
+				} ~
+				complete(StatusCodes.BadRequest -> "Expecting only HTTP POST on this path")
 			}
 		}
 	}
