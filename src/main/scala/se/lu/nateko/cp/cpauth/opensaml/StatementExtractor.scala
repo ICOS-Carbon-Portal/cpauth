@@ -2,6 +2,7 @@ package se.lu.nateko.cp.cpauth.opensaml
 
 import org.opensaml.saml2.core.Assertion
 import se.lu.nateko.cp.cpauth.utils.Utils.SafeJavaCollectionWrapper
+import org.opensaml.xml.schema.XSAny
 import org.opensaml.xml.schema.XSString
 import org.opensaml.saml2.core.Attribute
 import scala.util.Try
@@ -63,6 +64,9 @@ object StatementExtractor {
 		.filter(s => s != null && s.length != 0)
 	
 	def getStringValues(attribute: Attribute): Iterable[String] =
-		attribute.getAttributeValues.toSafeIterable.collect{ case s: XSString => s.getValue}
+		attribute.getAttributeValues.toSafeIterable.collect{
+			case s: XSString => s.getValue
+			case xsAny: XSAny => xsAny.getTextContent
+		}
 
 }

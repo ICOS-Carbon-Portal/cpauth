@@ -24,4 +24,11 @@ class StatementExtractorTests extends FunSuite{
 		val attrVals = StatementExtractor.extractAttributeStringValues(assertion).toSeq
 		assert(attrVals.contains(("givenName", "FirstName")))
 	}
+
+	test("assertion from unitus.it is parsed correctly"){
+		val stream = getClass.getResourceAsStream("/saml/unitus_it_assertion.xml")
+		val assertion = Parser.fromStream[Assertion](stream)
+		val stats = StatementExtractor.extractAttributeStringValues(assertion).toMap
+		assert(stats("mail") === "nickname@unitus.it")
+	}
 }
