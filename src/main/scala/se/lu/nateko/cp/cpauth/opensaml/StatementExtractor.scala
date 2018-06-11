@@ -17,7 +17,7 @@ class AllStatements(nameValues: Map[String, Seq[String]]){
 	def getSingleValue(attributes: Seq[String]): Try[String] =
 		attributes.flatMap(attr => nameValues.get(attr).toSeq.flatten).distinct.toList match {
 
-			case Nil => fail(s"Attribute(s) '${attributes.mkString("', '")}' not available")
+			case Nil => fail(s"Attribute(s) '${attributes.mkString("', '")}' not available. Available attibutes:\n$contentDebugInfo\n")
 
 			case theOnly :: Nil => Success(theOnly)
 
@@ -26,7 +26,9 @@ class AllStatements(nameValues: Map[String, Seq[String]]){
 
 		}
 
-
+	private def contentDebugInfo: String = nameValues.iterator.map{
+			case (name, vals) => name + ": " + vals.mkString(", ")
+		}.mkString("\n")
 }
 
 object StatementExtractor {
