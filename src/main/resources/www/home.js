@@ -57,6 +57,7 @@ function updateUserProfile(uid){
 		method: "PATCH",
 		url: "/db/users/" + uid.email,
 		contentType: 'application/json',
+		dataType: 'text',
 		data: JSON.stringify({profile: payload})
 	}).done(function(){
 		reportSuccess('Profile updated');
