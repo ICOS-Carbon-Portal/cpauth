@@ -58,18 +58,19 @@ object MenuFetcher {
 
 	private def parseMenu(node: Node): Try[Seq[CpMenuItem]] = Try{
 		val topItems = children("ul", node).flatMap(ul => children("li", ul))
-		topItems.map(parseMenuItem)
+		topItems.flatMap(parseMenuItem)
 	}
 
-	private def parseMenuItem(liNode: Node): CpMenuItem = {
-		val anchor = children("a", liNode).headOption.getOrElse(throw new Exception("Missing <a> tag in <li>"))
+	private def parseMenuItem(liNode: Node): Option[CpMenuItem] = children("a", liNode).headOption.flatMap{anchor =>
 		val label = anchor.getTextContent
 
-		val childItems = parseMenu(liNode).get
+		val childItems = parseMenu(liNode).getOrElse(Nil)
+
 		if(childItems.isEmpty) {
-			val ref = anchor.getAttributes.getNamedItem("href").getTextContent
-			CpMenuLeaf(label, new URI(ref))
-		}else CpMenuGroup(label, childItems)
+			Option(anchor.getAttributes.getNamedItem("href")).map(href =>
+				CpMenuLeaf(label, new URI(href.getTextContent))
+			)
+		} else Some(CpMenuGroup(label, childItems))
 	}
 
 	private def children(name: String, node: Node): IndexedSeq[Node] = {
