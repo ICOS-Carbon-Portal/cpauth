@@ -20,6 +20,12 @@
 				</a>
 			</li>
 
+			<li role="presentation">
+				<a href="#loginas" aria-controls="edit" role="tab" data-toggle="tab" id="loginas-link">
+					Log in as user
+				</a>
+			</li>
+
 			<li class="col-sm-8"></li>
 		</ul>
 
@@ -36,7 +42,7 @@
 
 							<div class="form-group required">
 								<label for="mail" class="control">Email:</label>
-								<input id="mail" name="mail" type="email" class="form-control" placeholder="New user's email" autocomplete="off"/>
+								<input id="newaccmail" name="mail" type="email" class="form-control" placeholder="New user's email" autocomplete="off"/>
 							</div>
 
 							<div class="form-group required">
@@ -56,6 +62,25 @@
 				<div class="panel panel-default">
 					<div class="panel-body">
 						<div id="list-accounts"></div>
+					</div>
+				</div>
+			</div>
+
+			<div role="tabpanel" class="tab-pane" id="loginas">
+				<div class="panel panel-default">
+					<div class="panel-body">
+
+						<form id="loginas-account" autocomplete="off">
+
+							<div class="form-group required">
+								<label for="mail" class="control">Email:</label>
+								<input id="loginasmail" name="mail" type="email" class="form-control" placeholder="User's email" autocomplete="off"/>
+							</div>
+
+							<button type="button" class="btn btn-default" id="loginas-button">Log in!</button>
+
+						</form>
+
 					</div>
 				</div>
 			</div>

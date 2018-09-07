@@ -1,17 +1,18 @@
 package se.lu.nateko.cp.cpauth.routing
 
-import scala.util.Success
 import scala.util.Failure
-import se.lu.nateko.cp.cpauth.core.UserId
-import se.lu.nateko.cp.cpauth.CpauthJsonProtocol._
-import se.lu.nateko.cp.cpauth.accounts.UserEntry
-import akka.http.scaladsl.server.Route
-import akka.http.scaladsl.model.StatusCodes
+
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
+import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.server.Route
 import play.twirl.api.Html
-import se.lu.nateko.cp.cpauth.services.CookieFactory
+import se.lu.nateko.cp.cpauth.CpauthJsonProtocol._
+import se.lu.nateko.cp.cpauth.Envri
+import se.lu.nateko.cp.cpauth.accounts.UserEntry
 import se.lu.nateko.cp.cpauth.core.AuthSource
+import se.lu.nateko.cp.cpauth.core.UserId
+import se.lu.nateko.cp.cpauth.services.CookieFactory
 import se.lu.nateko.cp.cpauth.services.PasswordLifecycleHandler
 import se.lu.nateko.cp.cpauth.utils.TemplatePageMarshalling
 
@@ -41,13 +42,7 @@ trait PasswordRouting extends CpauthDirectives {
 				formFields(('mail, 'password)){(mail, password) =>
 					val uEntryFuture = passwordHandler.authUser(UserId(mail), password)
 					onSuccess(uEntryFuture){ uEntry =>
-
-						cookieFactory.makeTokenBase64(uEntry.id, AuthSource.Password) match{
-							case Success(token) =>
-								val cookie = cookieFactory.makeAuthCookie(token)
-								setCookie(cookie)(complete(StatusCodes.OK))
-							case Failure(err) => failWith(err)
-						}
+						logInWithPasswordCookie(uEntry.id)
 					}
 				}
 			} ~
@@ -122,7 +117,13 @@ trait PasswordRouting extends CpauthDirectives {
 					formField('mail)(mail =>
 						onSuccess(userDb.setAdminRights(UserId(mail), false))(complete(StatusCodes.OK))
 					)
-				}
+				} ~
+				path("loginas"){
+					formField('mail)(mail =>
+						logInWithPasswordCookie(UserId(mail))
+					)
+				} ~
+				complete(StatusCodes.NotFound)
 			}
 		}
 	} ~
@@ -137,4 +138,10 @@ trait PasswordRouting extends CpauthDirectives {
 		forbidAndInformAboutPassReset
 	}
 
+	private def logInWithPasswordCookie(user: UserId)(implicit envri: Envri.Value) = {
+		cookieFactory.makeTokenBase64(user, AuthSource.Password).fold(failWith, token => {
+			val cookie = cookieFactory.makeAuthCookie(token)
+			setCookie(cookie)(complete(StatusCodes.OK))
+		})
+	}
 }

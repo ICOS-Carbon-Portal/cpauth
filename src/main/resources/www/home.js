@@ -28,8 +28,12 @@ function displayUserInfo(uid){
 					method: 'PUT',
 					url: '/db/users/' + uid.email,
 					contentType: 'application/json',
+					dataType: 'text',
 					data: '{profile: {}}'
-				}).then(function(){return {profile: {}};})
+				}).then(function(){
+						reportSuccess('Profile created');
+						return {profile: {}};
+					})
 				: $.Deferred().reject(xhr);
 		})
 		.done(function(userInfo){

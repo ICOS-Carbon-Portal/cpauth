@@ -132,7 +132,7 @@ trait CpauthDirectives {
 	}
 
 	val admin: Directive0 = token.tflatMap(uit => ifUserIsAdmin(uit._1)) |
-		complete((StatusCodes.Forbidden, "Need to be logged in as admin"))
+		complete((StatusCodes.Forbidden, "Need to be logged in as admin, using username/password account"))
 
 	def ifUserIsAdmin(token: AuthToken): Directive0 = Directive{ inner =>
 

@@ -12,6 +12,7 @@ $(function(){
 	});
 
 	$('#new-account-button').click(createNewAccount);
+	$('#loginas-button').click(logInAs);
 
 	$("#mail").keypress(enterKeyHandler(function(){
 		$("#password").focus();
@@ -28,6 +29,14 @@ function createNewAccount() {
 		.done(function() {
 			resetNewUserCredentials();
 			reportSuccess('A new account has been created!');
+		})
+		.fail(reportError);
+}
+
+function logInAs() {
+	$.post('/password/loginas', $('#loginas-account').serializeArray())
+		.done(function() {
+			reportSuccess('You are now logged in as this user');
 		})
 		.fail(reportError);
 }
