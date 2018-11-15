@@ -14,7 +14,7 @@ $(function(){
 	$('#new-account-button').click(createNewAccount);
 	$('#loginas-button').click(logInAs);
 
-	$("#mail").keypress(enterKeyHandler(function(){
+	$("#newaccmail").keypress(enterKeyHandler(function(){
 		$("#password").focus();
 	}));
 	$("#password").keypress(enterKeyHandler(createNewAccount));
@@ -43,8 +43,8 @@ function logInAs() {
 
 function validateNewUserCredentials() {
 
-	if (! /\S+@\S+/.test($('#mail').val())) {
-		$('#mail').parent().addClass('has-error');
+	if (! emailIsValid($('#newaccmail').val())) {
+		$('#newaccmail').parent().addClass('has-error');
 		reportError('Valid email address must be provided!');
 		return false;
 	}
@@ -55,14 +55,14 @@ function validateNewUserCredentials() {
 		return false;
 	}
 
-	$('#mail').parent().removeClass('has-error');
+	$('#newaccmail').parent().removeClass('has-error');
 	$('#password').parent().removeClass('has-error');
 	hideMessage();
 	return true;
 }
 
 function resetNewUserCredentials() {
-	$('#mail').val('');
+	$('#newaccmail').val('');
 	$('#password').val('');
 }
 
