@@ -11,45 +11,64 @@
 		font-family: "Open Sans",sans-serif !important;
 	}
 
+	a {
+		color: #0a96f0;
+	}
+
+	a:hover,
+	a:focus,
+	a:active {
+		color: #0769A8;
+	}
+
 	#cp-main-content{
 		background: #fff;
 		padding-bottom: 40px;
+	}
+
+	.btn-primary {
+		background: #0a96f0;
+		color: #fff;
+		border: 0;
+	}
+
+	.btn-primary:hover,
+	.btn-primary:focus {
+		background: #0a96f0;
+		background: rgba(10, 150, 240, 0.85);
+		color: #fff;
+	}
+
+	.btn-primary:active {
+		background: #0a96f0;
+		filter: brightness(85%);
+		color: #fff;
 	}
 
 	/** Header **/
 	#cp-header {
 		background-size: cover;
 		line-height: 0;
-		background-image: url(@{styleConf.headerImageSmall});
+		background-image: url(@{styleConf.headerImage});
 	}
 
 	#cp-header img {
-		padding-left: 115px;
-		padding-top: 22px;
-		padding-bottom: 17px;
+		margin: 22px 0 17px;
+		max-height: 66px;
 	}
 
 	#cp-header .tint {
-		background-color: rgba(240, 99, 34, 0.3);
+		background-color: rgba(10, 150, 240, 0.5);
 	}
 
-	@@media all and (min-width: 513px) {
-		#cp-header {
-			background-image: url(@{styleConf.headerImageMedium});
-		}
+	#cp-header .layout-container {
+		max-width: 1290px;
+		margin: 0 auto;
 	}
 
-	@@media all and (min-width: 1025px) {
-		#cp-header {
-			background-image: url(@{styleConf.headerImage});
-		}
-	}
-
-	@@media all and (min-width: 1290px) {
+	@@media all and (min-width: 800px) {
 		#cp-header img {
-			display: block;
-			padding-right: 889px;
-			margin: 0 auto;
+			margin-left: 115px;
 		}
 	}
 
@@ -343,4 +362,3 @@
 	}
 
 </style>
-
