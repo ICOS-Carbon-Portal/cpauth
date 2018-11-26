@@ -11,45 +11,64 @@
 		font-family: "Open Sans",sans-serif !important;
 	}
 
+	a {
+		color: #0a96f0;
+	}
+
+	a:hover,
+	a:focus,
+	a:active {
+		color: #0769A8;
+	}
+
 	#cp-main-content{
 		background: #fff;
 		padding-bottom: 40px;
+	}
+
+	.btn-primary {
+		background: #0a96f0;
+		color: #fff;
+		border: 0;
+	}
+
+	.btn-primary:hover,
+	.btn-primary:focus {
+		background: #0a96f0;
+		background: rgba(10, 150, 240, 0.85);
+		color: #fff;
+	}
+
+	.btn-primary:active {
+		background: #0a96f0;
+		filter: brightness(85%);
+		color: #fff;
 	}
 
 	/** Header **/
 	#cp-header {
 		background-size: cover;
 		line-height: 0;
-		background-image: url(@{styleConf.headerImageSmall});
+		background-image: url(@{styleConf.headerImage});
 	}
 
 	#cp-header img {
-		padding-left: 115px;
-		padding-top: 22px;
-		padding-bottom: 17px;
+		margin: 22px 0 17px;
+		max-height: 66px;
 	}
 
 	#cp-header .tint {
-		background-color: rgba(240, 99, 34, 0.3);
+		background-color: rgba(10, 150, 240, 0.5);
 	}
 
-	@@media all and (min-width: 513px) {
-		#cp-header {
-			background-image: url(@{styleConf.headerImageMedium});
-		}
+	#cp-header .layout-container {
+		max-width: 1290px;
+		margin: 0 auto;
 	}
 
-	@@media all and (min-width: 1025px) {
-		#cp-header {
-			background-image: url(@{styleConf.headerImage});
-		}
-	}
-
-	@@media all and (min-width: 1290px) {
+	@@media all and (min-width: 800px) {
 		#cp-header img {
-			display: block;
-			padding-right: 889px;
-			margin: 0 auto;
+			margin-left: 115px;
 		}
 	}
 
@@ -61,17 +80,41 @@
 			height: 37px;
 		}
 	}
+
 	@if(includeMenu){
 		#cp-main-menu li {
-			list-style: none;
 			list-style: none;
 			list-style-image: none;
 			list-style-type: none;
 		}
+
+		#cp-main-menu .account {
+			display: none;
+			float: right;
+			cursor: pointer;
+		}
+
+		#cp-main-menu .account a {
+			display: block;
+			border: none;
+		}
+
+		#cp-main-menu .is_topnode .menu-icon {
+			float: right;
+			height: 1.6em;
+			cursor: pointer;
+			padding-right: 20px;
+			position: relative;
+			top: 0.8em;
+			color: white;
+			font-size: 1.2em;
+		}
+
+		#cp-main-menu .submenu-icon {
+			margin-left: 1em;
+		}
+
 		@@media all and (min-width: 800px) {
-			#cp-main-menu {
-				height: 37px;
-			}
 			#cp-main-menu ul {
 				padding: 0em 0em 0em 0em;
 				margin: 0;
@@ -89,52 +132,24 @@
 				background: #414042;
 			}
 
-			#cp-main-menu ul li.account {
-				float:right;
-				display:none;
-				cursor:pointer;
+			#cp-main-menu ul li a {
+				display: flex;
+				justify-content: space-between;
+				padding: 0.6em;
+				text-decoration: none;
+				white-space: nowrap;
+				color: #ffffff;
 			}
 
 			#cp-main-menu li ul {
 				display: none;
 			}
 
-			#cp-main-menu ul li a {
-				display: block;
-				padding: 0.6em;
-				text-decoration: none;
-				white-space: nowrap;
-				color: #ffffff;
-				height: 37px;
-				font-size: 14px;
-				line-height: 1.42857143;
-			}
-
-			#cp-main-menu ul li a:hover,
-			#cp-main-menu li:hover li a:hover {
-				color: #ffffff;
-			}
-
-			#cp-main-menu li:hover a {
-				background: #414042;
-			}
-
-			#cp-main-menu li:hover a:hover,
-			#cp-main-menu li:hover li a:hover {
-				background: #666468;
-			}
-
-			#cp-main-menu li:hover > ul {
-				display: block;
-				position: absolute;
-				z-index: 2000;
-			}
-
 			#cp-main-menu li:hover li {
 				float: none;
 			}
 
-			.cp-main-menu li ul li {
+			.cp_theme_d8_menu li ul li {
 				border-top: 0;
 			}
 
@@ -153,6 +168,69 @@
 				clear: both;
 			}
 
+			#cp-main-menu .is_topnode .menu-icon {
+				font-size: 1em;
+				padding-right: 10px;
+				top: 0.6em;
+			}
+
+		}
+
+		@@media all and (max-width: 799px) {
+			#cp-main-menu ul {
+				padding: 0;
+				margin: 0;
+			}
+
+			#cp-main-menu ul li {
+				display: block;
+				background: #414042;
+			}
+
+			#cp-main-menu li ul {
+				display: none;
+			}
+
+			#cp-main-menu ul li a {
+				display: block;
+				padding: 1em;
+				text-decoration: none;
+				white-space: nowrap;
+				color: #ffffff;
+			}
+
+			#cp-main-menu li.is_topnode ul,
+			#cp-main-menu li.has_subnodes ul {
+				margin-left: 2em;
+			}
+
+			#cp-main-menu .has_subnodes img {
+				width: 0.8em;
+				margin-left: 1em;
+				margin-bottom: 0.2em;
+			}
+		}
+
+
+		/** Hover menu **/
+
+		@@media all and (min-width: 800px) {
+			#cp-main-menu ul li a:hover,
+			#cp-main-menu li:hover li a:hover {
+				color: #ffffff;
+			}
+
+			#cp-main-menu .menu-item-text:hover,
+			#cp-main-menu a:hover {
+				background: #666468;
+			}
+
+			#cp-main-menu li:hover>ul {
+				display: block;
+				position: absolute;
+				z-index: 1000;
+			}
+
 			#cp-main-menu a:link {
 				border: 0;
 			}
@@ -167,85 +245,14 @@
 				margin-right: 1em;
 				margin-bottom: 0.2em;
 			}
-
-			#cp-main-menu .is_topnode .open_menu {
-				display: none;
-			}
 		}
 
 		@@media all and (max-width: 799px) {
-			#cp-main-menu ul {
-				padding: 0;
-				margin: 0;
-			}
-
-			#cp-main-menu ul li {
-				display: block;
-				background: #414042;
-			}
-
-			#cp-main-menu ul li.account {
-				display:none;
-				cursor:pointer;
-			}
-
-			#cp-main-menu li ul {
-				display: none;
-			}
-
 			#cp-main-menu li.open ul {
 				display: block;
 			}
-
-			#cp-main-menu ul li a {
-				display: block;
-				padding: 1em;
-				text-decoration: none;
-				white-space: nowrap;
-				color: #ffffff;
-				font-size: 14px;
-				line-height: 1.42857143;
-			}
-
-			#cp-main-menu li.is_topnode ul,
-			#cp-main-menu li.has_subnodes ul {
-				margin-left: 2em;
-			}
-
-			#cp-main-menu .has_subnodes img {
-				width: 0.8em;
-				margin-left: 1em;
-				margin-bottom: 0.2em;
-			}
-
-			#cp-main-menu .is_topnode .open_menu {
-				float: right;
-				height: 1.6em;
-				cursor: pointer;
-				padding-left: 50px;
-				padding-right: 50px;
-				position: relative;
-				top: 0.8em;
-				max-width: 100%;
-				font-size: 14px;
-				line-height: 1.42857143;
-				color: #333;
-			}
-			#cp-main-menu a {
-				border-color: white;
-				border-bottom: dotted;
-				border-width: 1px;
-			}
-
-			#cp-main-menu a:hover {
-				border-bottom: solid;
-				border-width: 1px;
-				border-color: white;
-			}
 		}
-
-	} /* end of non-empty menu style */
-
+	}
 
 	/** Footer **/
 
@@ -281,10 +288,10 @@
 		border: 0;
 	}
 
-	#cp-site-footer .region {
-		width: 33%;
-		padding: 0 0.65%;
-		min-width: 235px;
+    @@media all and (min-width: 780px) {
+        #cp-site-footer .region {
+            width: 33%;
+        }
 	}
 
 	#cp-site-footer h3 {
@@ -355,4 +362,3 @@
 	}
 
 </style>
-

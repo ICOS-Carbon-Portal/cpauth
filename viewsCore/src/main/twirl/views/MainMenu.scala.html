@@ -3,60 +3,61 @@
 @import java.net.URI
 
 @(menuItems: Seq[CpMenuItem])
-@subMenu(menuItems, true)
+@if(!menuItems.isEmpty){
+	<ul>
+		@for(item <- menuItems){
+			@menuItem(item, true)
+		}
+		<li id="accountLnk" class="account">
+			<a><span class="glyphicon glyphicon-user"></span> My Carbon Portal Account</a>
+		</li>
+		<li id="logOutLnk" class="account">
+			<a><span class="glyphicon glyphicon-log-out"></span> Log out</a>
+		</li>
+		<li id="logInLnk" class="account">
+			<a><span class="glyphicon glyphicon-log-in"></span> Log in</a>
+		</li>
 
-@subMenu(menuItems: Seq[CpMenuItem], isTop: Boolean = false) = {
-	@if(!menuItems.isEmpty){
-		<ul>
-			@for(item <- menuItems){
-				@menuItem(item, isTop)
-			}
-			@if(isTop){
-				<li id="accountLnk" class="account">
-					<a><span class="glyphicon glyphicon-user"></span> My Carbon Portal Account</a>
-				</li>
-				<li id="logOutLnk" class="account">
-					<a><span class="glyphicon glyphicon-log-out"></span> Log out</a>
-				</li>
-				<li id="logInLnk" class="account">
-					<a><span class="glyphicon glyphicon-log-in"></span> Log in</a>
-				</li>
-			}
-
-		</ul>
-	}
+	</ul>
 }
+
 
 @menuItem(item: CpMenuItem, isTop: Boolean) = {
-	<li class="@itemClass(item, isTop)">
-		@item match{
-			case CpMenuGroup(label, children) => {
-				@if(isTop){
-					<img src="https://www.icos-cp.eu/themes/cp_theme_d8/images/arrow-up-down.svg" class="open_menu" title="Open/Close"/>
-				}
-				<a>
-					@label
-					@if(!isTop){
-						<img src="https://www.icos-cp.eu/themes/cp_theme_d8/images/arrow-down.svg">
-					}
-				</a>
-				@subMenu(children)
+	@defining(!item.children.isEmpty){ hasChildren =>
+	<li class="@itemClass(hasChildren, isTop)">
+		@if(isTop && hasChildren) {
+		<div class="menu-item-text">
+			<span class="open_menu menu-icon"><span class="glyphicon glyphicon-menu-down"></span></span>
+			@anchor(item, isTop, hasChildren)
+		</div>
+		} else {
+			@anchor(item, isTop, hasChildren)
+		}
+		@if(hasChildren) {
+			<ul>
+			@for(item <- item.children){
+				@menuItem(item, false)
 			}
-			case CpMenuLeaf(label, ref) => {
-				<a href="@link(ref)">@label</a>
-			}
+			</ul>
 		}
 	</li>
-}
-
-@itemClass(item: CpMenuItem, isTop: Boolean) = @{
-	item match {
-		case CpMenuLeaf(_, _) => null
-		case CpMenuGroup(_, _) => if(isTop) "is_topnode" else "has_subnodes"
 	}
 }
 
-@link(uri: URI) = @{
-	(if(uri.isAbsolute) "" else cpHome) + uri.toString
+@anchor(item: CpMenuItem, isTop: Boolean, hasChildren: Boolean) = {
+	<a href="@link(item.url)">
+		@item.title
+		@if(!isTop && hasChildren) {
+		<span class="open_menu submenu-icon"><span class="glyphicon glyphicon-menu-right"></span></span>
+		}
+	</a>
+}
+
+@itemClass(isTop: Boolean, hasChildren: Boolean) = @{
+	if(isTop && hasChildren) "is_topnode"
+}
+
+@link(uri: String) = @{
+	if(uri.startsWith("https://") || uri.startsWith("http://")) uri else cpHome + uri
 }
 
