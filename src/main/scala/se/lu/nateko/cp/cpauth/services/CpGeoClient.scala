@@ -15,17 +15,24 @@ import scala.util.Failure
 import scala.util.control.NoStackTrace
 
 class CpGeoClient(conf: CpGeoConfig, errorEmailer: ErrorEmailer)(implicit system: ActorSystem) {
-	import CpGeoClient.{GeoError, QuotaError}
+	import CpGeoClient._
 
 	implicit val materializer = ActorMaterializer()
 	import system.dispatcher
 
 	private val baseUrl = Uri(conf.baseUri)
 
-	def lookup(ip: String): Future[JsObject] =
-		lookup(ip, Some(conf.maxAgeDays)).recoverWith{
-			case _: QuotaError => lookup(ip, None)
-		}
+	def lookup(ip: String): Future[JsObject] = ipError(ip) match{
+		case None =>
+			lookup(ip, Some(conf.maxAgeDays)).recoverWith{
+				case _: QuotaError => lookup(ip, None)
+			}
+		case Some(errMsg) =>
+			Future.successful(JsObject(
+				"ip" -> JsString(ip.trim),
+				"ipError" -> JsString(errMsg)
+			))
+	}
 
 	private def lookup(ip: String, maxAge: Option[Int]): Future[JsObject] = {
 		val ipPath = baseUrl.path / "ip" / ip
@@ -60,6 +67,25 @@ object CpGeoClient{
 
 	class GeoError(msg: String) extends Exception(msg) with NoStackTrace
 	class QuotaError extends GeoError("Geo IP provider usage quota has been exceeded")
+
+	def ipError(ip: String): Option[String] = {
+		val trimmed = ip.trim
+
+		if(trimmed.isEmpty) Some("IP address is an empty string") else try{
+
+			val addr = java.net.InetAddress.getByName(trimmed)
+
+			if(addr.isMulticastAddress)
+				Some("IP address is a multicast address")
+			else if(addr.isSiteLocalAddress)
+				Some("IP address is a site-local address")
+			else
+				None
+		} catch{
+			case err: Throwable =>
+				Some("Bad IP address: " + err.getMessage)
+		}
+	}
 
 	//private implicit val system = ActorSystem("cp_geo_test")
 	//def stop = system.terminate()
