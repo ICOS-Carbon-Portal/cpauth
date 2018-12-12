@@ -9,7 +9,7 @@ trait LoginStrings {
 object IcosLoginStrings extends LoginStrings {
 	val title = "Login to Carbon Portal"
 	val subheading = "Please sign in"
-	val cookieNotice = "<span class=\"label label-info\">Carbon Portal uses cookies to handle your login session</span><br/><span class=\"label label-info\">By using our services, you agree to our use of cookies</span>"
+	val cookieNotice = "<div class=\"alert alert-info\">Carbon Portal uses cookies to handle your login session. By using our services, you agree to our use of cookies.</div>"
 }
 
 object SitesLoginStrings extends LoginStrings {

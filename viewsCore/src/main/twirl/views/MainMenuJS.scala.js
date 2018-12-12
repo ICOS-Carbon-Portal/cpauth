@@ -7,7 +7,7 @@ window.addEventListener("load", function(){
         var elem = menuGroups[idx];
 
         elem.addEventListener("click", function(event){
-            event.target.parentElement.classList.toggle('open');
+            this.parentElement.parentElement.classList.toggle('open');
         });
     }
 

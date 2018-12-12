@@ -14,9 +14,9 @@
 		document.oauthConfig = @Html(oauthConfigJson);
 	</script>
 }{
-	<h4>
+	<div>
 		@Html(loginStrings.cookieNotice)
-	</h4>
+	</div>
 
 	<br/>
 
@@ -65,7 +65,7 @@
 
 							<div class="form-group">
 								<label for="idpUrlInput">Select university:</label><br>
-								<input type="text" id="idpUrlInput" class="form-control" style="width:50em;" />
+								<input type="text" id="idpUrlInput" class="form-control" style="width:50em; max-width: 100%;" />
 							</div>
 
 							<button id="signonBtn" class="btn btn-default">Login!</button>
