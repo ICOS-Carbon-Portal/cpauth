@@ -26,7 +26,7 @@ trait StaticRouting extends CpauthDirectives{
 
 	lazy val staticRoute: Route =
 		path("favicon.ico"){
-			getFromResource("favicon.ico")
+			getFromResource("www/favicon.ico")
 		} ~
 		pathPrefix("images"){
 		  getFromResourceDirectory("www/images")
