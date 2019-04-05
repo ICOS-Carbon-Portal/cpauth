@@ -36,6 +36,9 @@
 				<a href=@{styleConf.headerHomeLink} title="Home">
 					<img src=@{styleConf.headerLogo} alt="Home">
 				</a>
+				@if(menu.nonEmpty){
+				<div id="menu-button" class="btn btn-default"><span class="glyphicon glyphicon-menu-hamburger"></span></div>
+				}
 			</div>
 		</div>
 	</header>

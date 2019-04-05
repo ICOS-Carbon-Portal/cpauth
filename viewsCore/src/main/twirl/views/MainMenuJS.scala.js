@@ -1,6 +1,11 @@
 @(authHostOpt: Option[String])
 
 window.addEventListener("load", function(){
+
+    document.getElementById("menu-button").addEventListener('click', function() {
+        document.getElementById('cp-main-menu').classList.toggle('open');
+    });
+
     var menuGroups = document.getElementsByClassName("open_menu");
 
     for(var idx = 0; idx < menuGroups.length; idx++){

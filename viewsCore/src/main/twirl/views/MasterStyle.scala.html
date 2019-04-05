@@ -43,7 +43,7 @@
 	}
 
 	.btn-primary .badge {
-	  color: #0a96f0;
+		color: #0a96f0;
 	}
 
 	/** Header **/
@@ -65,11 +65,27 @@
 	#cp-header .layout-container {
 		max-width: 1290px;
 		margin: 0 auto;
+		display: flex;
+		justify-content: space-between;
+	}
+
+	#cp-header #menu-button {
+		margin: auto 20px;
+		font-weight: bold;
+		color: white;
+		background: rgba(255, 255, 255, 0.3);
+		font-size: 24px;
+		border: 2px solid rgba(255, 255, 255, 0.1);
+		line-height: 24px;
 	}
 
 	@@media all and (min-width: 800px) {
 		#cp-header img {
 			margin-left: 115px;
+		}
+
+		#cp-header #menu-button {
+			display: none;
 		}
 	}
 
@@ -77,15 +93,22 @@
 
 	#cp-main-menu {
 		background-color: #414042;
+		display: none;
 		@if(!includeMenu){
 			height: 37px;
 		}
 	}
 
+	#cp-main-menu.open {
+		display: block;
+	}
+
 	@if(includeMenu){
-	    #cp-main-menu a {
-	        border-bottom: 1px dotted;
+
+		#cp-main-menu a {
+			border-bottom: 1px dotted;
 		}
+
 		#cp-main-menu li {
 			list-style: none;
 			list-style-image: none;
@@ -94,13 +117,11 @@
 
 		#cp-main-menu .account {
 			display: none;
-			float: right;
 			cursor: pointer;
 		}
 
 		#cp-main-menu .account a {
 			display: block;
-			border: none;
 		}
 
 		#cp-main-menu .is_topnode .menu-icon {
@@ -119,6 +140,10 @@
 		}
 
 		@@media all and (min-width: 800px) {
+			#cp-main-menu {
+				display: block;
+			}
+
 			#cp-main-menu ul {
 				padding: 0em 0em 0em 0em;
 				margin: 0;
@@ -178,6 +203,9 @@
 				top: 0.6em;
 			}
 
+			#cp-main-menu .account {
+				float: right;
+			}
 		}
 
 		@@media all and (max-width: 799px) {
@@ -235,7 +263,7 @@
 				z-index: 1000;
 			}
 
-			#cp-main-menu a:link {
+			#cp-main-menu a {
 				border: 0;
 			}
 
@@ -292,10 +320,10 @@
 		border: 0;
 	}
 
-    @@media all and (min-width: 780px) {
-        #cp-site-footer .region {
-            width: 33%;
-        }
+		@@media all and (min-width: 780px) {
+				#cp-site-footer .region {
+						width: 33%;
+				}
 	}
 
 	#cp-site-footer h3 {
