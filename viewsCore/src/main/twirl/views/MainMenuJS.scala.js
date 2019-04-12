@@ -2,9 +2,13 @@
 
 window.addEventListener("load", function(){
 
-    document.getElementById("menu-button").addEventListener('click', function() {
+    let menuButton = document.getElementById("menu-button");
+
+    if (menuButton !== null) {
+      menuButton.addEventListener('click', function() {
         document.getElementById('cp-main-menu').classList.toggle('open');
-    });
+      });
+    }
 
     var menuGroups = document.getElementsByClassName("open_menu");
 
