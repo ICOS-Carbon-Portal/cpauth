@@ -13,7 +13,7 @@ import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
 
 import scala.concurrent.Future
 
-abstract class RestHeartLogClient(conf: RestHeartConfig, logCollection: String)(implicit system: ActorSystem) {
+class RestHeartLogClient(conf: RestHeartConfig, logCollection: String)(implicit system: ActorSystem) {
 
 	import system.dispatcher
 
@@ -42,6 +42,3 @@ abstract class RestHeartLogClient(conf: RestHeartConfig, logCollection: String)(
 		}
 	}
 }
-
-class PortalUseLogClient(conf: RestHeartConfig)(implicit system: ActorSystem) extends RestHeartLogClient(conf, conf.usageCollection)
-class ObjectDownloadsLogClient(conf: RestHeartConfig)(implicit system: ActorSystem) extends RestHeartLogClient(conf, conf.downloadsCollection)

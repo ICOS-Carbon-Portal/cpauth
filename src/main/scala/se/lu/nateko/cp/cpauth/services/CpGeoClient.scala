@@ -44,7 +44,7 @@ class CpGeoClient(conf: CpGeoConfig, errorEmailer: ErrorEmailer)(implicit system
 			if(resp.status == StatusCodes.OK)
 				Unmarshal(resp).to[JsValue].map(_.asJsObject)
 			else
-				throw new GeoError(resp.status.defaultMessage)
+				throw new GeoError("Got HTTP error from geoip service: " + resp.status.value)
 		}.map{js =>
 			js.fields.get("error") match{
 				case Some(JsString(msg)) =>

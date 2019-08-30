@@ -5,36 +5,45 @@ import se.lu.nateko.cp.cpauth.Envri.Envri
 import se.lu.nateko.cp.cpauth.{RestHeartConfig}
 import spray.json.{JsObject, JsString}
 
+trait PortalUsageLogger{
+	def log(entry: JsObject, ip: String)(implicit envri: Envri): Unit
+}
 
-abstract class PortalLogger(geoClient: CpGeoClient, confRestheart: RestHeartConfig)(implicit system: ActorSystem) {
+trait PortalDownloadsLogger{
+	def log(entry: JsObject)(implicit envri: Envri): Unit
+}
 
+class PortalLoggerFactory(geoClient: CpGeoClient, confRestheart: RestHeartConfig)(implicit system: ActorSystem){
 	import system.dispatcher
+	private trait PortalLogger{
+		protected val logClient: RestHeartLogClient
 
-	protected val logClient: RestHeartLogClient
-
-	protected def logInternal(entry: JsObject, ip: String)(implicit envri: Envri): Unit = if (!confRestheart.ipsToIgnore.contains(ip)){
-		geoClient.lookup(ip).recover{case _: Throwable => JsObject("ip" -> JsString(ip))}
-		  .flatMap { js =>
-			  val logEntry = JsObject(entry.fields ++ js.fields)
-			  logClient.log(logEntry)
-		  }
-
+		protected def logInternal(entry: JsObject, ip: String)(implicit envri: Envri): Unit = if (!confRestheart.ipsToIgnore.contains(ip)){
+			geoClient.lookup(ip)
+				.recover{case _: Throwable => JsObject("ip" -> JsString(ip))}
+				.flatMap { js =>
+					val logEntry = JsObject(entry.fields ++ js.fields)
+					logClient.log(logEntry)
+				}
+		}
 	}
-}
 
-class PortalUsageLogger(geoClient: CpGeoClient, confRestheart: RestHeartConfig)(implicit system: ActorSystem) extends PortalLogger(geoClient, confRestheart){
-	override val logClient = new PortalUseLogClient(confRestheart)
-	def log(entry: JsObject, ip: String)(implicit envri: Envri): Unit = logInternal(entry, ip)
-}
+	def usage: PortalUsageLogger = new PortalLogger with PortalUsageLogger{
+		override val logClient = new RestHeartLogClient(confRestheart, confRestheart.usageCollection)
+		def log(entry: JsObject, ip: String)(implicit envri: Envri): Unit = logInternal(entry, ip)
+	}
 
-class ObjectDownloadsLogger(geoClient: CpGeoClient, confRestheart: RestHeartConfig)(implicit system: ActorSystem) extends PortalLogger(geoClient, confRestheart){
+	def objectDownloads = downloadsLogger(confRestheart.downloadsCollection)
+	def collDownloads = downloadsLogger(confRestheart.collDlsCollection)
 
-	override val logClient = new ObjectDownloadsLogClient(confRestheart)
+	private def downloadsLogger(coll: String): PortalDownloadsLogger = new PortalLogger with PortalDownloadsLogger{
+		override val logClient = new RestHeartLogClient(confRestheart, coll)
 
-	def log(entry: JsObject)(implicit envri: Envri): Unit = entry.fields.get("ip") match{
-		case Some(JsString(ip)) =>
-			logInternal(entry, ip)
-		case _ =>
-			system.log.error("No 'ip' string property found in the js object, can not log data object download")
+		def log(entry: JsObject)(implicit envri: Envri): Unit = entry.fields.get("ip") match{
+			case Some(JsString(ip)) =>
+				logInternal(entry, ip)
+			case _ =>
+				system.log.error("No 'ip' string property found in the js object, can not log data object download")
+		}
 	}
 }

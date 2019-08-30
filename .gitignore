@@ -25,6 +25,9 @@ src_managed/
 .cache
 .cache-main
 .cache-tests
+.bloop/
+.metals/
+project/.bloop/
 
 nohup.out
 viewsCore/.gitignore

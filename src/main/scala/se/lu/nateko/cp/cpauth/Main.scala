@@ -61,8 +61,7 @@ object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
 	}
 	val targetLookup: TargetUrlLookup = new MapBasedUrlLookup
 
-	val usageLogger = new PortalUsageLogger(geoClient, config.restheart)
-	val downloadsLogger = new ObjectDownloadsLogger(geoClient, config.restheart)
+	val loggerFactory = new PortalLoggerFactory(geoClient, config.restheart)
 
 	val cpauthExceptionHandler = ExceptionHandler{
 		case AuthenticationFailedException =>

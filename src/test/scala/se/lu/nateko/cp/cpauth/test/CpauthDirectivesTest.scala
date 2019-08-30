@@ -48,6 +48,7 @@ class CpauthDirectivesTest extends FunSpec with ScalatestRouteTest {
 			usersCollection = "users",
 			usageCollection = "portaluse",
 			downloadsCollection = "dobjdls",
+			collDlsCollection = "colldls",
 			ipsToIgnore = Nil
 		),
 		mailing = null,
