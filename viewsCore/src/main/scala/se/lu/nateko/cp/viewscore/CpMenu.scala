@@ -8,7 +8,7 @@ object CpMenu {
 	val riHome = "https://www.icos-ri.eu"
 	val cpMenuApi = "https://www.icos-cp.eu/api/menu/main"
 
-	val fallback = Seq(CpMenuItem("Home", cpHome, Array.empty[CpMenuItem]))
+	val fallback = Seq(CpMenuItem("Home", cpHome, Nil))
 
 	def default = MenuProvider.menu.getOrElse(fallback)
 

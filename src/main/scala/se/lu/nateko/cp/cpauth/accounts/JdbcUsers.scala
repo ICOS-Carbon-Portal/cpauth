@@ -119,7 +119,7 @@ class JdbcUsers(getConnection: () => Connection)
 		while(rs.next()){
 			result += UserEntry(UserId(rs.getString("mail")), rs.getBoolean("isadmin"))
 		}
-		result
+		result.toVector
 	}
 
 	def userIsAdmin(uid: UserId) = withConnection { conn =>

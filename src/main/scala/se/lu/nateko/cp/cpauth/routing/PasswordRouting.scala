@@ -39,7 +39,7 @@ trait PasswordRouting extends CpauthDirectives {
 		} ~
 		post{
 			path("login"){
-				formFields(('mail, 'password)){(mail, password) =>
+				formFields(("mail", "password")){(mail, password) =>
 					val uEntryFuture = passwordHandler.authUser(UserId(mail), password)
 					onSuccess(uEntryFuture){ uEntry =>
 						logInWithPasswordCookie(uEntry.id)
@@ -48,7 +48,7 @@ trait PasswordRouting extends CpauthDirectives {
 			} ~
 			path("changepassword"){
 				user(uid =>
-					formFields(('oldPass, 'newPass))((oldPass, newPass) => {
+					formFields(("oldPass", "newPass"))((oldPass, newPass) => {
 						val result = passwordHandler.changePassword(uid, oldPass, newPass)
 						onSuccess(result)(complete(StatusCodes.OK))
 					})
@@ -57,7 +57,7 @@ trait PasswordRouting extends CpauthDirectives {
 			path("setpassword"){
 				token{ authToken =>
 					if(authToken.source == AuthSource.PasswordReset){
-						formFields('newPass){newPass =>
+						formFields("newPass"){newPass =>
 							val done = passwordHandler.setPassword(authToken.userId, newPass)
 							onSuccess(done){
 								deleteCookie(cookieFactory.makeAuthCookie("")){
@@ -91,7 +91,7 @@ trait PasswordRouting extends CpauthDirectives {
 			} ~
 			admin{
 				path("createaccount"){
-					formFields(('mail, 'password)){(mail, password) =>
+					formFields(("mail", "password")){(mail, password) =>
 						val uid = UserId(mail)
 						onSuccess(userDb.userExists(uid)) {
 							case true => complete((StatusCodes.Forbidden, "User already exists"))
@@ -104,22 +104,22 @@ trait PasswordRouting extends CpauthDirectives {
 					}
 				} ~
 				path("deleteaccount"){
-					formField('mail)(mail =>
+					formField("mail")(mail =>
 						onSuccess(userDb.dropUser(UserId(mail)))(complete(StatusCodes.OK))
 					)
 				} ~
 				path("makeadmin"){
-					formField('mail)(mail =>
+					formField("mail")(mail =>
 						onSuccess(userDb.setAdminRights(UserId(mail), true))(complete(StatusCodes.OK))
 					)
 				} ~
 				path("unmakeadmin"){
-					formField('mail)(mail =>
+					formField("mail")(mail =>
 						onSuccess(userDb.setAdminRights(UserId(mail), false))(complete(StatusCodes.OK))
 					)
 				} ~
 				path("loginas"){
-					formField('mail)(mail =>
+					formField("mail")(mail =>
 						logInWithPasswordCookie(UserId(mail))
 					)
 				} ~

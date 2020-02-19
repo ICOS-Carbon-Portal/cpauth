@@ -1,13 +1,13 @@
 package se.lu.nateko.cp.cpauth.test
 
-import org.scalatest.FunSpec
+import org.scalatest.funspec.AnyFunSpec
 
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.model.headers.Cookie
 import akka.http.scaladsl.model.headers.HttpCookie
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.testkit.ScalatestRouteTest
-import akka.stream.ActorMaterializer
+import akka.stream.Materializer
 import se.lu.nateko.cp.cpauth._
 import se.lu.nateko.cp.cpauth.core._
 import se.lu.nateko.cp.cpauth.routing.BadCpauthCookieRejection
@@ -15,7 +15,7 @@ import se.lu.nateko.cp.cpauth.routing.CpauthCookieMissingRejection
 import se.lu.nateko.cp.cpauth.routing.CpauthDirectives
 import se.lu.nateko.cp.cpauth.services.CookieFactory
 
-class CpauthDirectivesTest extends FunSpec with ScalatestRouteTest {
+class CpauthDirectivesTest extends AnyFunSpec with ScalatestRouteTest {
 	import Envri.ICOS
 	implicit val envri = ICOS
 
@@ -63,7 +63,7 @@ class CpauthDirectivesTest extends FunSpec with ScalatestRouteTest {
 		val authConfig = config.auth
 		val dispatcher = system.dispatcher
 		val scheduler = system.scheduler
-		val materializer = ActorMaterializer(namePrefix = Some("cpauth_dir_test"))
+		val materializer = Materializer(system)
 		def hostToEnvri(host: String) = config.http.serviceHosts.map(_.swap).get(host)
 		val userDb = null
 		val restHeart = null

@@ -1,6 +1,6 @@
 package se.lu.nateko.cp.cpauth.test.opensaml
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import se.lu.nateko.cp.cpauth.opensaml.IdpLibrary
 import java.net.URI
 import se.lu.nateko.cp.cpauth.opensaml.Parser
@@ -10,7 +10,7 @@ import se.lu.nateko.cp.cpauth.opensaml.AssertionValidator
 import se.lu.nateko.cp.cpauth.core.CoreUtils
 import se.lu.nateko.cp.cpauth.core.Crypto
 
-class AssertionValidatorTest extends FunSuite{
+class AssertionValidatorTest extends AnyFunSuite{
 
 	private def getAssertion: Assertion = {
 		val assertionStream = getClass.getResourceAsStream("/saml/testshib_assertion.xml")

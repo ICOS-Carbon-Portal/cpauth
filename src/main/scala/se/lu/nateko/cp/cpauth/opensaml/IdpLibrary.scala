@@ -86,12 +86,13 @@ object IdpLibrary {
 	) yield keys
 	
 	private def idpToCertsInBase64(idp: IDPSSODescriptor): Try[Seq[String]] = Try{
-		import scala.collection.JavaConverters._
+		import scala.jdk.CollectionConverters._
 		idp.getKeyDescriptors.asScala
 			.filter(_.getUse != UsageType.ENCRYPTION)
 			.map(
 				_.getKeyInfo.getX509Datas.get(0).getX509Certificates.get(0).getValue
 			)
+			.toVector
 	}
 	
 	private def idpToSsoRedirect(idp: IDPSSODescriptor): Try[URL] = Try{

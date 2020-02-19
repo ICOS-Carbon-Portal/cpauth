@@ -5,7 +5,7 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
 import akka.http.scaladsl.unmarshalling.Unmarshal
-import akka.stream.ActorMaterializer
+import akka.stream.Materializer.matFromSystem
 
 import scala.concurrent.Future
 import se.lu.nateko.cp.cpauth.CpGeoConfig
@@ -17,7 +17,6 @@ import scala.util.control.NoStackTrace
 class CpGeoClient(conf: CpGeoConfig, errorEmailer: ErrorEmailer)(implicit system: ActorSystem) {
 	import CpGeoClient._
 
-	implicit val materializer = ActorMaterializer()
 	import system.dispatcher
 
 	private val baseUrl = Uri(conf.baseUri)

@@ -1,12 +1,12 @@
 package se.lu.nateko.cp.cpauth.test
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import se.lu.nateko.cp.cpauth.core._
 import se.lu.nateko.cp.cpauth.utils.SignedTokenMaker
 import se.lu.nateko.cp.cpauth.PrivateAuthConfig
 import se.lu.nateko.cp.cpauth.Envri
 
-class AuthenticationTest extends FunSuite{
+class AuthenticationTest extends AnyFunSuite{
 	import Envri.ICOS
 	implicit val envri = ICOS
 

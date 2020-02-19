@@ -1,14 +1,14 @@
 package se.lu.nateko.cp.cpauth.test
 
 import java.sql.DriverManager
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.concurrent.ScalaFutures
 import scala.concurrent.ExecutionContext.Implicits.global
 import se.lu.nateko.cp.cpauth.accounts._
 import se.lu.nateko.cp.cpauth.core._
 import se.lu.nateko.cp.cpauth.core.AuthenticationFailedException
 
-class JdbcUsersTest extends FunSuite with ScalaFutures {
+class JdbcUsersTest extends AnyFunSuite with ScalaFutures {
 
 	def getConnection() = {
 		Class.forName("org.hsqldb.jdbc.JDBCDataSource")

@@ -13,7 +13,7 @@ import akka.http.scaladsl.model.StatusCodes
 import scala.concurrent.Await
 import scala.concurrent.ExecutionContext
 import akka.http.scaladsl.Http
-import akka.stream.ActorMaterializer
+import akka.stream.Materializer
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
 import se.lu.nateko.cp.cpauth.accounts.RestHeartClient
 import se.lu.nateko.cp.cpauth.utils.TargetUrlLookup
@@ -30,7 +30,7 @@ object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
 	implicit val system = ActorSystem("cpauth")
 	implicit val dispatcher = system.dispatcher
 	implicit val scheduler = system.scheduler
-	implicit val materializer = ActorMaterializer(namePrefix = Some("cpauth_mat"))
+	implicit val materializer = Materializer(system)
 
 	val config: CpauthConfig = ConfigReader.getDefault.getOrCrash("Problem reading/parsing config file")
 

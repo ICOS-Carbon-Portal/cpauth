@@ -38,7 +38,7 @@ object Utils {
 			.getLevel
 
 	implicit class SafeJavaCollectionWrapper[T](val list: java.util.Collection[T]) extends AnyVal {
-		import scala.collection.JavaConverters._
+		import scala.jdk.CollectionConverters._
 
 		def toSafeIterable: Iterable[T] =
 			if(list == null)
@@ -61,7 +61,7 @@ object Utils {
 
 	def slowFailureDown[T](future: Future[T], time: FiniteDuration)(implicit ex: ExecutionContext, scheduler: Scheduler): Future[T] =
 		future.recoverWith{
-			case err => after(time, scheduler, ex, Future.failed(err))
+			case err => after(time, scheduler, ex, () => Future.failed(err))
 		}
 
 	def tryseq[T](tries: Iterable[Try[T]]): Try[Seq[T]] = {
@@ -75,7 +75,7 @@ object Utils {
 				case Failure(err) => error = Some(Failure(err))
 			}
 		}
-		error.getOrElse(Success(successes))
+		error.getOrElse(Success(successes.toVector))
 	}
 
 	implicit class CrasheableTry[T](val inner: Try[T]) extends AnyVal{

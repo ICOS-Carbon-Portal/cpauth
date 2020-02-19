@@ -9,7 +9,7 @@ import se.lu.nateko.cp.cpauth.opensaml.ValidatedAssertion
 import se.lu.nateko.cp.cpauth.opensaml.StatementExtractor
 import se.lu.nateko.cp.cpauth.opensaml.ResponseStatusController
 import org.opensaml.xml.XMLObject
-import scala.collection.JavaConverters.asScalaBufferConverter
+import scala.jdk.CollectionConverters.ListHasAsScala
 import se.lu.nateko.cp.cpauth.core.UserId
 import se.lu.nateko.cp.cpauth.core.AuthSource
 import se.lu.nateko.cp.cpauth.utils.Utils
@@ -44,7 +44,7 @@ object Playground {
 		if(xmlObj == null)
 			Nil
 		else if(xmlObj.hasChildren)
-			xmlObj.getOrderedChildren.asScala.flatMap(extractClasses)
+			xmlObj.getOrderedChildren.asScala.flatMap(extractClasses).toVector
 		else
 			Seq(xmlObj.getClass)
 	}

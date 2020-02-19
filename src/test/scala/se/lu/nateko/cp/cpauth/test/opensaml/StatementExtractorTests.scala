@@ -1,12 +1,12 @@
 package se.lu.nateko.cp.cpauth.test.opensaml
 
 import org.opensaml.saml2.core.Assertion
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
 import se.lu.nateko.cp.cpauth.opensaml.Parser
 import se.lu.nateko.cp.cpauth.opensaml.StatementExtractor
 
-class StatementExtractorTests extends FunSuite{
+class StatementExtractorTests extends AnyFunSuite{
 
 	private val assertion: Assertion = {
 		val stream = getClass.getResourceAsStream("/saml/gu_response_assertion.xml")

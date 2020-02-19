@@ -12,7 +12,7 @@ trait TargetUrlLookup {
  * TODO Add a job for scheduled garbage cleanups to avoid potential memory leaks
  */
 class MapBasedUrlLookup extends TargetUrlLookup {
-	import scala.collection.JavaConverters._
+	import scala.jdk.CollectionConverters._
 
 	private[this] val map: concurrent.Map[String, Uri] = new java.util.concurrent.ConcurrentHashMap[String, Uri].asScala
 

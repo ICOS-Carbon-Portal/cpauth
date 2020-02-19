@@ -17,7 +17,7 @@ import akka.http.scaladsl.server.Directive1
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.server.StandardRoute
-import akka.stream.ActorMaterializer
+import akka.stream.Materializer
 import se.lu.nateko.cp.cpauth.AuthConfig
 import se.lu.nateko.cp.cpauth.Envri.Envri
 import se.lu.nateko.cp.cpauth.utils.Utils
@@ -40,7 +40,7 @@ trait CpauthDirectives {
 	def hostToEnvri(host: String): Option[Envri]
 
 	implicit def dispatcher: ExecutionContext
-	implicit def materializer: ActorMaterializer
+	implicit def materializer: Materializer
 	implicit def scheduler: Scheduler
 
 	def publicAuthConfig(implicit envri: Envri) = authConfig.pub(envri)

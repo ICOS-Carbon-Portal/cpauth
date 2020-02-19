@@ -39,15 +39,14 @@ object StatementExtractor {
 	def fail(msg: String) = Failure(new Exception(msg) with NoStackTrace)
 
 	def extractAttributeStringValues(assertions: Iterable[ValidatedAssertion]): Try[AllStatements] = Try{
-		val nameValues = assertions.collect{
+		val nameValues: Map[String, Seq[String]] = assertions.toSeq.collect{
 			case ValidatedAssertion(validated, None) => validated
 			case ValidatedAssertion(_, Some(validationError)) =>
 				val s = "Assertion validation error: " + validationError
 				log.warn(s)
 				throw new Exception(s) with NoStackTrace
 		}.flatMap(extractAttributeStringValues)
-			.groupBy{case (name, _) => name}
-			.mapValues(nameValuePairs => nameValuePairs.map{case (_, value) => value}.toSeq)
+			.groupMap(_._1)(_._2)
 
 		new AllStatements(nameValues)
 	}

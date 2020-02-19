@@ -17,7 +17,7 @@ object Saml {
 
 		val trimmedReqStr = scala.xml.Utility.trim(reqXml).toString
 		val authRequestBase64 = Utils.compressAndBase64ForSaml(trimmedReqStr)
-		val authUrl = idpHttpRedirectUrl +"?SAMLRequest=" + URLEncoder.encode(authRequestBase64, "UTF-8")
+		val authUrl = idpHttpRedirectUrl.toString + "?SAMLRequest=" + URLEncoder.encode(authRequestBase64, "UTF-8")
 
 		Uri(authUrl)
 	}

@@ -2,12 +2,12 @@ package se.lu.nateko.cp.cpauth.test.opensaml
 
 import org.opensaml.saml2.core.Response
 import org.opensaml.xml.encryption.DecryptionException
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import se.lu.nateko.cp.cpauth.utils.Utils
 import se.lu.nateko.cp.cpauth.opensaml.AssertionExtractor
 import se.lu.nateko.cp.cpauth.opensaml.Parser
 
-class AssertionExtractorTest extends FunSuite{
+class AssertionExtractorTest extends AnyFunSuite{
 
 	private def response: Response = Parser.fromStream[Response](getClass.getResourceAsStream("/saml/response_sample.xml"))
 

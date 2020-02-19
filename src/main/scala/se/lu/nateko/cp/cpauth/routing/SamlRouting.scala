@@ -39,7 +39,7 @@ trait SamlRouting extends CpauthDirectives{
 	val samlRoute: Route = (pathPrefix("saml") & extractEnvri){implicit envri =>
 		get{
 			path("login") {
-				parameter(('idpUrl, 'targetUrl.?)){ (idp, target) =>
+				parameter(("idpUrl", "targetUrl".?)){ (idp, target) =>
 
 					val idpPropTry = for(
 						idpUri <- Try(new URI(idp));
@@ -73,7 +73,7 @@ trait SamlRouting extends CpauthDirectives{
 		} ~
 		post{
 			path("SAML2" / "POST"){
-				formField('SAMLResponse){ resp =>
+				formField("SAMLResponse"){ resp =>
 
 					val cookieAndReqIdTry: Try[(HttpCookie, String)] = for(
 						extractor <- assExtractorTry;

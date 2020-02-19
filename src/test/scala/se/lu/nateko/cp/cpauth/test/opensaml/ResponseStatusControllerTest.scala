@@ -1,13 +1,13 @@
 package se.lu.nateko.cp.cpauth.test.opensaml
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import org.opensaml.saml2.core.Response
 import se.lu.nateko.cp.cpauth.opensaml.Parser
 import se.lu.nateko.cp.cpauth.opensaml.ResponseStatusController
 import scala.util.Try
 import org.opensaml.common.SAMLException
 
-class ResponseStatusControllerTest extends FunSuite {
+class ResponseStatusControllerTest extends AnyFunSuite {
 
 	def getResponse(path: String): Response = {
 		val responseStream = getClass.getResourceAsStream(path)
