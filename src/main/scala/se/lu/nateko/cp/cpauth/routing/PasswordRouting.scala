@@ -23,9 +23,6 @@ trait PasswordRouting extends CpauthDirectives {
 
 	private[this] implicit val pageMarsh = TemplatePageMarshalling.marshaller[Html]
 
-	private[this] val forbidAndInformAboutPassReset =
-		complete(StatusCodes.Forbidden -> "You need special permissions to reset your password")
-
 	lazy val passwordRoute: Route = (pathPrefix("password") & extractEnvri){implicit envri =>
 		get{
 			path("accountslist"){
@@ -54,7 +51,7 @@ trait PasswordRouting extends CpauthDirectives {
 					})
 				)
 			} ~
-			path("setpassword"){
+			(path("setpassword") & handleAuthRejections("setting new password")){
 				token{ authToken =>
 					if(authToken.source == AuthSource.PasswordReset){
 						formFields("newPass"){newPass =>
@@ -65,9 +62,8 @@ trait PasswordRouting extends CpauthDirectives {
 								}
 							}
 						}
-					} else reject
-				} ~
-				forbidAndInformAboutPassReset
+					} else reject(WrongCpauthCookieSourceRejection)
+				}
 			} ~
 			path("deleteownaccount"){
 				user(uid =>
@@ -127,15 +123,14 @@ trait PasswordRouting extends CpauthDirectives {
 			}
 		}
 	} ~
-	path("passwordreset" ~ Slash){
+	(path("passwordreset" ~ Slash) & handleAuthRejections("(re)setting password")){
 		token{ authToken =>
 			if(authToken.source == AuthSource.PasswordReset){
 				extractEnvri{implicit envri =>
 					complete(views.html.CpauthPassResetPage(authToken.userId.email))
 				}
-			} else reject
-		} ~
-		forbidAndInformAboutPassReset
+			} else reject(WrongCpauthCookieSourceRejection)
+		}
 	}
 
 	private def logInWithPasswordCookie(user: UserId)(implicit envri: Envri.Value) = {
