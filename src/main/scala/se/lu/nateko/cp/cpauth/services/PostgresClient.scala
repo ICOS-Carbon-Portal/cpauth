@@ -6,11 +6,13 @@ import se.lu.nateko.cp.cpauth.Envri.Envri
 import java.sql.Connection
 
 case class DobjDownload(
-	hash: String,
-	ip: String,
 	ts: String,
-	countryCode: String
-	//TODO More fields
+	pid: String,
+	ip: String,
+	city: String,
+	countryCode: String,
+	latitude: Float,
+	longitude: Float
 )
 
 class PostgresClient(conf: PostgresConfig) {

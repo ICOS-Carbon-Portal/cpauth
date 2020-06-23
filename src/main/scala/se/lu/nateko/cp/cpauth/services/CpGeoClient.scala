@@ -9,10 +9,23 @@ import akka.stream.Materializer.matFromSystem
 
 import scala.concurrent.Future
 import se.lu.nateko.cp.cpauth.CpGeoConfig
-import spray.json.{JsNumber, JsObject, JsString, JsValue}
+import spray.json._
 
 import scala.util.Failure
 import scala.util.control.NoStackTrace
+import spray.json.RootJsonReader
+
+sealed trait GeoIpResponse
+case class GeoIpInfo(
+	ip: String,
+	latitude: Double,
+	longitude: Double,
+	country_code: Option[String],
+	city: Option[String]
+) extends GeoIpResponse
+
+case class GeoIpError(error: String) extends GeoIpResponse
+case class GeoIpInnerError(msg: String, code: Int) extends GeoIpResponse
 
 class CpGeoClient(conf: CpGeoConfig, errorEmailer: ErrorEmailer)(implicit system: ActorSystem) {
 	import CpGeoClient._
@@ -21,19 +34,20 @@ class CpGeoClient(conf: CpGeoConfig, errorEmailer: ErrorEmailer)(implicit system
 
 	private val baseUrl = Uri(conf.baseUri)
 
-	def lookup(ip: String): Future[JsObject] = ipError(ip) match{
+	def lookup(ip: String): Future[GeoIpInfo] = ipError(ip) match{
 		case None =>
 			lookup(ip, Some(conf.maxAgeDays)).recoverWith{
 				case _: QuotaError => lookup(ip, None)
+			}.flatMap{
+				case GeoIpInnerError(msg, code) => Future.failed(new GeoError(s"$code : $msg"))
+				case GeoIpError(error) => Future.failed(new GeoError(error))
+				case info : GeoIpInfo => Future.successful(info)
 			}
 		case Some(errMsg) =>
-			Future.successful(JsObject(
-				"ip" -> JsString(ip.trim),
-				"ipError" -> JsString(errMsg)
-			))
+			Future.failed(new GeoError(errMsg))
 	}
 
-	private def lookup(ip: String, maxAge: Option[Int]): Future[JsObject] = {
+	private def lookup(ip: String, maxAge: Option[Int]): Future[GeoIpResponse] = {
 		val ipPath = baseUrl.path / "ip" / ip
 
 		val path = maxAge.fold(ipPath)(maxDays => ipPath / maxDays.toString)
@@ -41,20 +55,14 @@ class CpGeoClient(conf: CpGeoConfig, errorEmailer: ErrorEmailer)(implicit system
 			HttpRequest(uri = baseUrl.withPath(path))
 		).flatMap {resp =>
 			if(resp.status == StatusCodes.OK)
-				Unmarshal(resp).to[JsValue].map(_.asJsObject)
+				Unmarshal(resp.entity).to[GeoIpResponse]
 			else
-				throw new GeoError("Got HTTP error from geoip service: " + resp.status.value)
-		}.map{js =>
-			js.fields.get("error") match{
-				case Some(JsString(msg)) =>
-					throw new GeoError(msg)
-				case Some(JsObject(fields)) if fields.get("code").contains(JsNumber(104)) =>
-					throw new QuotaError
-				case Some(errJson) =>
-					throw new GeoError(errJson.prettyPrint)
-				case None =>
-					js
-			}
+				Unmarshal(resp.entity).to[String].flatMap{entStr =>
+					Future.failed(new GeoError(s"Got HTTP error from geoip service: ${resp.status.value} $entStr"))
+				}
+		}.flatMap{
+			case GeoIpInnerError(_, 104) => Future.failed(new QuotaError)
+			case x => Future.successful(x)
 		}.andThen{
 			case Failure(err) => errorEmailer.enqueue(err)
 		}
@@ -62,10 +70,29 @@ class CpGeoClient(conf: CpGeoConfig, errorEmailer: ErrorEmailer)(implicit system
 
 }
 
-object CpGeoClient{
+object CpGeoClient extends DefaultJsonProtocol{
 
 	class GeoError(msg: String) extends Exception(msg) with NoStackTrace
 	class QuotaError extends GeoError("Geo IP provider usage quota has been exceeded")
+
+	implicit val geoIpInfoFormat = jsonFormat5(GeoIpInfo)
+	implicit val geoIpErrorFormat = jsonFormat1(GeoIpError)
+	implicit val geoIpInnerErrorFormat = jsonFormat2(GeoIpInnerError)
+
+	implicit val geoIpResponseReader = new RootJsonFormat[GeoIpResponse]{
+		override def read(json: JsValue): GeoIpResponse = {
+			val obj = json.asJsObject("Expected GeoIpResponse to be a JSON object")
+			if(obj.fields.contains("ip")) obj.convertTo[GeoIpInfo]
+			else if(obj.fields.contains("error")) obj.convertTo[GeoIpError]
+			else if(obj.fields.contains("msg")) obj.convertTo[GeoIpInnerError]
+			else spray.json.deserializationError(s"undexpected GeoIpResponse: ${json.prettyPrint}")
+		}
+		override def write(obj: GeoIpResponse): JsValue = obj match{
+			case e: GeoIpError => e.toJson
+			case e: GeoIpInnerError => e.toJson
+			case i: GeoIpInfo => i.toJson
+		}
+	}
 
 	def ipError(ip: String): Option[String] = {
 		val trimmed = ip.trim
