@@ -19,8 +19,15 @@ import java.sql.Timestamp
 import java.time.Instant
 import java.sql.Types
 
-case class DobjDownload(
-	objType: String,	// document, data or collection
+object DownloadItemType extends Enumeration{
+	val Data = Value("data")
+	val Doc = Value("document")
+	val Coll = Value("collection")
+	type ItemType = Value
+}
+
+case class DownloadEvent(
+	itemType: DownloadItemType.ItemType,
 	ts: String,
 	hashId: String,
 	ip: String,
@@ -32,41 +39,38 @@ case class DobjDownload(
 
 class PostgresClient(conf: PostgresConfig) extends AutoCloseable {
 
-	def logDownload(entry: DobjDownload)(implicit envri: Envri): Future[Done] = {
-		execute(conf.writer)(conn => {
-			val  query = """
-    			|INSERT INTO downloads(obj_type, ts, hash_id, ip, city, country_code, pos)
-				|VALUES (?, ?, ?, ?, ?, ?, ?)""".stripMargin
+	def logDownload(entry: DownloadEvent)(implicit envri: Envri): Future[Done] = withTransaction(conf.writer){
+		"""INSERT INTO downloads(item_type, ts, hash_id, ip, city, country_code, pos)
+			|VALUES (?, ?, ?, ?, ?, ?, ?)""".stripMargin
+	}{st =>
 
-			val st = conn.prepareStatement(query)
-			
-			try {
-				val Seq(obj_type, ts, hash_id, ip, city, country_code, pos) = 1 to 7
+		val Seq(item_type, ts, hash_id, ip, city, country_code, pos) = 1 to 7
 
-				st.setString(obj_type, entry.objType)
-				st.setTimestamp(ts, Timestamp.from(Instant.parse(entry.ts)))
-				st.setString(hash_id, entry.hashId)
-				st.setString(ip, entry.ip)
-				entry.city match {
-					case Some(c) => st.setString(city, c)
-					case None => st.setNull(city, Types.VARCHAR)
-				}
-				entry.countryCode match {
-					case Some(cc) => st.setString(country_code, cc)
-					case None => st.setNull(country_code, Types.VARCHAR)
-				}
-				if (entry.longitude.isDefined && entry.latitude.isDefined){
-					st.setObject(pos, s"ST_SetSRID(POINT(${entry.longitude}, ${entry.latitude}), 4326)", Types.OTHER)
-				} else {
-					st.setNull(pos, Types.OTHER)
-				}
+		st.setString(item_type, entry.itemType.toString)
+		st.setTimestamp(ts, Timestamp.from(Instant.parse(entry.ts)))
+		st.setString(hash_id, entry.hashId)
+		st.setString(ip, entry.ip)
 
-				st.executeUpdate()
-			} finally {
-				st.close()
-			}
-		})
+		entry.city match {
+			case Some(c) => st.setString(city, c)
+			case None => st.setNull(city, Types.VARCHAR)
+		}
+
+		entry.countryCode match {
+			case Some(cc) => st.setString(country_code, cc)
+			case None => st.setNull(country_code, Types.VARCHAR)
+		}
+
+		entry.latitude.zip(entry.longitude) match{
+			case Some((lat, lon)) =>
+				st.setObject(pos, s"ST_SetSRID(POINT($lon, $lat), 4326)", Types.OTHER)
+			case None =>
+				st.setNull(pos, Types.OTHER)
+		}
+
+		st.executeUpdate()
 	}
+
 
 	private[this] val executor = {
 		val maxThreads = conf.dbAccessPoolSize * conf.dbNames.size
@@ -84,6 +88,8 @@ class PostgresClient(conf: PostgresConfig) extends AutoCloseable {
 		pgDs.setPortNumbers(Array(conf.port))
 		val ds = new SharedPoolDataSource()
 		ds.setMaxTotal(conf.dbAccessPoolSize)
+		ds.setDefaultMinIdle(1)
+		ds.setDefaultMaxIdle(2)
 		ds.setConnectionPoolDataSource(pgDs)
 		ds.setDefaultAutoCommit(false)
 		ds
@@ -94,40 +100,23 @@ class PostgresClient(conf: PostgresConfig) extends AutoCloseable {
 		dataSources.valuesIterator.foreach{_.close()}
 	}
 
-	private def getConnection(creds: CredentialsConfig)(implicit envri: Envri): Future[Connection] = Future{
-		dataSources(envri).getConnection(creds.username, creds.password)
-	}
-
-	private def withConnection[T](creds: CredentialsConfig)(act: Connection => T)(implicit envri: Envri): Future[T] =
-		getConnection(creds).map{conn =>
-			conn.setHoldability(ResultSet.CLOSE_CURSORS_AT_COMMIT)
-			try {
-				act(conn)
-			} finally{
-				conn.close()
-			}
-		}
-
-	private def execute(credentials: CredentialsConfig)(action: Connection => Unit)(implicit envri: Envri): Future[Done] = {
-		withConnection(credentials){conn =>
-			try {
-				action(conn)
-				conn.commit()
-				Done
-			} catch {
-				case ex: Throwable =>
-					conn.rollback()
-					throw ex
-			}
+	private def withConnection[T](creds: CredentialsConfig)(act: Connection => T)(implicit envri: Envri): Future[T] = Future{
+		val conn = dataSources(envri).getConnection(creds.username, creds.password)
+		conn.setHoldability(ResultSet.CLOSE_CURSORS_AT_COMMIT)
+		try {
+			act(conn)
+		} finally{
+			conn.close()
 		}
 	}
 
-	private def withTransaction(creds: CredentialsConfig)(query: String)(act: PreparedStatement => Unit)(implicit envri: Envri): Unit = {
+	private def withTransaction(creds: CredentialsConfig)(query: String)(act: PreparedStatement => Unit)(implicit envri: Envri): Future[Done] = {
 		withConnection(creds){conn =>
 			val st = conn.prepareStatement(query)
 			try{
 				act(st)
 				conn.commit()
+				Done
 			}finally{
 				st.close()
 			}

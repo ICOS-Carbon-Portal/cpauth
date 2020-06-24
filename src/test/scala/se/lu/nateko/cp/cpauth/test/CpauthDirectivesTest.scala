@@ -51,6 +51,7 @@ class CpauthDirectivesTest extends AnyFunSpec with ScalatestRouteTest {
 			collDlsCollection = "colldls",
 			ipsToIgnore = Nil
 		),
+		postgres = null,
 		mailing = null,
 		oauth = null,
 		geoip = null
