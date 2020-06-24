@@ -33,6 +33,7 @@ class CpGeoClient(conf: CpGeoConfig, errorEmailer: ErrorEmailer)(implicit system
 	import system.dispatcher
 
 	private val baseUrl = Uri(conf.baseUri)
+	private implicit val responseReader: RootJsonReader[GeoIpResponse] = CpGeoClient.geoIpResponseReader
 
 	def lookup(ip: String): Future[GeoIpInfo] = ipError(ip) match{
 		case None =>
@@ -85,7 +86,7 @@ object CpGeoClient extends DefaultJsonProtocol{
 			if(obj.fields.contains("ip")) obj.convertTo[GeoIpInfo]
 			else if(obj.fields.contains("error")) obj.convertTo[GeoIpError]
 			else if(obj.fields.contains("msg")) obj.convertTo[GeoIpInnerError]
-			else spray.json.deserializationError(s"undexpected GeoIpResponse: ${json.prettyPrint}")
+			else spray.json.deserializationError(s"unexpected GeoIpResponse: ${json.prettyPrint}")
 		}
 		override def write(obj: GeoIpResponse): JsValue = obj match{
 			case e: GeoIpError => e.toJson

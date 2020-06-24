@@ -4,6 +4,8 @@ import akka.actor.ActorSystem
 import se.lu.nateko.cp.cpauth.Envri.Envri
 import se.lu.nateko.cp.cpauth.{RestHeartConfig}
 import spray.json.{JsObject, JsString}
+import CpGeoClient.geoIpInfoFormat
+import spray.json._
 
 trait PortalUsageLogger{
 	def log(entry: JsObject, ip: String)(implicit envri: Envri): Unit
@@ -20,6 +22,7 @@ class PortalLoggerFactory(geoClient: CpGeoClient, confRestheart: RestHeartConfig
 
 		protected def logInternal(entry: JsObject, ip: String)(implicit envri: Envri): Unit = if (!confRestheart.ipsToIgnore.contains(ip)){
 			geoClient.lookup(ip)
+				.map(ipinfo => ipinfo.toJson.asJsObject)
 				.recover{case _: Throwable => JsObject("ip" -> JsString(ip))}
 				.flatMap { js =>
 					val logEntry = JsObject(entry.fields ++ js.fields)
