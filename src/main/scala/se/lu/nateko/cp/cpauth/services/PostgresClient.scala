@@ -33,8 +33,8 @@ case class DownloadEvent(
 	ip: String,
 	city: Option[String],
 	countryCode: Option[String],
-	longitude: Option[Float],
-	latitude: Option[Float]
+	longitude: Option[Double],
+	latitude: Option[Double]
 )
 
 class PostgresClient(conf: PostgresConfig) extends AutoCloseable {
