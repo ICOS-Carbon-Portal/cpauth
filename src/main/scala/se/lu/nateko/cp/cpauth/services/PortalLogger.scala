@@ -24,19 +24,26 @@ class PortalLoggerFactory(geoClient: CpGeoClient, confRestheart: RestHeartConfig
 
 		protected def logInternal(entry: JsObject, ip: String, coll: Option[String])(implicit envri: Envri): Unit = if (!confRestheart.ipsToIgnore.contains(ip)){
 			geoClient.lookup(ip)
-				// .map(ipinfo => ipinfo.toJson.asJsObject)
-				// .recover{case _: Throwable => JsObject("ip" -> JsString(ip))}
 				.flatMap { ipinfo =>
 					val js = ipinfo.toJson.asJsObject
 
-					if (coll.isDefined){
+					if (coll.isDefined && entry.fields.contains("_id")){
 						val itemType = coll.get match{
 							case "dobjdls" => DownloadItemType.Data
 							case "docdls" => DownloadItemType.Doc
 							case "colldls" => DownloadItemType.Coll
 							case _ => deserializationError(s"Unsupported collection (${coll.get}) provided")
 						}
-						val pgEvent = DownloadEvent(itemType, "time", "hash", ip, ipinfo.city, ipinfo.country_code, Some(ipinfo.longitude), Some(ipinfo.latitude))
+
+						val oid = entry.fields("_id").asJsObject.fields("$oid").asInstanceOf[JsString].value
+						val secondsSinceEpochHex = oid.substring(0, 8).toString()
+						val secondsSinceEpoch = java.lang.Long.parseLong(secondsSinceEpochHex, 16)
+						val ts = java.time.Instant.ofEpochSecond(secondsSinceEpoch)
+
+						val hashId = entry.fields("dobj").asJsObject.fields("pid").asInstanceOf[JsString].value.split("/").last
+
+						val pgEvent = DownloadEvent(itemType, ts, hashId, ip, ipinfo.city, ipinfo.country_code, Some(ipinfo.longitude), Some(ipinfo.latitude))
+						pgLogClient.logDownload(pgEvent)
 					}
 
 					val logEntry = JsObject(entry.fields ++ js.fields)

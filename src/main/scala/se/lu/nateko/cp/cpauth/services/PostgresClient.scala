@@ -28,7 +28,7 @@ object DownloadItemType extends Enumeration{
 
 case class DownloadEvent(
 	itemType: DownloadItemType.ItemType,
-	ts: String,
+	ts: Instant,
 	hashId: String,
 	ip: String,
 	city: Option[String],
@@ -40,14 +40,19 @@ case class DownloadEvent(
 class PostgresClient(conf: PostgresConfig) extends AutoCloseable {
 
 	def logDownload(entry: DownloadEvent)(implicit envri: Envri): Future[Done] = withTransaction(conf.writer){
-		"""INSERT INTO downloads(item_type, ts, hash_id, ip, city, country_code, pos)
-			|VALUES (?, ?, ?, ?, ?, ?, ?)""".stripMargin
+		entry.latitude.zip(entry.longitude) match{
+			case Some((lat, lon)) =>
+				"""INSERT INTO downloads(item_type, ts, hash_id, ip, city, country_code, pos)
+      			|VALUES (?, ?::timestamptz at time zone 'utc', ?, ?, ?, ?, ST_SetSRID(ST_MakePoint(?, ?), 4326))""".stripMargin
+			case None =>
+				"""INSERT INTO downloads(item_type, ts, hash_id, ip, city, country_code)
+      			|VALUES (?, ?::timestamptz at time zone 'utc', ?, ?, ?, ?)""".stripMargin
+		}
 	}{st =>
-
-		val Seq(item_type, ts, hash_id, ip, city, country_code, pos) = 1 to 7
+		val Seq(item_type, ts, hash_id, ip, city, country_code, lon, lat) = 1 to 8
 
 		st.setString(item_type, entry.itemType.toString)
-		st.setTimestamp(ts, Timestamp.from(Instant.parse(entry.ts)))
+		st.setString(ts, entry.ts.toString)
 		st.setString(hash_id, entry.hashId)
 		st.setString(ip, entry.ip)
 
@@ -62,10 +67,10 @@ class PostgresClient(conf: PostgresConfig) extends AutoCloseable {
 		}
 
 		entry.latitude.zip(entry.longitude) match{
-			case Some((lat, lon)) =>
-				st.setObject(pos, s"ST_SetSRID(POINT($lon, $lat), 4326)", Types.OTHER)
-			case None =>
-				st.setNull(pos, Types.OTHER)
+			case Some((latitude, longitude)) =>
+				st.setDouble(lon, longitude)
+				st.setDouble(lat, latitude)
+			case None => ;
 		}
 
 		st.executeUpdate()
