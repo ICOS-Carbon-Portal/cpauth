@@ -28,7 +28,7 @@ object DownloadItemType extends Enumeration{
 
 case class DownloadEvent(
 	itemType: DownloadItemType.ItemType,
-	ts: Instant,
+	time: String,
 	hashId: String,
 	ip: String,
 	city: Option[String],
@@ -41,7 +41,7 @@ class PostgresClient(conf: PostgresConfig) extends AutoCloseable {
 
 	def logDownload(entry: DownloadEvent)(implicit envri: Envri): Future[Done] = withTransaction(conf.writer){
 		entry.latitude.zip(entry.longitude) match{
-			case Some((lat, lon)) =>
+			case Some(_) =>
 				"""INSERT INTO downloads(item_type, ts, hash_id, ip, city, country_code, pos)
       			|VALUES (?, ?::timestamptz at time zone 'utc', ?, ?, ?, ?, ST_SetSRID(ST_MakePoint(?, ?), 4326))""".stripMargin
 			case None =>
@@ -52,7 +52,7 @@ class PostgresClient(conf: PostgresConfig) extends AutoCloseable {
 		val Seq(item_type, ts, hash_id, ip, city, country_code, lon, lat) = 1 to 8
 
 		st.setString(item_type, entry.itemType.toString)
-		st.setString(ts, entry.ts.toString)
+		st.setString(ts, entry.time)
 		st.setString(hash_id, entry.hashId)
 		st.setString(ip, entry.ip)
 
