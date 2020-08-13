@@ -7,65 +7,63 @@ import spray.json.{JsObject, JsString}
 import CpGeoClient.geoIpInfoFormat
 import spray.json._
 import se.lu.nateko.cp.cpauth.PostgresConfig
+import se.lu.nateko.cp.cpauth.core.DownloadEventInfo
+import scala.util.Success
+import scala.util.Failure
+import se.lu.nateko.cp.cpauth.core.CollectionDownloadInfo
+import se.lu.nateko.cp.cpauth.core.DocumentDownloadInfo
+import se.lu.nateko.cp.cpauth.core.DataObjDownloadInfo
 
-trait PortalUsageLogger{
-	def log(entry: JsObject, ip: String)(implicit envri: Envri): Unit
-}
+class PortalLogger(
+	geoClient: CpGeoClient, confRestheart: RestHeartConfig, confPg: PostgresConfig
+)(implicit system: ActorSystem){
 
-trait PortalDownloadsLogger{
-	def log(entry: JsObject)(implicit envri: Envri): Unit
-}
-
-class PortalLoggerFactory(geoClient: CpGeoClient, confRestheart: RestHeartConfig, confPg: PostgresConfig)(implicit system: ActorSystem){
 	import system.dispatcher
-	private trait PortalLogger{
-		protected val restHeartLogClient: RestHeartLogClient
-		protected val pgLogClient: PostgresClient
+	private val restHeartLogClient = new RestHeartLogClient(confRestheart)
+	private val pgLogClient = new PostgresClient(confPg)
 
-		protected def logInternal(entry: JsObject, ip: String, coll: Option[String])(implicit envri: Envri): Unit = if (!confRestheart.ipsToIgnore.contains(ip)){
-			geoClient.lookup(ip)
-				.flatMap { ipinfo =>
-					val js = ipinfo.toJson.asJsObject
+	def logUsage(entry: JsObject, ip: String)(implicit envri: Envri): Unit =
+		logInternally(ip)(logToRestheart(entry, _, confRestheart.usageCollection))
 
-					if (coll.isDefined){
-						val itemType = coll.get match{
-							case "dobjdls" => DownloadItemType.Data
-							case "docdls" => DownloadItemType.Doc
-							case "colldls" => DownloadItemType.Coll
-							case _ => deserializationError(s"Unsupported collection (${coll.get}) provided")
-						}
+	def logDl(entry: DownloadEventInfo)(implicit envri: Envri): Unit = logInternally(entry.ip){ipinfo =>
 
-						val hashId = entry.fields("dobj").asJsObject.fields("pid").asInstanceOf[JsString].value.split("/").last
-						val time = entry.fields("time").asInstanceOf[JsString].value
+		val (itemType, coll) = entry match{
+			case _: CollectionDownloadInfo => DownloadItemType.Coll -> confRestheart.collDlsCollection
+			case _: DocumentDownloadInfo => DownloadItemType.Doc -> confRestheart.downloadsCollection
+			case _: DataObjDownloadInfo => DownloadItemType.Data -> confRestheart.downloadsCollection
+		}
 
-						val pgEvent = DownloadEvent(itemType, time, hashId, ip, ipinfo.city, ipinfo.country_code, Some(ipinfo.longitude), Some(ipinfo.latitude))
-						pgLogClient.logDownload(pgEvent)
-					}
+		logToRestheart(entry.toJson.asJsObject, ipinfo, coll)
 
-					val logEntry = JsObject(entry.fields ++ js.fields)
-					restHeartLogClient.log(logEntry)
-				}
+		val pgEvent = DownloadEvent(
+			itemType,
+			entry.time,
+			entry.hashId,
+			entry.ip,
+			ipinfo.city,
+			ipinfo.country_code,
+			Some(ipinfo.longitude),
+			Some(ipinfo.latitude)
+		)
+		pgLogClient.logDownload(pgEvent).failed.foreach{err =>
+			system.log.error(err, "Could not log download to Postgres")
 		}
 	}
 
-	def usage: PortalUsageLogger = new PortalLogger with PortalUsageLogger{
-		override val restHeartLogClient = new RestHeartLogClient(confRestheart, confRestheart.usageCollection)
-		def log(entry: JsObject, ip: String)(implicit envri: Envri): Unit = logInternal(entry, ip, None)
-		override val pgLogClient = new PostgresClient(confPg)
-	}
-
-	def objectDownloads = downloadsLogger(confRestheart.downloadsCollection)
-	def collDownloads = downloadsLogger(confRestheart.collDlsCollection)
-
-	private def downloadsLogger(coll: String): PortalDownloadsLogger = new PortalLogger with PortalDownloadsLogger{
-		override val restHeartLogClient = new RestHeartLogClient(confRestheart, coll)
-		override val pgLogClient = new PostgresClient(confPg)
-		
-		def log(entry: JsObject)(implicit envri: Envri): Unit = entry.fields.get("ip") match{
-			case Some(JsString(ip)) =>
-				logInternal(entry, ip, Some(coll))
-			case _ =>
-				system.log.error("No 'ip' string property found in the js object, can not log data object download")
+	private def logInternally(ip: String)(logAction: GeoIpInfo => Unit): Unit = if (!confRestheart.ipsToIgnore.contains(ip)){
+		geoClient.lookup(ip).onComplete{
+			case Success(ipinfo) => logAction(ipinfo)
+			case Failure(err) => system.log.error(err, s"Could not fetch GeoIP information for ip $ip")
 		}
 	}
+
+	private def logToRestheart(entry: JsObject, ipinfo: GeoIpInfo, coll: String)(implicit envri: Envri): Unit = {
+		val js = ipinfo.toJson.asJsObject
+		val logEntry = JsObject(entry.fields ++ js.fields)
+
+		restHeartLogClient.log(logEntry, coll).failed.foreach{err =>
+			system.log.error(err, s"Could not log download info ${logEntry.compactPrint} to RestHeart collection $coll")
+		}
+	}
+
 }

@@ -33,8 +33,9 @@ lazy val cpauthCore = (project in file("core"))
 	.settings(publishingSettings: _*)
 	.settings(
 		name := "cpauth-core",
-		version := "0.6.1",
+		version := "0.6.2",
 		libraryDependencies ++= Seq(
+			"io.spray"              %% "spray-json"                         % "1.3.5"
 		)
 	)
 

@@ -6,19 +6,14 @@ import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.model.headers._
 import akka.http.scaladsl.server.{Directive1, MissingHeaderRejection, RejectionHandler, Route}
 import akka.http.scaladsl.server.Directives._
-import se.lu.nateko.cp.cpauth.services.PortalLoggerFactory
+import se.lu.nateko.cp.cpauth.services.PortalLogger
 import spray.json.JsValue
+import se.lu.nateko.cp.cpauth.core.DownloadEventInfo
 
 
 trait PortalLogRouting extends CpauthDirectives{
 
-	def loggerFactory: PortalLoggerFactory
-
-	lazy val usageLogger = loggerFactory.usage
-	lazy val downloadLoggers = Map(
-		"dobjdls" -> loggerFactory.objectDownloads,
-		"colldls" -> loggerFactory.collDownloads
-	)
+	def portalLogger: PortalLogger
 
 	val portalLogRoute = extractEnvri{ implicit envri =>
 		pathPrefix("logs"){
@@ -27,7 +22,7 @@ trait PortalLogRouting extends CpauthDirectives{
 					respondWithHeaders(`Access-Control-Allow-Origin`.*){
 						getClientIp{ip =>
 							entity(as[JsValue]){js =>
-								usageLogger.log(js.asJsObject, ip)
+								portalLogger.logUsage(js.asJsObject, ip)
 								complete(StatusCodes.OK)
 							}
 						}
@@ -44,16 +39,15 @@ trait PortalLogRouting extends CpauthDirectives{
 				} ~
 				complete(StatusCodes.BadRequest -> "Expecting only HTTP POST or OPTIONS on this path")
 			} ~
-			path(Segment){loggerKey =>
-				downloadLoggers.get(loggerKey).fold[Route](reject){dowloadLogger =>
-					post{
-						entity(as[JsValue]){js =>
-							dowloadLogger.log(js.asJsObject)
-							complete(StatusCodes.OK)
-						}
+			path("dobjdls" | "colldls" | "downloads"){
+				post{
+					entity(as[DownloadEventInfo]){dlInfo =>
+						portalLogger.logDl(dlInfo)
+						complete(StatusCodes.OK)
 					} ~
-					complete(StatusCodes.BadRequest -> "Expecting only HTTP POST on this path")
-				}
+					complete(StatusCodes.BadRequest -> "Expected DownloadEventInfo, got something else")
+				} ~
+				complete(StatusCodes.BadRequest -> "Expecting only HTTP POST on this path")
 			}
 		}
 	}
