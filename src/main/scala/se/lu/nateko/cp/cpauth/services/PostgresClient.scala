@@ -18,57 +18,49 @@ import java.sql.PreparedStatement
 import java.sql.Timestamp
 import java.time.Instant
 import java.sql.Types
-
-object DownloadItemType extends Enumeration{
-	val Data = Value("data")
-	val Doc = Value("document")
-	val Coll = Value("collection")
-	type ItemType = Value
-}
-
-case class DownloadEvent(
-	itemType: DownloadItemType.ItemType,
-	time: Instant,
-	hashId: String,
-	ip: String,
-	city: Option[String],
-	countryCode: Option[String],
-	longitude: Option[Double],
-	latitude: Option[Double]
-)
+import se.lu.nateko.cp.cpauth.core.DownloadEventInfo
+import se.lu.nateko.cp.cpauth.core.DataObjDownloadInfo
+import se.lu.nateko.cp.cpauth.core.DocumentDownloadInfo
+import se.lu.nateko.cp.cpauth.core.CollectionDownloadInfo
 
 class PostgresClient(conf: PostgresConfig) extends AutoCloseable {
 
-	def logDownload(entry: DownloadEvent)(implicit envri: Envri): Future[Done] = withTransaction(conf.writer){
-		entry.latitude.zip(entry.longitude) match{
-			case Some(_) =>
+	def logDownload(dlInfo: DownloadEventInfo, ip: Either[String, GeoIpInfo])(implicit envri: Envri): Future[Done] = withTransaction(conf.writer){
+		ip.fold(
+			ip => """INSERT INTO downloads(item_type, ts, hash_id, ip)
+				|VALUES (?, ?::timestamptz at time zone 'utc', ?, ?)""".stripMargin,
+			geo =>
 				"""INSERT INTO downloads(item_type, ts, hash_id, ip, city, country_code, pos)
 				|VALUES (?, ?::timestamptz at time zone 'utc', ?, ?, ?, ?, ST_SetSRID(ST_MakePoint(?, ?), 4326))""".stripMargin
-			case None =>
-				"""INSERT INTO downloads(item_type, ts, hash_id, ip, city, country_code)
-				|VALUES (?, ?::timestamptz at time zone 'utc', ?, ?, ?, ?)""".stripMargin
-		}
+		)
 	}{st =>
-		val Seq(item_type, ts, hash_id, ip, city, country_code, lon, lat) = 1 to 8
+		val Seq(item_type, ts, hash_id, ip_idx, city, country_code, lon, lat) = 1 to 8
 
-		st.setString(item_type, entry.itemType.toString)
-		st.setString(ts, entry.time.toString) //TODO investigate .setTimestamp or similar, to avoid .toString
-		st.setString(hash_id, entry.hashId)
-		st.setString(ip, entry.ip)
-
-		entry.city match {
-			case Some(c) => st.setString(city, c)
-			case None => st.setNull(city, Types.VARCHAR)
+		val itemType = dlInfo match{
+			case _: DataObjDownloadInfo => "data"
+			case _: DocumentDownloadInfo => "document"
+			case _: CollectionDownloadInfo => "collection"
 		}
+		st.setString(item_type, itemType)
+		st.setString(ts, dlInfo.time.toString) //TODO investigate .setTimestamp or similar, to avoid .toString
+		st.setString(hash_id, dlInfo.hashId)
+		st.setString(ip_idx, ip.fold(identity, _.ip))
 
-		entry.countryCode match {
-			case Some(cc) => st.setString(country_code, cc)
-			case None => st.setNull(country_code, Types.VARCHAR)
-		}
+		ip.foreach{geo =>
 
-		for(latitude <- entry.latitude; longitude <- entry.longitude){
-			st.setDouble(lon, longitude)
-			st.setDouble(lat, latitude)
+			geo.city match {
+				case Some(c) => st.setString(city, c)
+				case None => st.setNull(city, Types.VARCHAR)
+			}
+
+			geo.country_code match {
+				case Some(cc) => st.setString(country_code, cc)
+				case None => st.setNull(country_code, Types.VARCHAR)
+			}
+
+			st.setDouble(lon, geo.longitude)
+			st.setDouble(lat, geo.latitude)
+
 		}
 
 		st.executeUpdate()

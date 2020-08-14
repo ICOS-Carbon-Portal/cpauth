@@ -39,7 +39,7 @@ trait PortalLogRouting extends CpauthDirectives{
 				} ~
 				complete(StatusCodes.BadRequest -> "Expecting only HTTP POST or OPTIONS on this path")
 			} ~
-			path("dobjdls" | "colldls" | "downloads"){
+			path("downloads"){
 				post{
 					entity(as[DownloadEventInfo]){dlInfo =>
 						portalLogger.logDl(dlInfo)

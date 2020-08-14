@@ -27,39 +27,35 @@ class PortalLogger(
 
 	def logDl(entry: DownloadEventInfo)(implicit envri: Envri): Unit = logInternally(entry.ip){ipinfo =>
 
-		val (itemType, coll) = entry match{
-			case _: CollectionDownloadInfo => DownloadItemType.Coll -> confRestheart.collDlsCollection
-			case _: DocumentDownloadInfo => DownloadItemType.Doc -> confRestheart.downloadsCollection
-			case _: DataObjDownloadInfo => DownloadItemType.Data -> confRestheart.downloadsCollection
+		val coll = entry match{
+			case _: CollectionDownloadInfo => confRestheart.collDlsCollection
+			case _: DocumentDownloadInfo => confRestheart.downloadsCollection
+			case _: DataObjDownloadInfo => confRestheart.downloadsCollection
 		}
 
 		logToRestheart(entry.toJson.asJsObject, ipinfo, coll)
 
-		val pgEvent = DownloadEvent(
-			itemType,
-			entry.time,
-			entry.hashId,
-			entry.ip,
-			ipinfo.city,
-			ipinfo.country_code,
-			Some(ipinfo.longitude),
-			Some(ipinfo.latitude)
-		)
-		pgLogClient.logDownload(pgEvent).failed.foreach{err =>
+		pgLogClient.logDownload(entry, ipinfo).failed.foreach{err =>
 			system.log.error(err, "Could not log download to Postgres")
 		}
 	}
 
-	private def logInternally(ip: String)(logAction: GeoIpInfo => Unit): Unit = if (!confRestheart.ipsToIgnore.contains(ip)){
+	private def logInternally(ip: String)(logAction: Either[String, GeoIpInfo] => Unit): Unit = if (!confRestheart.ipsToIgnore.contains(ip)){
 		geoClient.lookup(ip).onComplete{
-			case Success(ipinfo) => logAction(ipinfo)
-			case Failure(err) => system.log.error(err, s"Could not fetch GeoIP information for ip $ip")
+			case Success(ipinfo) =>
+				logAction(Right(ipinfo))
+			case Failure(err) =>
+				logAction(Left(ip))
+				system.log.error(err, s"Could not fetch GeoIP information for ip $ip")
 		}
 	}
 
-	private def logToRestheart(entry: JsObject, ipinfo: GeoIpInfo, coll: String)(implicit envri: Envri): Unit = {
-		val js = ipinfo.toJson.asJsObject
-		val logEntry = JsObject(entry.fields ++ js.fields)
+	private def logToRestheart(entry: JsObject, ipinfo: Either[String, GeoIpInfo], coll: String)(implicit envri: Envri): Unit = {
+		val geoJs = ipinfo.fold(
+			ip => JsObject("ip" -> JsString(ip)),
+			geo => geo.toJson.asJsObject
+		)
+		val logEntry = JsObject(entry.fields ++ geoJs.fields)
 
 		restHeartLogClient.log(logEntry, coll).failed.foreach{err =>
 			system.log.error(err, s"Could not log download info ${logEntry.compactPrint} to RestHeart collection $coll")
