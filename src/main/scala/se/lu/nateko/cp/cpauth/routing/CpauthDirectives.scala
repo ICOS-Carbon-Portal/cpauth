@@ -97,16 +97,21 @@ trait CpauthDirectives {
 		})
 	}
 
-	val authRejectionHandler = RejectionHandler.newBuilder()
-		.handle{
-			case CpauthCookieMissingRejection => complete((StatusCodes.Unauthorized, "Authentication cookie missing"))
-			case bad: BadCpauthCookieRejection => complete((StatusCodes.Unauthorized, bad.message))
-		}
-		.result()
+	def handleAuthRejections(context: String): Directive0 = {
+		val err = s"Authentication/authorization error while $context:"
+		val authRejectionHandler = RejectionHandler.newBuilder()
+			.handle{
+				case CpauthCookieMissingRejection => complete((StatusCodes.Unauthorized, s"$err authentication cookie missing"))
+				case WrongCpauthCookieSourceRejection => complete((StatusCodes.Forbidden, s"$err wrong kind of authentication method"))
+				case bad: BadCpauthCookieRejection => complete((StatusCodes.Unauthorized, s"$err ${bad.message}"))
+			}
+			.result()
+		handleRejections(authRejectionHandler)
+	}
 
 	lazy val whoami: Route =  extractEnvri { implicit envri =>
 		addAccessControlHeaders(envri) {
-			(get & handleRejections(authRejectionHandler)) {
+			(get & handleAuthRejections("Login control")) {
 				user { userId =>
 					import se.lu.nateko.cp.cpauth.CpauthJsonProtocol.userIdFormat
 					complete(userId)
@@ -160,8 +165,10 @@ trait CpauthDirectives {
 	}.recover(_ => pass)
 }
 
-case object CpauthCookieMissingRejection extends CustomRejection
+sealed trait CpauthCustomRejection extends CustomRejection
+case object CpauthCookieMissingRejection extends CpauthCustomRejection
+case object WrongCpauthCookieSourceRejection extends CpauthCustomRejection
 
-class BadCpauthCookieRejection(err: Throwable) extends CustomRejection{
+class BadCpauthCookieRejection(err: Throwable) extends CpauthCustomRejection{
 	val message = err.getMessage + err.getStackTrace.map(_.toString).mkString("\n", "\n", "")
 }
