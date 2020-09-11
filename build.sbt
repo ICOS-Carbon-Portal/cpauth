@@ -83,7 +83,7 @@ lazy val cpauth = (project in file("."))
 			"org.hsqldb"             %  "hsqldb"                             % "2.3.4",
 			"org.apache.commons"     % "commons-email"                       % "1.4",
 			"org.postgresql"         % "postgresql"                          % "42.2.12",
-			"org.apache.commons"     % "commons-dbcp2"                       % "2.7.0"
+			"org.apache.commons"     % "commons-dbcp2"                       % "2.7.0" exclude("commons-logging", "commons-logging")
 		),
 
 		fork := true,
