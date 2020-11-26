@@ -63,23 +63,18 @@ class PostgresClient(conf: PostgresConfig) extends AutoCloseable {
 
 		}
 
-		dlInfo match {
-			case dobjInfo: DataObjDownloadInfo =>
-				dobjInfo.distributor match {
-					case Some(distributor) => st.setString(distributor_idx, distributor)
-					case _ => st.setNull(distributor_idx, Types.VARCHAR)
-				}
+		val dobjOpt = Option(dlInfo).collect{ case d: DataObjDownloadInfo => d }
 
-				dobjInfo.endUser match {
-					case Some(endUser) => st.setString(endUser_idx, endUser)
-					case _ => st.setNull(endUser_idx, Types.VARCHAR)
-				}
-
-			case _ =>
-				st.setNull(distributor_idx, Types.VARCHAR)
-				st.setNull(endUser_idx, Types.VARCHAR)
+		dobjOpt.flatMap(_.distributor) match {
+			case Some(distributor) => st.setString(distributor_idx, distributor)
+			case _                 => st.setNull(distributor_idx, Types.VARCHAR)
 		}
-		
+
+		dobjOpt.flatMap(_.endUser) match {
+			case Some(endUser) => st.setString(endUser_idx, endUser)
+			case _             => st.setNull(endUser_idx, Types.VARCHAR)
+		}
+
 		st.executeUpdate()
 	}
 
