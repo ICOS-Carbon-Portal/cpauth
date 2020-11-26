@@ -4,8 +4,9 @@ import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
 import akka.http.scaladsl.model.HttpMethods
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.model.headers._
-import akka.http.scaladsl.server.{Directive1, MissingHeaderRejection, RejectionHandler, Route}
+import akka.http.scaladsl.server.{Directive1, Directive0, MissingHeaderRejection, RejectionHandler, Route}
 import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.server.MalformedRequestContentRejection
 import se.lu.nateko.cp.cpauth.services.PortalLogger
 import spray.json.JsValue
 import se.lu.nateko.cp.cpauth.core.DownloadEventInfo
@@ -40,12 +41,11 @@ trait PortalLogRouting extends CpauthDirectives{
 				complete(StatusCodes.BadRequest -> "Expecting only HTTP POST or OPTIONS on this path")
 			} ~
 			path("downloads"){
-				post{
+				(post & failOnParsingErrors("Expected DownloadEventInfo, got something else")){
 					entity(as[DownloadEventInfo]){dlInfo =>
 						portalLogger.logDl(dlInfo)
 						complete(StatusCodes.OK)
-					} ~
-					complete(StatusCodes.BadRequest -> "Expected DownloadEventInfo, got something else")
+					}
 				} ~
 				complete(StatusCodes.BadRequest -> "Expecting only HTTP POST on this path")
 			}
@@ -61,5 +61,12 @@ trait PortalLogRouting extends CpauthDirectives{
 		}.result()
 
 		handleRejections(rejHandler) & headerValueByType[`X-Real-Ip`](()).map(_.value)
+	}
+
+	def failOnParsingErrors(msg: String): Directive0 = {
+		val rejHandler = RejectionHandler.newBuilder().handle{
+			case MalformedRequestContentRejection(error, _) => complete((StatusCodes.BadRequest, s"$msg : $error"))
+		}.result()
+		handleRejections(rejHandler)
 	}
 }
