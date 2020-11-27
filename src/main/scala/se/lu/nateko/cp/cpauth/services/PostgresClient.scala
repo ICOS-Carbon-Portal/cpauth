@@ -27,14 +27,14 @@ class PostgresClient(conf: PostgresConfig) extends AutoCloseable {
 
 	def logDownload(dlInfo: DownloadEventInfo, ip: Either[String, GeoIpInfo])(implicit envri: Envri): Future[Done] = withTransaction(conf.writer){
 		ip.fold(
-			ip => """INSERT INTO downloads(item_type, ts, hash_id, ip)
-				|VALUES (?, ?::timestamptz at time zone 'utc', ?, ?)""".stripMargin,
+			ip => """INSERT INTO downloads(item_type, ts, hash_id, ip, distributor, endUser)
+				|VALUES (?, ?::timestamptz at time zone 'utc', ?, ?, ?, ?)""".stripMargin,
 			geo =>
-				"""INSERT INTO downloads(item_type, ts, hash_id, ip, city, country_code, pos)
-				|VALUES (?, ?::timestamptz at time zone 'utc', ?, ?, ?, ?, ST_SetSRID(ST_MakePoint(?, ?), 4326))""".stripMargin
+				"""INSERT INTO downloads(item_type, ts, hash_id, ip, city, country_code, pos, distributor, endUser)
+				|VALUES (?, ?::timestamptz at time zone 'utc', ?, ?, ?, ?, ST_SetSRID(ST_MakePoint(?, ?), 4326), ?, ?)""".stripMargin
 		)
 	}{st =>
-		val Seq(item_type, ts, hash_id, ip_idx, city, country_code, lon, lat) = 1 to 8
+		val Seq(item_type, ts, hash_id, ip_idx, city, country_code, lon, lat, distributor_idx, endUser_idx) = 1 to 10
 
 		val itemType = dlInfo match{
 			case _: DataObjDownloadInfo => "data"
@@ -61,6 +61,18 @@ class PostgresClient(conf: PostgresConfig) extends AutoCloseable {
 			st.setDouble(lon, geo.longitude)
 			st.setDouble(lat, geo.latitude)
 
+		}
+
+		val dobjOpt = Option(dlInfo).collect{ case d: DataObjDownloadInfo => d }
+
+		dobjOpt.flatMap(_.distributor) match {
+			case Some(distributor) => st.setString(distributor_idx, distributor)
+			case _                 => st.setNull(distributor_idx, Types.VARCHAR)
+		}
+
+		dobjOpt.flatMap(_.endUser) match {
+			case Some(endUser) => st.setString(endUser_idx, endUser)
+			case _             => st.setNull(endUser_idx, Types.VARCHAR)
 		}
 
 		st.executeUpdate()
