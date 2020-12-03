@@ -1,4 +1,4 @@
-val defaultScala = "2.13.1"
+val defaultScala = "2.13.4"
 
 val commonSettings = Seq(
 	organization := "se.lu.nateko.cp",

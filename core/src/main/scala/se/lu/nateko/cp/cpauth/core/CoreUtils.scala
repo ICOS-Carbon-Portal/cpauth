@@ -60,7 +60,7 @@ object CoreUtils {
 	def getResourceLines(resourcePath: String): Iterator[String] = {
 		val stream = getClass.getResourceAsStream(resourcePath)
 		if(stream == null) Iterator()
-		else Source.fromInputStream(stream, utf8.displayName).getLines
+		else Source.fromInputStream(stream, utf8.displayName).getLines()
 	}
 
 	def compress(data: Array[Byte]): Array[Byte] = {

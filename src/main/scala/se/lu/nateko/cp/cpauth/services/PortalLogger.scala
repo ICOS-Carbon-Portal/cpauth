@@ -33,11 +33,12 @@ class PortalLogger(
 			case _: DataObjDownloadInfo => confRestheart.downloadsCollection
 		}
 
-		logToRestheart(entry.toJson.asJsObject, ipinfo, coll)
-
 		pgLogClient.logDownload(entry, ipinfo).failed.foreach{err =>
 			system.log.error(err, "Could not log download to Postgres")
 		}
+
+		logToRestheart(entry.toJson.asJsObject, ipinfo, coll)
+
 	}
 
 	private def logInternally(ip: String)(logAction: Either[String, GeoIpInfo] => Unit): Unit = if (!confRestheart.ipsToIgnore.contains(ip)){
