@@ -12,6 +12,15 @@ sealed trait DownloadEventInfo{
 
 case class CollectionDownloadInfo(time: Instant, ip: String, hashId: String, coll: JsObject) extends DownloadEventInfo
 case class DocumentDownloadInfo(time: Instant, ip: String, hashId: String, doc: JsObject) extends DownloadEventInfo
+case class CsvDownloadInfo(
+	time: Instant,
+	ip: String,
+	hashId: String,
+	columns: Option[Seq[String]],
+	offset: Option[Long],
+	limit: Option[Int]
+) extends DownloadEventInfo
+
 case class DataObjDownloadInfo(
 	time: Instant,
 	ip: String,
@@ -37,6 +46,7 @@ object DownloadEventInfo extends DefaultJsonProtocol{
 	implicit val collectionDlInfoFormat = jsonFormat4(CollectionDownloadInfo)
 	implicit val docDlInfoFormat = jsonFormat4(DocumentDownloadInfo)
 	implicit val dataDlInfoFormat = jsonFormat6(DataObjDownloadInfo)
+	implicit val csvDlInfoFormat = jsonFormat6(CsvDownloadInfo)
 
 	implicit object downloadEventInfoFormat extends RootJsonFormat[DownloadEventInfo]{
 
@@ -44,6 +54,7 @@ object DownloadEventInfo extends DefaultJsonProtocol{
 			case coll: CollectionDownloadInfo => coll.toJson
 			case doc: DocumentDownloadInfo => doc.toJson
 			case data: DataObjDownloadInfo => data.toJson
+			case csv: CsvDownloadInfo => csv.toJson
 		}
 
 		override def read(json: JsValue): DownloadEventInfo = {

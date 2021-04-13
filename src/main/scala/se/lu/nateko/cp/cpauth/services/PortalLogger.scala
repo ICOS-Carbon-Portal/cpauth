@@ -13,6 +13,7 @@ import scala.util.Failure
 import se.lu.nateko.cp.cpauth.core.CollectionDownloadInfo
 import se.lu.nateko.cp.cpauth.core.DocumentDownloadInfo
 import se.lu.nateko.cp.cpauth.core.DataObjDownloadInfo
+import se.lu.nateko.cp.cpauth.core.CsvDownloadInfo
 
 class PortalLogger(
 	geoClient: CpGeoClient, confRestheart: RestHeartConfig, confPg: PostgresConfig
@@ -27,18 +28,14 @@ class PortalLogger(
 
 	def logDl(entry: DownloadEventInfo)(implicit envri: Envri): Unit = logInternally(entry.ip){ipinfo =>
 
-		val coll = entry match{
-			case _: CollectionDownloadInfo => confRestheart.collDlsCollection
-			case _: DocumentDownloadInfo => confRestheart.downloadsCollection
-			case _: DataObjDownloadInfo => confRestheart.downloadsCollection
+		entry match{
+			case _: CollectionDownloadInfo | _: DocumentDownloadInfo | _: DataObjDownloadInfo =>
+				pgLogClient.logDownload(entry, ipinfo).failed.foreach{err =>
+					system.log.error(err, "Could not log download to Postgres")
+				}
+			case csv: CsvDownloadInfo =>
+				logUsage(JsObject("csvDownload" -> csv.toJson), csv.ip)
 		}
-
-		pgLogClient.logDownload(entry, ipinfo).failed.foreach{err =>
-			system.log.error(err, "Could not log download to Postgres")
-		}
-
-		logToRestheart(entry.toJson.asJsObject, ipinfo, coll)
-
 	}
 
 	private def logInternally(ip: String)(logAction: Either[String, GeoIpInfo] => Unit): Unit = if (!confRestheart.ipsToIgnore.contains(ip)){

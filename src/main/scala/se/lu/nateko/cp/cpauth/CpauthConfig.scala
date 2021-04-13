@@ -67,8 +67,6 @@ case class RestHeartConfig(
 	dbNames: Map[Envri, String],
 	usersCollection: String,
 	usageCollection: String,
-	downloadsCollection: String,
-	collDlsCollection: String,
 	ipsToIgnore: Seq[String]
 ){
 	def dbName(implicit envri: Envri) = dbNames(envri)
@@ -158,7 +156,7 @@ object ConfigReader extends DefaultJsonProtocol{
 	implicit val pubAuthConfigFormat = jsonFormat4(PublicAuthConfig)
 	implicit val privAuthConfigFormat = jsonFormat2(PrivateAuthConfig)
 	implicit val authConfigFormat = jsonFormat4(AuthConfig)
-	implicit val restHeartConfigFormat = jsonFormat7(RestHeartConfig)
+	implicit val restHeartConfigFormat = jsonFormat5(RestHeartConfig)
 	implicit val credentialsConfigFormat = jsonFormat2(CredentialsConfig)
 	implicit val postgresConfigFormat = jsonFormat5(PostgresConfig)
 	implicit val emailConfigFormat = jsonFormat5(EmailConfig)

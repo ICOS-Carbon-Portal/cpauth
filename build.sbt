@@ -1,4 +1,4 @@
-val defaultScala = "2.13.4"
+val defaultScala = "2.13.5"
 
 val commonSettings = Seq(
 	organization := "se.lu.nateko.cp",
@@ -33,9 +33,9 @@ lazy val cpauthCore = (project in file("core"))
 	.settings(publishingSettings: _*)
 	.settings(
 		name := "cpauth-core",
-		version := "0.6.2",
+		version := "0.6.3",
 		libraryDependencies ++= Seq(
-			"io.spray"              %% "spray-json"                         % "1.3.5"
+			"io.spray"              %% "spray-json"                         % "1.3.6"
 		)
 	)
 
@@ -49,7 +49,7 @@ lazy val viewsCore = (project in file("viewsCore"))
 		version := "0.4.5",
 		scalacOptions += "-Wunused:-imports",
 		libraryDependencies ++= Seq(
-			"io.spray"              %% "spray-json"                         % "1.3.5"
+			"io.spray"              %% "spray-json"                         % "1.3.6"
 		),
 	)
 

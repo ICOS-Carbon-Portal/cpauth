@@ -47,8 +47,6 @@ class CpauthDirectivesTest extends AnyFunSpec with ScalatestRouteTest {
 			dbNames = Map(ICOS -> "db"),
 			usersCollection = "users",
 			usageCollection = "portaluse",
-			downloadsCollection = "dobjdls",
-			collDlsCollection = "colldls",
 			ipsToIgnore = Nil
 		),
 		postgres = null,

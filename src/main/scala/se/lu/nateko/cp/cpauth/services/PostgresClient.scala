@@ -22,6 +22,7 @@ import se.lu.nateko.cp.cpauth.core.DownloadEventInfo
 import se.lu.nateko.cp.cpauth.core.DataObjDownloadInfo
 import se.lu.nateko.cp.cpauth.core.DocumentDownloadInfo
 import se.lu.nateko.cp.cpauth.core.CollectionDownloadInfo
+import se.lu.nateko.cp.cpauth.core.CsvDownloadInfo
 
 class PostgresClient(conf: PostgresConfig) extends AutoCloseable {
 
@@ -40,6 +41,7 @@ class PostgresClient(conf: PostgresConfig) extends AutoCloseable {
 			case _: DataObjDownloadInfo => "data"
 			case _: DocumentDownloadInfo => "document"
 			case _: CollectionDownloadInfo => "collection"
+			case _: CsvDownloadInfo => "data" //not meant to be used at the time of this writing
 		}
 		st.setString(item_type, itemType)
 		st.setString(ts, dlInfo.time.toString) //TODO investigate .setTimestamp or similar, to avoid .toString
