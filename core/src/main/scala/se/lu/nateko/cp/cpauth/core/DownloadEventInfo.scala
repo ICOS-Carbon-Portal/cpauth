@@ -16,9 +16,7 @@ case class CsvDownloadInfo(
 	time: Instant,
 	ip: String,
 	hashId: String,
-	columns: Option[Seq[String]],
-	offset: Option[Long],
-	limit: Option[Int]
+	select: DownloadEventInfo.CsvSelect
 ) extends DownloadEventInfo
 
 case class DataObjDownloadInfo(
@@ -33,6 +31,7 @@ case class DataObjDownloadInfo(
 
 object DownloadEventInfo extends DefaultJsonProtocol{
 
+	case class CsvSelect(columns: Option[Seq[String]], offset: Option[Long], limit: Option[Int])
 	implicit object javaTimeInstantFormat extends RootJsonFormat[Instant] {
 
 		def write(instant: Instant) = JsString(instant.toString)
@@ -46,7 +45,8 @@ object DownloadEventInfo extends DefaultJsonProtocol{
 	implicit val collectionDlInfoFormat = jsonFormat4(CollectionDownloadInfo)
 	implicit val docDlInfoFormat = jsonFormat4(DocumentDownloadInfo)
 	implicit val dataDlInfoFormat = jsonFormat6(DataObjDownloadInfo)
-	implicit val csvDlInfoFormat = jsonFormat6(CsvDownloadInfo)
+	implicit val csvSelectFormat = jsonFormat3(CsvSelect)
+	implicit val csvDlInfoFormat = jsonFormat4(CsvDownloadInfo)
 
 	implicit object downloadEventInfoFormat extends RootJsonFormat[DownloadEventInfo]{
 
@@ -62,7 +62,8 @@ object DownloadEventInfo extends DefaultJsonProtocol{
 			if(obj.fields.contains("coll")) obj.convertTo[CollectionDownloadInfo]
 			else if(obj.fields.contains("doc")) obj.convertTo[DocumentDownloadInfo]
 			else if(obj.fields.contains("dobj")) obj.convertTo[DataObjDownloadInfo]
-			else deserializationError("Expected DownloadEventInfo to contain one of: 'coll', 'doc', 'dobj', but found none")
+			else if(obj.fields.contains("select")) obj.convertTo[CsvDownloadInfo]
+			else deserializationError("Expected DownloadEventInfo to contain one of: 'coll', 'doc', 'dobj', 'select', but found none")
 		}
 	}
 }

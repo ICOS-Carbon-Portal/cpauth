@@ -1,9 +1,9 @@
 package se.lu.nateko.cp.cpauth.core.test
 
-import org.scalatest.FunSpec
+import org.scalatest.funspec.AnyFunSpec
 import se.lu.nateko.cp.cpauth.core.CoreUtils
 
-class CoreUtilsTest extends FunSpec {
+class CoreUtilsTest extends AnyFunSpec {
 
 	describe("getResourceBytes"){
 		it("gives an empty array from non-existent file"){

@@ -1,13 +1,13 @@
 package se.lu.nateko.cp.cpauth.core.test
 
 import scala.util.Try
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import se.lu.nateko.cp.cpauth.core.CoreUtils
 import se.lu.nateko.cp.cpauth.core.Crypto
 import java.security.interfaces.RSAPrivateKey
 import java.security.interfaces.RSAPublicKey
 
-class CryptoTest extends FunSuite {
+class CryptoTest extends AnyFunSuite {
 
 	val privateKey: Try[RSAPrivateKey] = {
 		val keyBytes = CoreUtils.getResourceBytes("/private1.der")

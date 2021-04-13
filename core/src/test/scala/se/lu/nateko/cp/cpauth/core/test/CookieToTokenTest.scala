@@ -1,10 +1,10 @@
 package se.lu.nateko.cp.cpauth.core.test
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
 import se.lu.nateko.cp.cpauth.core._
 
-class CookieToTokenTest extends FunSuite{
+class CookieToTokenTest extends AnyFunSuite{
 
 	test("Round trip works"){
 
