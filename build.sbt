@@ -1,4 +1,4 @@
-val defaultScala = "2.13.5"
+val defaultScala = "2.13.6"
 
 val commonSettings = Seq(
 	organization := "se.lu.nateko.cp",
@@ -7,7 +7,7 @@ val commonSettings = Seq(
 	libraryDependencies += "org.scalatest" %% "scalatest" % "3.1.0" % "test",
 
 	scalacOptions ++= Seq(
-		"-target:jvm-1.8",
+		"-target:jvm-1.11",
 		"-encoding", "UTF-8",
 		"-unchecked",
 		"-feature",
@@ -59,6 +59,11 @@ val akkaHttpVersion = "10.1.11"
 val cpauthMain = Some("se.lu.nateko.cp.cpauth.Main")
 
 lazy val fetchIdpList = taskKey[Unit]("Fetches SAML IdP list from SWAMID")
+
+resolvers := {
+	("ICOS CP Nexus repo" at "https://repo.icos-cp.eu/content/groups/public") +:
+	resolvers.value
+}
 
 lazy val cpauth = (project in file("."))
 	.dependsOn(cpauthCore, viewsCore)

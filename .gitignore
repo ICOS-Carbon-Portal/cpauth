@@ -11,6 +11,7 @@
 
 # VSCode + Scala metals specific
 .bloop/
+.bsp/
 .metals/
 .vscode/
 project/.bloop/
