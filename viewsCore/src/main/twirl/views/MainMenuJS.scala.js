@@ -38,15 +38,18 @@ window.addEventListener("load", function(){
             var response = JSON.parse(xhr.response);
 
             if (response.email) {
-                document.getElementById("logOutLnk").addEventListener('click', function(){
-                    ajaxGet('/logout', function(){
-                        window.location.reload(false);
+                let logoutLink = document.getElementById("logOutLnk")
+                if (logoutLink) {
+                    logoutLink.addEventListener('click', function(){
+                        ajaxGet('/logout', function(){
+                            window.location.reload();
+                        });
                     });
-                });
+                    logoutLink.style.display = 'inline';
+                }
                 document.getElementById("accountLnk").addEventListener('click', function(){
                     window.location = 'https://@(authHost)/';
                 });
-                document.getElementById("logOutLnk").style.display = 'inline';
                 document.getElementById("accountLnk").style.display = 'block';
             } else {
                 document.getElementById("logInLnk").addEventListener('click', function(){

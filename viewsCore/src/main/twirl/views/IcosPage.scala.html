@@ -5,12 +5,22 @@
 	title: String,
 	menu: Seq[CpMenuItem] = CpMenu.default,
 	cpauthHostOpt: Option[String] = None,
-	styleConf: IcosStyleConfig
+	styleConf: IcosStyleConfig,
+	bootstrapVersion: Option[Int] = None
 )(customHeader: Html)(body: Html)
 <!DOCTYPE html>
 <html>
 <head>
-	<link rel="stylesheet" href="https://static.icos-cp.eu/constant/bootstrap/3.3.4/css/bootstrap.min.css">
+	@if(bootstrapVersion == Some(5)){
+		<link rel="stylesheet" href="https://static.icos-cp.eu/css/bootstrap/5.0.1/icos-bootstrap.css">
+		<link rel="stylesheet" href="https://static.icos-cp.eu/constant/fontawesome/5.15.3/css/fontawesome.min.css">
+		<link rel="stylesheet" href="https://static.icos-cp.eu/constant/fontawesome/5.15.3/css/solid.min.css">
+		@IcosStyle(menu.nonEmpty, styleConf)
+	} else {
+		<link rel="stylesheet" href="https://static.icos-cp.eu/constant/bootstrap/3.3.4/css/bootstrap.min.css">
+		@IcosStyle(menu.nonEmpty, styleConf)
+		@IcosB3Style()
+	}
 
 	<meta charset="utf-8"/>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
@@ -25,8 +35,6 @@
 
 	<title>@title</title>
 
-	@MasterStyle(menu.nonEmpty, styleConf)
-
 </head>
 
 <body>
@@ -37,7 +45,7 @@
 					<img src=@{styleConf.headerLogo} alt="ICOS Carbon Portal">
 				</a>
 				@if(menu.nonEmpty){
-				<div id="menu-button" class="btn btn-default"><span class="glyphicon glyphicon-menu-hamburger"></span></div>
+				<div id="menu-button" class="btn btn-default"><span class="glyphicon glyphicon-menu-hamburger"></span><i class="fas fa-bars"></i></div>
 				}
 			</div>
 		</div>

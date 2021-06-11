@@ -1,6 +1,6 @@
 @import views.js.MainMenuJS
 
-@(title: String)(customHeader: Html)(body: Html)
+@(title: String, bootstrapVersion: Option[Int] = None)(customHeader: Html)(body: Html)
 <!DOCTYPE html>
 <html>
 
@@ -9,8 +9,21 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
+  @if(bootstrapVersion == Some(5)){
+		<link rel="stylesheet" href="https://static.icos-cp.eu/css/bootstrap/5.0.1/sites-bootstrap.css">
+		<link rel="stylesheet" href="https://static.icos-cp.eu/constant/fontawesome/5.15.3/css/fontawesome.min.css">
+		<link rel="stylesheet" href="https://static.icos-cp.eu/constant/fontawesome/5.15.3/css/solid.min.css">
+	} else {
+		<link rel="stylesheet" href="https://static.icos-cp.eu/constant/bootstrap/3.3.4/css/bootstrap.min.css">
+    <style type="text/css">
+      .nav > li > a:focus, .nav > li > a:hover {
+        background: none;
+        text-decoration: underline;
+      }
+    </style>
+	}
+
   <link rel="icon" type="image/x-icon" href="//static.icos-cp.eu/images/sites-favicon.ico">
-  <link rel="stylesheet" href="//static.icos-cp.eu/constant/bootstrap/3.3.4/css/bootstrap.min.css">
   <link rel="stylesheet" href="//static.icos-cp.eu/css/fonts/source-sans-pro.css">
 
   @SitesStyle()
@@ -32,23 +45,20 @@
         <img src="https://static.icos-cp.eu/images/sites-logo.jpg">
       </div>
     </a>
-    <nav class="menu">
-      <ul class="menu-content">
-        <li><a href="//data.fieldsites.se">Data catalogue</a></li>
-        <li>
-          <ul class="menu-content-right">
-            <li id="accountLnk" class="account">
-              <a><span class="glyphicon glyphicon-user"></span> My Account</a>
-            </li>
-            <li id="logOutLnk" class="account">
-              <a><span class="glyphicon glyphicon-log-out"></span> Log out</a>
-            </li>
-            <li id="logInLnk" class="account">
-              <a><span class="glyphicon glyphicon-log-in"></span> Log in</a>
-            </li>
-          </ul>
-        </li>
-      </ul>
+    <nav class="menu navbar navbar-dark">
+      <div class="menu-content">
+        <ul class="navbar-nav nav">
+          <li class="nav-item"><a class="nav-link" href="//data.fieldsites.se">Data catalogue</a></li>
+        </ul>
+        <ul class="menu-content-right navbar-nav nav">
+          <li id="accountLnk" class="nav-item account">
+            <a class="nav-link"><span class="glyphicon glyphicon-user"></span><i class="fas fa-user"></i> My Account</a>
+          </li>
+          <li id="logInLnk" class="nav-item account">
+            <a class="nav-link"><span class="glyphicon glyphicon-log-in"></span><i class="fas fa-sign-out-alt"></i> Log in</a>
+          </li>
+        </ul>
+      </div>
     </nav>
   </header>
 

@@ -9,13 +9,13 @@
 			@menuItem(item, true)
 		}
 		<li id="accountLnk" class="account">
-			<a><span class="glyphicon glyphicon-user"></span> My Carbon Portal Account</a>
+			<a><span class="glyphicon glyphicon-user"></span><i class="fas fa-user"></i> My Carbon Portal Account</a>
 		</li>
 		<li id="logOutLnk" class="account">
-			<a><span class="glyphicon glyphicon-log-out"></span> Log out</a>
+			<a><span class="glyphicon glyphicon-log-out"></span><i class="fas fa-sign-out-alt"></i> Log out</a>
 		</li>
 		<li id="logInLnk" class="account">
-			<a><span class="glyphicon glyphicon-log-in"></span> Log in</a>
+			<a><span class="glyphicon glyphicon-log-in"></span><i class="fas fa-sign-in-alt"></i> Log in</a>
 		</li>
 
 	</ul>
@@ -27,7 +27,7 @@
 	<li class="@itemClass(hasChildren, isTop)">
 		@if(isTop && hasChildren) {
 		<div class="menu-item-text">
-			<span class="open_menu menu-icon"><span class="glyphicon glyphicon-menu-down"></span></span>
+			<span class="open_menu menu-icon"><span class="glyphicon glyphicon-menu-down"></span><i class="fas fa-chevron-down"></i></span>
 			@anchor(item, isTop, hasChildren)
 		</div>
 		} else {
@@ -48,7 +48,7 @@
 	<a href="@link(item.url)">
 		@item.title
 		@if(!isTop && hasChildren) {
-		<span class="open_menu submenu-icon"><span class="glyphicon glyphicon-menu-right"></span></span>
+		<span class="open_menu submenu-icon"><span class="glyphicon glyphicon-menu-right"></span><i class="fas fa-chevron-right"></i></span>
 		}
 	</a>
 }
