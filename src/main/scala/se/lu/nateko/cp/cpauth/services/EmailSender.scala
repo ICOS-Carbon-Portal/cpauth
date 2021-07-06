@@ -23,9 +23,9 @@ class EmailSender(config: EmailConfig) {
 			val message: Message = {
 				val properties = new Properties()
 				properties.put("mail.smtp.auth", "true")
-				properties.put("mail.smtp.starttls.enable", "true")
+				properties.put("mail.smtp.starttls.enable", config.starttls)
 				properties.put("mail.smtp.host", config.smtpServer)
-				properties.put("mail.smtp.port", "587")
+				properties.put("mail.smtp.port", config.smtpPort)
 				val session = Session.getDefaultInstance(properties, new Authenticator{
 					override def getPasswordAuthentication = new PasswordAuthentication(config.username, config.password)
 				})

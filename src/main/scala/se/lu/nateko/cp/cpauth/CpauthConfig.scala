@@ -86,6 +86,8 @@ case class CpGeoConfig(baseUri: String, maxAgeDays: Int, emailErrorsTo: String)
 
 case class EmailConfig(
 	smtpServer: String,
+	starttls: Boolean,
+	smtpPort: Int,
 	username: String,
 	password: String,
 	fromAddress: String,
@@ -159,7 +161,7 @@ object ConfigReader extends DefaultJsonProtocol{
 	implicit val restHeartConfigFormat = jsonFormat5(RestHeartConfig)
 	implicit val credentialsConfigFormat = jsonFormat2(CredentialsConfig)
 	implicit val postgresConfigFormat = jsonFormat5(PostgresConfig)
-	implicit val emailConfigFormat = jsonFormat5(EmailConfig)
+	implicit val emailConfigFormat = jsonFormat7(EmailConfig)
 	implicit val oauthProviderConfigFormat = jsonFormat3(OAuthProviderConfig)
 	implicit val geoConfigFormat = jsonFormat3(CpGeoConfig)
 
@@ -175,5 +177,5 @@ object ConfigReader extends DefaultJsonProtocol{
 	}
 
 	implicit val envriOAuthConfigFormat = implicitly[JsonFormat[CpauthConfig.EnvriOAuthConfig]]
-	
+
 }
