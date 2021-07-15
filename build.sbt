@@ -111,7 +111,7 @@ lazy val cpauth = (project in file("."))
 
 		//initialCommands in console := """""",
 
-		mainClass in assembly := cpauthMain,
-		mainClass in (Compile, run) := cpauthMain
+		assembly / mainClass  := cpauthMain,
+		Compile / mainClass := cpauthMain
 
 	)
