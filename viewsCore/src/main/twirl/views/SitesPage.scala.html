@@ -6,74 +6,84 @@
 
 <head>
 
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1">
 
-  @if(bootstrapVersion == Some(5)){
-		<link rel="stylesheet" href="https://static.icos-cp.eu/css/bootstrap/5.0.1/sites-bootstrap.css">
+	@if(bootstrapVersion == Some(5)){
+		<link rel="stylesheet" href="https://static.icos-cp.eu/css/bootstrap/5.1.0/sites-bootstrap.css">
 		<link rel="stylesheet" href="https://static.icos-cp.eu/constant/fontawesome/5.15.3/css/fontawesome.min.css">
 		<link rel="stylesheet" href="https://static.icos-cp.eu/constant/fontawesome/5.15.3/css/solid.min.css">
 	} else {
 		<link rel="stylesheet" href="https://static.icos-cp.eu/constant/bootstrap/3.3.4/css/bootstrap.min.css">
-    <style type="text/css">
-      .nav > li > a:focus, .nav > li > a:hover {
-        background: none;
-        text-decoration: underline;
-      }
-    </style>
+		<style type="text/css">
+			.nav > li > a:focus, .nav > li > a:hover {
+				background: none;
+				text-decoration: underline;
+			}
+		</style>
 	}
 
-  <link rel="icon" type="image/x-icon" href="//static.icos-cp.eu/images/sites-favicon.ico">
-  <link rel="stylesheet" href="//static.icos-cp.eu/css/fonts/source-sans-pro.css">
+	<link rel="icon" type="image/x-icon" href="//static.icos-cp.eu/images/sites-favicon.ico">
+	<link rel="stylesheet" href="//static.icos-cp.eu/css/fonts/source-sans-pro.css">
 
-  @SitesStyle()
+	@SitesStyle()
 
-  <script type="application/javascript">
-  @Html(MainMenuJS(Some("auth.fieldsites.se")).body)
-  </script>
+	<script type="application/javascript">
+	@Html(MainMenuJS(Some("auth.fieldsites.se")).body)
+	</script>
 
-  @customHeader
+	@customHeader
 
-  <title>@title | SITES</title>
+	<title>@title | SITES</title>
 
 </head>
 
 <body>
-  <header class="header">
-    <a href="https://www.fieldsites.se">
-      <div class="logo">
-        <img src="https://static.icos-cp.eu/images/sites-logo.jpg">
-      </div>
-    </a>
-    <nav class="menu navbar navbar-dark">
-      <div class="menu-content">
-        <ul class="navbar-nav nav">
-          <li class="nav-item"><a class="nav-link" href="//data.fieldsites.se">Data catalogue</a></li>
-        </ul>
-        <ul class="menu-content-right navbar-nav nav">
-          <li id="accountLnk" class="nav-item account">
-            <a class="nav-link"><span class="glyphicon glyphicon-user"></span><i class="fas fa-user"></i> My Account</a>
-          </li>
-          <li id="logInLnk" class="nav-item account">
-            <a class="nav-link"><span class="glyphicon glyphicon-log-in"></span><i class="fas fa-sign-out-alt"></i> Log in</a>
-          </li>
-        </ul>
-      </div>
-    </nav>
-  </header>
+	<header class="header">
+		<a href="https://www.fieldsites.se">
+			<div class="logo">
+				<img src="https://static.icos-cp.eu/images/sites-logo.jpg">
+			</div>
+		</a>
+		<nav class="menu navbar navbar-dark">
+			<div class="menu-content">
+				<ul class="navbar-nav nav">
+					<li class="nav-item"><a class="nav-link" href="//data.fieldsites.se">Data catalogue</a></li>
+				</ul>
+				<ul class="menu-content-right navbar-nav nav">
+					<li id="accountLnk" class="nav-item account">
+						<a class="nav-link">
+							@if(bootstrapVersion == Some(5)){
+								<i class="fas fa-user"></i>
+							} else {
+								<span class="glyphicon glyphicon-user"></span>
+							} My Account</a>
+					</li>
+					<li id="logInLnk" class="nav-item account">
+						<a class="nav-link">
+							@if(bootstrapVersion == Some(5)){
+								<i class="fas fa-sign-out-alt"></i>
+							} else {
+								<span class="glyphicon glyphicon-log-in"></span>
+							} Log in</a>
+					</li>
+				</ul>
+			</div>
+		</nav>
+	</header>
 
-  <div class="page sites-page">
-    <div id="main-content">
-      <div class="container-fluid">
-        @body
-      </div>
-    </div>
-  </div>
+	<div class="page sites-page">
+		<div id="main-content">
+			<div class="container-fluid">
+				@body
+			</div>
+		</div>
+	</div>
 
-  <div class="footer">
-    <p>SITES (Swedish Infrastructure for Ecosystem Science) is a national research infrastructure for terrestrial and limnological field research that will help to strengthen Swedish research based on measurements and experiments carried out in the field.</p>
-    <p><a href="https://www.fieldsites.se/en-GB/about/about-sites-32652196">About SITES</a> • <a href="mailto:info@@fieldsites.se">info@@fieldsites.se</a></p>
-  </div>
+	<div class="footer">
+		<p>SITES (Swedish Infrastructure for Ecosystem Science) is a national research infrastructure for terrestrial and limnological field research that will help to strengthen Swedish research based on measurements and experiments carried out in the field.</p>
+		<p><a href="https://www.fieldsites.se/en-GB/about/about-sites-32652196">About SITES</a> • <a href="mailto:info@@fieldsites.se">info@@fieldsites.se</a></p>
+	</div>
 
 </body>
 

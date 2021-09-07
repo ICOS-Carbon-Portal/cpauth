@@ -12,7 +12,7 @@
 <html>
 <head>
 	@if(bootstrapVersion == Some(5)){
-		<link rel="stylesheet" href="https://static.icos-cp.eu/css/bootstrap/5.0.1/icos-bootstrap.css">
+		<link rel="stylesheet" href="https://static.icos-cp.eu/css/bootstrap/5.1.0/icos-bootstrap.css">
 		<link rel="stylesheet" href="https://static.icos-cp.eu/constant/fontawesome/5.15.3/css/fontawesome.min.css">
 		<link rel="stylesheet" href="https://static.icos-cp.eu/constant/fontawesome/5.15.3/css/solid.min.css">
 		@IcosStyle(menu.nonEmpty, styleConf)
@@ -52,7 +52,7 @@
 	</header>
 
 	<div id="cp-main-menu">
-		@MainMenu(menu)
+		@MainMenu(menu, bootstrapVersion)
 	</div>
 
 	<div id="cp-main-content">
