@@ -27,6 +27,8 @@ object CookieToToken {
 			),
 			Signature(signatureBytes)
 		)
+	}.recoverWith{
+		case err: Throwable => Exceptions.failure(s"Failed to parse authentication token: ${err.getMessage()}")
 	}
 
 	def constructCookieContent(token: SignedToken): String = {
