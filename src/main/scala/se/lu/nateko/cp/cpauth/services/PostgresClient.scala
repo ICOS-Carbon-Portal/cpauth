@@ -27,14 +27,13 @@ import se.lu.nateko.cp.cpauth.core.CsvDownloadInfo
 class PostgresClient(conf: PostgresConfig) extends AutoCloseable {
 
 	def logDownload(dlInfo: DownloadEventInfo, ip: Either[String, GeoIpInfo])(implicit envri: Envri): Future[Done] = withTransaction(conf.writer){
-		ip.fold(
-			ip => """INSERT INTO downloads(item_type, ts, hash_id, ip, distributor, endUser)
-				|VALUES (?, ?::timestamptz at time zone 'utc', ?, ?, ?, ?)""".stripMargin,
-			geo =>
-				"""INSERT INTO downloads(item_type, ts, hash_id, ip, city, country_code, pos, distributor, endUser)
-				|VALUES (?, ?::timestamptz at time zone 'utc', ?, ?, ?, ?, ST_SetSRID(ST_MakePoint(?, ?), 4326), ?, ?)""".stripMargin
-		)
+		"SELECT addDownloadRecord(_item_type:=?, _ts:=?, _hash_id:=?, _ip:=?, _city:=?, _country_code:=?, _lon:=?, _lat:=?, _distributor:=?, _endUser:=?)"
 	}{st =>
+		def setOptVarchar(strOpt: Option[String], idx: Int): Unit = strOpt match{
+			case Some(s) => st.setString(idx, s)
+			case None => st.setNull(idx, Types.VARCHAR)
+		}
+
 		val Seq(item_type, ts, hash_id, ip_idx, city, country_code, lon, lat, distributor_idx, endUser_idx) = 1 to 10
 
 		val itemType = dlInfo match{
@@ -44,26 +43,25 @@ class PostgresClient(conf: PostgresConfig) extends AutoCloseable {
 			case _: CsvDownloadInfo => "data" //not meant to be used at the time of this writing
 		}
 		st.setString(item_type, itemType)
-		st.setString(ts, dlInfo.time.toString) //TODO investigate .setTimestamp or similar, to avoid .toString
+		st.setTimestamp(ts, java.sql.Timestamp.from(dlInfo.time))
 		st.setString(hash_id, dlInfo.hashId)
 		st.setString(ip_idx, ip.fold(identity, _.ip))
 
-		ip.foreach{geo =>
+		ip.fold(
+			ip => {
+				st.setNull(city, Types.VARCHAR)
+				st.setNull(country_code, Types.VARCHAR)
+				st.setNull(lon, Types.DOUBLE)
+				st.setNull(lat, Types.DOUBLE)
+			},
+			geo => {
+				setOptVarchar(geo.city, city)
+				setOptVarchar(geo.country_code, country_code)
 
-			geo.city match {
-				case Some(c) => st.setString(city, c)
-				case None => st.setNull(city, Types.VARCHAR)
+				st.setDouble(lon, geo.longitude)
+				st.setDouble(lat, geo.latitude)
 			}
-
-			geo.country_code match {
-				case Some(cc) => st.setString(country_code, cc)
-				case None => st.setNull(country_code, Types.VARCHAR)
-			}
-
-			st.setDouble(lon, geo.longitude)
-			st.setDouble(lat, geo.latitude)
-
-		}
+		)
 
 		val dobjOpt = Option(dlInfo).collect{ case d: DataObjDownloadInfo => d }
 
@@ -77,7 +75,7 @@ class PostgresClient(conf: PostgresConfig) extends AutoCloseable {
 			case _             => st.setNull(endUser_idx, Types.VARCHAR)
 		}
 
-		st.executeUpdate()
+		st.execute()
 	}
 
 
