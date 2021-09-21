@@ -24,7 +24,7 @@ class PortalLogger(
 	private val pgLogClient = new PostgresClient(confPg)
 
 	def logUsage(entry: JsObject, ip: String)(implicit envri: Envri): Unit =
-		logInternally(ip)(logToRestheart(entry, _, confRestheart.usageCollection))
+		logInternally(ip)(logUsageToRestheart(entry, _))
 
 	def logDl(entry: DownloadEventInfo)(implicit envri: Envri): Unit = logInternally(entry.ip){ipinfo =>
 
@@ -34,7 +34,7 @@ class PortalLogger(
 					system.log.error(err, "Could not log download to Postgres")
 				}
 			case csv: CsvDownloadInfo =>
-				logUsage(JsObject("csvDownload" -> csv.toJson), csv.ip)
+				logUsageToRestheart(JsObject("csvDownload" -> csv.toJson), ipinfo)
 		}
 	}
 
@@ -48,15 +48,16 @@ class PortalLogger(
 		}
 	}
 
-	private def logToRestheart(entry: JsObject, ipinfo: Either[String, GeoIpInfo], coll: String)(implicit envri: Envri): Unit = {
+	private def logUsageToRestheart(entry: JsObject, ipinfo: Either[String, GeoIpInfo])(implicit envri: Envri): Unit = {
 		val geoJs = ipinfo.fold(
 			ip => JsObject("ip" -> JsString(ip)),
 			geo => geo.toJson.asJsObject
 		)
 		val logEntry = JsObject(entry.fields ++ geoJs.fields)
+		val coll = confRestheart.usageCollection
 
 		restHeartLogClient.log(logEntry, coll).failed.foreach{err =>
-			system.log.error(err, s"Could not log download info ${logEntry.compactPrint} to RestHeart collection $coll")
+			system.log.error(err, s"Could not log portal usage info ${logEntry.compactPrint} to RestHeart collection $coll")
 		}
 	}
 
