@@ -2,15 +2,17 @@
 
 @(includeMenu: Boolean, styleConf: IcosStyleConfig)
 <style type="text/css">
-	/** Body **/
+	html {
+		font-size: 14px;
+	}
+
 	body {
 		background-color: #414042;
-		font-size: 14px;
 	}
 
 	#cp-main-content{
 		background: #fff;
-		padding-bottom: 40px;
+		padding: 2rem 0 3rem;
 	}
 
 	.label-keyword {
@@ -21,6 +23,10 @@
 		padding-top: 0.4em;
 		background-color: #81898f;
 		border-radius: 20px;
+	}
+
+	h2:not(:first-child) {
+		margin-top: 2rem;
 	}
 
 	/** Header **/

@@ -1,6 +1,7 @@
 @import views.js.MainMenuJS
+@import se.lu.nateko.cp.viewscore.ImportVersions._
 
-@(title: String, bootstrapVersion: Option[Int] = None)(customHeader: Html)(body: Html)
+@(title: String, bootstrapVersion: Option[Int] = None, bootstrapJavascript: Boolean = false)(customHeader: Html)(body: Html)
 <!DOCTYPE html>
 <html>
 
@@ -10,9 +11,9 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 
 	@if(bootstrapVersion == Some(5)){
-		<link rel="stylesheet" href="https://static.icos-cp.eu/css/bootstrap/5.1.0/sites-bootstrap.css">
-		<link rel="stylesheet" href="https://static.icos-cp.eu/constant/fontawesome/5.15.3/css/fontawesome.min.css">
-		<link rel="stylesheet" href="https://static.icos-cp.eu/constant/fontawesome/5.15.3/css/solid.min.css">
+		<link rel="stylesheet" href="https://static.icos-cp.eu/css/bootstrap/@{bootstrapCSS}/sites-bootstrap.css">
+		<link rel="stylesheet" href="https://static.icos-cp.eu/constant/fontawesome/@{fontAwesome}/css/fontawesome.min.css">
+		<link rel="stylesheet" href="https://static.icos-cp.eu/constant/fontawesome/@{fontAwesome}/css/solid.min.css">
 	} else {
 		<link rel="stylesheet" href="https://static.icos-cp.eu/constant/bootstrap/3.3.4/css/bootstrap.min.css">
 		<style type="text/css">
@@ -72,11 +73,9 @@
 		</nav>
 	</header>
 
-	<div class="page sites-page">
-		<div id="main-content">
-			<div class="container-fluid">
-				@body
-			</div>
+	<div class="page sites-page pt-4">
+		<div class="container-fluid">
+			@body
 		</div>
 	</div>
 
@@ -84,6 +83,13 @@
 		<p>SITES (Swedish Infrastructure for Ecosystem Science) is a national research infrastructure for terrestrial and limnological field research that will help to strengthen Swedish research based on measurements and experiments carried out in the field.</p>
 		<p><a href="https://www.fieldsites.se/en-GB/about/about-sites-32652196">About SITES</a> • <a href="mailto:info@@fieldsites.se">info@@fieldsites.se</a></p>
 	</div>
+
+	@if(bootstrapJavascript){
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@@@{bootstrapJS}/dist/js/bootstrap.bundle.min.js"
+			integrity="@{bootstrapJSIntegrity}"
+			crossorigin="anonymous">
+		</script>
+	}
 
 </body>
 

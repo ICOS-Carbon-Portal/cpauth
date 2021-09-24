@@ -1,7 +1,7 @@
 @import se.lu.nateko.cp.viewscore._
 
-@(title: String, menu: Seq[CpMenuItem] = CpMenu.default, cpauthHostOpt: Option[String] = None, bootstrapVersion: Option[Int] = None)(customHeader: Html)(body: Html)
-@CpPage(title, menu, cpauthHostOpt, bootstrapVersion = bootstrapVersion){
+@(title: String, menu: Seq[CpMenuItem] = CpMenu.default, cpauthHostOpt: Option[String] = None, bootstrapVersion: Option[Int] = None, bootstrapJavascript: Boolean = false)(customHeader: Html)(body: Html)
+@CpPage(title, menu, cpauthHostOpt, bootstrapVersion = bootstrapVersion, bootstrapJavascript = bootstrapJavascript){
 	<link rel="shortcut icon" type="image/png" href="https://static.icos-cp.eu/images/favicon.png"/>
 	@customHeader
 }(body)

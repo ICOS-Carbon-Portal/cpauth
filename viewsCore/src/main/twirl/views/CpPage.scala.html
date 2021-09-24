@@ -1,4 +1,4 @@
 @import se.lu.nateko.cp.viewscore._
 
-@(title: String, menu: Seq[CpMenuItem] = CpMenu.default, cpauthHostOpt: Option[String] = None, bootstrapVersion: Option[Int] = None)(customHeader: Html)(body: Html)
-@IcosPage(title, menu, cpauthHostOpt, CpStyleConfig, bootstrapVersion = bootstrapVersion)(customHeader)(body)
+@(title: String, menu: Seq[CpMenuItem] = CpMenu.default, cpauthHostOpt: Option[String] = None, bootstrapVersion: Option[Int] = None, bootstrapJavascript: Boolean = false)(customHeader: Html)(body: Html)
+@IcosPage(title, menu, cpauthHostOpt, CpStyleConfig, bootstrapVersion = bootstrapVersion, bootstrapJavascript = bootstrapJavascript)(customHeader)(body)

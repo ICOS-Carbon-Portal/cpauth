@@ -1,4 +1,5 @@
 @import se.lu.nateko.cp.viewscore._
+@import se.lu.nateko.cp.viewscore.ImportVersions._
 @import views.js.MainMenuJS
 
 @(
@@ -6,15 +7,16 @@
 	menu: Seq[CpMenuItem] = CpMenu.default,
 	cpauthHostOpt: Option[String] = None,
 	styleConf: IcosStyleConfig,
-	bootstrapVersion: Option[Int] = None
+	bootstrapVersion: Option[Int] = None,
+	bootstrapJavascript: Boolean = false
 )(customHeader: Html)(body: Html)
 <!DOCTYPE html>
 <html>
 <head>
 	@if(bootstrapVersion == Some(5)){
-		<link rel="stylesheet" href="https://static.icos-cp.eu/css/bootstrap/5.1.0/icos-bootstrap.css">
-		<link rel="stylesheet" href="https://static.icos-cp.eu/constant/fontawesome/5.15.3/css/fontawesome.min.css">
-		<link rel="stylesheet" href="https://static.icos-cp.eu/constant/fontawesome/5.15.3/css/solid.min.css">
+		<link rel="stylesheet" href="https://static.icos-cp.eu/css/bootstrap/@{bootstrapCSS}/icos-bootstrap.css">
+		<link rel="stylesheet" href="https://static.icos-cp.eu/constant/fontawesome/@{fontAwesome}/css/fontawesome.min.css">
+		<link rel="stylesheet" href="https://static.icos-cp.eu/constant/fontawesome/@{fontAwesome}/css/solid.min.css">
 		@IcosStyle(menu.nonEmpty, styleConf)
 	} else {
 		<link rel="stylesheet" href="https://static.icos-cp.eu/constant/bootstrap/3.3.4/css/bootstrap.min.css">
@@ -62,6 +64,13 @@
 	</div>
 
 	@Footer()
+
+	@if(bootstrapJavascript){
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@@@{bootstrapJS}/dist/js/bootstrap.bundle.min.js"
+			integrity="@{bootstrapJSIntegrity}"
+			crossorigin="anonymous">
+		</script>
+	}
 
 	<script>
 		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
