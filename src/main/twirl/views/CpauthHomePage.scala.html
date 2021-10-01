@@ -5,26 +5,24 @@
 @()(implicit envri: Envri)
 @CpauthPage(homeStrings.title, homeStrings.subheading, "home"){
 }{
-	<div id="hello" hidden>
+	<div id="hello" style="display: none">
 		@if(envri == Envri.ICOS){
-		<div class="panel panel-default">
-			<div class="panel-body">
-				<p>Here you can see and edit your personal data. All information is voluntary, remains your property and you are in control, please see our privacy policy! We will use the information only to improve our services to you. In the future, you will access and manage here the links to your stored searches and downloads and, in case of updates of the data that you downloaded, you'll be able to opt in here to receive notifications of updates.</p>
-				<p>As soon as you have accepted the ICOS data policy, your choice will be remembered, and, when signed in, you will not be bothered by ICOS license acceptance before every dataset download.</p>
-				<p>Gender and year of birth information are not obligatory, either, and will only be used in usage statistics (for example, number of downloads and page views) and will never be traceable to individuals.</p>
-				<p>ICOS PIs and contributors can fill in their details here so that we can contact you, especially we recommend specifying ORCID ID if you have one. We plan to use this, with your explicit permission, to automatically update your ORCID profile with your contributed data and usage and citation statistics of this data. It will also be useful to record your ICOS-related publications to the ICOS publication list.</p>
-				<p>The API token at the end of the page enables technical users to perform automated operations, such as data uploads and batch-downloads.</p>
-			</div>
+		<div class="mb-4">
+			<p>Here you can see and edit your personal data. All information is voluntary, remains your property and you are in control, please see our privacy policy! We will use the information only to improve our services to you. In the future, you will access and manage here the links to your stored searches and downloads and, in case of updates of the data that you downloaded, you'll be able to opt in here to receive notifications of updates.</p>
+			<p>As soon as you have accepted the ICOS data policy, your choice will be remembered, and, when signed in, you will not be bothered by ICOS license acceptance before every dataset download.</p>
+			<p>Gender and year of birth information are not obligatory, either, and will only be used in usage statistics (for example, number of downloads and page views) and will never be traceable to individuals.</p>
+			<p>ICOS PIs and contributors can fill in their details here so that we can contact you, especially we recommend specifying ORCID ID if you have one. We plan to use this, with your explicit permission, to automatically update your ORCID profile with your contributed data and usage and citation statistics of this data. It will also be useful to record your ICOS-related publications to the ICOS publication list.</p>
+			<p>The API token at the end of the page enables technical users to perform automated operations, such as data uploads and batch-downloads.</p>
 		</div>
 		}
-		<div class="panel panel-info">
-			<div class="panel-heading">
-				<h3 class="panel-title">
-					<span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+		<div class="card mb-4">
+			<div class="card-header">
+				<h3 class="fs-6 mb-0">
+					<span class="fas fa-user" aria-hidden="true"></span>
 					User profile
 				</h3>
 			</div>
-			<div class="panel-body">
+			<div class="card-body">
 				<div class="row">
 					<div class="col-md-10">
 						@ValueWidget("User ID"){
@@ -32,7 +30,7 @@
 						}
 						@ValueWidget("License acceptance"){
 							<div class="input-group">
-								<span class="input-group-addon">
+								<span class="input-group-text">
 									<input id="icosLicenceOk" type="checkbox">
 								</span>
 								<span class="form-control">
@@ -54,7 +52,7 @@
 							@TextValueControl("Country", "country", "Country")
 						}
 						@ValueWidget("Gender"){
-							<select id="gender" class="form-control">
+							<select id="gender" class="form-select">
 								<option value="">unspecified</option>
 								<option value="Female">Female</option>
 								<option value="Male">Male</option>
@@ -65,91 +63,78 @@
 						}
 					</div>
 					<div class="col-md-2">
-						<div class="row">
-							<div class="col-md-12">
-								<button type="button" class="btn btn-primary" id="signOutButton">Sign out</button>
-							</div>
-						</div>
-						<div class="row" style="margin-top:20px">
-							<div class="col-md-12">
-								<button type="button" class="btn btn-primary" id="updateProfileButton">Save profile</button>
-							</div>
-						</div>
+						<button type="button" class="btn btn-primary mb-2" id="updateProfileButton">Save profile</button>
+						<button type="button" class="btn btn-secondary mb-2" id="signOutButton">Sign out</button>
 					</div>
 				</div>
 			</div>
 		</div>
 
-		@DangerousDeletionPanel("profile")("This operation will delete all information about your user profile and activities")
+		@DangerousDeletionPanel("profile")("Delete all information in your profile and your activities. A new profile will be created so you can keep using your account.")
 
-		<div id="forLocalsOnly" hidden>
+		<div id="forLocalsOnly" style="display: none">
 
-			<div class="panel panel-info">
-				<div class="panel-heading">
-					<h3 class="panel-title">
-						<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+			<div class="card mb-4">
+				<div class="card-header">
+					<h3 class="fs-6 mb-0">
+						<span class="fas fa-wrench" aria-hidden="true"></span>
 						Change your password
 					</h3>
 				</div>
-				<div class="panel-body">
-					<div class="input-group">
-						<span class="input-group-addon">Enter your old password</span>
-						<input type="password" id="oldPassword" class="form-control" placeholder="Old password">
-					</div>
-					<br/>
-					<div class="input-group">
-						<span class="input-group-addon">Enter your new password</span>
-						<input type="password" id="newPassword" class="form-control" placeholder="New password">
-						<span class="input-group-btn">
-						  <button class="btn btn-primary" type="button" id="changePasswordButton">Change!</button>
-						</span>
-					</div>
+				<div class="card-body">
+					@ValueWidget("Old password"){
+						<input id="oldPassword" type="password" class="form-control">
+					}
+					@ValueWidget("New password"){
+						<input id="newPassword" type="password" class="form-control">
+					}
+					<button class="btn btn-primary" type="button" id="changePasswordButton">Change password</button>
 				</div>
 			</div>
-			@DangerousDeletionPanel("account")("This operation will delete your profile and remove your account")
+			@DangerousDeletionPanel("account")("Delete your profile and your account. You will have to sign up again and create a new account to use this service.")
 		</div>
 
-		<div class="panel panel-info">
-			<div class="panel-heading">
-				<h3 class="panel-title">
-					<span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+		<div class="card mb-4">
+			<div class="card-header">
+				<h3 class="fs-6 mb-0">
+					<span class="fas fa-user" aria-hidden="true"></span>
 					API token
 				</h3>
 			</div>
-			<div class="panel-body">
+			<div class="card-body">
 				<div class="row">
-					<div class="col-sm-1">
-						<strong>Value:</strong>
+					<div class="col-md-2">
+						<strong>Value</strong>
 					</div>
-					<div id="tokenValue" class="col-sm-11" style="word-wrap: break-word;"></div>
+					<div id="tokenValue" class="col-md-10" style="word-wrap: break-word;"></div>
 				</div>
 				<div class="row" style="margin-top: 5px">
-					<div class="col-sm-1">
-						<strong>Expiry:</strong>
+					<div class="col-md-2">
+						<strong>Expiry</strong>
 					</div>
-					<div id="tokenExpiry" class="col-sm-11"></div>
+					<div id="tokenExpiry" class="col-md-10"></div>
 				</div>
 				<div class="row" style="margin-top: 5px">
-					<div class="col-sm-1">
-						<strong>Source:</strong>
+					<div class="col-md-2">
+						<strong>Source</strong>
 					</div>
-					<div id="tokenSource" class="col-sm-11"></div>
+					<div id="tokenSource" class="col-md-10"></div>
 				</div>
 			</div>
 		</div>
 
 	</div>
 
-	<div id="goodbye" hidden>
-		<div class="panel panel-info">
-			<div class="panel-heading">
-				<h3 class="panel-title">
-					<span class="glyphicon glyphicon-minus-sign" aria-hidden="true"></span>
+	<div id="goodbye" style="display: none">
+		<div class="card mb-4">
+			<div class="card-header">
+				<h3 class="fs-6 mb-0">
+					<span class="fas fa-minus-circle" aria-hidden="true"></span>
 					You are not signed in
 				</h3>
 			</div>
-			<div class="panel-body">
-				<h4>Sign in here: <a href="@homeStrings.loginUrl">@homeStrings.loginUrl</a></h4>
+			<div class="card-body">
+				<a href="/login">Sign in here</a>
 			</div>
 		</div>
 	</div>
@@ -157,7 +142,7 @@
 
 @ValueWidget(title: String)(valueHtml: Html) = {
 	<div class="row" style="margin-bottom: 7px">
-		<div class="col-md-2"><strong>@{title}:</strong></div>
+		<label class="col-md-2 col-form-label"><strong>@{title}</strong></label>
 		<div class="col-md-10">
 			@valueHtml
 		</div>
@@ -172,29 +157,28 @@
 
 @DangerousDeletionPanel(deletedInfo: String)(explanation: String) = {
 	@defining(deletedInfo.capitalize){capitalized =>
-		<div class="panel panel-info">
-			<div class="panel-heading">
-				<h3 class="panel-title">
-					<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+		<div class="card mb-4">
+			<div class="card-header">
+				<h3 class="fs-6 mb-0">
+					<span class="fas fa-trash" aria-hidden="true"></span>
 					Delete your @deletedInfo
 				</h3>
 			</div>
-			<div class="panel-body">
+			<div class="card-body">
 				<div><p>@explanation</p></div>
-				<button type="button" class="btn btn-primary" id="delete@{capitalized}Button">Delete @deletedInfo</button>
+				<button type="button" class="btn btn-danger" id="delete@{capitalized}Button">Delete @deletedInfo</button>
 
-				<div id="delete@{capitalized}Confirmation" hidden>
-					<br/>
-					<div class="panel panel-danger">
-						<div class="panel-heading">
-							<h3 class="panel-title">
-								<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+				<div id="delete@{capitalized}Confirmation" style="display: none">
+					<div class="card border-danger">
+						<div class="card-header bg-danger border-danger">
+							<h3 class="fs-6 mb-0">
+								<span class="fas fa-exclamation-triangle" aria-hidden="true"></span>
 								ARE YOU SURE YOU WANT TO DELETE YOUR @{deletedInfo.toUpperCase}?
 							</h3>
 						</div>
-						<div class="panel-body">
-							<button type="button" class="btn btn-primary" id="cancelDelete@{capitalized}Button">NO! GO BACK TO SAFETY!</button>
-							<button type="button" class="btn btn-danger" id="reallyDelete@{capitalized}Button">YES</button>
+						<div class="card-body">
+							<button type="button" class="btn btn-danger" id="reallyDelete@{capitalized}Button">Yes, delete it</button>
+							<button type="button" class="btn btn-secondary" id="cancelDelete@{capitalized}Button">No, keep my @{deletedInfo}</button>
 						</div>
 					</div>
 				</div>

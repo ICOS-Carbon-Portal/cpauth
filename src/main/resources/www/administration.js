@@ -77,7 +77,7 @@ function populateAccountsList() {
 			$('#list-accounts table').append('<tr><th>User</th><th>Delete</th><th>Is admin?</th></tr>');
 
 			$.each(data, function(i, entry){
-			
+
 				var id = entry.id.email;
 				var isAdmin = entry.isAdmin;
 
@@ -85,7 +85,7 @@ function populateAccountsList() {
 					? '<input type="checkbox" onClick="unmakeAdmin(\'' + id + '\')" checked />'
 					: '<input type="checkbox" onClick="makeAdmin(\'' + id + '\')" />';
 
-				var deleteButton = '<button class="btn btn-default" onClick="deleteAccount(\'' + id + '\')">Delete</button>';
+				var deleteButton = '<button class="btn btn-danger" onClick="deleteAccount(\'' + id + '\')"><span class="fas fa-trash"></span></button>';
 				$('#list-accounts table').append('<tr><td>' + id + '</td><td>' + deleteButton + '</td><td>' + editAdmin + '</td></tr>');
 
 			});

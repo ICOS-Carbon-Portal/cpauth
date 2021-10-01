@@ -3,28 +3,30 @@
 @(email: String)(implicit envri: Envri)
 @CpauthPage("Set your password", "Set password", "passwordreset"){
 }{
-	<div class="row">
-		<div class="panel panel-default">
-			<div class="panel-body">
+	<div class="card">
+		<div class="card-body row">
+			<div class="col-md-5 ">
 
-				<form id="password-reset"  autocomplete="off">
+				<form id="password-reset" class="row g-3" autocomplete="off">
 
-					<div class="form-group">
-						<label for="mail">Email:</label>
+					<div class="col-12 form-group">
+						<label class="form-label" for="mail">Email</label>
 						<input id="mail" name="mail" value="@email" class="form-control" readonly/>
 					</div>
 
-					<div class="form-group">
-						<label for="newPass">Password:</label>
+					<div class="col-12 form-group">
+						<label class="form-label" for="newPass">Password</label>
 						<input id="newPass" name="newPass" type="password" class="form-control" placeholder="New password"  autocomplete="new-password"/>
 					</div>
 
-					<div class="form-group">
-						<label for="newPass2">Confirm password:</label>
+					<div class="col-12 form-group">
+						<label class="form-label" for="newPass2">Confirm password</label>
 						<input id="newPass2" name="newPass2" type="password" class="form-control" placeholder="Confirm new password"  autocomplete="new-password"/>
 					</div>
 
-					<button type="button" class="btn btn-default" id="setPasswordButton">Set password!</button>
+					<div class="col-12">
+						<button type="button" class="btn btn-primary" id="setPasswordButton">Set password</button>
+					</div>
 
 				</form>
 

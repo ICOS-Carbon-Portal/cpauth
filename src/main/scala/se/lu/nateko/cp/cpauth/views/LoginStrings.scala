@@ -9,11 +9,11 @@ trait LoginStrings {
 object IcosLoginStrings extends LoginStrings {
 	val title = "Login to Carbon Portal"
 	val subheading = "Please sign in"
-	val cookieNotice = "<div class=\"alert alert-info\">Carbon Portal uses cookies to handle your login session. By using our services, you agree to our use of cookies.</div>"
+	val cookieNotice = "<p>Carbon Portal uses cookies to handle your login session. By using our services, you agree to our use of cookies.</p>"
 }
 
 object SitesLoginStrings extends LoginStrings {
 	val title = "Sign in"
 	val subheading = ""
-	val cookieNotice = "<small>SITES uses cookies to handle your login session. By using our services, you agree to our use of cookies.</small>"
+	val cookieNotice = "<p>SITES uses cookies to handle your login session. By using our services, you agree to our use of cookies.</p>"
 }

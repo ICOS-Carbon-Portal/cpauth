@@ -4,89 +4,83 @@
 @()(implicit envri: Envri)
 @CpauthPage(adminPageTitle, "Manage all accounts here", "administration"){
 }{
-	<div class="row"><div class="col-md-12">
+	<div class="card mb-4">
+		<div class="card-header">
 
-		<ul class="nav nav-tabs" role="tablist">
+			<ul class="nav nav-tabs card-header-tabs" role="tablist">
 
-			<li role="presentation" class="active">
-				<a href="#new" aria-controls="new" role="tab" data-toggle="tab" id="new-link">
-					Create a new account
-				</a>
-			</li>
+				<li role="presentation" class="nav-item">
+					<a class="nav-link active" href="#new" aria-controls="new" role="tab" data-bs-toggle="tab" id="new-link">
+						Create a new account
+					</a>
+				</li>
 
-			<li role="presentation">
-				<a href="#edit" aria-controls="edit" role="tab" data-toggle="tab" id="edit-link">
-					Edit accounts
-				</a>
-			</li>
+				<li role="presentation" class="nav-item">
+					<a class="nav-link" href="#edit" aria-controls="edit" role="tab" data-bs-toggle="tab" id="edit-link">
+						Edit accounts
+					</a>
+				</li>
 
-			<li role="presentation">
-				<a href="#loginas" aria-controls="edit" role="tab" data-toggle="tab" id="loginas-link">
-					Log in as user
-				</a>
-			</li>
+				<li role="presentation" class="nav-item">
+					<a class="nav-link" href="#loginas" aria-controls="edit" role="tab" data-bs-toggle="tab" id="loginas-link">
+						Sign in as user
+					</a>
+				</li>
 
-			<li class="col-sm-8"></li>
-		</ul>
+			</ul>
 
-	</div></div> <!-- col, row -->
+		</div>
 
-	<div class="row"><div class="col-md-12">
-		<div class="tab-content">
+		<div class="card-body tab-content">
 
-			<div role="tabpanel" class="tab-pane active" id="new">
-				<div class="panel panel-default">
-					<div class="panel-body">
+			<div role="tabpanel" class="tab-pane active row" id="new">
 
-						<form id="new-account" autocomplete="off">
+				<div class="col-md-5">
+					<form class="row g-3" id="new-account" autocomplete="off">
 
-							<div class="form-group required">
-								<label for="mail" class="control">Email:</label>
-								<input id="newaccmail" name="mail" type="email" class="form-control" placeholder="New user's email" autocomplete="off"/>
-							</div>
+						<div class="col-12 form-group required">
+							<label for="mail" class="form-label control">Email</label>
+							<input id="newaccmail" name="mail" type="email" class="form-control" placeholder="Email" autocomplete="off"/>
+						</div>
 
-							<div class="form-group required">
-								<label for="password" class="control">Password:</label>
-								<input id="password" name="password" type="password" class="form-control" placeholder="Password" autocomplete="new-password"/>
-							</div>
+						<div class="col-12 form-group required">
+							<label for="password" class="form-label control">Password</label>
+							<input id="password" name="password" type="password" class="form-control" placeholder="Password" autocomplete="new-password"/>
+						</div>
 
-							<button type="button" class="btn btn-default" id="new-account-button">Create!</button>
+						<div class="col-12">
+							<button type="button" class="btn btn-primary" id="new-account-button">Create account</button>
+						</div>
 
-						</form>
-
-					</div>
+					</form>
 				</div>
+
 			</div>
 
 			<div role="tabpanel" class="tab-pane" id="edit">
-				<div class="panel panel-default">
-					<div class="panel-body">
-						<div id="list-accounts"></div>
-					</div>
-				</div>
+				<div id="list-accounts"></div>
 			</div>
 
-			<div role="tabpanel" class="tab-pane" id="loginas">
-				<div class="panel panel-default">
-					<div class="panel-body">
+			<div role="tabpanel" class="tab-pane row" id="loginas">
+				<div class="col-md-5">
+					<form class="row g-3" id="loginas-account" autocomplete="off">
 
-						<form id="loginas-account" autocomplete="off">
+						<div class="col-12 form-group required">
+							<label for="mail" class="form-label control">Email</label>
+							<input id="loginasmail" name="mail" type="email" class="form-control" placeholder="User's email" autocomplete="off"/>
+						</div>
 
-							<div class="form-group required">
-								<label for="mail" class="control">Email:</label>
-								<input id="loginasmail" name="mail" type="email" class="form-control" placeholder="User's email" autocomplete="off"/>
-							</div>
+						<div class="col-12">
+							<button type="button" class="btn btn-primary" id="loginas-button">Sign in</button>
+						</div>
 
-							<button type="button" class="btn btn-default" id="loginas-button">Log in!</button>
+					</form>
 
-						</form>
-
-					</div>
 				</div>
 			</div>
 
 		</div>
-	</div></div> <!-- col, row -->
+	</div>
 }
 
 @adminPageTitle = @{ if(envri == Envri.SITES) "Account Management" else "Manage Carbon Portal accounts" }

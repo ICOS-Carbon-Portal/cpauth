@@ -18,146 +18,129 @@
 		@Html(loginStrings.cookieNotice)
 	</div>
 
-	<br/>
+	<div class="card mb-4">
+		<div class="card-header">
+			<ul class="nav nav-tabs card-header-tabs" role="tablist">
 
-	<div class="row"><div class="col-md-12">
+				<li role="presentation" class="nav-item">
+					<a class="nav-link active" href="#swamid" id="swamid-link" aria-controls="swamid" role="tab" data-bs-toggle="tab">
+						University sign in
+					</a>
+				</li>
 
-		<ul class="nav nav-tabs" role="tablist">
+				<li role="presentation" class="nav-item">
+					<a class="nav-link" href="#plain" id="plain-link" aria-controls="plain" role="tab" data-bs-toggle="tab">
+						Password sign in
+					</a>
+				</li>
 
-			<li role="presentation" class="active">
-				<a href="#swamid" id="swamid-link" aria-controls="swamid" role="tab" data-toggle="tab">
-					University sign in
-				</a>
-			</li>
+				<li role="presentation" class="nav-item">
+					<a class="nav-link" href="#social-sign-in" id="social-sign-in-link" aria-controls="social-sign-in" role="tab" data-bs-toggle="tab">
+						Social sign in
+					</a>
+				</li>
 
-			<li role="presentation">
-				<a href="#plain" id="plain-link" aria-controls="plain" role="tab" data-toggle="tab">
-					Password sign in
-				</a>
-			</li>
+				<li role="presentation" class="nav-item">
+					<a class="nav-link" href="#create" id="create-link" aria-controls="create" role="tab" data-bs-toggle="tab">
+						Create account / forgot password
+					</a>
+				</li>
 
-			<li role="presentation">
-				<a href="#social-sign-in" id="social-sign-in-link" aria-controls="social-sign-in" role="tab" data-toggle="tab">
-					Social sign in
-				</a>
-			</li>
+			</ul>
+		</div>
 
-			<li role="presentation">
-				<a href="#create" id="create-link" aria-controls="create" role="tab" data-toggle="tab">
-					Create account / forgot password
-				</a>
-			</li>
-
-			<li class="col-sm-8"></li>
-		</ul>
-
-	</div></div> <!-- col, row -->
-
-	<div class="row"><div class="col-md-12">
-		<div class="tab-content">
+		<div class="card-body tab-content">
 
 			<div role="tabpanel" class="tab-pane active" id="swamid">
-				<div class="panel panel-default">
-					<div class="panel-body">
 
-						<form id="saml-login" action="/saml/login">
-							<input id="targetUrl" class="targetUrlRelay" type="hidden" name="targetUrl">
+				<form class="row g-3" id="saml-login" action="/saml/login">
+					<input id="targetUrl" class="targetUrlRelay" type="hidden" name="targetUrl">
 
-							<div class="form-group">
-								<label for="idpUrlInput">Select university:</label><br>
-								<input type="text" id="idpUrlInput" class="form-control" style="width:50em; max-width: 100%;" />
-							</div>
-
-							<button id="signonBtn" class="btn btn-default">Login!</button>
-						</form>
-
+					<div class="col-md-5 form-group">
+						<label class="form-label" for="idpUrlInput">University</label><br>
+						<input type="text" id="idpUrlInput" class="form-control" placeholder="Type to search university..."/>
 					</div>
+
+					<div class="col-12">
+						<button id="signonBtn" class="btn btn-primary">Sign in</button>
+					</div>
+				</form>
+
 				</div>
-			</div>
 
-			<div role="tabpanel" class="tab-pane" id="plain">
-				<div class="panel panel-default">
-					<div class="panel-body">
+				<div role="tabpanel" class="tab-pane row" id="plain">
 
-						<form id="plain-login">
+					<div class="col-md-5">
+						<form class="row g-3" id="plain-login">
 							<input class="targetUrlRelay" type="hidden" name="targetUrl">
 
-							<div class="form-group">
-								<label for="mail">Email:</label>
+							<div class="col-md-12 form-group">
+								<label class="form-label" for="mail">Email</label>
 								<input id="mail" name="mail" type="email" class="form-control" placeholder="Enter email" />
 							</div>
 
-							<div class="form-group">
-								<label for="password">Password:</label>
+							<div class="col-md-12 form-group">
+								<label class="form-label" for="password">Password</label>
 								<input id="password" name="password" type="password" class="form-control" placeholder="Password" />
 							</div>
 
-							<button type="button" class="btn btn-default" id="passwordLoginButton">Login!</button>
-
-						</form>
-
-					</div>
-				</div>
-			</div>
-
-			<div role="tabpanel" class="tab-pane" id="social-sign-in">
-				<div class="panel panel-default">
-					<div class="panel-body">
-
-						<table class="table">
-							<tbody>
-								<tr>
-									<td>
-										<a type="button" id="orcididLoginButton" style="display: inline-block; float: left; margin-right: 7px"><img src="/images/orcidid_login.png"/></a>
-										@if(envri == Envri.ICOS){
-										<span>To be able to login with your existing ORCID ID account, you need to make your email information public in the ORCID account settings. Alternatively, if you already have a Carbon Portal account that you can access using other sign-in mechanism (e.g. username/password), you can specify you ORCID ID in your CP user profile (About -> My CP, when logged in). Then you will be able to sign in to that CP account from here, using your ORCID account instead.</span>
-										}
-									</td>
-								</tr>
-
-								<tr>
-									<td><a type="button" id="facebookLoginButton"><img src="/images/facebook_login.png"/></a></td>
-								</tr>
-
-							</tbody>
-						</table>
-
-					</div>
-				</div>
-			</div>
-
-			<div role="tabpanel" class="tab-pane" id="create">
-				<div class="panel panel-default">
-					<div class="panel-body">
-
-						<form id="create-account">
-
-							<div class="form-group">
-								<label for="newmail">Email:</label>
-								<input id="newmail" name="newmail" type="email" class="form-control" placeholder="Enter email" />
+							<div class="col-12">
+								<button type="button" class="btn btn-primary" id="passwordLoginButton">Sign in</button>
 							</div>
 
-							<button type="button" class="btn btn-default" id="choosePasswordButton">Let me choose a password!</button>
-
 						</form>
-
 					</div>
-				</div>
-			</div>
 
+				</div>
+
+				<div role="tabpanel" class="tab-pane" id="social-sign-in">
+
+					<table class="table">
+						<tbody>
+							<tr>
+								<td>
+									<a type="button" id="orcididLoginButton" style="display: inline-block; float: left; margin-right: 7px"><img src="/images/orcidid_login.png"/></a>
+									@if(envri == Envri.ICOS){
+									<span>To be able to login with your existing ORCID ID account, you need to make your email information public in the ORCID account settings. Alternatively, if you already have a Carbon Portal account that you can access using other sign-in mechanism (e.g. username/password), you can specify you ORCID ID in your CP user profile (About -> My CP, when logged in). Then you will be able to sign in to that CP account from here, using your ORCID account instead.</span>
+									}
+								</td>
+							</tr>
+
+							<tr>
+								<td><a type="button" id="facebookLoginButton"><img src="/images/facebook_login.png"/></a></td>
+							</tr>
+
+						</tbody>
+					</table>
+
+				</div>
+
+				<div role="tabpanel" class="tab-pane" id="create">
+
+					<form class="row g-3" id="create-account">
+
+						<div class="col-md-5 form-group">
+							<label class="form-label" for="newmail">Email</label>
+							<input id="newmail" name="newmail" type="email" class="form-control" placeholder="Enter email" />
+						</div>
+
+						<div class="col-12">
+							<button type="button" class="btn btn-primary" id="choosePasswordButton">Set password</button>
+						</div>
+
+					</form>
+
+				</div>
+
+			</div>
 		</div>
-	</div></div> <!-- col, row -->
 
 @if(envri == Envri.ICOS){
 	<div class="row"><div class="col-md-12">
-		<div class="panel panel-default">
-			<div class="panel-body">
-				<p>When you sign in here, you get access to the services at Carbon Portal for which you are authorized, and to your personal account settings.</p>
-				<p>Your login will be active for about one day on the same device where you logged in.</p>
-				<p>Data search and download are freely accessible for everyone and can be performed without signing in, but one benefit of signing in is bypassing the ICOS data licence acceptance needed for every download. For this, accept the licence in your <a href="/home/">user profile</a> (available when signed in). More info on the ICOS data licence: <a href="https://data.icos-cp.eu/licence" target="_blank">https://data.icos-cp.eu/licence</a>.</p>
-				<p>You can sign in with your institutional login through eduGAIN (preferred) or, if that does not work, through the social or password login. For the password login you should first create an account here, using the tab on the right. Please be aware that the email address with which you sign in will be the user id that identifies you to our services.</p>
-			</div>
-		</div>
+		<p>When you sign in here, you get access to the services at Carbon Portal for which you are authorized, and to your personal account settings.</p>
+		<p>Your login will be active for about one day on the same device where you logged in.</p>
+		<p>Data search and download are freely accessible for everyone and can be performed without signing in, but one benefit of signing in is bypassing the ICOS data licence acceptance needed for every download. For this, accept the licence in your <a href="/home/">user profile</a> (available when signed in). More info on the ICOS data licence: <a href="https://data.icos-cp.eu/licence" target="_blank">https://data.icos-cp.eu/licence</a>.</p>
+		<p>You can sign in with your institutional login through eduGAIN (preferred) or, if that does not work, through the social or password login. For the password login you should first create an account here, using the tab on the right. Please be aware that the email address with which you sign in will be the user id that identifies you to our services.</p>
 	</div></div> <!-- col, row -->
 }
 }

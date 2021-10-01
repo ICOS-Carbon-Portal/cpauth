@@ -4,7 +4,6 @@
 @(title: String, subheading: String, scriptName: String)(customHeader: Html)(body: Html)(implicit envri: Envri)
 @template{
 	<script src="https://static.icos-cp.eu/constant/jquery/1.11.2/jquery.min.js"></script>
-	<script src="https://static.icos-cp.eu/constant/bootstrap/3.3.4/js/bootstrap.min.js"></script>
 	@customHeader
 	<script src="common.js"></script>
 	<script src="@(scriptName).js"></script>
@@ -33,17 +32,20 @@
 		@if(envri == Envri.SITES) {
 		<h1>@title</h1>
 		} else {
-		<h1>ICOS Carbon Portal Authentication Service <small>@subheading</small></h1>
+		<h1>ICOS Carbon Portal Authentication Service <small class="text-muted">@subheading</small></h1>
 		}
 	</div>
 
 	<div id="message-container">
-		<div hidden id="message" class="alert" role="alert"></div>
+		<div id="message" class="alert" role="alert" style="display: none;"></div>
 	</div>
 
 	@body
 }
 
 @template = @{
-	if(envri == Envri.SITES) SitesPage(title) _ else CpCommonPage(title) _
+	if(envri == Envri.SITES)
+		SitesPage(title, bootstrapVersion = Some(5), bootstrapJavascript = true) _
+	else
+		CpCommonPage(title, bootstrapVersion = Some(5), bootstrapJavascript = true) _
 }
