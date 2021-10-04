@@ -1,28 +1,24 @@
 package se.lu.nateko.cp.cpauth.services
 
-import se.lu.nateko.cp.cpauth.PostgresConfig
-import se.lu.nateko.cp.cpauth.Envri.Envri
-
-import java.sql.Connection
-import java.util.concurrent.ThreadPoolExecutor
-import java.util.concurrent.TimeUnit
-import java.util.concurrent.ArrayBlockingQueue
-import scala.concurrent.ExecutionContext
+import akka.Done
 import org.apache.commons.dbcp2.datasources.SharedPoolDataSource
 import org.postgresql.ds.PGConnectionPoolDataSource
 import se.lu.nateko.cp.cpauth.CredentialsConfig
-import scala.concurrent.Future
-import java.sql.ResultSet
-import akka.Done
+import se.lu.nateko.cp.cpauth.Envri.Envri
+import se.lu.nateko.cp.cpauth.PostgresConfig
+import se.lu.nateko.cp.cpauth.core._
+
+import java.sql.Connection
 import java.sql.PreparedStatement
+import java.sql.ResultSet
 import java.sql.Timestamp
-import java.time.Instant
 import java.sql.Types
-import se.lu.nateko.cp.cpauth.core.DownloadEventInfo
-import se.lu.nateko.cp.cpauth.core.DataObjDownloadInfo
-import se.lu.nateko.cp.cpauth.core.DocumentDownloadInfo
-import se.lu.nateko.cp.cpauth.core.CollectionDownloadInfo
-import se.lu.nateko.cp.cpauth.core.CsvDownloadInfo
+import java.time.Instant
+import java.util.concurrent.ArrayBlockingQueue
+import java.util.concurrent.ThreadPoolExecutor
+import java.util.concurrent.TimeUnit
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
 
 class PostgresClient(conf: PostgresConfig) extends AutoCloseable {
 
@@ -40,7 +36,8 @@ class PostgresClient(conf: PostgresConfig) extends AutoCloseable {
 			case _: DataObjDownloadInfo => "data"
 			case _: DocumentDownloadInfo => "document"
 			case _: CollectionDownloadInfo => "collection"
-			case _: CsvDownloadInfo => "data" //not meant to be used at the time of this writing
+			case _: CsvDownloadInfo => "data" //not meant to be logged to postgres at the time of this writing
+			case _: CpbDownloadInfo => "data" //not meant to be logged to postgres at the time of this writing
 		}
 		st.setString(item_type, itemType)
 		st.setTimestamp(ts, java.sql.Timestamp.from(dlInfo.time))

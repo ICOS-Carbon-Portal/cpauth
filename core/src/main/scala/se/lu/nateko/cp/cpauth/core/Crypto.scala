@@ -1,8 +1,9 @@
 package se.lu.nateko.cp.cpauth.core
 
 import java.io.ByteArrayInputStream
-import java.nio.charset.Charset
+import java.nio.charset.StandardCharsets
 import java.security.KeyFactory
+import java.security.MessageDigest
 import java.security.PublicKey
 import java.security.cert.CertificateFactory
 import java.security.cert.X509Certificate
@@ -20,6 +21,10 @@ case class Signature(bytes: Array[Byte]){
 }
 
 object Crypto{
+
+	def sha256sum(s: String): Array[Byte] = MessageDigest
+		.getInstance("SHA-256")
+		.digest(getMessageBytes(s))
 
 	def publicKeyFromX509Cert(base64: String): Try[PublicKey] = Try{
 		val cf = CertificateFactory.getInstance("X.509")
@@ -56,7 +61,7 @@ object Crypto{
 	}
 	
 	private def getSigner = java.security.Signature.getInstance("SHA1withRSA")
-	private def getMessageBytes(msg: String): Array[Byte] = msg.getBytes(Charset.forName("UTF-8"))
+	private def getMessageBytes(msg: String): Array[Byte] = msg.getBytes(StandardCharsets.UTF_8)
 	
 	private def keyBytesFromPemLines(lines: IndexedSeq[String], keyType: String): Try[Array[Byte]] = {
 		

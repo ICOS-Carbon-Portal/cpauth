@@ -10,10 +10,7 @@ import se.lu.nateko.cp.cpauth.PostgresConfig
 import se.lu.nateko.cp.cpauth.core.DownloadEventInfo
 import scala.util.Success
 import scala.util.Failure
-import se.lu.nateko.cp.cpauth.core.CollectionDownloadInfo
-import se.lu.nateko.cp.cpauth.core.DocumentDownloadInfo
-import se.lu.nateko.cp.cpauth.core.DataObjDownloadInfo
-import se.lu.nateko.cp.cpauth.core.CsvDownloadInfo
+import se.lu.nateko.cp.cpauth.core._
 
 class PortalLogger(
 	geoClient: CpGeoClient, confRestheart: RestHeartConfig, confPg: PostgresConfig
@@ -35,6 +32,9 @@ class PortalLogger(
 				}
 			case csv: CsvDownloadInfo =>
 				logUsageToRestheart(JsObject("csvDownload" -> csv.toJson), ipinfo)
+
+			case cpb: CpbDownloadInfo =>
+				logUsageToRestheart(JsObject("cpbDownload" -> cpb.toJson), ipinfo)
 		}
 	}
 
