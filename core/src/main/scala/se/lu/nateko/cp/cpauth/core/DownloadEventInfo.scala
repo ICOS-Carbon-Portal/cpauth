@@ -28,7 +28,8 @@ case class CpbDownloadInfo(
 	hashId: String,
 	cpUser: Option[AnonId],
 	colNums: Seq[Int],
-	slice: Option[DownloadEventInfo.CpbSlice]
+	slice: Option[DownloadEventInfo.CpbSlice],
+	localOrigin: Boolean
 ) extends DownloadEventInfo
 
 case class DataObjDownloadInfo(
@@ -52,9 +53,7 @@ object DownloadEventInfo extends DefaultJsonProtocol{
 		CoreUtils.encodeToBase64String(Crypto.sha256sum(id.email + salt))
 
 	implicit object javaTimeInstantFormat extends RootJsonFormat[Instant] {
-
 		def write(instant: Instant) = JsString(instant.toString)
-
 		def read(value: JsValue): Instant = value match{
 			case JsString(s) => Instant.parse(s)
 			case _ => deserializationError("String representation of a time instant is expected")
@@ -67,20 +66,26 @@ object DownloadEventInfo extends DefaultJsonProtocol{
 	implicit val csvSelectFormat = jsonFormat3(CsvSelect)
 	implicit val csvDlInfoFormat = jsonFormat5(CsvDownloadInfo)
 	implicit val cbpSliceFormat = jsonFormat2(CpbSlice)
-	implicit val cpbDlInfoFormat = jsonFormat6(CpbDownloadInfo)
+	implicit val cpbDlInfoFormat = jsonFormat7(CpbDownloadInfo)
 
 	implicit object downloadEventInfoFormat extends RootJsonFormat[DownloadEventInfo]{
 
-		override def write(obj: DownloadEventInfo): JsValue = obj match{
-			case coll: CollectionDownloadInfo => coll.toJson
-			case doc: DocumentDownloadInfo => doc.toJson
-			case data: DataObjDownloadInfo => data.toJson
-			case csv: CsvDownloadInfo => csv.toJson
-			case cpb: CpbDownloadInfo => cpb.toJson
+		override def write(obj: DownloadEventInfo): JsValue = {
+			def withType[T : JsonWriter](typ: String, e: T) =
+				JsObject(e.toJson.asJsObject.fields + ("type" -> JsString(typ)))
+
+			obj match{
+				case coll: CollectionDownloadInfo => withType("coll", coll)
+				case doc: DocumentDownloadInfo => withType("doc", doc)
+				case data: DataObjDownloadInfo => withType("dobj", data)
+				case csv: CsvDownloadInfo => withType("csv", csv)
+				case cpb: CpbDownloadInfo => withType("cpb", cpb)
+			}
 		}
 
 		override def read(json: JsValue): DownloadEventInfo = {
 			val obj = json.asJsObject("Expected DownloadEventInfo to be a JS object, not a plain value")
+			//TODO Switch to using field 'type' for determining the type
 			if(obj.fields.contains("coll")) obj.convertTo[CollectionDownloadInfo]
 			else if(obj.fields.contains("doc")) obj.convertTo[DocumentDownloadInfo]
 			else if(obj.fields.contains("dobj")) obj.convertTo[DataObjDownloadInfo]
