@@ -18,13 +18,11 @@ trait RestHeartRouting extends RestHeartDirectives{
 
 		val config = restHeart.config
 
-		def injectUsersCollection(req: HttpRequest) = req.copy(
-			uri = {
-				val oldPathPart = req.uri.path.tail.tail.tail.tail
-				val newPath = Path./(config.dbName) / config.usersCollection ++ oldPathPart
-				req.uri.withPath(newPath)
-			}
-		)
+		def injectUsersCollection(req: HttpRequest) = req.withUri{
+			val oldPathPart = req.uri.path.tail.tail.tail.tail
+			val newPath = Path./(config.dbName) / config.usersCollection ++ oldPathPart
+			req.uri.withPath(newPath)
+		}
 
 		path("db" / "users" / Segment){ email =>
 			options{
@@ -64,10 +62,10 @@ trait RestHeartRouting extends RestHeartDirectives{
 	private def validateUser(email: String, uid: UserId): Directive0 =
 		validate(email == uid.email, "Only admins can write to other users' documents")
 
-	def addAccessControlAllowOrigin(implicit envri: Envri): Directive0 = headerValueByType[Origin](()).flatMap{origin =>
+	def addAccessControlAllowOrigin(implicit envri: Envri): Directive0 = headerValueByType(Origin).flatMap{origin =>
 		if (origin.value.endsWith(authConfig.pub(envri).authCookieDomain)) {
 			respondWithHeaders(
-				`Access-Control-Allow-Origin`(origin.value)
+				`Access-Control-Allow-Origin`(origin.origins.head)
 			)
 		} else {
 			pass

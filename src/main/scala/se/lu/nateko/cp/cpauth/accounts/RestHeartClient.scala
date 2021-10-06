@@ -49,6 +49,7 @@ class RestHeartClient(val config: RestHeartConfig, http: HttpExt)(implicit m: Ma
 		db.withPath(db.path / config.usageCollection)
 	}
 	private val KeepIdsOnly = "keys" -> "{\"_id\": 1}"
+	private def pageSizeQpar(size: Int) = "pagesize" -> size.toString
 
 	def getUserUri(uid: UserId)(implicit envri: Envri): Uri = usersCollUri.withPath(usersCollUri.path / uid.email)
 
@@ -130,7 +131,7 @@ class RestHeartClient(val config: RestHeartConfig, http: HttpExt)(implicit m: Ma
 		}.mkString("{", ", ", "}")
 
 		val qParams: Map[String, String] = if(filter.nonEmpty) Map("filter" -> filterParam) else Map.empty
-		val uri = usersCollUri.withQuery(Uri.Query(qParams + KeepIdsOnly))
+		val uri = usersCollUri.withQuery(Uri.Query(qParams + KeepIdsOnly + pageSizeQpar(1000)))
 		for(
 			resp <- http.singleRequest(HttpRequest(uri = uri));
 			usersListResp <- Unmarshal(resp.entity.withContentType(ContentTypes.`application/json`)).to[JsValue];

@@ -157,7 +157,7 @@ trait CpauthDirectives {
 	}
 
 	//TODO Maybe this is not even needed, as Cpauth's whoami and logout are not used by any other services
-	def addAccessControlHeaders(implicit envri: Envri): Directive0 = headerValueByType[Origin](()).flatMap{origin =>
+	def addAccessControlHeaders(implicit envri: Envri): Directive0 = headerValueByType(Origin).flatMap{origin =>
 		if (origin.value.endsWith(authConfig.pub(envri).authCookieDomain)) {
 			respondWithHeaders(
 				`Access-Control-Allow-Origin`(origin.value),

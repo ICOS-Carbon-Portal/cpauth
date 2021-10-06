@@ -4,6 +4,7 @@ import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
 import akka.http.scaladsl.model.HttpMethods
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.model.headers._
+import akka.http.scaladsl.model.Uri
 import akka.http.scaladsl.server.Directive0
 import akka.http.scaladsl.server.Directive1
 import akka.http.scaladsl.server.Directives._
@@ -16,6 +17,7 @@ import se.lu.nateko.cp.cpauth.services.PortalLogger
 import spray.json.JsObject
 import spray.json.JsString
 import spray.json.JsValue
+import se.lu.nateko.cp.cpauth.Envri.Envri
 
 
 trait PortalLogRouting extends CpauthDirectives{
@@ -23,10 +25,11 @@ trait PortalLogRouting extends CpauthDirectives{
 	def portalLogger: PortalLogger
 
 	val portalLogRoute = extractEnvri{ implicit envri =>
+		val controlOrigins = controlOriginsDir
 		pathPrefix("logs"){
 			path("portaluse"){
-				post{
-					respondWithHeaders(`Access-Control-Allow-Origin`.*){
+				(post & respondWithHeaders(`Access-Control-Allow-Credentials`(true))){
+					(controlOrigins | pass){
 						getClientIp{ip =>
 							(withSizeLimit(2048) & entity(as[JsValue])){js =>
 								userOpt{uidOpt =>
@@ -42,13 +45,16 @@ trait PortalLogRouting extends CpauthDirectives{
 					}
 				} ~
 				options{
-					respondWithHeaders(
-						`Access-Control-Allow-Origin`.*,
-						`Access-Control-Allow-Methods`(HttpMethods.POST),
-						`Access-Control-Allow-Headers`("Content-Type")
-					){
-						complete(StatusCodes.OK)
-					}
+					controlOrigins{
+						respondWithHeaders(
+							`Access-Control-Allow-Methods`(HttpMethods.POST),
+							`Access-Control-Allow-Credentials`(true),
+							`Access-Control-Allow-Headers`("Content-Type")
+						){
+							complete(StatusCodes.OK)
+						}
+					} ~
+					complete(StatusCodes.BadRequest -> "Expected data-portal associated HTTP Origin")
 				} ~
 				complete(StatusCodes.BadRequest -> "Expecting only HTTP POST or OPTIONS on this path")
 			} ~
@@ -72,7 +78,7 @@ trait PortalLogRouting extends CpauthDirectives{
 			case MissingHeaderRejection(_) => complete((StatusCodes.BadRequest, errMsg))
 		}.result()
 
-		handleRejections(rejHandler) & headerValueByType[`X-Real-Ip`](()).map(_.value)
+		handleRejections(rejHandler) & headerValueByType(`X-Real-Ip`).map(_.value)
 	}
 
 	def failOnParsingErrors(msg: String): Directive0 = {
@@ -81,4 +87,14 @@ trait PortalLogRouting extends CpauthDirectives{
 		}.result()
 		handleRejections(rejHandler)
 	}
+
+
+	private def controlOriginsDir(implicit envri: Envri): Directive0 = headerValueByType(Origin).tflatMap{
+		case Tuple1(Origin(Seq(o @ HttpOrigin(_, Host(Uri.NamedHost(host), _))))) =>
+			if(authConfig.pub.get(envri).map(_.authCookieDomain).contains(host.dropWhile(_ != '.')))
+				respondWithHeader(`Access-Control-Allow-Origin`(o))
+			else reject
+		case _ => reject
+	}
+
 }

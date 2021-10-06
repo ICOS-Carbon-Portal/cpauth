@@ -37,7 +37,7 @@ trait PasswordRouting extends CpauthDirectives {
 		} ~
 		post{
 			path("login"){
-				formFields(("mail", "password")){(mail, password) =>
+				formFields("mail", "password"){(mail, password) =>
 					val uEntryFuture = passwordHandler.authUser(UserId(mail), password)
 					onSuccess(uEntryFuture){ uEntry =>
 						logInWithPasswordCookie(uEntry.id)
@@ -46,7 +46,7 @@ trait PasswordRouting extends CpauthDirectives {
 			} ~
 			path("changepassword"){
 				user(uid =>
-					formFields(("oldPass", "newPass"))((oldPass, newPass) => {
+					formFields("oldPass", "newPass")((oldPass, newPass) => {
 						val result = passwordHandler.changePassword(uid, oldPass, newPass)
 						onSuccess(result)(complete(StatusCodes.OK))
 					})
@@ -88,7 +88,7 @@ trait PasswordRouting extends CpauthDirectives {
 			} ~
 			admin{
 				path("createaccount"){
-					formFields(("mail", "password")){(mail, password) =>
+					formFields("mail", "password"){(mail, password) =>
 						val uid = UserId(mail)
 						onSuccess(userDb.userExists(uid)) {
 							case true => complete((StatusCodes.Forbidden, "User already exists"))

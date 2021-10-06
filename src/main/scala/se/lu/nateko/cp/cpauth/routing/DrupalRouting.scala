@@ -58,7 +58,7 @@ trait DrupalRouting extends CpauthDirectives with ProxyDirectives{
 		dropResponseBody &
 		respondWithHeader(Location(withoutParam(dropParam, target))) &
 		dropLocation & //happens before the previous line
-		mapResponse(_.copy(status = StatusCodes.Found)) &
+		mapResponse(_.withStatus(StatusCodes.Found)) &
 		remakeCookies
 
 	private def withoutParam(param: Option[String], uri: Uri): Uri = param match{
@@ -73,7 +73,7 @@ trait DrupalRouting extends CpauthDirectives with ProxyDirectives{
 
 	private def remakeCookie(header: HttpHeader): HttpHeader = header match{
 		case `Set-Cookie`(cookie) =>
-			val newCookie = cookie.copy(secure = true, httpOnly = true, expires = None)
+			val newCookie = cookie.withSecure(true).withHttpOnly(true)
 			`Set-Cookie`(newCookie)
 		case x => x
 	}

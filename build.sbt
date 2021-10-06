@@ -54,8 +54,8 @@ lazy val viewsCore = (project in file("viewsCore"))
 	)
 
 
-val akkaVersion = "2.6.3"
-val akkaHttpVersion = "10.1.11"
+val akkaVersion = "2.6.16"
+val akkaHttpVersion = "10.2.6"
 val cpauthMain = Some("se.lu.nateko.cp.cpauth.Main")
 
 lazy val fetchIdpList = taskKey[Unit]("Fetches SAML IdP list from SWAMID")

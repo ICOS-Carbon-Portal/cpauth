@@ -39,7 +39,7 @@ trait SamlRouting extends CpauthDirectives{
 	val samlRoute: Route = (pathPrefix("saml") & extractEnvri){implicit envri =>
 		get{
 			path("login") {
-				parameter(("idpUrl", "targetUrl".?)){ (idp, target) =>
+				parameters("idpUrl", "targetUrl".?){ (idp, target) =>
 
 					val idpPropTry = for(
 						idpUri <- Try(new URI(idp));

@@ -26,7 +26,7 @@ trait ProxyDirectives { this: CpauthDirectives =>
 	}
 
 	protected def proxyToUri(req: HttpRequest, newUri: Uri): Future[RouteResult] = {
-		val newReq = req.copy(uri = newUri, protocol = HttpProtocols.`HTTP/1.1`).withoutRedundantHeaders
+		val newReq = req.withUri(newUri).withProtocol(HttpProtocols.`HTTP/1.1`).withoutRedundantHeaders
 		http.singleRequest(newReq).map(response => Complete(response.withoutRedundantHeaders))
 	}
 }
