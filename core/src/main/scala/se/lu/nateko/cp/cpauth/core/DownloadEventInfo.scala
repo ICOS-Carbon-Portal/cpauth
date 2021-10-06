@@ -50,7 +50,7 @@ object DownloadEventInfo extends DefaultJsonProtocol{
 	case class CpbSlice(offset: Long, length: Int)
 
 	def anonymizeCpUser(id: UserId, salt: String): AnonId =
-		CoreUtils.encodeToBase64String(Crypto.sha256sum(id.email + salt))
+		CoreUtils.encodeToBase64String(Crypto.sha256sum(id.email + salt)).take(12)
 
 	implicit object javaTimeInstantFormat extends RootJsonFormat[Instant] {
 		def write(instant: Instant) = JsString(instant.toString)
