@@ -29,7 +29,7 @@ case class CpbDownloadInfo(
 	cpUser: Option[AnonId],
 	colNums: Seq[Int],
 	slice: Option[DownloadEventInfo.CpbSlice],
-	localOrigin: Boolean
+	localOrigin: Option[String]
 ) extends DownloadEventInfo
 
 case class DataObjDownloadInfo(
