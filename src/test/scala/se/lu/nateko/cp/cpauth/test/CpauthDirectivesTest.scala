@@ -31,6 +31,7 @@ class CpauthDirectivesTest extends AnyFunSpec with ScalatestRouteTest {
 				authHost = "cpauth.icos-cp.eu",
 				publicKeyPath = "/public1.pem"
 			)),
+			secretUserSalt = "bla",
 			masterAdminUser = "",
 			masterAdminPass = "",
 		),

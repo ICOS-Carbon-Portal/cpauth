@@ -31,6 +31,7 @@ import se.lu.nateko.cp.cpauth.core.AuthSource
 import akka.http.javadsl.server.CustomRejection
 import akka.http.scaladsl.server.MissingCookieRejection
 import akka.http.scaladsl.server.RejectionHandler
+import se.lu.nateko.cp.cpauth.core.DownloadEventInfo
 
 trait CpauthDirectives {
 
@@ -45,6 +46,8 @@ trait CpauthDirectives {
 
 	def publicAuthConfig(implicit envri: Envri) = authConfig.pub(envri)
 	def authenticator(implicit envri: Envri): Try[Authenticator] = Authenticator(publicAuthConfig)
+	def anonymizeCpUser(uid: UserId): DownloadEventInfo.AnonId =
+		DownloadEventInfo.anonymizeCpUser(uid, authConfig.secretUserSalt)
 
 	val extractEnvri: Directive1[Envri] = extractHost.flatMap{h =>
 		hostToEnvri(h) match{
@@ -83,6 +86,7 @@ trait CpauthDirectives {
 	}
 
 	val user: Directive1[UserId] = token.map(_.userId)
+	val userOpt: Directive1[Option[UserId]] = user.map(Some.apply) | provide(None)
 
 	def cpauthCookie: Route = extractEnvri{implicit envri =>
 		cookie(publicAuthConfig.authCookieName)(cookie => {

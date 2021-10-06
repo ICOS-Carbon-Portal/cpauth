@@ -15,6 +15,7 @@ import se.lu.nateko.cp.cpauth.core.UserId
 import se.lu.nateko.cp.cpauth.services.CookieFactory
 import se.lu.nateko.cp.cpauth.services.PasswordLifecycleHandler
 import se.lu.nateko.cp.cpauth.utils.TemplatePageMarshalling
+import se.lu.nateko.cp.cpauth.core.DownloadEventInfo
 
 trait PasswordRouting extends CpauthDirectives {
 

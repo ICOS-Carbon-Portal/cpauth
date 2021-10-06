@@ -85,13 +85,17 @@ object DownloadEventInfo extends DefaultJsonProtocol{
 
 		override def read(json: JsValue): DownloadEventInfo = {
 			val obj = json.asJsObject("Expected DownloadEventInfo to be a JS object, not a plain value")
-			//TODO Switch to using field 'type' for determining the type
-			if(obj.fields.contains("coll")) obj.convertTo[CollectionDownloadInfo]
-			else if(obj.fields.contains("doc")) obj.convertTo[DocumentDownloadInfo]
-			else if(obj.fields.contains("dobj")) obj.convertTo[DataObjDownloadInfo]
-			else if(obj.fields.contains("select")) obj.convertTo[CsvDownloadInfo]
-			else if(obj.fields.contains("colNums")) obj.convertTo[CpbDownloadInfo]
-			else deserializationError("Expected DownloadEventInfo to contain one of: 'coll', 'doc', 'dobj', 'select', 'colNums', but found none")
+			obj.fields.get("type").collect{case JsString(typ) => typ} match{
+				case Some("cpb") => obj.convertTo[CpbDownloadInfo]
+				case Some("dobj") => obj.convertTo[DataObjDownloadInfo]
+				case Some("coll") => obj.convertTo[CollectionDownloadInfo]
+				case Some("doc") => obj.convertTo[DocumentDownloadInfo]
+				case Some("csv") => obj.convertTo[CsvDownloadInfo]
+				case None =>
+					deserializationError("Missing field 'type' on JSON for DownloadEventInfo")
+				case Some(other) =>
+					deserializationError(s"Unsupported type of DownloadEventInfo: $other")
+			}
 		}
 	}
 }

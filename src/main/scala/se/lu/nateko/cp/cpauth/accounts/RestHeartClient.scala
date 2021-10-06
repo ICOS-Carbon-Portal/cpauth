@@ -129,7 +129,8 @@ class RestHeartClient(val config: RestHeartConfig, http: HttpExt)(implicit m: Ma
 			case (path, value) => s""""$path": "$value""""
 		}.mkString("{", ", ", "}")
 
-		val uri = usersCollUri.withQuery(Uri.Query("filter" -> filterParam, KeepIdsOnly))
+		val qParams: Map[String, String] = if(filter.nonEmpty) Map("filter" -> filterParam) else Map.empty
+		val uri = usersCollUri.withQuery(Uri.Query(qParams + KeepIdsOnly))
 		for(
 			resp <- http.singleRequest(HttpRequest(uri = uri));
 			usersListResp <- Unmarshal(resp.entity.withContentType(ContentTypes.`application/json`)).to[JsValue];

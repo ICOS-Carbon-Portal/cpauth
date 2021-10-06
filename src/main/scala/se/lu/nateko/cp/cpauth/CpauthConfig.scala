@@ -58,6 +58,7 @@ case class PrivateAuthConfig(authTokenValiditySeconds: Int, privateKeyPaths: Map
 case class AuthConfig(
 	priv: PrivateAuthConfig,
 	pub: Map[Envri, PublicAuthConfig],
+	secretUserSalt: String,
 	masterAdminUser: String,
 	masterAdminPass: String
 )
@@ -155,7 +156,7 @@ object ConfigReader extends DefaultJsonProtocol{
 
 	implicit val pubAuthConfigFormat = jsonFormat4(PublicAuthConfig)
 	implicit val privAuthConfigFormat = jsonFormat2(PrivateAuthConfig)
-	implicit val authConfigFormat = jsonFormat4(AuthConfig)
+	implicit val authConfigFormat = jsonFormat5(AuthConfig)
 	implicit val restHeartConfigFormat = jsonFormat5(RestHeartConfig)
 	implicit val credentialsConfigFormat = jsonFormat2(CredentialsConfig)
 	implicit val postgresConfigFormat = jsonFormat5(PostgresConfig)

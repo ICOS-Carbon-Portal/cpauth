@@ -4,12 +4,18 @@ import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
 import akka.http.scaladsl.model.HttpMethods
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.model.headers._
-import akka.http.scaladsl.server.{Directive1, Directive0, MissingHeaderRejection, RejectionHandler, Route}
+import akka.http.scaladsl.server.Directive0
+import akka.http.scaladsl.server.Directive1
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.MalformedRequestContentRejection
-import se.lu.nateko.cp.cpauth.services.PortalLogger
-import spray.json.JsValue
+import akka.http.scaladsl.server.MissingHeaderRejection
+import akka.http.scaladsl.server.RejectionHandler
+import akka.http.scaladsl.server.Route
 import se.lu.nateko.cp.cpauth.core.DownloadEventInfo
+import se.lu.nateko.cp.cpauth.services.PortalLogger
+import spray.json.JsObject
+import spray.json.JsString
+import spray.json.JsValue
 
 
 trait PortalLogRouting extends CpauthDirectives{
@@ -22,9 +28,15 @@ trait PortalLogRouting extends CpauthDirectives{
 				post{
 					respondWithHeaders(`Access-Control-Allow-Origin`.*){
 						getClientIp{ip =>
-							entity(as[JsValue]){js =>
-								portalLogger.logUsage(js.asJsObject, ip)
-								complete(StatusCodes.OK)
+							(withSizeLimit(2048) & entity(as[JsValue])){js =>
+								userOpt{uidOpt =>
+									val usage = uidOpt.fold(js.asJsObject){uid =>
+										val anonId = anonymizeCpUser(uid)
+										JsObject(js.asJsObject.fields + ("cpUser" -> JsString(anonId)))
+									}
+									portalLogger.logUsage(usage, ip)
+									complete(StatusCodes.OK)
+								}
 							}
 						}
 					}

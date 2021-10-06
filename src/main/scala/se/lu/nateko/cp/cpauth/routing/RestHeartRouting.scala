@@ -1,5 +1,6 @@
 package se.lu.nateko.cp.cpauth.routing
 
+import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
 import akka.http.scaladsl.model.{ HttpMethods, StatusCodes }
 import akka.http.scaladsl.model.HttpRequest
 import akka.http.scaladsl.model.Uri.Path
@@ -7,6 +8,7 @@ import akka.http.scaladsl.model.headers._
 import akka.http.scaladsl.server.Directive0
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
+import se.lu.nateko.cp.cpauth.CpauthJsonProtocol._
 import se.lu.nateko.cp.cpauth.Envri.Envri
 import se.lu.nateko.cp.cpauth.core.UserId
 
@@ -47,7 +49,16 @@ trait RestHeartRouting extends RestHeartDirectives{
 				forbid("Access to other users' documents is forbidden")
 			} ~
 			forbid("Must be logged in with Carbon Portal for this operation")
+		} ~
+		path("anonidlookup"){
+			(admin & onSuccess(restHeart.findUsers(Map.empty))){users =>
+				val table = users.map{uid =>
+					anonymizeCpUser(uid) -> uid.email
+				}.sortBy(_._1)
+				complete(table)
+			}
 		}
+
 	}
 
 	private def validateUser(email: String, uid: UserId): Directive0 =
