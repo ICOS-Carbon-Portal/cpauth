@@ -1,14 +1,10 @@
 
-function switchToLoggedOutState(){
-	hideMessage();
-	$("#hello").hide();
-	$("#forLocalsOnly").hide();
-	$("#goodbye").show();
+function redirectHome(){
+	window.location.href = "/login";
 }
 
 
 function switchToLoggedInState(){
-	$("#goodbye").hide();
 	$("#hello").show();
 }
 
@@ -108,7 +104,7 @@ function enterKeyHandler(innerFun){
 
 function signOut(){
 	$.get("/logout")
-		.done(switchToLoggedOutState)
+		.done(redirectHome)
 		.fail(reportError);
 }
 
@@ -140,7 +136,7 @@ function deleteAccount(uid){
 		.then(function(){
 			return $.post("/password/deleteownaccount");
 		})
-		.then(switchToLoggedOutState, reportError);
+		.then(redirectHome, reportError);
 }
 
 function deleteProfileAndRefresh(uid){
@@ -187,7 +183,7 @@ $(function(){
 			displayUserInfo(uid);
 			setupEvents(uid);
 		})
-		.fail(switchToLoggedOutState);
+		.fail(redirectHome);
 
 	$.getJSON("/cpauthcookie")
 		.done(displayToken);
