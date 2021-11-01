@@ -12,7 +12,7 @@ class ErrorEmailer(to: String, subject: String, emailSender: EmailSender)(implic
 
 	private val errorLog = Source.queue[Throwable](10, OverflowStrategy.dropTail)
 	  .map((java.time.Instant.now, _))
-	  .groupedWithin(1000, 1.hour)
+	  .groupedWithin(2000, 24.hours)
 	  .filter(_.nonEmpty)
 	  .toMat(Sink.foreach{errList =>
 		  try {
