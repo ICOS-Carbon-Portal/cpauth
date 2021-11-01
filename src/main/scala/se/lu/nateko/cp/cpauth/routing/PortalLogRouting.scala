@@ -31,7 +31,7 @@ trait PortalLogRouting extends CpauthDirectives{
 				(post & respondWithHeaders(`Access-Control-Allow-Credentials`(true))){
 					(controlOrigins | pass){
 						getClientIp{ip =>
-							(withSizeLimit(2048) & entity(as[JsValue])){js =>
+							(withSizeLimit(50000) & entity(as[JsValue])){js =>
 								userOpt{uidOpt =>
 									val usage = uidOpt.fold(js.asJsObject){uid =>
 										val anonId = anonymizeCpUser(uid)
