@@ -8,7 +8,8 @@
 	cpauthHostOpt: Option[String] = None,
 	styleConf: IcosStyleConfig,
 	bootstrapVersion: Option[Int] = None,
-	bootstrapJavascript: Boolean = false
+	bootstrapJavascript: Boolean = false,
+	dataHost: Option[String] = None
 )(customHeader: Html)(body: Html)
 <!DOCTYPE html>
 <html>
@@ -29,7 +30,7 @@
 
 	@if(menu.nonEmpty){
 	<script type="application/javascript">
-		@Html(MainMenuJS(cpauthHostOpt).body)
+		@Html(MainMenuJS(cpauthHostOpt, dataHost).body)
 	</script>
 	}
 

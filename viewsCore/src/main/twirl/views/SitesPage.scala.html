@@ -1,7 +1,12 @@
 @import views.js.MainMenuJS
 @import se.lu.nateko.cp.viewscore.ImportVersions._
 
-@(title: String, bootstrapVersion: Option[Int] = None, bootstrapJavascript: Boolean = false)(customHeader: Html)(body: Html)
+@(title: String,
+	bootstrapVersion: Option[Int] = None,
+	bootstrapJavascript: Boolean = false,
+	authHost: Option[String] = Some("auth.fieldsites.se"),
+	dataHost: Option[String] = Some("data.fieldsites.se")
+)(customHeader: Html)(body: Html)
 <!DOCTYPE html>
 <html>
 
@@ -30,7 +35,7 @@
 	@SitesStyle()
 
 	<script type="application/javascript">
-	@Html(MainMenuJS(Some("auth.fieldsites.se")).body)
+	@Html(MainMenuJS(authHost, dataHost).body)
 	</script>
 
 	@customHeader
@@ -46,18 +51,26 @@
 				<img src="https://static.icos-cp.eu/images/sites-logo.jpg">
 			</div>
 		</a>
-		<nav class="menu navbar navbar-dark">
+		<nav class="menu navbar navbar-expand-sm navbar-dark">
 			<div class="menu-content">
-				<ul class="navbar-nav nav">
-					<li class="nav-item"><a class="nav-link" href="//data.fieldsites.se">Data catalogue</a></li>
+				<ul class="navbar-nav nav mt-auto">
+					<li class="nav-item"><a class="nav-link" href="//@dataHost">Data catalogue</a></li>
 				</ul>
 				<ul class="menu-content-right navbar-nav nav">
+					<li id="cartLink" class="nav-item account">
+						<a class="nav-link">
+							@if(bootstrapVersion == Some(5)){
+								<i class="fas fa-shopping-cart"></i>
+							} else {
+								<span class="glyphicon-shopping-cart"></span>
+							} Cart</a>
+					</li>
 					<li id="accountLnk" class="nav-item account">
 						<a class="nav-link">
 							@if(bootstrapVersion == Some(5)){
-								<i class="fas fa-user"></i>
+							<i class="fas fa-user"></i>
 							} else {
-								<span class="glyphicon glyphicon-user"></span>
+							<span class="glyphicon glyphicon-user"></span>
 							} My Account</a>
 					</li>
 					<li id="logInLnk" class="nav-item account">

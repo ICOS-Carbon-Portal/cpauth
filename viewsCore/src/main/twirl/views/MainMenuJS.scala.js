@@ -1,63 +1,106 @@
-@(authHostOpt: Option[String])
+@(authHostOpt: Option[String], dataHostOpt: Option[String])
 
 window.addEventListener("load", function(){
 
-    let menuButton = document.getElementById("menu-button");
+	let menuButton = document.getElementById("menu-button");
 
-    if (menuButton !== null) {
-      menuButton.addEventListener('click', function() {
-        document.getElementById('cp-main-menu').classList.toggle('open');
-      });
-    }
+	if (menuButton !== null) {
+		menuButton.addEventListener('click', function() {
+			document.getElementById('cp-main-menu').classList.toggle('open');
+		});
+	}
 
-    var menuGroups = document.getElementsByClassName("open_menu");
+	var menuGroups = document.getElementsByClassName("open_menu");
 
-    for(var idx = 0; idx < menuGroups.length; idx++){
-        var elem = menuGroups[idx];
+	for(var idx = 0; idx < menuGroups.length; idx++){
+		var elem = menuGroups[idx];
 
-        elem.addEventListener("click", function(event){
-            this.parentElement.parentElement.classList.toggle('open');
-        });
-    }
+		elem.addEventListener("click", function(event){
+			this.parentElement.parentElement.classList.toggle('open');
+		});
+	}
 
-    @for(authHost <- authHostOpt){
+	@for(authHost <- authHostOpt){
 
-        function ajaxGet(url, action){
-            var xhr = new XMLHttpRequest();
-            xhr.open("GET", url);
-            xhr.send(null);
+		function ajaxGet(url, action){
+			var xhr = new XMLHttpRequest();
+			xhr.open("GET", url);
+			xhr.send(null);
 
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState === 4 && xhr.status === 200) {
-                    action(xhr);
-                }
-            };
-        }
+			xhr.onreadystatechange = function () {
+				if (xhr.readyState === 4 && xhr.status === 200) {
+					action(xhr);
+				}
+			};
+		}
 
-        ajaxGet('/whoami', function(xhr){
-            var response = JSON.parse(xhr.response);
+		ajaxGet('/whoami', function(xhr){
+			var response = JSON.parse(xhr.response);
 
-            if (response.email) {
-                let logoutLink = document.getElementById("logOutLnk")
-                if (logoutLink) {
-                    logoutLink.addEventListener('click', function(){
-                        ajaxGet('/logout', function(){
-                            window.location.reload();
-                        });
-                    });
-                    logoutLink.style.display = 'inline';
-                }
-                document.getElementById("accountLnk").addEventListener('click', function(){
-                    window.location = 'https://@(authHost)/';
-                });
-                document.getElementById("accountLnk").style.display = 'block';
-            } else {
-                document.getElementById("logInLnk").addEventListener('click', function(){
-                    window.location = 'https://@(authHost)/login/?targetUrl=' + encodeURIComponent(window.location.href);
-                });
-                document.getElementById("logInLnk").style.display = 'inline';
-            }
-        });
+			if (response.email) {
+				let email = response.email;
+				document.getElementById("accountLnk").addEventListener('click', function(){
+					window.location = 'https://@(authHost)/';
+				});
+				document.getElementById("accountLnk").style.display = 'block';
 
-    }
+				@for(dataHost <- dataHostOpt) {
+					document.getElementById("cartLink").addEventListener('click', function () {
+						window.location = 'https://@(dataHost)/portal#{"route":"cart"}';
+					});
+					document.getElementById("cartLink").style.display = 'block';
+				}
+
+				let addButton = document.getElementById("meta-add-to-cart-button");
+				let removeButton = document.getElementById("meta-remove-from-cart-button");
+
+				if (addButton) {
+					let objId = addButton.dataset.id;
+					fetch(`https://@(authHost)/db/users/${email}?keys=${encodeURIComponent('{cart:1}')}`, { credentials: 'include' })
+						.then(response => response.json())
+						.then(data => {
+							if (data.cart._items.some(i => i._id === objId)) {
+								removeButton.classList.remove('d-none');
+							} else {
+								addButton.classList.remove('d-none');
+							}
+
+							removeButton.addEventListener("click", () => {
+								addButton.classList.remove('d-none');
+								removeButton.classList.add('d-none');
+								let items = data.cart._items.filter(i => i._id != objId)
+								data.cart._items = items;
+								updateProfile(email, data);
+							});
+
+							addButton.addEventListener("click", () => {
+								addButton.classList.add('d-none');
+								removeButton.classList.remove('d-none');
+								data.cart._items.push({"_id": objId})
+								updateProfile(email, data);
+							});
+						});
+				}
+
+			} else {
+				document.getElementById("logInLnk").addEventListener('click', function(){
+					window.location = 'https://@(authHost)/login/?targetUrl=' + encodeURIComponent(window.location.href);
+				});
+				document.getElementById("logInLnk").style.display = 'inline';
+			}
+		});
+
+		const updateProfile = (email, data) => {
+			fetch(`https://@(authHost)/db/users/${email}`, {
+				credentials: 'include',
+				method: 'PATCH',
+				mode: 'cors',
+				headers: new Headers({
+					'Content-Type': 'application/json'
+				}),
+				body: JSON.stringify(data)
+			});
+		};
+
+	}
 });
