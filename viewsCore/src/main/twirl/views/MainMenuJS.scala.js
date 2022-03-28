@@ -79,14 +79,27 @@ window.addEventListener("load", function(){
 								data.cart._items.push({"_id": objId})
 								updateProfile(email, data);
 							});
+
+							if (window.location.hash == "#add-to-cart") {
+								history.replaceState(null, "", window.location.href.split('#')[0]);
+								addButton.classList.add('d-none');
+								removeButton.classList.remove('d-none');
+								data.cart._items.push({"_id": objId})
+								updateProfile(email, data);
+							}
+
 						});
 				}
 
 			} else {
-				document.getElementById("logInLnk").addEventListener('click', function(){
-					window.location = 'https://@(authHost)/login/?targetUrl=' + encodeURIComponent(window.location.href);
-				});
+				document.getElementById("logInLnk").addEventListener('click', () => loginAndRedirect(window.location.href));
 				document.getElementById("logInLnk").style.display = 'inline';
+
+				let addButton = document.getElementById("meta-add-to-cart-button");
+				if (addButton) {
+					addButton.addEventListener("click", () => loginAndRedirect(window.location.href + "#add-to-cart"));
+					addButton.classList.remove('d-none');
+				}
 			}
 		});
 
@@ -101,6 +114,10 @@ window.addEventListener("load", function(){
 				body: JSON.stringify(data)
 			});
 		};
+
+		const loginAndRedirect = (url) => {
+			window.location = 'https://@(authHost)/login/?targetUrl=' + encodeURIComponent(url);
+		}
 
 	}
 });
