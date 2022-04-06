@@ -5,11 +5,11 @@
 @(
 	title: String,
 	menu: Seq[CpMenuItem] = CpMenu.default,
-	cpauthHostOpt: Option[String] = None,
+	authHost: String,
 	styleConf: IcosStyleConfig,
 	bootstrapVersion: Option[Int] = None,
 	bootstrapJavascript: Boolean = false,
-	dataHost: Option[String] = None
+	dataHost: String
 )(customHeader: Html)(body: Html)
 <!DOCTYPE html>
 <html>
@@ -30,7 +30,7 @@
 
 	@if(menu.nonEmpty){
 	<script type="application/javascript">
-		@Html(MainMenuJS(cpauthHostOpt, dataHost).body)
+		@Html(MainMenuJS(authHost, dataHost).body)
 	</script>
 	}
 

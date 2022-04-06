@@ -2,12 +2,12 @@
 
 @(title: String,
 	menu: Seq[CpMenuItem] = CpMenu.default,
-	cpauthHostOpt: Option[String] = None,
+	authHost: String,
 	bootstrapVersion: Option[Int] = None,
 	bootstrapJavascript: Boolean = false,
-	dataHost: Option[String] = None
+	dataHost: String
 )(customHeader: Html)(body: Html)
-@CpPage(title, menu, cpauthHostOpt, bootstrapVersion, bootstrapJavascript, dataHost){
+@CpPage(title, menu, authHost, bootstrapVersion, bootstrapJavascript, dataHost){
 	<link rel="shortcut icon" type="image/png" href="https://static.icos-cp.eu/images/favicon.png"/>
 	@customHeader
 }(body)

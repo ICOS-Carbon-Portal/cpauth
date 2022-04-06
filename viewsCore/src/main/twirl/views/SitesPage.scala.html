@@ -4,8 +4,8 @@
 @(title: String,
 	bootstrapVersion: Option[Int] = None,
 	bootstrapJavascript: Boolean = false,
-	authHost: Option[String] = Some("auth.fieldsites.se"),
-	dataHost: Option[String] = Some("data.fieldsites.se")
+	authHost: String,
+	dataHost: String
 )(customHeader: Html)(body: Html)
 <!DOCTYPE html>
 <html>
