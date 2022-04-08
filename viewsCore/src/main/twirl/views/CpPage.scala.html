@@ -4,8 +4,7 @@
 	title: String,
 	menu: Seq[CpMenuItem] = CpMenu.default,
 	authHost: String,
-	bootstrapVersion: Option[Int] = None,
 	bootstrapJavascript: Boolean = false,
 	dataHost: String
 )(customHeader: Html)(body: Html)
-@IcosPage(title, menu, authHost, CpStyleConfig, bootstrapVersion, bootstrapJavascript, dataHost)(customHeader)(body)
+@IcosPage(title, menu, authHost, CpStyleConfig, bootstrapJavascript, dataHost)(customHeader)(body)

@@ -85,5 +85,8 @@
 @name = @{ if(envri == Envri.SITES) "SITES" else "Carbon Portal" }
 @title = @{ name + " GÉANT privacy statement" }
 @template = @{
-if(envri == Envri.SITES) SitesPage(title) _ else CpCommonPage(title) _
+if(envri == Envri.SITES)
+		SitesPage(title, authHost = "auth.fieldsites.se", dataHost = "data.fieldsites.se") _
+	else
+		CpCommonPage(title, authHost = "cpauth.icos-cp.eu", dataHost = "data.icos-cp.eu") _
 }

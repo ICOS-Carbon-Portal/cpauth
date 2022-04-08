@@ -7,23 +7,16 @@
 	menu: Seq[CpMenuItem] = CpMenu.default,
 	authHost: String,
 	styleConf: IcosStyleConfig,
-	bootstrapVersion: Option[Int] = None,
 	bootstrapJavascript: Boolean = false,
 	dataHost: String
 )(customHeader: Html)(body: Html)
 <!DOCTYPE html>
 <html>
 <head>
-	@if(bootstrapVersion == Some(5)){
-		<link rel="stylesheet" href="https://static.icos-cp.eu/css/bootstrap/@{bootstrapCSS}/icos-bootstrap.css">
-		<link rel="stylesheet" href="https://static.icos-cp.eu/constant/fontawesome/@{fontAwesome}/css/fontawesome.min.css">
-		<link rel="stylesheet" href="https://static.icos-cp.eu/constant/fontawesome/@{fontAwesome}/css/solid.min.css">
-		@IcosStyle(menu.nonEmpty, styleConf)
-	} else {
-		<link rel="stylesheet" href="https://static.icos-cp.eu/constant/bootstrap/3.3.4/css/bootstrap.min.css">
-		@IcosStyle(menu.nonEmpty, styleConf)
-		@IcosB3Style()
-	}
+	<link rel="stylesheet" href="https://static.icos-cp.eu/css/bootstrap/@{bootstrapCSS}/icos-bootstrap.css">
+	<link rel="stylesheet" href="https://static.icos-cp.eu/constant/fontawesome/@{fontAwesome}/css/fontawesome.min.css">
+	<link rel="stylesheet" href="https://static.icos-cp.eu/constant/fontawesome/@{fontAwesome}/css/solid.min.css">
+	@IcosStyle(menu.nonEmpty, styleConf)
 
 	<meta charset="utf-8"/>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
@@ -55,7 +48,7 @@
 	</header>
 
 	<div id="cp-main-menu">
-		@MainMenu(menu, bootstrapVersion)
+		@MainMenu(menu)
 	</div>
 
 	<div id="cp-main-content">

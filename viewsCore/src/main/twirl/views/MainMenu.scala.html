@@ -2,35 +2,20 @@
 @import CpMenu.cpHome
 @import java.net.URI
 
-@(menuItems: Seq[CpMenuItem], bootstrapVersion: Option[Int] = None)
+@(menuItems: Seq[CpMenuItem])
 @if(!menuItems.isEmpty){
 	<ul>
 		@for(item <- menuItems){
 			@menuItem(item, true)
 		}
 		<li id="accountLnk" class="account">
-			<a>
-				@if(bootstrapVersion == Some(5)){
-					<i class="fas fa-user"></i>
-				} else {
-					<span class="glyphicon glyphicon-user"></span>
-				} My Account</a>
+			<a><i class="fas fa-user"></i> My Account</a>
 		</li>
 		<li id="cartLink" class="account">
-			<a>
-				@if(bootstrapVersion == Some(5)){
-					<i class="fas fa-shopping-cart"></i>
-				} else {
-					<span class="glyphicon-shopping-cart"></span>
-				} Cart</a>
+			<a><i class="fas fa-shopping-cart"></i> Cart</a>
 		</li>
 		<li id="logInLnk" class="account">
-			<a>
-				@if(bootstrapVersion == Some(5)){
-					<i class="fas fa-sign-in-alt"></i>
-				} else {
-					<span class="glyphicon glyphicon-log-in"></span>
-				} Log in</a>
+			<a><i class="fas fa-sign-in-alt"></i> Log in</a>
 		</li>
 
 	</ul>
@@ -43,11 +28,7 @@
 		@if(isTop && hasChildren) {
 		<div class="menu-item-text">
 			<span class="open_menu menu-icon">
-				@if(bootstrapVersion == Some(5)){
-					<i class="fas fa-chevron-down"></i>
-				} else {
-					<span class="glyphicon glyphicon-menu-down"></span>
-				}
+				<i class="fas fa-chevron-down"></i>
 			</span>
 			@anchor(item, isTop, hasChildren)
 		</div>
@@ -70,11 +51,7 @@
 		@item.title
 		@if(!isTop && hasChildren) {
 		<span class="open_menu submenu-icon">
-			@if(bootstrapVersion == Some(5)){
-				<i class="fas fa-chevron-right"></i>
-			} else {
-				<span class="glyphicon glyphicon-menu-right"></span>
-			}
+			<i class="fas fa-chevron-right"></i>
 		</span>
 		}
 	</a>
