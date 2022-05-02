@@ -67,7 +67,7 @@ class PostgresClient(conf: PostgresConfig) extends AutoCloseable {
 			case _                 => st.setNull(distributor_idx, Types.VARCHAR)
 		}
 
-		dobjOpt.flatMap(_.endUser) match {
+		dobjOpt.flatMap(dodi => dodi.endUser.orElse(dodi.cpUser)) match {
 			case Some(endUser) => st.setString(endUser_idx, endUser)
 			case _             => st.setNull(endUser_idx, Types.VARCHAR)
 		}
