@@ -9,9 +9,7 @@ trait IcosStyleConfig{
 }
 
 object CpStyleConfig extends IcosStyleConfig{
-	private val prefix = "https://www.icos-cp.eu/themes/cp_theme_d8/"
-
-	val headerImage = new URI("https://static.icos-cp.eu/images/cp-header-background.jpg")
-	val headerLogo = new URI(prefix + "logo.svg")
+	val headerImage = new URI("https://static.icos-cp.eu/images/icos-header.jpg")
+	val headerLogo = new URI("https://static.icos-cp.eu/images/ICOS-logo.svg")
 	val headerHomeLink = new URI("https://www.icos-cp.eu/")
 }

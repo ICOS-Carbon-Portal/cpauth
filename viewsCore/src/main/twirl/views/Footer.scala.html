@@ -1,48 +1,35 @@
 @import se.lu.nateko.cp.viewscore.CpMenu._
 
 @()
-<footer id="cp-site-footer">
+<footer id="cp-site-footer" class="site-footer">
 
 	<div class="region region-footer-first">
 		<div class="footer-box">
-			<h3>ICOS Carbon Portal</h3>
-
-			<p>Lund University<br />
-			Geocentrum II<br />
-			Sölvegatan 12<br />
-			22362 Lund<br />
-			Sweden<br />
-			<a class="footer-link" href="mailto:info@@icos-cp.eu">info@@icos-cp.eu</a></p>
+			<p class="mb-5"><img alt="ICOS Logo" src="https://static.icos-cp.eu/images/ICOS-logo.svg" style="height: 70px"></p>
+			<p class="marked-link"><a href="@(cpHome)/contact-us">CONTACT</a></p>
+			<p class="marked-link"><a href="@(cpHome)/privacy">PRIVACY POLICY</a></p>
+			<p class="marked-link"><a href="@(cpHome)/data-services/about-data-portal/data-license">DATA LICENSE</a></p>
 		</div>
 	</div>
 
 	<div class="region region-footer-second">
 		<div class="footer-box">
-			<h3>ICOS RI</h3>
-			<p>
-				<a class="footer-link" href="@riHome">ICOS RI</a>
-				<a class="footer-link" href="https://data.icos-cp.eu/licence">ICOS Data License</a>
-				<a class="footer-link" href="@(cpHome)/privacy">ICOS ERIC privacy policy</a>
-			</p>
+			<h3>Central Facility websites</h3>
+			<p class="marked-link external-link"><a href="https://icos-atc.lsce.ipsl.fr/">Atmosphere Thematic Centre (ATC)</a></p>
+			<p class="marked-link external-link"><a href="http://www.icos-etc.eu/">Ecosystem Thematic Centre (ETC)</a></p>
+			<p class="marked-link external-link"><a href="https://otc.icos-cp.eu/">Ocean Thematic Centre (OTC)</a></p>
+			<p class="marked-link external-link"><a href="https://www.icos-cal.eu/">Central Analytical Laboratories (CAL)</a></p>
+			<h3 class="marked-link"><a href="@(cpHome)/observations/national-networks">National networks</a></h3>
 		</div>
 	</div>
 
 	<div class="region region-footer-third">
 		<div class="footer-box">
-			<p>
-				<a class="footer-link" href="https://icos-atc.lsce.ipsl.fr/">Atmosphere Thematic Centre</a>
-				<a class="footer-link" href="http://www.icos-etc.eu/">Ecosystem Thematic Centre</a>
-				<a class="footer-link" href="http://www.icos-otc.eu">Ocean Thematic Centre</a>
-				<a class="footer-link" href="https://www.icos-cal.eu/">Central Analytical Laboratories</a>
-			</p>
-			<p>
-				@ccLink{<img alt="creativecommons" src="@(cpHome)/sites/default/files/inline-images/creativecommons.png" />}
-				Except where otherwise noted, content on this site is licensed under a @ccLink{Creative Commons Attribution 4.0 International License}.
-			</p>
+			<h3>ICOS on social media</h3>
+			<p><a class="social-media-icon fab fa-twitter-square" href="https://twitter.com/icos_ri">&nbsp;</a> <a class="social-media-icon fab fa-instagram" href="https://www.instagram.com/icosri/">&nbsp;</a> <a class="social-media-icon fab fa-youtube-square" href="https://www.youtube.com/c/ICOSRI">&nbsp;</a> <a class="social-media-icon fab fa-linkedin" href="https://www.linkedin.com/company/integrated-carbon-observation-system">&nbsp;</a></p>
+			<h3 class="marked-link"><a href="@(cpHome)/news-and-events/newsletter">ICOS Newsletter</a></h3>
+			<h3 class="marked-link"><a href="https://fileshare.icos-cp.eu/">Nextcloud – ICOS Fileshare</a></h3>
 		</div>
 	</div>
 
 </footer>
-
-@ccLink(inner: Html) = {<a href="http://creativecommons.org/licenses/by/4.0/" target="_blank">@inner</a>}
-

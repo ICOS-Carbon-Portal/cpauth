@@ -14,8 +14,7 @@
 <html>
 <head>
 	<link rel="stylesheet" href="https://static.icos-cp.eu/css/bootstrap/@{bootstrapCSS}/icos-bootstrap.css">
-	<link rel="stylesheet" href="https://static.icos-cp.eu/constant/fontawesome/@{fontAwesome}/css/fontawesome.min.css">
-	<link rel="stylesheet" href="https://static.icos-cp.eu/constant/fontawesome/@{fontAwesome}/css/solid.min.css">
+	<link rel="stylesheet" href="https://static.icos-cp.eu/constant/fontawesome/@{fontAwesome}/css/all.min.css">
 	@IcosStyle(menu.nonEmpty, styleConf)
 
 	<meta charset="utf-8"/>
@@ -35,15 +34,30 @@
 
 <body>
 	<header id="cp-header">
-		<div class="tint" >
-			<div class="layout-container">
-				<a href=@{styleConf.headerHomeLink} title="Home">
-					<img src=@{styleConf.headerLogo} alt="ICOS Carbon Portal">
-				</a>
-				@if(menu.nonEmpty){
-				<div id="menu-button" class="btn btn-default"><span class="glyphicon glyphicon-menu-hamburger"></span><i class="fas fa-bars"></i></div>
-				}
+		<div class="layout-container">
+			<a href=@{styleConf.headerHomeLink} title="Home">
+				<img src=@{styleConf.headerLogo} alt="ICOS Carbon Portal">
+			</a>
+			<div class="header-links d-flex align-items-end flex-column justify-content-end pb-5 pe-3">
+				<ul class="d-flex">
+					<li id="cartLink" class="header-link cart-link">
+						<a><i class="fas fa-shopping-cart"></i> Cart</a>
+					</li>
+					<li id="accountLnk" class="header-link header-link-separator account-link">
+						<a><i class="fas fa-user"></i> My Account</a>
+					</li>
+					<li id="logInLnk" class="header-link login-link">
+						<a><i class="fas fa-sign-in-alt"></i> Log in</a>
+					</li>
+				</ul>
+				<form method="get" action="https://www.icos-cp.eu/search/node" class="input-group">
+					<input type="search" class="form-control" name="keys">
+					<button class="btn btn-light border-0" type="submit"><i class="fas fa-search"></i></button>
+				</form>
 			</div>
+			@if(menu.nonEmpty){
+			<div id="menu-button" class="btn btn-default"><span class="glyphicon glyphicon-menu-hamburger"></span><i class="fas fa-bars"></i></div>
+			}
 		</div>
 	</header>
 

@@ -37,15 +37,22 @@ window.addEventListener("load", function(){
 
 		if (response.email) {
 			let email = response.email;
-			document.getElementById("accountLnk").addEventListener('click', function(){
-				window.location = 'https://@(authHost)/';
-			});
-			document.getElementById("accountLnk").style.display = 'block';
 
-			document.getElementById("cartLink").addEventListener('click', function () {
-				window.location = 'https://@(dataHost)/portal#{"route":"cart"}';
+			const accountLinks = document.querySelectorAll('.account-link');
+			accountLinks.forEach(link => {
+				link.addEventListener('click', function(){
+					window.location = 'https://@(authHost)/';
+				});
+				link.style.display = 'block';
 			});
-			document.getElementById("cartLink").style.display = 'block';
+
+			const cartLinks = document.querySelectorAll('.cart-link');
+			cartLinks.forEach(link => {
+				link.addEventListener('click', function () {
+					window.location = 'https://@(dataHost)/portal#{"route":"cart"}';
+				});
+				link.style.display = 'block';
+			});
 
 			let addButton = document.getElementById("meta-add-to-cart-button");
 			let removeButton = document.getElementById("meta-remove-from-cart-button");
@@ -88,8 +95,11 @@ window.addEventListener("load", function(){
 			}
 
 		} else {
-			document.getElementById("logInLnk").addEventListener('click', () => loginAndRedirect(window.location.href));
-			document.getElementById("logInLnk").style.display = 'inline';
+			const loginLinks = document.querySelectorAll('.login-link');
+			loginLinks.forEach(link => {
+				link.addEventListener('click', () => loginAndRedirect(window.location.href));
+				link.style.display = 'block';
+			});
 
 			let addButton = document.getElementById("meta-add-to-cart-button");
 			if (addButton) {

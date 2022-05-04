@@ -46,7 +46,7 @@ lazy val viewsCore = (project in file("viewsCore"))
 	.enablePlugins(SbtTwirl)
 	.settings(
 		name := "views-core",
-		version := "0.4.12",
+		version := "0.5.0",
 		scalacOptions += "-Wunused:-imports",
 		libraryDependencies ++= Seq(
 			"io.spray"              %% "spray-json"                         % "1.3.6"
