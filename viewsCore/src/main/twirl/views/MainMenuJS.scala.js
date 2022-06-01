@@ -2,7 +2,7 @@
 
 window.addEventListener("load", function(){
 
-	let menuButton = document.getElementById("menu-button");
+	const menuButton = document.getElementById("menu-button");
 
 	if (menuButton !== null) {
 		menuButton.addEventListener('click', function() {
@@ -36,32 +36,34 @@ window.addEventListener("load", function(){
 		var response = JSON.parse(xhr.response);
 
 		if (response.email) {
-			let email = response.email;
+			const email = response.email;
 
-			const accountLinks = document.querySelectorAll('.account-link');
-			accountLinks.forEach(link => {
-				link.addEventListener('click', function(){
-					window.location = 'https://@(authHost)/';
-				});
-				link.style.display = 'block';
-			});
+			fetch(`https://@(authHost)/db/users/${email}?keys=${encodeURIComponent('{cart:1}')}`, { credentials: 'include' })
+				.then(response => response.json())
+				.then(data => {
 
-			const cartLinks = document.querySelectorAll('.cart-link');
-			cartLinks.forEach(link => {
-				link.addEventListener('click', function () {
-					window.location = 'https://@(dataHost)/portal#{"route":"cart"}';
-				});
-				link.style.display = 'block';
-			});
+					const cartLinks = document.querySelectorAll('.cart-link');
+					cartLinks.forEach(link => {
+						link.querySelector('.items-number').innerText = data.cart._items.length;
+						link.addEventListener('click', function () {
+							window.location = 'https://@(dataHost)/portal#{"route":"cart"}';
+						});
+						link.style.display = 'block';
+					});
 
-			let addButton = document.getElementById("meta-add-to-cart-button");
-			let removeButton = document.getElementById("meta-remove-from-cart-button");
+					const accountLinks = document.querySelectorAll('.account-link');
+					accountLinks.forEach(link => {
+						link.addEventListener('click', function(){
+							window.location = 'https://@(authHost)/';
+						});
+						link.style.display = 'block';
+					});
 
-			if (addButton) {
-				let objId = addButton.dataset.id;
-				fetch(`https://@(authHost)/db/users/${email}?keys=${encodeURIComponent('{cart:1}')}`, { credentials: 'include' })
-					.then(response => response.json())
-					.then(data => {
+					const addButton = document.getElementById("meta-add-to-cart-button");
+					const removeButton = document.getElementById("meta-remove-from-cart-button");
+
+					if (addButton) {
+						const objId = addButton.dataset.id;
 						if (data.cart._items.some(i => i._id === objId)) {
 							removeButton.classList.remove('d-none');
 						} else {
@@ -71,7 +73,7 @@ window.addEventListener("load", function(){
 						removeButton.addEventListener("click", () => {
 							addButton.classList.remove('d-none');
 							removeButton.classList.add('d-none');
-							let items = data.cart._items.filter(i => i._id != objId)
+							const items = data.cart._items.filter(i => i._id != objId)
 							data.cart._items = items;
 							updateProfile(email, data);
 						});
@@ -90,9 +92,8 @@ window.addEventListener("load", function(){
 							data.cart._items.push({"_id": objId})
 							updateProfile(email, data);
 						}
-
-					});
-			}
+					}
+				});
 
 		} else {
 			const loginLinks = document.querySelectorAll('.login-link');
@@ -101,7 +102,7 @@ window.addEventListener("load", function(){
 				link.style.display = 'block';
 			});
 
-			let addButton = document.getElementById("meta-add-to-cart-button");
+			const addButton = document.getElementById("meta-add-to-cart-button");
 			if (addButton) {
 				addButton.addEventListener("click", () => loginAndRedirect(window.location.href + "#add-to-cart"));
 				addButton.classList.remove('d-none');

@@ -39,9 +39,14 @@
 				<img src=@{styleConf.headerLogo} alt="ICOS Carbon Portal">
 			</a>
 			<div class="header-links d-flex align-items-end flex-column justify-content-end pb-5 pe-3">
-				<ul class="d-flex">
+				<ul class="d-flex lh-base">
 					<li class="header-link cart-link">
-						<a><i class="fas fa-shopping-cart"></i> Cart</a>
+						<a><i class="fas fa-shopping-cart"></i> Cart
+						<span class="badge rounded-pill bg-secondary">
+							<span class="items-number">0</span>
+							<span class="visually-hidden">items in cart</span>
+						</span>
+					</a>
 					</li>
 					<li class="header-link header-link-separator account-link">
 						<a><i class="fas fa-user"></i> My Account</a>
