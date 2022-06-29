@@ -21,6 +21,7 @@ object OAuthProvider extends Enumeration{
 }
 
 case class HttpConfig(
+	serviceInterface: String,
 	serviceHosts: Map[Envri, String],
 	servicePrivatePort: Int,
 	loginPath: String,
@@ -150,7 +151,7 @@ object ConfigReader extends DefaultJsonProtocol{
 	implicit val samlSpConfigFormat = jsonFormat3(SamlSpConfig)
 	implicit val proxyConfigFormat = jsonFormat3(ProxyConfig)
 	implicit val samlAttrFormat = jsonFormat3(SamlAttrConfig)
-	implicit val urlsConfigFormat = jsonFormat4(HttpConfig)
+	implicit val urlsConfigFormat = jsonFormat5(HttpConfig)
 	implicit val samlConfigFormat = jsonFormat5(SamlConfig)
 	implicit val databaseConfigFormat = jsonFormat4(DatabaseConfig)
 

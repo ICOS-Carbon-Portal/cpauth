@@ -93,7 +93,7 @@ object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
 	}
 
 	restHeart.init.flatMap{_ =>
-		http.newServerAt("127.0.0.1", httpConfig.servicePrivatePort).bindFlow(route)
+		http.newServerAt(httpConfig.serviceInterface, httpConfig.servicePrivatePort).bindFlow(route)
 	}.onComplete{
 		case Success(binding) =>
 			sys.addShutdownHook{
