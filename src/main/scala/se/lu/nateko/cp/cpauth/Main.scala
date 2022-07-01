@@ -97,9 +97,8 @@ object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
 	}.onComplete{
 		case Success(binding) =>
 			sys.addShutdownHook{
-				val doneFuture = binding.unbind()
-					.flatMap(_ => system.terminate())(ExecutionContext.Implicits.global)
-				Await.result(doneFuture, 3.seconds)
+				Await.result(binding.unbind(), 3.seconds)
+				println("cpauth has been taken offline successfully")
 			}
 			system.log.info(s"Started cpauth: $binding")
 		case Failure(err) =>

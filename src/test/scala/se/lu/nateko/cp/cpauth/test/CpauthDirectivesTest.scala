@@ -41,7 +41,8 @@ class CpauthDirectivesTest extends AnyFunSpec with ScalatestRouteTest {
 			drupalProxying = null,
 			loginPath = null,
 			serviceHosts = Map(ICOS -> "cpauth.icos-cp.eu"),
-			servicePrivatePort = 0
+			servicePrivatePort = 0,
+			serviceInterface = "localhost"
 		),
 		restheart = RestHeartConfig(
 			baseUri = "http://127.0.0.1:8088",

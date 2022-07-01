@@ -100,6 +100,7 @@ lazy val cpauth = (project in file("."))
 			import java.nio.file.{StandardCopyOption, Files, Paths}
 			val url = new java.net.URL("http://mds.swamid.se/md/swamid-idp-transitive.xml")
 			val file = Paths.get("./src/main/resources/swamid-idps.xml")
+			streams.value.log.info("Fetching SAML identity provider list from SWAMID...")
 			Files.copy(url.openStream(), file, StandardCopyOption.REPLACE_EXISTING)
 		},
 

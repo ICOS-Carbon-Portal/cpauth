@@ -142,10 +142,13 @@ object ConfigReader extends DefaultJsonProtocol{
 	def getDefault: Try[CpauthConfig] = Try(fromAppConfig(getAppConfig))
 
 	def getAppConfig: Config = {
-		val default = ConfigFactory.load
 		val confFile = new java.io.File("application.conf").getAbsoluteFile
-		if(!confFile.exists) default
-		else ConfigFactory.parseFile(confFile).withFallback(default)
+		if(!confFile.exists) ConfigFactory.load
+		else
+			ConfigFactory.parseFile(confFile)
+				.withFallback(ConfigFactory.defaultApplication)
+				.withFallback(ConfigFactory.defaultReferenceUnresolved)
+				.resolve
 	}
 
 	implicit val samlSpConfigFormat = jsonFormat3(SamlSpConfig)
