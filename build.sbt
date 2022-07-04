@@ -35,12 +35,14 @@ lazy val cpauthCore = (project in file("core"))
 		name := "cpauth-core",
 		version := "0.6.5",
 		libraryDependencies ++= Seq(
-			"io.spray"              %% "spray-json"                         % "1.3.6"
+			"io.spray"              %% "spray-json"         % "1.3.6",
+			"com.typesafe"           % "config"             % "1.4.2"
 		)
 	)
 
 
 lazy val viewsCore = (project in file("viewsCore"))
+	.dependsOn(cpauthCore)
 	.settings(commonSettings: _*)
 	.settings(publishingSettings: _*)
 	.enablePlugins(SbtTwirl)
@@ -66,7 +68,7 @@ resolvers := {
 }
 
 lazy val cpauth = (project in file("."))
-	.dependsOn(cpauthCore, viewsCore)
+	.dependsOn(viewsCore)
 	.settings(commonSettings: _*)
 	.enablePlugins(SbtTwirl, IcosCpSbtDeployPlugin)
 	.settings(

@@ -6,6 +6,7 @@ import com.typesafe.config.Config
 import spray.json._
 import com.typesafe.config.ConfigRenderOptions
 import com.typesafe.config.ConfigFactory
+import se.lu.nateko.cp.cpauth.core.ConfigLoader
 import se.lu.nateko.cp.cpauth.core.PublicAuthConfig
 import Envri.Envri
 import OAuthProvider.OAuthProvider
@@ -139,17 +140,7 @@ object ConfigReader extends DefaultJsonProtocol{
 		}
 	}
 
-	def getDefault: Try[CpauthConfig] = Try(fromAppConfig(getAppConfig))
-
-	def getAppConfig: Config = {
-		val confFile = new java.io.File("application.conf").getAbsoluteFile
-		if(!confFile.exists) ConfigFactory.load
-		else
-			ConfigFactory.parseFile(confFile)
-				.withFallback(ConfigFactory.defaultApplication)
-				.withFallback(ConfigFactory.defaultReferenceUnresolved)
-				.resolve
-	}
+	def getDefault: Try[CpauthConfig] = Try(fromAppConfig(ConfigLoader.appConfig))
 
 	implicit val samlSpConfigFormat = jsonFormat3(SamlSpConfig)
 	implicit val proxyConfigFormat = jsonFormat3(ProxyConfig)
@@ -158,8 +149,8 @@ object ConfigReader extends DefaultJsonProtocol{
 	implicit val samlConfigFormat = jsonFormat5(SamlConfig)
 	implicit val databaseConfigFormat = jsonFormat4(DatabaseConfig)
 
-	implicit val pubAuthConfigFormat = jsonFormat4(PublicAuthConfig)
 	implicit val privAuthConfigFormat = jsonFormat2(PrivateAuthConfig)
+	import se.lu.nateko.cp.cpauth.core.JsonSupport.pubAuthConfigFormat
 	implicit val authConfigFormat = jsonFormat5(AuthConfig)
 	implicit val restHeartConfigFormat = jsonFormat5(RestHeartConfig)
 	implicit val credentialsConfigFormat = jsonFormat2(CredentialsConfig)
