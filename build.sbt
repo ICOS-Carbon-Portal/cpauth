@@ -95,6 +95,7 @@ lazy val cpauth = (project in file("."))
 
 		cpDeployTarget := "cpauth",
 		cpDeployBuildInfoPackage := "se.lu.nateko.cp.cpauth",
+		cpDeployPreAssembly := Def.sequential(Test / test, fetchIdpList).value,
 
 		fetchIdpList := {
 			import java.nio.file.{StandardCopyOption, Files, Paths}
@@ -103,12 +104,6 @@ lazy val cpauth = (project in file("."))
 			streams.value.log.info("Fetching SAML identity provider list from SWAMID...")
 			Files.copy(url.openStream(), file, StandardCopyOption.REPLACE_EXISTING)
 		},
-
-		assembly := (Def.taskDyn{
-			val original = assembly.taskValue
-			fetchIdpList.value
-			Def.task(original.value)
-		}).value,
 
 		//initialCommands in console := """""",
 
