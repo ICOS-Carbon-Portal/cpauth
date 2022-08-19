@@ -23,7 +23,6 @@ import scala.util.Failure
 import utils.Utils.CrasheableTry
 import akka.actor.Scheduler
 
-
 object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
 		with StaticRouting with RestHeartRouting with OAuthRouting with PortalLogRouting {
 
@@ -41,6 +40,7 @@ object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
 	val cookieFactory = new CookieFactory(config)
 
 	Class.forName(config.database.driver)
+
 	val userDb = new JdbcUsers( () => {
 		DriverManager.getConnection(
 			config.database.url,
@@ -54,6 +54,7 @@ object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
 		val errorMailer = new ErrorEmailer(config.geoip.emailErrorsTo, "Resolving IP to location failed", emailSender)
 		new CpGeoClient(config.geoip, errorMailer)
 	}
+
 	val passwordHandler = {
 		implicit val exeCtxt = system.dispatchers.lookup("my-blocking-dispatcher")
 		new PasswordLifecycleHandler(emailSender, cookieFactory, userDb, config.http, config.auth)
@@ -91,7 +92,7 @@ object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
 		}
 	}
 
-	restHeart.init.flatMap{_ =>
+	restHeart.init.zip(userDb.init()).flatMap{_ =>
 		http.newServerAt(httpConfig.serviceInterface, httpConfig.servicePrivatePort).bindFlow(route)
 	}.onComplete{
 		case Success(binding) =>
