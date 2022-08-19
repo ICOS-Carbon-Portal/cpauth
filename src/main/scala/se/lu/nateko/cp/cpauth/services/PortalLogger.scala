@@ -4,26 +4,26 @@ import akka.actor.ActorSystem
 import se.lu.nateko.cp.cpauth.Envri.Envri
 import se.lu.nateko.cp.cpauth.{RestHeartConfig}
 import spray.json.{JsObject, JsString}
-import CpGeoClient.geoIpInfoFormat
-import spray.json._
+import CpGeoClient.given
+import spray.json.*
 import se.lu.nateko.cp.cpauth.PostgresConfig
 import se.lu.nateko.cp.cpauth.core.DownloadEventInfo
 import scala.util.Success
 import scala.util.Failure
-import se.lu.nateko.cp.cpauth.core._
+import se.lu.nateko.cp.cpauth.core.*
 
 class PortalLogger(
 	geoClient: CpGeoClient, confRestheart: RestHeartConfig, confPg: PostgresConfig
-)(implicit system: ActorSystem){
+)(using system: ActorSystem){
 
 	import system.dispatcher
 	private val restHeartLogClient = new RestHeartLogClient(confRestheart)
 	private val pgLogClient = new PostgresClient(confPg)
 
-	def logUsage(entry: JsObject, ip: String)(implicit envri: Envri): Unit =
+	def logUsage(entry: JsObject, ip: String)(using Envri): Unit =
 		logInternally(ip)(logUsageToRestheart(entry, _))
 
-	def logDl(entry: DownloadEventInfo)(implicit envri: Envri): Unit = logInternally(entry.ip){ipinfo =>
+	def logDl(entry: DownloadEventInfo)(using Envri): Unit = logInternally(entry.ip){ipinfo =>
 
 		entry match{
 			case _: CollectionDownloadInfo | _: DocumentDownloadInfo | _: DataObjDownloadInfo =>
@@ -48,7 +48,7 @@ class PortalLogger(
 		}
 	}
 
-	private def logUsageToRestheart(entry: JsObject, ipinfo: Either[String, GeoIpInfo])(implicit envri: Envri): Unit = {
+	private def logUsageToRestheart(entry: JsObject, ipinfo: Either[String, GeoIpInfo])(using Envri): Unit = {
 		val geoJs = ipinfo.fold(
 			ip => JsObject("ip" -> JsString(ip)),
 			geo => geo.toJson.asJsObject

@@ -149,7 +149,7 @@ class RestHeartClient(val config: RestHeartConfig, http: HttpExt)(implicit m: Ma
 				arr <- getField[JsArray](obj, "_embedded");
 				uidObjs <- getElements[JsObject](arr);
 				ids <- Utils.tryseq(uidObjs.map(getStringField(_, "_id")))
-			) yield ids.map(UserId)
+			) yield ids.map(UserId.apply)
 	}.flatten
 
 	private def createDbIfNotExists(implicit envri: Envri): Future[Done] =

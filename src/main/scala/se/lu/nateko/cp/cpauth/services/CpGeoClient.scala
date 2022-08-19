@@ -33,7 +33,7 @@ class CpGeoClient(conf: CpGeoConfig, errorEmailer: ErrorEmailer)(implicit system
 	import system.dispatcher
 
 	private val baseUrl = Uri(conf.baseUri)
-	private implicit val responseReader: RootJsonReader[GeoIpResponse] = CpGeoClient.geoIpResponseReader
+	private given RootJsonReader[GeoIpResponse] = CpGeoClient.geoIpResponseFormat
 
 	def lookup(ip: String): Future[GeoIpInfo] = ipError(ip) match{
 		case None =>
@@ -76,11 +76,11 @@ object CpGeoClient extends DefaultJsonProtocol{
 	class GeoError(msg: String) extends Exception(msg) with NoStackTrace
 	class QuotaError extends GeoError("Geo IP provider usage quota has been exceeded")
 
-	implicit val geoIpInfoFormat = jsonFormat5(GeoIpInfo)
-	implicit val geoIpErrorFormat = jsonFormat1(GeoIpError)
-	implicit val geoIpInnerErrorFormat = jsonFormat2(GeoIpInnerError)
+	given RootJsonFormat[GeoIpInfo] = jsonFormat5(GeoIpInfo.apply)
+	given RootJsonFormat[GeoIpError] = jsonFormat1(GeoIpError.apply)
+	given RootJsonFormat[GeoIpInnerError] = jsonFormat2(GeoIpInnerError.apply)
 
-	implicit val geoIpResponseReader = new RootJsonFormat[GeoIpResponse]{
+	given geoIpResponseFormat: RootJsonFormat[GeoIpResponse] with{
 		override def read(json: JsValue): GeoIpResponse = {
 			val obj = json.asJsObject("Expected GeoIpResponse to be a JSON object")
 			if(obj.fields.contains("ip")) obj.convertTo[GeoIpInfo]

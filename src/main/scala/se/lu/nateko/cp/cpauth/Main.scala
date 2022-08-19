@@ -5,32 +5,31 @@ import java.sql.DriverManager
 import se.lu.nateko.cp.cpauth.accounts.JdbcUsers
 import se.lu.nateko.cp.cpauth.core.AuthenticationFailedException
 import se.lu.nateko.cp.cpauth.opensaml.IdpLibrary
-import se.lu.nateko.cp.cpauth.routing._
+import se.lu.nateko.cp.cpauth.routing.*
 import scala.concurrent.duration.DurationInt
-import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.server.Directives.*
 import akka.http.scaladsl.server.ExceptionHandler
 import akka.http.scaladsl.model.StatusCodes
 import scala.concurrent.Await
 import scala.concurrent.ExecutionContext
 import akka.http.scaladsl.Http
 import akka.stream.Materializer
-import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
 import se.lu.nateko.cp.cpauth.accounts.RestHeartClient
 import se.lu.nateko.cp.cpauth.utils.TargetUrlLookup
 import se.lu.nateko.cp.cpauth.utils.MapBasedUrlLookup
-import se.lu.nateko.cp.cpauth.services._
+import se.lu.nateko.cp.cpauth.services.*
 import scala.util.Success
 import scala.util.Failure
 import utils.Utils.CrasheableTry
+import akka.actor.Scheduler
 
 
 object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
 		with StaticRouting with RestHeartRouting with OAuthRouting with PortalLogRouting {
 
-	implicit val system = ActorSystem("cpauth")
-	implicit val dispatcher = system.dispatcher
-	implicit val scheduler = system.scheduler
-	implicit val materializer = Materializer(system)
+	given system: ActorSystem = ActorSystem("cpauth")
+	given dispatcher: ExecutionContext = system.dispatcher
+	given scheduler: Scheduler = system.scheduler
 
 	val config: CpauthConfig = ConfigReader.getDefault.getOrCrash("Problem reading/parsing config file")
 

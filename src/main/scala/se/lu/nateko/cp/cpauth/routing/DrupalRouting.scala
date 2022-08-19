@@ -16,10 +16,10 @@ import se.lu.nateko.cp.cpauth.Envri
 trait DrupalRouting extends CpauthDirectives with ProxyDirectives{
 
 	def httpConfig: HttpConfig
-	implicit val system: ActorSystem
-	implicit val timeout = Timeout(60.seconds)
+	given system: ActorSystem
+	given Timeout = Timeout(60.seconds)
 	//We only need Drupal proxying for ICOS
-	private implicit val drupalEnvri = Envri.ICOS
+	private given Envri.Value = Envri.ICOS
 
 	val drupalRoute = get{
 		headerValue{

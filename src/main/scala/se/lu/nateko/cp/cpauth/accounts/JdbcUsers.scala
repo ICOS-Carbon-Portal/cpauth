@@ -27,8 +27,7 @@ trait UsersIo{
 }
 
 
-class JdbcUsers(getConnection: () => Connection)
-			   (implicit ctxt: ExecutionContext) extends UsersIo {
+class JdbcUsers(getConnection: () => Connection)(using ExecutionContext) extends UsersIo {
 
 	private def execute(statement: String): Future[Unit] = withConnection{ conn =>
 		val st = conn.createStatement

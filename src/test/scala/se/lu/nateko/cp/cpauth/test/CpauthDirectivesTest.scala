@@ -17,7 +17,7 @@ import se.lu.nateko.cp.cpauth.services.CookieFactory
 
 class CpauthDirectivesTest extends AnyFunSpec with ScalatestRouteTest {
 	import Envri.ICOS
-	implicit val envri = ICOS
+	given Envri.Envri = ICOS
 
 	def getConfig(privKeyPath: String) = CpauthConfig(
 		auth = AuthConfig(

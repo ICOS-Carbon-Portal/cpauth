@@ -1,15 +1,13 @@
 package se.lu.nateko.cp.viewscore
 
 import scala.util.Try
-import spray.json._
+import spray.json.*
 
 object MenuFetcher {
 
-	import spray.json.DefaultJsonProtocol._
+	import spray.json.DefaultJsonProtocol.*
 
-
-
-	implicit val menuInfoFormat: JsonFormat[CpMenuItem] = lazyFormat(jsonFormat(CpMenuItem, "title", "url", "children"))
+	given JsonFormat[CpMenuItem] = lazyFormat(jsonFormat(CpMenuItem.apply, "title", "url", "children"))
 
 	def getMenu: Try[Seq[CpMenuItem]] = Try {
 		scala.io.Source.fromURL(CpMenu.cpMenuApi).mkString.parseJson.convertTo[Seq[CpMenuItem]]

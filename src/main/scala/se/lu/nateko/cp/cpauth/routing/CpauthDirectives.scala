@@ -1,37 +1,47 @@
 package se.lu.nateko.cp.cpauth.routing
 
+import akka.actor.Scheduler
+import akka.http.javadsl.server.CustomRejection
+import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
+import akka.http.scaladsl.marshalling.ToEntityMarshaller
+import akka.http.scaladsl.marshalling.ToResponseMarshaller
+import akka.http.scaladsl.model.HttpMethods
+import akka.http.scaladsl.model.StatusCodes
+import akka.http.scaladsl.model.headers.*
+import akka.http.scaladsl.server.AuthorizationFailedRejection
+import akka.http.scaladsl.server.Directive
+import akka.http.scaladsl.server.Directive0
+import akka.http.scaladsl.server.Directive1
+import akka.http.scaladsl.server.Directives.*
+import akka.http.scaladsl.server.MissingCookieRejection
+import akka.http.scaladsl.server.RejectionHandler
+import akka.http.scaladsl.server.Route
+import akka.http.scaladsl.server.StandardRoute
+import play.twirl.api.Html
+import se.lu.nateko.cp.cpauth.AuthConfig
+import se.lu.nateko.cp.cpauth.Envri.Envri
+import se.lu.nateko.cp.cpauth.accounts.RestHeartClient
+import se.lu.nateko.cp.cpauth.accounts.UsersIo
+import se.lu.nateko.cp.cpauth.core.AuthSource
+import se.lu.nateko.cp.cpauth.core.AuthToken
+import se.lu.nateko.cp.cpauth.core.Authenticator
+import se.lu.nateko.cp.cpauth.core.CookieToToken
+import se.lu.nateko.cp.cpauth.core.DownloadEventInfo
+import se.lu.nateko.cp.cpauth.core.UserId
+import se.lu.nateko.cp.cpauth.utils.TemplatePageMarshalling
+import se.lu.nateko.cp.cpauth.utils.Utils
+import spray.json.RootJsonFormat
+import spray.json.RootJsonWriter
+
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationInt
 import scala.util.Failure
 import scala.util.Success
 import scala.util.Try
-import akka.actor.Scheduler
-import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
-import akka.http.scaladsl.model.{HttpMethods, StatusCodes}
-import akka.http.scaladsl.model.headers._
-import akka.http.scaladsl.server.AuthorizationFailedRejection
-import akka.http.scaladsl.server.Directive
-import akka.http.scaladsl.server.Directive0
-import akka.http.scaladsl.server.Directive1
-import akka.http.scaladsl.server.Directives._
-import akka.http.scaladsl.server.Route
-import akka.http.scaladsl.server.StandardRoute
-import akka.stream.Materializer
-import se.lu.nateko.cp.cpauth.AuthConfig
-import se.lu.nateko.cp.cpauth.Envri.Envri
-import se.lu.nateko.cp.cpauth.utils.Utils
-import se.lu.nateko.cp.cpauth.accounts.RestHeartClient
-import se.lu.nateko.cp.cpauth.accounts.UsersIo
-import se.lu.nateko.cp.cpauth.core.Authenticator
-import se.lu.nateko.cp.cpauth.core.CookieToToken
-import se.lu.nateko.cp.cpauth.core.UserId
-import se.lu.nateko.cp.cpauth.core.AuthToken
-import se.lu.nateko.cp.cpauth.core.AuthSource
-import akka.http.javadsl.server.CustomRejection
-import akka.http.scaladsl.server.MissingCookieRejection
-import akka.http.scaladsl.server.RejectionHandler
-import se.lu.nateko.cp.cpauth.core.DownloadEventInfo
+
+import SprayJsonSupport.sprayJsValueMarshaller
+
 
 trait CpauthDirectives {
 
@@ -40,9 +50,10 @@ trait CpauthDirectives {
 	def restHeart: RestHeartClient
 	def hostToEnvri(host: String): Option[Envri]
 
-	implicit def dispatcher: ExecutionContext
-	implicit def materializer: Materializer
-	implicit def scheduler: Scheduler
+	given dispatcher: ExecutionContext
+	given scheduler: Scheduler
+	given ToResponseMarshaller[Html] = TemplatePageMarshalling.marshaller[Html]
+	given [T: RootJsonWriter]: ToEntityMarshaller[T] = SprayJsonSupport.sprayJsonMarshaller
 
 	def publicAuthConfig(implicit envri: Envri) = authConfig.pub(envri)
 	def authenticator(implicit envri: Envri): Try[Authenticator] = Authenticator(publicAuthConfig)
@@ -117,7 +128,7 @@ trait CpauthDirectives {
 		addAccessControlHeaders(envri) {
 			(get & handleAuthRejections("Login control")) {
 				user { userId =>
-					import se.lu.nateko.cp.cpauth.CpauthJsonProtocol.userIdFormat
+					import se.lu.nateko.cp.cpauth.CpauthJsonProtocol.{given RootJsonFormat[UserId]}
 					complete(userId)
 				}
 			} ~

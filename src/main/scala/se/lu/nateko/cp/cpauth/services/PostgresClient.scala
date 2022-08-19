@@ -6,7 +6,7 @@ import org.postgresql.ds.PGConnectionPoolDataSource
 import se.lu.nateko.cp.cpauth.CredentialsConfig
 import se.lu.nateko.cp.cpauth.Envri.Envri
 import se.lu.nateko.cp.cpauth.PostgresConfig
-import se.lu.nateko.cp.cpauth.core._
+import se.lu.nateko.cp.cpauth.core.*
 
 import java.sql.Connection
 import java.sql.PreparedStatement
@@ -83,7 +83,7 @@ class PostgresClient(conf: PostgresConfig) extends AutoCloseable {
 		)
 	}
 
-	private[this] implicit val exeCtxt = ExecutionContext.fromExecutor(executor)
+	private given ExecutionContext = ExecutionContext.fromExecutor(executor)
 
 	private[this] val dataSources: Map[Envri, SharedPoolDataSource] = conf.dbNames.view.mapValues{ dbName =>
 		val pgDs = new PGConnectionPoolDataSource()

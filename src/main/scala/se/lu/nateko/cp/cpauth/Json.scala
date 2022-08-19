@@ -3,26 +3,27 @@ package se.lu.nateko.cp.cpauth
 import se.lu.nateko.cp.cpauth.opensaml.IdpInfo
 import se.lu.nateko.cp.cpauth.core.UserId
 import se.lu.nateko.cp.cpauth.accounts.UserEntry
-import spray.json._
+import spray.json.*
 
-object CpauthJsonProtocol extends DefaultJsonProtocol {
+object CpauthJsonProtocol {
+	import DefaultJsonProtocol.*
 
-	implicit val idpInfoFormat = jsonFormat2(IdpInfo)
+	given RootJsonFormat[IdpInfo] = jsonFormat2(IdpInfo.apply)
 	
-	implicit val userIdFormat = jsonFormat1(UserId)
+	given RootJsonFormat[UserId] = jsonFormat1(UserId.apply)
 	
-	implicit val userEntryFormat = jsonFormat2(UserEntry)
+	given RootJsonFormat[UserEntry] = jsonFormat2(UserEntry.apply)
 
-	def enumFormat[T <: Enumeration](enum: T) = new RootJsonFormat[enum.Value] {
-		def write(v: enum.Value) = JsString(v.toString)
+	def enumFormat[T <: Enumeration](e: T) = new RootJsonFormat[e.Value] {
+		def write(v: e.Value) = JsString(v.toString)
 
-		def read(value: JsValue): enum.Value = value match{
+		def read(value: JsValue): e.Value = value match{
 			case JsString(s) =>
 				try{
-					enum.withName(s)
+					e.withName(s)
 				}catch{
 					case _: NoSuchElementException => deserializationError(
-						"Expected one of: " + enum.values.map(_.toString).mkString("'", "', '", "'")
+						"Expected one of: " + e.values.map(_.toString).mkString("'", "', '", "'")
 					)
 				}
 			case _ => deserializationError("Expected a string")

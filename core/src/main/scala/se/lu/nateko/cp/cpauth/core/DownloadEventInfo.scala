@@ -1,7 +1,7 @@
 package se.lu.nateko.cp.cpauth.core
 
 import java.time.Instant
-import spray.json._
+import spray.json.*
 import DownloadEventInfo.{CsvSelect, CpbSlice, AnonId}
 
 
@@ -52,7 +52,7 @@ object DownloadEventInfo extends DefaultJsonProtocol{
 	def anonymizeCpUser(id: UserId, salt: String): AnonId =
 		CoreUtils.encodeToBase64String(Crypto.sha256sum(id.email + salt)).take(12)
 
-	implicit object javaTimeInstantFormat extends RootJsonFormat[Instant] {
+	given RootJsonFormat[Instant] with {
 		def write(instant: Instant) = JsString(instant.toString)
 		def read(value: JsValue): Instant = value match{
 			case JsString(s) => Instant.parse(s)
@@ -60,15 +60,15 @@ object DownloadEventInfo extends DefaultJsonProtocol{
 		}
 	}
 
-	implicit val collectionDlInfoFormat = jsonFormat5(CollectionDownloadInfo)
-	implicit val docDlInfoFormat = jsonFormat5(DocumentDownloadInfo)
-	implicit val dataDlInfoFormat = jsonFormat7(DataObjDownloadInfo)
-	implicit val csvSelectFormat = jsonFormat3(CsvSelect)
-	implicit val csvDlInfoFormat = jsonFormat5(CsvDownloadInfo)
-	implicit val cbpSliceFormat = jsonFormat2(CpbSlice)
-	implicit val cpbDlInfoFormat = jsonFormat7(CpbDownloadInfo)
+	given RootJsonFormat[CollectionDownloadInfo] = jsonFormat5(CollectionDownloadInfo.apply)
+	given RootJsonFormat[DocumentDownloadInfo] = jsonFormat5(DocumentDownloadInfo.apply)
+	given RootJsonFormat[DataObjDownloadInfo] = jsonFormat7(DataObjDownloadInfo.apply)
+	given RootJsonFormat[CsvSelect] = jsonFormat3(CsvSelect.apply)
+	given RootJsonFormat[CsvDownloadInfo] = jsonFormat5(CsvDownloadInfo.apply)
+	given RootJsonFormat[CpbSlice] = jsonFormat2(CpbSlice.apply)
+	given RootJsonFormat[CpbDownloadInfo] = jsonFormat7(CpbDownloadInfo.apply)
 
-	implicit object downloadEventInfoFormat extends RootJsonFormat[DownloadEventInfo]{
+	given RootJsonFormat[DownloadEventInfo] with {
 
 		override def write(obj: DownloadEventInfo): JsValue = {
 			def withType[T : JsonWriter](typ: String, e: T) =

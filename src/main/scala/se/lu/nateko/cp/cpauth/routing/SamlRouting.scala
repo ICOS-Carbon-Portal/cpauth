@@ -5,22 +5,22 @@ import java.net.URI
 import scala.util.Try
 import se.lu.nateko.cp.cpauth.opensaml.IdpLibrary
 import se.lu.nateko.cp.cpauth.opensaml.IdpInfo
-import se.lu.nateko.cp.cpauth.CpauthJsonProtocol._
+import se.lu.nateko.cp.cpauth.CpauthJsonProtocol.given
 import org.opensaml.saml2.core.Response
 import se.lu.nateko.cp.cpauth.opensaml.Parser
 import se.lu.nateko.cp.cpauth.opensaml.AssertionExtractor
 import akka.actor.ActorSystem
 import akka.http.scaladsl.server.Route
-import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.server.Directives.*
 import akka.http.scaladsl.model.StatusCodes
-import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
 import akka.http.scaladsl.model.headers.HttpCookie
 import akka.http.scaladsl.model.Uri
 import play.twirl.api.Html
 import se.lu.nateko.cp.cpauth.services.CookieFactory
-import se.lu.nateko.cp.cpauth.utils.{Saml, TargetUrlLookup, TemplatePageMarshalling}
+import se.lu.nateko.cp.cpauth.utils.{Saml, TargetUrlLookup}
 import se.lu.nateko.cp.cpauth.SamlConfig
 import se.lu.nateko.cp.cpauth.Envri.Envri
+import spray.json.DefaultJsonProtocol.immSeqFormat
 
 trait SamlRouting extends CpauthDirectives{
 
@@ -28,11 +28,9 @@ trait SamlRouting extends CpauthDirectives{
 	def idpLib: IdpLibrary
 	def cookieFactory: CookieFactory
 	def targetLookup: TargetUrlLookup
-	implicit val system: ActorSystem
+	given system: ActorSystem
 
-	private[this] implicit val pageMarsh = TemplatePageMarshalling.marshaller[Html]
-
-	private def assExtractorTry(implicit envri: Envri): Try[AssertionExtractor] = AssertionExtractor(samlConfig)
+	private def assExtractorTry(using Envri): Try[AssertionExtractor] = AssertionExtractor(samlConfig)
 
 	lazy val idpInfos: Seq[IdpInfo] = idpLib.getInfos.toSeq.sortBy(_.name)
 
