@@ -1,19 +1,17 @@
-val defaultScala = "2.13.6"
+val defaultScala = "3.2.0-RC3"
 
 val commonSettings = Seq(
 	organization := "se.lu.nateko.cp",
 	scalaVersion := defaultScala,
 
-	libraryDependencies += "org.scalatest" %% "scalatest" % "3.1.0" % "test",
+	libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.13" % "test",
 
 	scalacOptions ++= Seq(
-		"-target:jvm-1.11",
+		"-Xtarget:11",
 		"-encoding", "UTF-8",
 		"-unchecked",
 		"-feature",
-		"-deprecation",
-		"-Wdead-code",
-		"-Wnumeric-widen"
+		"-deprecation"
 	)
 )
 
@@ -33,7 +31,7 @@ lazy val cpauthCore = (project in file("core"))
 	.settings(publishingSettings: _*)
 	.settings(
 		name := "cpauth-core",
-		version := "0.6.5",
+		version := "0.7.0",
 		libraryDependencies ++= Seq(
 			"io.spray"              %% "spray-json"                         % "1.3.6"
 		)
@@ -46,16 +44,15 @@ lazy val viewsCore = (project in file("viewsCore"))
 	.enablePlugins(SbtTwirl)
 	.settings(
 		name := "views-core",
-		version := "0.5.4",
-		scalacOptions += "-Wunused:-imports",
+		version := "0.6.0",
 		libraryDependencies ++= Seq(
 			"io.spray"              %% "spray-json"                         % "1.3.6"
 		),
 	)
 
 
-val akkaVersion = "2.6.16"
-val akkaHttpVersion = "10.2.6"
+val akkaVersion = "2.6.19"
+val akkaHttpVersion = "10.2.9"
 val cpauthMain = Some("se.lu.nateko.cp.cpauth.Main")
 
 lazy val fetchIdpList = taskKey[Unit]("Fetches SAML IdP list from SWAMID")
@@ -71,16 +68,15 @@ lazy val cpauth = (project in file("."))
 	.enablePlugins(SbtTwirl, IcosCpSbtDeployPlugin)
 	.settings(
 		name := "cpauth",
-		version := "0.5.1",
+		version := "0.6.0",
 		libraryDependencies ++= Seq(
-			"com.typesafe.akka"      %% "akka-http-spray-json"               % akkaHttpVersion,
-			"com.typesafe.akka"      %% "akka-http-testkit"                  % akkaHttpVersion % "test",
-			"com.typesafe.akka"      %% "akka-stream-testkit"                % akkaVersion     % "test",
-			"com.typesafe.akka"      %% "akka-slf4j"                         % akkaVersion,
-			"com.typesafe.akka"      %% "akka-stream"                        % akkaVersion,
+			"com.typesafe.akka"      %% "akka-http-spray-json"               % akkaHttpVersion excludeAll("io.spray") cross CrossVersion.for3Use2_13,
+			"com.typesafe.akka"      %% "akka-http-testkit"                  % akkaHttpVersion % "test" cross CrossVersion.for3Use2_13,
+			"com.typesafe.akka"      %% "akka-stream-testkit"                % akkaVersion     % "test" cross CrossVersion.for3Use2_13,
+			"com.typesafe.akka"      %% "akka-slf4j"                         % akkaVersion cross CrossVersion.for3Use2_13,
 			"ch.qos.logback"         %  "logback-classic"                    % "1.1.3",
 			"org.opensaml"           %  "opensaml"                           % "2.6.6",
-			"org.scala-lang.modules" %% "scala-xml"                          % "1.2.0",
+			"org.scala-lang.modules" %% "scala-xml"                          % "2.1.0",
 			"org.apache.santuario"   %  "xmlsec"                             % "2.0.7", //to force a newer version
 //			"xalan"                  %  "serializer"                         % "2.7.2", //for DOM serialization to strings during debug
 			"net.jcip"               %  "jcip-annotations"                   % "1.0",
