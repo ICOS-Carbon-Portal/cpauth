@@ -1,10 +1,9 @@
 package se.lu.nateko.cp.cpauth.routing
 
 import akka.http.scaladsl.server.Route
-import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.server.Directives.*
 import akka.http.scaladsl.model.StatusCodes
-import play.twirl.api._
-import se.lu.nateko.cp.cpauth.utils.TemplatePageMarshalling
+import play.twirl.api.Html
 import se.lu.nateko.cp.cpauth.CpauthConfig
 import se.lu.nateko.cp.cpauth.Envri.Envri
 
@@ -21,8 +20,6 @@ trait StaticRouting extends CpauthDirectives{
 		case "administration" => Some(implicit envri => views.html.CpauthAdminPage())
 		case "passwordreset" => None
 	}
-
-	private[this] implicit val htmlMarsh = TemplatePageMarshalling.marshaller[Html]
 
 	lazy val staticRoute: Route =
 		path("favicon.ico"){

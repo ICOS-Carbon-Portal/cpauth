@@ -8,7 +8,7 @@ import se.lu.nateko.cp.cpauth.Envri
 
 class AuthenticationTest extends AnyFunSuite{
 	import Envri.ICOS
-	implicit val envri = ICOS
+	given Envri.Envri = ICOS
 
 	val user = UserId("vasja.pupkin@mail.org")
 	val pubAuthConfig = PublicAuthConfig(

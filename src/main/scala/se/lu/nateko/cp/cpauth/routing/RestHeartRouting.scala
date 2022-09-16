@@ -1,6 +1,5 @@
 package se.lu.nateko.cp.cpauth.routing
 
-import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
 import akka.http.scaladsl.model.{ HttpMethods, StatusCodes }
 import akka.http.scaladsl.model.HttpRequest
 import akka.http.scaladsl.model.Uri.Path
@@ -8,9 +7,10 @@ import akka.http.scaladsl.model.headers._
 import akka.http.scaladsl.server.Directive0
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
-import se.lu.nateko.cp.cpauth.CpauthJsonProtocol._
+import se.lu.nateko.cp.cpauth.CpauthJsonProtocol.given
 import se.lu.nateko.cp.cpauth.Envri.Envri
 import se.lu.nateko.cp.cpauth.core.UserId
+import spray.json.DefaultJsonProtocol.{immSeqFormat, tuple2Format, StringJsonFormat}
 
 trait RestHeartRouting extends RestHeartDirectives{
 

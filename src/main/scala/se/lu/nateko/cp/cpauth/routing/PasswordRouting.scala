@@ -2,27 +2,24 @@ package se.lu.nateko.cp.cpauth.routing
 
 import scala.util.Failure
 
-import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
 import akka.http.scaladsl.model.StatusCodes
-import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.server.Directives.*
 import akka.http.scaladsl.server.Route
 import play.twirl.api.Html
-import se.lu.nateko.cp.cpauth.CpauthJsonProtocol._
+import se.lu.nateko.cp.cpauth.CpauthJsonProtocol.given
 import se.lu.nateko.cp.cpauth.Envri
 import se.lu.nateko.cp.cpauth.accounts.UserEntry
 import se.lu.nateko.cp.cpauth.core.AuthSource
 import se.lu.nateko.cp.cpauth.core.UserId
 import se.lu.nateko.cp.cpauth.services.CookieFactory
 import se.lu.nateko.cp.cpauth.services.PasswordLifecycleHandler
-import se.lu.nateko.cp.cpauth.utils.TemplatePageMarshalling
 import se.lu.nateko.cp.cpauth.core.DownloadEventInfo
+import spray.json.DefaultJsonProtocol.immSeqFormat
 
 trait PasswordRouting extends CpauthDirectives {
 
 	def cookieFactory: CookieFactory
 	def passwordHandler: PasswordLifecycleHandler
-
-	private[this] implicit val pageMarsh = TemplatePageMarshalling.marshaller[Html]
 
 	lazy val passwordRoute: Route = (pathPrefix("password") & extractEnvri){implicit envri =>
 		get{

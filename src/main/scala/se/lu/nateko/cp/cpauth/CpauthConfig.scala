@@ -109,11 +109,12 @@ case class CpauthConfig(
 object CpauthConfig{
 	type EnvriOAuthConfig = Map[OAuthProvider, OAuthProviderConfig]
 	type OAuthConfig = Map[Envri, EnvriOAuthConfig]
+	import ConfigReader.given
 
 	def oauthJson(conf: EnvriOAuthConfig): String = {
 		conf.map{
 			case (provider, config) => provider -> config.public
-		}.toJson(ConfigReader.envriOAuthConfigFormat).prettyPrint
+		}.toJson.prettyPrint
 	}
 }
 
@@ -123,10 +124,10 @@ case class OAuthProviderConfig(clientId: String, clientSecret: String, redirectP
 
 object ConfigReader extends DefaultJsonProtocol{
 
-	implicit val envriFormat = CpauthJsonProtocol.enumFormat(Envri)
-	implicit val oAuthProviderFormat = CpauthJsonProtocol.enumFormat(OAuthProvider)
+	given RootJsonFormat[Envri] = CpauthJsonProtocol.enumFormat(Envri)
+	given RootJsonFormat[OAuthProvider] = CpauthJsonProtocol.enumFormat(OAuthProvider)
 
-	implicit object urlFormat extends RootJsonFormat[URI] {
+	given RootJsonFormat[URI] with {
 		def write(uri: URI): JsValue = JsString(uri.toString)
 
 		def read(value: JsValue): URI = value match{
@@ -151,34 +152,29 @@ object ConfigReader extends DefaultJsonProtocol{
 				.resolve
 	}
 
-	implicit val samlSpConfigFormat = jsonFormat3(SamlSpConfig)
-	implicit val proxyConfigFormat = jsonFormat3(ProxyConfig)
-	implicit val samlAttrFormat = jsonFormat3(SamlAttrConfig)
-	implicit val urlsConfigFormat = jsonFormat5(HttpConfig)
-	implicit val samlConfigFormat = jsonFormat5(SamlConfig)
-	implicit val databaseConfigFormat = jsonFormat4(DatabaseConfig)
+	given RootJsonFormat[SamlSpConfig] = jsonFormat3(SamlSpConfig.apply)
+	given RootJsonFormat[ProxyConfig] = jsonFormat3(ProxyConfig.apply)
+	given RootJsonFormat[SamlAttrConfig] = jsonFormat3(SamlAttrConfig.apply)
+	given RootJsonFormat[HttpConfig] = jsonFormat5(HttpConfig.apply)
+	given RootJsonFormat[SamlConfig] = jsonFormat5(SamlConfig.apply)
+	given RootJsonFormat[DatabaseConfig] = jsonFormat4(DatabaseConfig.apply)
 
-	implicit val pubAuthConfigFormat = jsonFormat4(PublicAuthConfig)
-	implicit val privAuthConfigFormat = jsonFormat2(PrivateAuthConfig)
-	implicit val authConfigFormat = jsonFormat5(AuthConfig)
-	implicit val restHeartConfigFormat = jsonFormat5(RestHeartConfig)
-	implicit val credentialsConfigFormat = jsonFormat2(CredentialsConfig)
-	implicit val postgresConfigFormat = jsonFormat5(PostgresConfig)
-	implicit val emailConfigFormat = jsonFormat5(EmailConfig)
-	implicit val oauthProviderConfigFormat = jsonFormat3(OAuthProviderConfig)
-	implicit val geoConfigFormat = jsonFormat3(CpGeoConfig)
+	given RootJsonFormat[PublicAuthConfig] = jsonFormat4(PublicAuthConfig.apply)
+	given RootJsonFormat[PrivateAuthConfig] = jsonFormat2(PrivateAuthConfig.apply)
+	given RootJsonFormat[AuthConfig] = jsonFormat5(AuthConfig.apply)
+	given RootJsonFormat[RestHeartConfig] = jsonFormat5(RestHeartConfig.apply)
+	given RootJsonFormat[CredentialsConfig] = jsonFormat2(CredentialsConfig.apply)
+	given RootJsonFormat[PostgresConfig] = jsonFormat5(PostgresConfig.apply)
+	given RootJsonFormat[EmailConfig] = jsonFormat5(EmailConfig.apply)
+	given RootJsonFormat[OAuthProviderConfig] = jsonFormat3(OAuthProviderConfig.apply)
+	given RootJsonFormat[CpGeoConfig] = jsonFormat3(CpGeoConfig.apply)
 
-	implicit val cpauthConfigFormat = jsonFormat9(CpauthConfig.apply)
+	given RootJsonFormat[CpauthConfig] = jsonFormat9(CpauthConfig.apply)
 
 	def fromAppConfig(applicationConfig: Config): CpauthConfig = {
-
-
 		val renderOpts = ConfigRenderOptions.concise.setJson(true)
 		val cpConfJson: String = applicationConfig.getValue("cpauth").render(renderOpts)
-
 		cpConfJson.parseJson.convertTo[CpauthConfig]
 	}
 
-	implicit val envriOAuthConfigFormat = implicitly[JsonFormat[CpauthConfig.EnvriOAuthConfig]]
-	
 }
