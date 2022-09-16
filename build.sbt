@@ -1,4 +1,4 @@
-val defaultScala = "3.2.0-RC3"
+val defaultScala = "3.2.0"
 
 val commonSettings = Seq(
 	organization := "se.lu.nateko.cp",
@@ -34,7 +34,7 @@ lazy val cpauthCore = (project in file("core"))
 		version := "0.7.0",
 		libraryDependencies ++= Seq(
 			"io.spray"              %% "spray-json"                         % "1.3.6"
-		)
+		),
 	)
 
 
