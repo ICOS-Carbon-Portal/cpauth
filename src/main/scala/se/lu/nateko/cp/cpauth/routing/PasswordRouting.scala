@@ -37,6 +37,10 @@ trait PasswordRouting extends CpauthDirectives {
 				formFields("mail", "password"){(mail, password) =>
 					val uEntryFuture = passwordHandler.authUser(UserId(mail), password)
 					onSuccess(uEntryFuture){ uEntry =>
+
+						//Silent side effect: creating user profile if it does not already exist
+						restHeart.createUserIfNew(uEntry.id, "", "")
+
 						logInWithPasswordCookie(uEntry.id)
 					}
 				}
