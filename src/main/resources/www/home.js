@@ -18,20 +18,6 @@ function displayUserInfo(uid){
 	var keys = '{profile: 1}';
 
 	$.getJSON('/db/users/' + uid.email + '?keys=' + encodeURIComponent(keys))
-		.then(null, function(xhr){
-			return xhr.status == 404
-				? $.ajax({ //create user profile in RESTHeart if it does not exist
-					method: 'PUT',
-					url: '/db/users/' + uid.email,
-					contentType: 'application/json',
-					dataType: 'text',
-					data: '{profile: {}}'
-				}).then(function(){
-						reportSuccess('Profile created');
-						return {profile: {}};
-					})
-				: $.Deferred().reject(xhr);
-		})
 		.done(function(userInfo){
 			var profile = userInfo.profile;
 			stringKeys.forEach(function(key){
