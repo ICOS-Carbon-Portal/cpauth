@@ -28,7 +28,7 @@ trait PortalLogRouting extends CpauthDirectives{
 		val controlOrigins = controlOriginsDir
 		pathPrefix("logs"){
 			path("portaluse"){
-				(post & respondWithCorsHeaders){
+				(post & respondWithHeaders(`Access-Control-Allow-Credentials`(true))){
 					(controlOrigins | pass){
 						getClientIp{ip =>
 							(withSizeLimit(50000) & entity(as[JsValue])){js =>
@@ -46,7 +46,11 @@ trait PortalLogRouting extends CpauthDirectives{
 				} ~
 				options{
 					controlOrigins{
-						respondWithCorsHeaders{
+						respondWithHeaders(
+							`Access-Control-Allow-Methods`(HttpMethods.POST),
+							`Access-Control-Allow-Credentials`(true),
+							`Access-Control-Allow-Headers`("Content-Type")
+						){
 							complete(StatusCodes.OK)
 						}
 					} ~
@@ -65,12 +69,6 @@ trait PortalLogRouting extends CpauthDirectives{
 			}
 		}
 	}
-
-	private val respondWithCorsHeaders: Directive0 = respondWithHeaders(
-		`Access-Control-Allow-Methods`(HttpMethods.POST),
-		`Access-Control-Allow-Credentials`(true),
-		`Access-Control-Allow-Headers`("Content-Type")
-	)
 
 	val getClientIp: Directive1[String] = {
 
