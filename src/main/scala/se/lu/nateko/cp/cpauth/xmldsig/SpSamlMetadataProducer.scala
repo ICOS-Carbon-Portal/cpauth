@@ -14,21 +14,21 @@ object SpSamlMetadataProducer {
 		new java.io.File("").getAbsolutePath + resource
 	}
 
-	val spMetaPath = "/icos-cp_sp_meta.xml"
-	//val spMetaPath = "/sites_sp_meta.xml"
+	//val spMetaPath = "/icos-cp_sp_meta.xml"
+	val spMetaPath = "/sites_sp_meta.xml"
 
 	def produceSignedMetadata(): Unit = {
 		val generator = new XmlDigitalSignatureGenerator
 		val targetPath = getPath("/src/main/resources" + spMetaPath)
 
 		generator.generateXMLDigitalSignature(
-			getPath("/src/main/resources/icos-cp_sp_meta_unsigned.xml"), //originalXmlFilePath
-			//getPath("/src/main/resources/sites_sp_meta_unsigned.xml"), //originalXmlFilePath
+			//getPath("/src/main/resources/icos-cp_sp_meta_unsigned.xml"), //originalXmlFilePath
+			getPath("/src/main/resources/sites_sp_meta_unsigned.xml"), //originalXmlFilePath
 			targetPath, //destnSignedXmlFilePath
-			getPath("/privateKeys/cpauth_private.der"), //privateKeyFilePath
-			//getPath("/privateKeys/sites_private.der"), //privateKeyFilePath
-			getPath("/core/src/main/resources/cpauthCore/crypto/cpauth_public.der") //publicKeyFilePath
-			//getPath("/core/src/main/resources/cpauthCore/crypto/sites_public.der") //publicKeyFilePath
+			//getPath("/privateKeys/cpauth_private.der"), //privateKeyFilePath
+			getPath("/privateKeys/sites_private.der"), //privateKeyFilePath
+			//getPath("/core/src/main/resources/cpauthCore/crypto/cpauth_public.der") //publicKeyFilePath
+			getPath("/core/src/main/resources/cpauthCore/crypto/sites_public.der") //publicKeyFilePath
 		)
 		val xml = XML.loadFile(new java.io.File(targetPath))
 		val pretty = new PrettyPrinter(200, 3)

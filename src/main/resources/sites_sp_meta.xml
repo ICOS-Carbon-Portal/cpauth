@@ -1,48 +1,54 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?><EntitiesDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata" ID="_b09b61df89a2ef1c3d0f27fa5fb97f81dc12e043">
-
-<EntityDescriptor entityID="https://auth.fieldsites.se/saml/cpauth">
-
-	<Extensions xmlns:alg="urn:oasis:names:tc:SAML:metadata:algsupport">
-
-		<EntityAttributes xmlns="urn:oasis:names:tc:SAML:metadata:attribute">
-			<Attribute xmlns="urn:oasis:names:tc:SAML:2.0:assertion" Name="http://macedir.org/entity-category" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
-				<AttributeValue>http://www.geant.net/uri/dataprotection-code-of-conduct/v1</AttributeValue>
-			</Attribute>
-		</EntityAttributes>
-
-		<alg:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha512"/>
-		<alg:DigestMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#sha384"/>
-		<alg:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/>
-		<alg:DigestMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#sha224"/>
-		<alg:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
-		<alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha512"/>
-		<alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha384"/>
-		<alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha256"/>
-		<alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha224"/>
-		<alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha512"/>
-		<alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha384"/>
-		<alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>
-		<alg:SigningMethod Algorithm="http://www.w3.org/2009/xmldsig11#dsa-sha256"/>
-		<alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha1"/>
-		<alg:SigningMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
-		<alg:SigningMethod Algorithm="http://www.w3.org/2000/09/xmldsig#dsa-sha1"/>
-	</Extensions>
-
-	<SPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
-		<Extensions>
-			<init:RequestInitiator xmlns:init="urn:oasis:names:tc:SAML:profiles:SSO:request-init" Binding="urn:oasis:names:tc:SAML:profiles:SSO:request-init" Location="https://auth.fieldsites.se/saml/login"/>
-			<UIInfo xmlns="urn:oasis:names:tc:SAML:metadata:ui">
-				<DisplayName xml:lang="en">SITES Authentication Service</DisplayName>
-				<Description xml:lang="en">Single sign on for SITES data services</Description>
-				<PrivacyStatementURL xml:lang="en">https://auth.fieldsites.se/saml/privacyStatement</PrivacyStatementURL>
-			</UIInfo>
-		</Extensions>
-		<KeyDescriptor>
-			<ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
-				<ds:KeyName>auth.fieldsites.se</ds:KeyName>
-				<ds:X509Data>
-					<ds:X509SubjectName>CN=auth.fieldsites.se</ds:X509SubjectName>
-					<ds:X509Certificate>MIIEYzCCA0ugAwIBAgIJAInunDnNa8QOMA0GCSqGSIb3DQEBCwUAMIHHMQswCQYD
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<EntitiesDescriptor ID="_b09b61df89a2ef1c3d0f27fa5fb97f81dc12e043" xmlns="urn:oasis:names:tc:SAML:2.0:metadata">
+   <md:EntityDescriptor 
+   entityID="https://auth.fieldsites.se/saml/cpauth" xmlns:alg="urn:oasis:names:tc:SAML:metadata:algsupport" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:init="urn:oasis:names:tc:SAML:profiles:SSO:request-init" xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" xmlns:mdattr="urn:oasis:names:tc:SAML:metadata:attribute" xmlns:mdrpi="urn:oasis:names:tc:SAML:metadata:rpi" xmlns:mdui="urn:oasis:names:tc:SAML:metadata:ui" xmlns:samla="urn:oasis:names:tc:SAML:2.0:assertion">
+      <md:Extensions>
+         <mdrpi:RegistrationInfo registrationAuthority="http://www.swamid.se/" registrationInstant="2018-03-22T15:55:20Z">
+            <mdrpi:RegistrationPolicy xml:lang="en">http://swamid.se/policy/mdrps</mdrpi:RegistrationPolicy>
+         </mdrpi:RegistrationInfo>
+         <alg:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha512"/>
+         <alg:DigestMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#sha384"/>
+         <alg:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/>
+         <alg:DigestMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#sha224"/>
+         <alg:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+         <alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha512"/>
+         <alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha384"/>
+         <alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha256"/>
+         <alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha224"/>
+         <alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha512"/>
+         <alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha384"/>
+         <alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>
+         <alg:SigningMethod Algorithm="http://www.w3.org/2009/xmldsig11#dsa-sha256"/>
+         <alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha1"/>
+         <alg:SigningMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
+         <alg:SigningMethod Algorithm="http://www.w3.org/2000/09/xmldsig#dsa-sha1"/>
+         <mdattr:EntityAttributes>
+            <samla:Attribute Name="http://macedir.org/entity-category" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
+               <samla:AttributeValue>http://www.geant.net/uri/dataprotection-code-of-conduct/v1</samla:AttributeValue>
+            </samla:Attribute>
+         </mdattr:EntityAttributes>
+      </md:Extensions>
+      <md:SPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+         <md:Extensions>
+            <init:RequestInitiator Binding="urn:oasis:names:tc:SAML:profiles:SSO:request-init" Location="https://auth.fieldsites.se/saml/login"/>
+            <mdui:UIInfo>
+               <mdui:DisplayName xml:lang="en">SITES Authentication Service</mdui:DisplayName>
+               <mdui:Description xml:lang="en">Single sign on for SITES data services</mdui:Description>
+               <mdui:PrivacyStatementURL xml:lang="en">https://auth.fieldsites.se/saml/privacyStatement</mdui:PrivacyStatementURL>
+               <mdui:InformationURL xml:lang="sv">https://www.fieldsites.se/sv-SE</mdui:InformationURL>
+               <mdui:InformationURL xml:lang="en">https://www.fieldsites.se/en-GB</mdui:InformationURL>
+               <mdui:PrivacyStatementURL xml:lang="sv">https://auth.fieldsites.se/saml/privacyStatement</mdui:PrivacyStatementURL>
+               <mdui:DisplayName xml:lang="sv">SITES inloggningstjänst</mdui:DisplayName>
+               <mdui:Description xml:lang="sv">Inloggning för SITES data tjänster</mdui:Description>
+            </mdui:UIInfo>
+         </md:Extensions>
+         <md:KeyDescriptor>
+            <ds:KeyInfo>
+               <ds:KeyName>auth.fieldsites.se</ds:KeyName>
+               <ds:X509Data>
+                  <ds:X509SubjectName>CN=auth.fieldsites.se</ds:X509SubjectName>
+                  <ds:X509Certificate>
+                     MIIEYzCCA0ugAwIBAgIJAInunDnNa8QOMA0GCSqGSIb3DQEBCwUAMIHHMQswCQYD
 VQQGEwJTRTERMA8GA1UECAwIU2vDg8KlbmUxDTALBgNVBAcMBEx1bmQxNTAzBgNV
 BAoMLFN3ZWRpc2ggSW5mcmFzdHJ1Y3R1cmUgZm9yIEVjb3N5c3RlbSBTY2llbmNl
 MR8wHQYDVQQLDBZBdXRoZW50aWNhdGlvbiBTZXJ2aWNlMRswGQYDVQQDDBJhdXRo
@@ -66,52 +72,87 @@ b8UpNU6UUQ12GBHhUP7OFv4VLz1OS3bwWxujRdMxjttW85rtjFCDnzjht2w1K3sJ
 to63TmmP1EIbqrj1LGv23EngIG0wfhrKkV5cT1/TJ/0xJfLim6e66SO3crc9L2Q/
 r2UZOu21reg8IOKK+GgCBXVyc6ihEFpUF5sg/k4EThNjZM5PDDRYnwOwg8WdnOjF
 ut7vQ9gFxIHIfE526gVIlHUomwr6JGU=
-					</ds:X509Certificate>
-				</ds:X509Data>
-			</ds:KeyInfo>
-			<EncryptionMethod Algorithm="http://www.w3.org/2009/xmlenc11#aes128-gcm"/>
-			<EncryptionMethod Algorithm="http://www.w3.org/2009/xmlenc11#aes192-gcm"/>
-			<EncryptionMethod Algorithm="http://www.w3.org/2009/xmlenc11#aes256-gcm"/>
-			<EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes128-cbc"/>
-			<EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes192-cbc"/>
-			<EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes256-cbc"/>
-			<EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#tripledes-cbc"/>
-			<EncryptionMethod Algorithm="http://www.w3.org/2009/xmlenc11#rsa-oaep"/>
-			<EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p"/>
-		</KeyDescriptor>
-
-		<SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://auth.fieldsites.se/saml/logout"/>
-
-		<AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://auth.fieldsites.se/saml/SAML2/POST" index="1" isDefault="true"/>
-
-		<AttributeConsumingService>
-			<RequestedAttribute FriendlyName="givenName" Name="urn:oid:2.5.4.42" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" isRequired="true"/>
-			<RequestedAttribute FriendlyName="sn" Name="urn:oid:2.5.4.4" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" isRequired="true"/>
-			<RequestedAttribute FriendlyName="mail" Name="urn:oid:0.9.2342.19200300.100.1.3" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" isRequired="true"/>
-		</AttributeConsumingService>
-
-	</SPSSODescriptor>
-
-	<Organization>
-		<OrganizationName xml:lang="en">SITES Data Portal</OrganizationName>
-		<OrganizationDisplayName xml:lang="en">SITES Data Portal</OrganizationDisplayName>
-		<OrganizationURL xml:lang="en">http://www.fieldsites.se/</OrganizationURL>
-	</Organization>
-
-	<ContactPerson contactType="technical">
-		<GivenName>Oleg</GivenName>
-		<SurName>Mirzov</SurName>
-		<EmailAddress>oleg.mirzov@nateko.lu.se</EmailAddress>
-	</ContactPerson>
-
-</EntityDescriptor>
-
-<Signature xmlns="http://www.w3.org/2000/09/xmldsig#"><SignedInfo><CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/><SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/><Reference URI=""><Transforms><Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/></Transforms><DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/><DigestValue>I/ymh3SCz90qJoKMOhllvyAXTkg=</DigestValue></Reference></SignedInfo><SignatureValue>gc+2bNuSfQHsDv5jmnCl/hDFG8I5ttg0b9TioK15Y3YlOJgTFpEoa/PJobGMbUU4lTLJAs4W8RO6
-glJmT4sYVy2sej17i9LhTutNbYq7omp/esGamzmniUH8kihTRlcRTpKbnc1kf+vhsZgMziGxD+YK
-T/LW5Tuj7VXGpJHEK2PE1yFshXguLo259Outy7wYgoojwgNogytTO4epmuPcjzwM8Qg/gglVcJoh
-zMdhVdV2Pzn/l9dn2FRnqaXtVkfFjwEG00lPxFjj2TZfU9vwEAbgDntVen5hdYm0EzRgV+rC/wDz
-Xs55lDvCDdbV8D6Dw/USFZMTDlkjHOVMPkXguw==</SignatureValue><KeyInfo><KeyValue><RSAKeyValue><Modulus>vnskv2ZsZJSMrpSAPvfIYrcUuZb0lKihvYGiJeU7kARyepUGAg3MCE8dMN0R+uOHcsKHPW0NI6Mi
+                  </ds:X509Certificate>
+               </ds:X509Data>
+            </ds:KeyInfo>
+            <md:EncryptionMethod Algorithm="http://www.w3.org/2009/xmlenc11#aes128-gcm"/>
+            <md:EncryptionMethod Algorithm="http://www.w3.org/2009/xmlenc11#aes192-gcm"/>
+            <md:EncryptionMethod Algorithm="http://www.w3.org/2009/xmlenc11#aes256-gcm"/>
+            <md:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes128-cbc"/>
+            <md:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes192-cbc"/>
+            <md:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes256-cbc"/>
+            <md:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#tripledes-cbc"/>
+            <md:EncryptionMethod Algorithm="http://www.w3.org/2009/xmlenc11#rsa-oaep"/>
+            <md:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p"/>
+         </md:KeyDescriptor>
+         <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://auth.fieldsites.se/saml/logout"/>
+         <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://auth.fieldsites.se/saml/SAML2/POST" index="1" isDefault="true"/>
+         <md:AttributeConsumingService index="0">
+            <md:ServiceName xml:lang="en">SITES SAML service</md:ServiceName>
+            <md:ServiceName xml:lang="sv">SITES SAML tjänst</md:ServiceName>
+            <md:ServiceDescription xml:lang="en">Single sign on for SITES data services</md:ServiceDescription>
+            <md:ServiceDescription xml:lang="sv">Enskild inloggning för SITES data tjänster</md:ServiceDescription>
+            <md:RequestedAttribute FriendlyName="givenName" Name="urn:oid:2.5.4.42" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" isRequired="true"/>
+            <md:RequestedAttribute FriendlyName="sn" Name="urn:oid:2.5.4.4" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" isRequired="true"/>
+            <md:RequestedAttribute FriendlyName="mail" Name="urn:oid:0.9.2342.19200300.100.1.3" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" isRequired="true"/>
+         </md:AttributeConsumingService>
+      </md:SPSSODescriptor>
+      <md:Organization>
+         <md:OrganizationName xml:lang="en">SITES Data Portal</md:OrganizationName>
+         <md:OrganizationName xml:lang="sv">SITES data portalen</md:OrganizationName>
+         <md:OrganizationDisplayName xml:lang="en">SITES Data Portal</md:OrganizationDisplayName>
+         <md:OrganizationDisplayName xml:lang="sv">SITES data portalen</md:OrganizationDisplayName>
+         <md:OrganizationURL xml:lang="en">https://www.fieldsites.se/en-GB</md:OrganizationURL>
+         <md:OrganizationURL xml:lang="sv">https://www.fieldsites.se/sv-SE</md:OrganizationURL>
+      </md:Organization>
+      <md:ContactPerson contactType="technical">
+         <md:GivenName>Oleg</md:GivenName>
+         <md:SurName>Mirzov</md:SurName>
+         <md:EmailAddress>mailto:oleg.mirzov@nateko.lu.se</md:EmailAddress>
+      </md:ContactPerson>
+      <md:ContactPerson contactType="administrative">
+         <md:GivenName>Holger</md:GivenName>
+         <md:SurName>Villwock</md:SurName>
+         <md:EmailAddress>mailto:holger.villwock@slu.se</md:EmailAddress>
+      </md:ContactPerson>
+      <md:ContactPerson contactType="support">
+         <md:GivenName>Jonathan</md:GivenName>
+         <md:SurName>Thiry</md:SurName>
+         <md:EmailAddress>mailto:jonathan.thiry@nateko.lu.se</md:EmailAddress>
+      </md:ContactPerson>
+</md:EntityDescriptor>
+   <Signature xmlns="http://www.w3.org/2000/09/xmldsig#">
+      <SignedInfo>
+         <CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>
+         <SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
+         <Reference URI="">
+            <Transforms>
+               <Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
+            </Transforms>
+            <DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+            <DigestValue>yOpcMC78Svv9RcqANXmJnDPeroY=</DigestValue>
+         </Reference>
+      </SignedInfo>
+      <SignatureValue>
+         dKlSqNJtY9+nN6ir3Oq4yZS2Tc7Z6+8Sda6DSkfVCeyBHVVhbNb65LsVeBEHn24U+2pxcehqbYRo
+gO4My8VL983mhH0GL/vA2u/RTaqg8bmLfejH2i7RGZvS3DcjQcLViW/+XU6OpyRsawx2Zd+ib9af
+cdYjdncFg8wAubGclwdCdw3nY8OuGwoEeCu94+1hm1mS1WN8NCAvD9UhOQ7uKKqKgdT1QccpC1BH
+Z2nYxOdgcFIovTlvRFwOelXXVHCbbpZnkzmxucROWe65FxVjeI/BVEEck71Bt/aYTJvpmnSj+o/a
+x9c5cgfYhfAHI3SbKqXI1Ov4O9K6JVAtQiGUtg==
+      </SignatureValue>
+      <KeyInfo>
+         <KeyValue>
+            <RSAKeyValue>
+               <Modulus>
+                  vnskv2ZsZJSMrpSAPvfIYrcUuZb0lKihvYGiJeU7kARyepUGAg3MCE8dMN0R+uOHcsKHPW0NI6Mi
 5twYAR30oBXuWYTpd/7CdFeAoqzKoXYCz6+VPklAXclu4P57O4TyLixPNbaj9pyHSem0CHdJRPjt
 Bz/hgTpgDuBCdx2wWLXDiPr1ny0YA4nJ2Xhn8BOykaI1IJjDl7y+mO4rTpAc6rekTycGrtCf0Jg7
 1/d0+wubqpBwMd4savAWVxcOM9G7d55+FMo7KgKrli9qvq8Z2e8T1dXuVqKRgJH8SrwuJt82Ozzm
-Nj5XMWwg4kdIvO1ZoEiFZQoZ/oezA/GMBOsO8Q==</Modulus><Exponent>AQAB</Exponent></RSAKeyValue></KeyValue></KeyInfo></Signature></EntitiesDescriptor>
+Nj5XMWwg4kdIvO1ZoEiFZQoZ/oezA/GMBOsO8Q==
+               </Modulus>
+               <Exponent>AQAB</Exponent>
+            </RSAKeyValue>
+         </KeyValue>
+      </KeyInfo>
+   </Signature>
+</EntitiesDescriptor>
