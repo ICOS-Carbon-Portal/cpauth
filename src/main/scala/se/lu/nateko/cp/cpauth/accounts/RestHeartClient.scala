@@ -151,13 +151,11 @@ class RestHeartClient(val config: RestHeartConfig, http: HttpExt)(using Material
 
 	private def parseFilteredUsersList(v: JsValue): Try[Seq[UserId]] = {
 		for(
-			obj <- ensure[JsObject](v);
-			returned <- getField[JsNumber](obj, "_returned")
+			returned <- ensure[JsArray](v);
+			uidObjs <- getElements[JsObject](returned)
 		) yield
-			if(returned.value == 0) Success(Nil)
+			if(uidObjs.size == 0) Success(Nil)
 			else for(
-				arr <- getField[JsArray](obj, "_embedded");
-				uidObjs <- getElements[JsObject](arr);
 				ids <- Utils.tryseq(uidObjs.map(getStringField(_, "_id")))
 			) yield ids.map(UserId.apply)
 	}.flatten
