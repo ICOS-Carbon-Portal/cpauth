@@ -38,8 +38,11 @@
 				Location="https://cpauth.icos-cp.eu/saml/login"/>
 			<UIInfo xmlns="urn:oasis:names:tc:SAML:metadata:ui">
 				<DisplayName xml:lang="en">Carbon Portal Authentication Service</DisplayName>
-				<Description xml:lang="en">Single sign on for all Carbon Portal services</Description>
+				<Description xml:lang="en">Single sign on for Carbon Portal in-house developed services</Description>
 				<PrivacyStatementURL xml:lang="en">https://cpauth.icos-cp.eu/saml/privacyStatement</PrivacyStatementURL>
+				<PrivacyStatementURL xml:lang="sv">https://cpauth.icos-cp.eu/saml/privacyStatement</PrivacyStatementURL>
+				<InformationURL xml:lang="en">https://www.icos-cp.eu/</InformationURL>
+				<InformationURL xml:lang="sv">https://www.icos-cp.eu/</InformationURL>
 			</UIInfo>
 		</Extensions>
 		<KeyDescriptor>
@@ -89,6 +92,8 @@ D265cqy6Le/toVg=
 		<AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://cpauth.icos-cp.eu/saml/SAML2/POST" index="1" isDefault="true"/>
 
 		<AttributeConsumingService>
+			<ServiceName xml:lang="en">ICOS Carbon Portal SAML service</ServiceName>
+			<ServiceName xml:lang="sv">ICOS Kolportalens SAML tjänst</ServiceName>
 			<RequestedAttribute
 				FriendlyName="givenName"
 				Name="urn:oid:2.5.4.42"
@@ -110,14 +115,23 @@ D265cqy6Le/toVg=
 
 	<Organization>
 		<OrganizationName xml:lang="en">ICOS Carbon Portal</OrganizationName>
+		<OrganizationName xml:lang="sv">ICOS Kolportalen</OrganizationName>
 		<OrganizationDisplayName xml:lang="en">Carbon Portal</OrganizationDisplayName>
+		<OrganizationDisplayName xml:lang="sv">Kolportalen</OrganizationDisplayName>
 		<OrganizationURL xml:lang="en">https://www.icos-cp.eu/</OrganizationURL>
+		<OrganizationURL xml:lang="sv">https://www.icos-cp.eu/</OrganizationURL>
 	</Organization>
 
 	<ContactPerson contactType="technical">
 		<GivenName>Oleg</GivenName>
 		<SurName>Mirzov</SurName>
 		<EmailAddress>oleg.mirzov@nateko.lu.se</EmailAddress>
+	</ContactPerson>
+
+	<ContactPerson contactType="administrative">
+		<GivenName>Alex</GivenName>
+		<SurName>Vermeulen</SurName>
+		<EmailAddress>alex.vermeulen@nateko.lu.se</EmailAddress>
 	</ContactPerson>
 
 </EntityDescriptor>
