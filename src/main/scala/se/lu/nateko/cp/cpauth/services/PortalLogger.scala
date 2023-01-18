@@ -35,6 +35,10 @@ class PortalLogger(
 
 			case cpb: CpbDownloadInfo =>
 				logUsageToRestheart(JsObject("cpbDownload" -> cpb.toJson), ipinfo)
+			
+			case zip: ZipExtractionInfo =>
+				logUsageToRestheart(JsObject("zipExtraction" -> zip.toJson), ipinfo)
+
 		}
 	}
 

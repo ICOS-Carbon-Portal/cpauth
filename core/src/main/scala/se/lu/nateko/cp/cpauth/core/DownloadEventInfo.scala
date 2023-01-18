@@ -42,6 +42,14 @@ case class DataObjDownloadInfo(
 	endUser: Option[String]
 ) extends DownloadEventInfo
 
+case class ZipExtractionInfo(
+	time: Instant,
+	ip: String,
+	hashId: String,
+	cpUser: Option[AnonId],
+	zip: JsObject
+) extends DownloadEventInfo
+
 
 object DownloadEventInfo extends DefaultJsonProtocol{
 
@@ -67,6 +75,7 @@ object DownloadEventInfo extends DefaultJsonProtocol{
 	given RootJsonFormat[CsvDownloadInfo] = jsonFormat5(CsvDownloadInfo.apply)
 	given RootJsonFormat[CpbSlice] = jsonFormat2(CpbSlice.apply)
 	given RootJsonFormat[CpbDownloadInfo] = jsonFormat7(CpbDownloadInfo.apply)
+	given RootJsonFormat[ZipExtractionInfo] = jsonFormat5(ZipExtractionInfo.apply)
 
 	given RootJsonFormat[DownloadEventInfo] with {
 
@@ -80,6 +89,7 @@ object DownloadEventInfo extends DefaultJsonProtocol{
 				case data: DataObjDownloadInfo => withType("dobj", data)
 				case csv: CsvDownloadInfo => withType("csv", csv)
 				case cpb: CpbDownloadInfo => withType("cpb", cpb)
+				case zip: ZipExtractionInfo => withType("zip", zip)
 			}
 		}
 
@@ -91,6 +101,7 @@ object DownloadEventInfo extends DefaultJsonProtocol{
 				case Some("coll") => obj.convertTo[CollectionDownloadInfo]
 				case Some("doc") => obj.convertTo[DocumentDownloadInfo]
 				case Some("csv") => obj.convertTo[CsvDownloadInfo]
+				case Some("zip") => obj.convertTo[ZipExtractionInfo]
 				case None =>
 					deserializationError("Missing field 'type' on JSON for DownloadEventInfo")
 				case Some(other) =>

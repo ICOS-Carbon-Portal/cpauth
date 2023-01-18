@@ -38,6 +38,7 @@ class PostgresClient(conf: PostgresConfig) extends AutoCloseable {
 			case _: CollectionDownloadInfo => "collection"
 			case _: CsvDownloadInfo => "data" //not meant to be logged to postgres at the time of this writing
 			case _: CpbDownloadInfo => "data" //not meant to be logged to postgres at the time of this writing
+			case _: ZipExtractionInfo => "data" //not meant to be logged to postgres at the time of this writing
 		}
 		st.setString(item_type, itemType)
 		st.setTimestamp(ts, java.sql.Timestamp.from(dlInfo.time))
