@@ -12,8 +12,8 @@ sealed trait DownloadEventInfo{
 	def cpUser: Option[AnonId]
 }
 
-case class CollectionDownloadInfo(time: Instant, ip: String, hashId: String, cpUser: Option[AnonId], coll: JsObject) extends DownloadEventInfo
-case class DocumentDownloadInfo(time: Instant, ip: String, hashId: String, cpUser: Option[AnonId], doc: JsObject) extends DownloadEventInfo
+case class CollectionDownloadInfo(time: Instant, ip: String, hashId: String, cpUser: Option[AnonId]) extends DownloadEventInfo
+case class DocumentDownloadInfo(time: Instant, ip: String, hashId: String, cpUser: Option[AnonId]) extends DownloadEventInfo
 case class CsvDownloadInfo(
 	time: Instant,
 	ip: String,
@@ -37,7 +37,6 @@ case class DataObjDownloadInfo(
 	ip: String,
 	hashId: String,
 	cpUser: Option[AnonId],
-	dobj: JsObject,
 	distributor: Option[String],
 	endUser: Option[String]
 ) extends DownloadEventInfo
@@ -46,8 +45,9 @@ case class ZipExtractionInfo(
 	time: Instant,
 	ip: String,
 	hashId: String,
+	zipEntryPath: String,
 	cpUser: Option[AnonId],
-	zip: JsObject
+	localOrigin: Option[String]
 ) extends DownloadEventInfo
 
 
@@ -68,14 +68,14 @@ object DownloadEventInfo extends DefaultJsonProtocol{
 		}
 	}
 
-	given RootJsonFormat[CollectionDownloadInfo] = jsonFormat5(CollectionDownloadInfo.apply)
-	given RootJsonFormat[DocumentDownloadInfo] = jsonFormat5(DocumentDownloadInfo.apply)
-	given RootJsonFormat[DataObjDownloadInfo] = jsonFormat7(DataObjDownloadInfo.apply)
+	given RootJsonFormat[CollectionDownloadInfo] = jsonFormat4(CollectionDownloadInfo.apply)
+	given RootJsonFormat[DocumentDownloadInfo] = jsonFormat4(DocumentDownloadInfo.apply)
+	given RootJsonFormat[DataObjDownloadInfo] = jsonFormat6(DataObjDownloadInfo.apply)
 	given RootJsonFormat[CsvSelect] = jsonFormat3(CsvSelect.apply)
 	given RootJsonFormat[CsvDownloadInfo] = jsonFormat5(CsvDownloadInfo.apply)
 	given RootJsonFormat[CpbSlice] = jsonFormat2(CpbSlice.apply)
 	given RootJsonFormat[CpbDownloadInfo] = jsonFormat7(CpbDownloadInfo.apply)
-	given RootJsonFormat[ZipExtractionInfo] = jsonFormat5(ZipExtractionInfo.apply)
+	given RootJsonFormat[ZipExtractionInfo] = jsonFormat6(ZipExtractionInfo.apply)
 
 	given RootJsonFormat[DownloadEventInfo] with {
 
