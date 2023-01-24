@@ -2,18 +2,17 @@ package se.lu.nateko.cp.cpauth.services
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
-import akka.http.scaladsl.model._
-import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
+import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport.*
+import akka.http.scaladsl.model.*
+import akka.http.scaladsl.settings.ConnectionPoolSettings
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.stream.Materializer.matFromSystem
+import se.lu.nateko.cp.cpauth.CpGeoConfig
+import spray.json.*
 
 import scala.concurrent.Future
-import se.lu.nateko.cp.cpauth.CpGeoConfig
-import spray.json._
-
 import scala.util.Failure
 import scala.util.control.NoStackTrace
-import spray.json.RootJsonReader
 
 sealed trait GeoIpResponse
 case class GeoIpInfo(
@@ -27,7 +26,7 @@ case class GeoIpInfo(
 case class GeoIpError(error: String) extends GeoIpResponse
 case class GeoIpInnerError(msg: String, code: Int) extends GeoIpResponse
 
-class CpGeoClient(conf: CpGeoConfig, errorEmailer: ErrorEmailer)(implicit system: ActorSystem) {
+class CpGeoClient(conf: CpGeoConfig, errorEmailer: ErrorEmailer)(using system: ActorSystem) {
 	import CpGeoClient._
 
 	import system.dispatcher
@@ -53,7 +52,8 @@ class CpGeoClient(conf: CpGeoConfig, errorEmailer: ErrorEmailer)(implicit system
 
 		val path = maxAge.fold(ipPath)(maxDays => ipPath / maxDays.toString)
 		Http().singleRequest(
-			HttpRequest(uri = baseUrl.withPath(path))
+			request = HttpRequest(uri = baseUrl.withPath(path)),
+			settings = ConnectionPoolSettings(system).withMaxConnections(8).withMaxOpenRequests(512)
 		).flatMap {resp =>
 			if(resp.status == StatusCodes.OK)
 				Unmarshal(resp.entity).to[GeoIpResponse]
