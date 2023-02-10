@@ -1,7 +1,7 @@
 package se.lu.nateko.cp.cpauth.test
 
 import org.scalatest.funsuite.AnyFunSuite
-import se.lu.nateko.cp.cpauth.core._
+import se.lu.nateko.cp.cpauth.core.*
 import se.lu.nateko.cp.cpauth.utils.SignedTokenMaker
 import se.lu.nateko.cp.cpauth.PrivateAuthConfig
 import se.lu.nateko.cp.cpauth.Envri
@@ -54,7 +54,7 @@ class AuthenticationTest extends AnyFunSuite{
 			privateKeyPaths = Map(ICOS -> private1)
 		)).get.makeToken(user, AuthSource.Saml)
 
-		val unwrappedToken = Authenticator(pubAuthConfig).get.unwrapTrustedToken(token, AuthSource.ValueSet(AuthSource.Password))
+		val unwrappedToken = Authenticator(pubAuthConfig).get.unwrapTrustedToken(token, Set(AuthSource.Password))
 
 		assert(unwrappedToken.isFailure)
 

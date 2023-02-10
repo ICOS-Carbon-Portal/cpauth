@@ -52,7 +52,7 @@ class CookieFactory(config: CpauthConfig) {
 	) yield (cookie, userId, statements)
 
 
-	def makeTokenBase64(userId: UserId, source: AuthSource.Value)(implicit envri: Envri): Try[String] = for(
+	def makeTokenBase64(userId: UserId, source: AuthSource)(using Envri): Try[String] = for(
 		tokenMaker <- tokenMakerTry;
 		token = tokenMaker.makeToken(userId, source)
 	) yield CookieToToken.constructCookieContent(token)

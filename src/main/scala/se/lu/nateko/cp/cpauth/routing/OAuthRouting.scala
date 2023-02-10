@@ -62,7 +62,7 @@ trait OAuthRouting extends CpauthDirectives{
 			})
 	}
 
-	private def oauthRoute(uidProvider: String => Future[UserId], source: AuthSource.AuthSource)(using Envri): Route = {
+	private def oauthRoute(uidProvider: String => Future[UserId], source: AuthSource)(using Envri): Route = {
 		parameters("code", "state".?){(code, targetUrl) =>
 			val tokenFut: Future[String] = uidProvider(code).flatMap{uid =>
 				Future.fromTry(

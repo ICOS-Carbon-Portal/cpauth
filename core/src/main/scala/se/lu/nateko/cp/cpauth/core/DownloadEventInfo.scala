@@ -5,32 +5,15 @@ import spray.json.*
 import DownloadEventInfo.{CsvSelect, CpbSlice, AnonId}
 
 
-sealed trait DownloadEventInfo{
+sealed trait DownloadEventInfo:
 	def time: Instant
 	def ip: String
 	def hashId: String
 	def cpUser: Option[AnonId]
-}
 
-case class CollectionDownloadInfo(time: Instant, ip: String, hashId: String, cpUser: Option[AnonId]) extends DownloadEventInfo
-case class DocumentDownloadInfo(time: Instant, ip: String, hashId: String, cpUser: Option[AnonId]) extends DownloadEventInfo
-case class CsvDownloadInfo(
-	time: Instant,
-	ip: String,
-	hashId: String,
-	cpUser: Option[AnonId],
-	select: DownloadEventInfo.CsvSelect
-) extends DownloadEventInfo
-
-case class CpbDownloadInfo(
-	time: Instant,
-	ip: String,
-	hashId: String,
-	cpUser: Option[AnonId],
-	colNums: Seq[Int],
-	slice: Option[DownloadEventInfo.CpbSlice],
-	localOrigin: Option[String]
-) extends DownloadEventInfo
+sealed trait DlEventForPostgres extends DownloadEventInfo
+sealed trait DlEventForMongo extends DownloadEventInfo:
+	def userAgent: Option[String]
 
 case class DataObjDownloadInfo(
 	time: Instant,
@@ -39,7 +22,31 @@ case class DataObjDownloadInfo(
 	cpUser: Option[AnonId],
 	distributor: Option[String],
 	endUser: Option[String]
-) extends DownloadEventInfo
+) extends DlEventForPostgres
+
+case class CollectionDownloadInfo(time: Instant, ip: String, hashId: String, cpUser: Option[AnonId]) extends DlEventForPostgres
+case class DocumentDownloadInfo(time: Instant, ip: String, hashId: String, cpUser: Option[AnonId]) extends DlEventForPostgres
+
+case class CsvDownloadInfo(
+	time: Instant,
+	ip: String,
+	hashId: String,
+	cpUser: Option[AnonId],
+	userAgent: Option[String],
+	select: DownloadEventInfo.CsvSelect
+) extends DlEventForMongo
+
+case class CpbDownloadInfo(
+	time: Instant,
+	ip: String,
+	hashId: String,
+	cpUser: Option[AnonId],
+	colNums: Seq[Int],
+	slice: Option[DownloadEventInfo.CpbSlice],
+	localOrigin: Option[String],
+	userAgent: Option[String]
+) extends DlEventForMongo
+
 
 case class ZipExtractionInfo(
 	time: Instant,
@@ -47,8 +54,9 @@ case class ZipExtractionInfo(
 	hashId: String,
 	zipEntryPath: String,
 	cpUser: Option[AnonId],
-	localOrigin: Option[String]
-) extends DownloadEventInfo
+	localOrigin: Option[String],
+	userAgent: Option[String]
+) extends DlEventForMongo
 
 
 object DownloadEventInfo extends DefaultJsonProtocol{
@@ -72,10 +80,10 @@ object DownloadEventInfo extends DefaultJsonProtocol{
 	given RootJsonFormat[DocumentDownloadInfo] = jsonFormat4(DocumentDownloadInfo.apply)
 	given RootJsonFormat[DataObjDownloadInfo] = jsonFormat6(DataObjDownloadInfo.apply)
 	given RootJsonFormat[CsvSelect] = jsonFormat3(CsvSelect.apply)
-	given RootJsonFormat[CsvDownloadInfo] = jsonFormat5(CsvDownloadInfo.apply)
+	given RootJsonFormat[CsvDownloadInfo] = jsonFormat6(CsvDownloadInfo.apply)
 	given RootJsonFormat[CpbSlice] = jsonFormat2(CpbSlice.apply)
-	given RootJsonFormat[CpbDownloadInfo] = jsonFormat7(CpbDownloadInfo.apply)
-	given RootJsonFormat[ZipExtractionInfo] = jsonFormat6(ZipExtractionInfo.apply)
+	given RootJsonFormat[CpbDownloadInfo] = jsonFormat8(CpbDownloadInfo.apply)
+	given RootJsonFormat[ZipExtractionInfo] = jsonFormat7(ZipExtractionInfo.apply)
 
 	given RootJsonFormat[DownloadEventInfo] with {
 

@@ -13,7 +13,6 @@ import se.lu.nateko.cp.cpauth.core.AuthSource
 import se.lu.nateko.cp.cpauth.core.UserId
 import se.lu.nateko.cp.cpauth.services.CookieFactory
 import se.lu.nateko.cp.cpauth.services.PasswordLifecycleHandler
-import se.lu.nateko.cp.cpauth.core.DownloadEventInfo
 import spray.json.DefaultJsonProtocol.immSeqFormat
 
 trait PasswordRouting extends CpauthDirectives {

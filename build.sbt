@@ -31,7 +31,7 @@ lazy val cpauthCore = (project in file("core"))
 	.settings(publishingSettings: _*)
 	.settings(
 		name := "cpauth-core",
-		version := "0.7.1",
+		version := "0.8.0",
 		libraryDependencies ++= Seq(
 			"io.spray"              %% "spray-json"                         % "1.3.6"
 		),
@@ -68,7 +68,7 @@ lazy val cpauth = (project in file("."))
 	.enablePlugins(SbtTwirl, IcosCpSbtDeployPlugin)
 	.settings(
 		name := "cpauth",
-		version := "0.6.0",
+		version := "0.6.1",
 		libraryDependencies ++= Seq(
 			"com.typesafe.akka"      %% "akka-http-spray-json"               % akkaHttpVersion excludeAll("io.spray") cross CrossVersion.for3Use2_13,
 			"com.typesafe.akka"      %% "akka-http-testkit"                  % akkaHttpVersion % "test" cross CrossVersion.for3Use2_13,

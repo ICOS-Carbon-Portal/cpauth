@@ -7,7 +7,6 @@ import spray.json.{JsObject, JsString}
 import CpGeoClient.given
 import spray.json.*
 import se.lu.nateko.cp.cpauth.PostgresConfig
-import se.lu.nateko.cp.cpauth.core.DownloadEventInfo
 import scala.util.Success
 import scala.util.Failure
 import se.lu.nateko.cp.cpauth.core.*
@@ -25,9 +24,9 @@ class PortalLogger(
 
 	def logDl(entry: DownloadEventInfo)(using Envri): Unit = logInternally(entry.ip){ipinfo =>
 
-		entry match{
-			case _: CollectionDownloadInfo | _: DocumentDownloadInfo | _: DataObjDownloadInfo =>
-				pgLogClient.logDownload(entry, ipinfo).failed.foreach{err =>
+		entry match
+			case pgEvent: DlEventForPostgres =>
+				pgLogClient.logDownload(pgEvent, ipinfo).failed.foreach{err =>
 					system.log.error(err, "Could not log download to Postgres")
 				}
 			case csv: CsvDownloadInfo =>
@@ -38,8 +37,6 @@ class PortalLogger(
 			
 			case zip: ZipExtractionInfo =>
 				logUsageToRestheart(JsObject("zipExtraction" -> zip.toJson), ipinfo)
-
-		}
 	}
 
 	private def logInternally(ip: String)(logAction: Either[String, GeoIpInfo] => Unit): Unit = if (!confRestheart.ipsToIgnore.contains(ip)){
