@@ -7,7 +7,7 @@
 	@customHeader
 	<script src="common.js"></script>
 	<script src="@(scriptName).js"></script>
-	<style type="text/css">
+	<style>
 		.fixed-message {
 			position:fixed;
 			top:3px;
@@ -18,7 +18,7 @@
 		}
 	</style>
 
-	<script type="text/javascript">
+	<script>
 		$(window).scroll(function() {
 			if ($('#message-container').offset().top < $(window).scrollTop()) {
 				$('#message').addClass('fixed-message');

@@ -11,17 +11,17 @@
 	dataHost: String
 )(customHeader: Html)(body: Html)
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 	<link rel="stylesheet" href="https://static.icos-cp.eu/css/bootstrap/@{bootstrapCSS}/icos-bootstrap.css">
 	<link rel="stylesheet" href="https://static.icos-cp.eu/constant/fontawesome/@{fontAwesome}/css/all.min.css">
 	@IcosStyle(menu.nonEmpty, styleConf)
 
-	<meta charset="utf-8"/>
+	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 
 	@if(menu.nonEmpty){
-	<script type="application/javascript">
+	<script>
 		@Html(MainMenuJS(authHost, dataHost).body)
 	</script>
 	}
