@@ -6,7 +6,7 @@ import org.postgresql.ds.PGConnectionPoolDataSource
 import se.lu.nateko.cp.cpauth.CredentialsConfig
 import se.lu.nateko.cp.cpauth.Envri.Envri
 import se.lu.nateko.cp.cpauth.PostgresConfig
-import se.lu.nateko.cp.cpauth.core._
+import se.lu.nateko.cp.cpauth.core.*
 
 import java.sql.Connection
 import java.sql.PreparedStatement
@@ -22,7 +22,7 @@ import scala.concurrent.Future
 
 class PostgresClient(conf: PostgresConfig) extends AutoCloseable {
 
-	def logDownload(dlInfo: DownloadEventInfo, ip: Either[String, GeoIpInfo])(implicit envri: Envri): Future[Done] = withTransaction(conf.writer){
+	def logDownload(dlInfo: DlEventForPostgres, ip: Either[String, GeoIpInfo])(using Envri): Future[Done] = withTransaction(conf.writer){
 		"SELECT addDownloadRecord(_item_type:=?, _ts:=?, _hash_id:=?, _ip:=?, _city:=?, _country_code:=?, _lon:=?, _lat:=?, _distributor:=?, _endUser:=?)"
 	}{st =>
 		def setOptVarchar(strOpt: Option[String], idx: Int): Unit = strOpt match{
@@ -32,13 +32,10 @@ class PostgresClient(conf: PostgresConfig) extends AutoCloseable {
 
 		val Seq(item_type, ts, hash_id, ip_idx, city, country_code, lon, lat, distributor_idx, endUser_idx) = 1 to 10
 
-		val itemType = dlInfo match{
+		val itemType = dlInfo match
 			case _: DataObjDownloadInfo => "data"
 			case _: DocumentDownloadInfo => "document"
 			case _: CollectionDownloadInfo => "collection"
-			case _: CsvDownloadInfo => "data" //not meant to be logged to postgres at the time of this writing
-			case _: CpbDownloadInfo => "data" //not meant to be logged to postgres at the time of this writing
-		}
 		st.setString(item_type, itemType)
 		st.setTimestamp(ts, java.sql.Timestamp.from(dlInfo.time))
 		st.setString(hash_id, dlInfo.hashId)
@@ -83,7 +80,7 @@ class PostgresClient(conf: PostgresConfig) extends AutoCloseable {
 		)
 	}
 
-	private[this] implicit val exeCtxt = ExecutionContext.fromExecutor(executor)
+	private given ExecutionContext = ExecutionContext.fromExecutor(executor)
 
 	private[this] val dataSources: Map[Envri, SharedPoolDataSource] = conf.dbNames.view.mapValues{ dbName =>
 		val pgDs = new PGConnectionPoolDataSource()
@@ -104,7 +101,7 @@ class PostgresClient(conf: PostgresConfig) extends AutoCloseable {
 		dataSources.valuesIterator.foreach{_.close()}
 	}
 
-	private def withConnection[T](creds: CredentialsConfig)(act: Connection => T)(implicit envri: Envri): Future[T] = Future{
+	private def withConnection[T](creds: CredentialsConfig)(act: Connection => T)(using envri: Envri): Future[T] = Future{
 		val conn = dataSources(envri).getConnection(creds.username, creds.password)
 		conn.setHoldability(ResultSet.CLOSE_CURSORS_AT_COMMIT)
 		try {
@@ -114,7 +111,7 @@ class PostgresClient(conf: PostgresConfig) extends AutoCloseable {
 		}
 	}
 
-	private def withTransaction(creds: CredentialsConfig)(query: String)(act: PreparedStatement => Unit)(implicit envri: Envri): Future[Done] = {
+	private def withTransaction(creds: CredentialsConfig)(query: String)(act: PreparedStatement => Unit)(using Envri): Future[Done] = {
 		withConnection(creds){conn =>
 			val st = conn.prepareStatement(query)
 			try{

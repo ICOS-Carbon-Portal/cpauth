@@ -21,8 +21,7 @@ trait OAuthRouting extends CpauthDirectives{
 
 	def oauthConfig: CpauthConfig.OAuthConfig
 	def cookieFactory: CookieFactory
-	implicit def dispatcher: ExecutionContext
-	implicit def system: ActorSystem
+	given system: ActorSystem
 	def restHeart: RestHeartClient
 
 	val facebookRoute: Route = (pathPrefix("oauth" / "facebook") & extractEnvri){implicit envri =>
@@ -33,7 +32,7 @@ trait OAuthRouting extends CpauthDirectives{
 		oauthRoute(cpauthTokenFromOrcidId, AuthSource.Orcid)
 	}
 
-	private def cpauthTokenFromFacebook(code: String)(implicit envri: Envri): Future[UserId] = {
+	private def cpauthTokenFromFacebook(code: String)(using Envri): Future[UserId] = {
 		facebookAuth.retrieveUserInfo(code).map{userInfo =>
 			val uid = UserId(userInfo.email)
 
@@ -44,7 +43,7 @@ trait OAuthRouting extends CpauthDirectives{
 		}
 	}
 
-	private def cpauthTokenFromOrcidId(code: String)(implicit envri: Envri): Future[UserId] = {
+	private def cpauthTokenFromOrcidId(code: String)(using Envri): Future[UserId] = {
 		orcidIdAuthenticationService.retrieveUserInfo(code)
 			.flatMap(userInfo => userInfo.email match {
 				case Some(email) =>
@@ -63,7 +62,7 @@ trait OAuthRouting extends CpauthDirectives{
 			})
 	}
 
-	private def oauthRoute(uidProvider: String => Future[UserId], source: AuthSource.AuthSource)(implicit envri: Envri): Route = {
+	private def oauthRoute(uidProvider: String => Future[UserId], source: AuthSource)(using Envri): Route = {
 		parameters("code", "state".?){(code, targetUrl) =>
 			val tokenFut: Future[String] = uidProvider(code).flatMap{uid =>
 				Future.fromTry(
@@ -86,11 +85,11 @@ trait OAuthRouting extends CpauthDirectives{
 		}
 	}
 
-	private def facebookAuth(implicit envri: Envri) = new FacebookAuthenticationService(
+	private def facebookAuth(using envri: Envri) = new FacebookAuthenticationService(
 		oauthConfig(envri)(OAuthProvider.facebook)
 	)
 
-	private def orcidIdAuthenticationService(implicit envri: Envri) = new OrcidAuthenticationService(
+	private def orcidIdAuthenticationService(using envri: Envri) = new OrcidAuthenticationService(
 		oauthConfig(envri)(OAuthProvider.orcidid)
 	)
 

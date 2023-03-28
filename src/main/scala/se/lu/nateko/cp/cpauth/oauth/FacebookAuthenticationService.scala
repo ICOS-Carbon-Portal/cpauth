@@ -4,7 +4,7 @@ import scala.concurrent.Future
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
-import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
+import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport.*
 import akka.http.scaladsl.model.FormData
 import akka.http.scaladsl.model.HttpMethods
 import akka.http.scaladsl.model.HttpRequest
@@ -12,13 +12,12 @@ import akka.http.scaladsl.model.MediaTypes
 import akka.http.scaladsl.model.Uri
 import akka.http.scaladsl.model.headers.Accept
 import akka.http.scaladsl.unmarshalling.Unmarshal
-import akka.stream.Materializer
 import se.lu.nateko.cp.cpauth.OAuthProviderConfig
-import se.lu.nateko.cp.cpauth.utils.SprayJsonUtils._
-import spray.json._
+import se.lu.nateko.cp.cpauth.utils.SprayJsonUtils.*
+import spray.json.*
 
 
-class FacebookAuthenticationService(config: OAuthProviderConfig)(implicit system: ActorSystem, mat: Materializer) {
+class FacebookAuthenticationService(config: OAuthProviderConfig)(using system: ActorSystem) {
 
 	import system.dispatcher
 

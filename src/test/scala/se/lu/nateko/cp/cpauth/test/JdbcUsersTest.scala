@@ -7,6 +7,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import se.lu.nateko.cp.cpauth.accounts._
 import se.lu.nateko.cp.cpauth.core._
 import se.lu.nateko.cp.cpauth.core.AuthenticationFailedException
+import scala.concurrent.Await
+import scala.concurrent.duration.DurationInt
 
 class JdbcUsersTest extends AnyFunSuite with ScalaFutures {
 
@@ -17,6 +19,7 @@ class JdbcUsersTest extends AnyFunSuite with ScalaFutures {
 
 	test("Simple test of all operations") {
 		val jdu = new se.lu.nateko.cp.cpauth.accounts.JdbcUsers(() => getConnection())
+		Await.ready(jdu.init(), 2.seconds)
 		val uid = UserId("ordinaryuser")
 		val ue  = UserEntry(uid, false)
 

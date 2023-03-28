@@ -2,16 +2,16 @@
 @import se.lu.nateko.cp.viewscore.ImportVersions._
 
 @(title: String,
-	bootstrapJavascript: Boolean = false,
-	authHost: String,
-	dataHost: String
+  bootstrapJavascript: Boolean = false,
+  authHost: String,
+  dataHost: String
 )(customHeader: Html)(body: Html)
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
 
-	<meta charset="utf-8" />
+	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 
 	<link rel="stylesheet" href="https://static.icos-cp.eu/css/bootstrap/@{bootstrapCSS}/sites-bootstrap.css">
@@ -23,7 +23,7 @@
 
 	@SitesStyle()
 
-	<script type="application/javascript">
+	<script>
 	@Html(MainMenuJS(authHost, dataHost).body)
 	</script>
 

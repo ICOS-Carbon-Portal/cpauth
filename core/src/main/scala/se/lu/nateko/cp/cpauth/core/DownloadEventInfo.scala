@@ -1,26 +1,40 @@
 package se.lu.nateko.cp.cpauth.core
 
 import java.time.Instant
-import spray.json._
+import spray.json.*
 import DownloadEventInfo.{CsvSelect, CpbSlice, AnonId}
 
 
-sealed trait DownloadEventInfo{
+sealed trait DownloadEventInfo:
 	def time: Instant
 	def ip: String
 	def hashId: String
 	def cpUser: Option[AnonId]
-}
 
-case class CollectionDownloadInfo(time: Instant, ip: String, hashId: String, cpUser: Option[AnonId], coll: JsObject) extends DownloadEventInfo
-case class DocumentDownloadInfo(time: Instant, ip: String, hashId: String, cpUser: Option[AnonId], doc: JsObject) extends DownloadEventInfo
+sealed trait DlEventForPostgres extends DownloadEventInfo
+sealed trait DlEventForMongo extends DownloadEventInfo:
+	def userAgent: Option[String]
+
+case class DataObjDownloadInfo(
+	time: Instant,
+	ip: String,
+	hashId: String,
+	cpUser: Option[AnonId],
+	distributor: Option[String],
+	endUser: Option[String]
+) extends DlEventForPostgres
+
+case class CollectionDownloadInfo(time: Instant, ip: String, hashId: String, cpUser: Option[AnonId]) extends DlEventForPostgres
+case class DocumentDownloadInfo(time: Instant, ip: String, hashId: String, cpUser: Option[AnonId]) extends DlEventForPostgres
+
 case class CsvDownloadInfo(
 	time: Instant,
 	ip: String,
 	hashId: String,
 	cpUser: Option[AnonId],
+	userAgent: Option[String],
 	select: DownloadEventInfo.CsvSelect
-) extends DownloadEventInfo
+) extends DlEventForMongo
 
 case class CpbDownloadInfo(
 	time: Instant,
@@ -29,18 +43,20 @@ case class CpbDownloadInfo(
 	cpUser: Option[AnonId],
 	colNums: Seq[Int],
 	slice: Option[DownloadEventInfo.CpbSlice],
-	localOrigin: Option[String]
-) extends DownloadEventInfo
+	localOrigin: Option[String],
+	userAgent: Option[String]
+) extends DlEventForMongo
 
-case class DataObjDownloadInfo(
+
+case class ZipExtractionInfo(
 	time: Instant,
 	ip: String,
 	hashId: String,
+	zipEntryPath: String,
 	cpUser: Option[AnonId],
-	dobj: JsObject,
-	distributor: Option[String],
-	endUser: Option[String]
-) extends DownloadEventInfo
+	localOrigin: Option[String],
+	userAgent: Option[String]
+) extends DlEventForMongo
 
 
 object DownloadEventInfo extends DefaultJsonProtocol{
@@ -52,7 +68,7 @@ object DownloadEventInfo extends DefaultJsonProtocol{
 	def anonymizeCpUser(id: UserId, salt: String): AnonId =
 		CoreUtils.encodeToBase64String(Crypto.sha256sum(id.email + salt)).take(12)
 
-	implicit object javaTimeInstantFormat extends RootJsonFormat[Instant] {
+	given RootJsonFormat[Instant] with {
 		def write(instant: Instant) = JsString(instant.toString)
 		def read(value: JsValue): Instant = value match{
 			case JsString(s) => Instant.parse(s)
@@ -60,15 +76,16 @@ object DownloadEventInfo extends DefaultJsonProtocol{
 		}
 	}
 
-	implicit val collectionDlInfoFormat = jsonFormat5(CollectionDownloadInfo)
-	implicit val docDlInfoFormat = jsonFormat5(DocumentDownloadInfo)
-	implicit val dataDlInfoFormat = jsonFormat7(DataObjDownloadInfo)
-	implicit val csvSelectFormat = jsonFormat3(CsvSelect)
-	implicit val csvDlInfoFormat = jsonFormat5(CsvDownloadInfo)
-	implicit val cbpSliceFormat = jsonFormat2(CpbSlice)
-	implicit val cpbDlInfoFormat = jsonFormat7(CpbDownloadInfo)
+	given RootJsonFormat[CollectionDownloadInfo] = jsonFormat4(CollectionDownloadInfo.apply)
+	given RootJsonFormat[DocumentDownloadInfo] = jsonFormat4(DocumentDownloadInfo.apply)
+	given RootJsonFormat[DataObjDownloadInfo] = jsonFormat6(DataObjDownloadInfo.apply)
+	given RootJsonFormat[CsvSelect] = jsonFormat3(CsvSelect.apply)
+	given RootJsonFormat[CsvDownloadInfo] = jsonFormat6(CsvDownloadInfo.apply)
+	given RootJsonFormat[CpbSlice] = jsonFormat2(CpbSlice.apply)
+	given RootJsonFormat[CpbDownloadInfo] = jsonFormat8(CpbDownloadInfo.apply)
+	given RootJsonFormat[ZipExtractionInfo] = jsonFormat7(ZipExtractionInfo.apply)
 
-	implicit object downloadEventInfoFormat extends RootJsonFormat[DownloadEventInfo]{
+	given RootJsonFormat[DownloadEventInfo] with {
 
 		override def write(obj: DownloadEventInfo): JsValue = {
 			def withType[T : JsonWriter](typ: String, e: T) =
@@ -80,6 +97,7 @@ object DownloadEventInfo extends DefaultJsonProtocol{
 				case data: DataObjDownloadInfo => withType("dobj", data)
 				case csv: CsvDownloadInfo => withType("csv", csv)
 				case cpb: CpbDownloadInfo => withType("cpb", cpb)
+				case zip: ZipExtractionInfo => withType("zip", zip)
 			}
 		}
 
@@ -91,6 +109,7 @@ object DownloadEventInfo extends DefaultJsonProtocol{
 				case Some("coll") => obj.convertTo[CollectionDownloadInfo]
 				case Some("doc") => obj.convertTo[DocumentDownloadInfo]
 				case Some("csv") => obj.convertTo[CsvDownloadInfo]
+				case Some("zip") => obj.convertTo[ZipExtractionInfo]
 				case None =>
 					deserializationError("Missing field 'type' on JSON for DownloadEventInfo")
 				case Some(other) =>

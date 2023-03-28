@@ -11,22 +11,22 @@ import scala.concurrent.duration.DurationInt
 class ErrorEmailer(to: String, subject: String, emailSender: EmailSender)(implicit system: ActorSystem, mat: Materializer) {
 
 	private val errorLog = Source.queue[Throwable](10, OverflowStrategy.dropTail)
-	  .map((java.time.Instant.now, _))
-	  .groupedWithin(2000, 2.hours)
-	  .filter(_.nonEmpty)
-	  .toMat(Sink.foreach{errList =>
-		  try {
+		.map((java.time.Instant.now, _))
+		.groupedWithin(2000, 2.hours)
+		.filter(_.nonEmpty)
+		.toMat(Sink.foreach{errList =>
+			try {
 
-			  val body = errList.map {
-				  case (time, err) => s"$time ${err.getMessage}"
-			  }.mkString("\n" + "-" * 10 + "\n")
+			val body = errList.map {
+				case (time, err) => s"$time ${err.getMessage}"
+			}.mkString("\n" + "-" * 10 + "\n")
 
-			  emailSender.sendText(Seq(to), subject, body)
+				emailSender.sendText(Seq(to), subject, body)
 
-		  } catch {
-			  case e: Throwable => system.log.error(e, "Error sending error report email")
-		  }
-	  })(Keep.left).run()
+		} catch {
+				case e: Throwable => system.log.error(e, "Error sending error report email")
+			}
+		})(Keep.left).run()
 
 	def enqueue(error: Throwable): Future[QueueOfferResult] = errorLog.offer(error)
 

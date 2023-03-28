@@ -7,18 +7,16 @@ import java.time.Instant
 
 case class UserId(email: String)
 
-object AuthSource extends Enumeration{
-	type AuthSource = Value
-	val Password, PasswordReset, Saml, Orcid, Facebook = Value
-}
+enum AuthSource:
+	case Password, PasswordReset, Saml, Orcid, Facebook
 
-case class AuthToken(userId: UserId, expiresOn: Long, source: AuthSource.Value)
+case class AuthToken(userId: UserId, expiresOn: Long, source: AuthSource)
 
 case class SignedToken(token: AuthToken, signature: Signature)
 
 class Authenticator(key: RSAPublicKey){
 
-	def unwrapTrustedToken(token: SignedToken, trustedSources: AuthSource.ValueSet): Try[AuthToken] =
+	def unwrapTrustedToken(token: SignedToken, trustedSources: Set[AuthSource]): Try[AuthToken] =
 		if(!trustedSources.contains(token.token.source))
 			Exceptions.failure(s"Authentication tokens originating from ${token.token.source} are not trusted by this application")
 		else unwrapToken(token)

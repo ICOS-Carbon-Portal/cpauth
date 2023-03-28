@@ -2,7 +2,7 @@ package se.lu.nateko.cp.cpauth.core.test
 
 import org.scalatest.funsuite.AnyFunSuite
 
-import se.lu.nateko.cp.cpauth.core._
+import se.lu.nateko.cp.cpauth.core.*
 
 class CookieToTokenTest extends AnyFunSuite{
 

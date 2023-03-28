@@ -16,3 +16,5 @@ object Exceptions{
 	def failure[T](msg: String): Try[T] = Failure(new CpauthException(msg) with NoStackTrace)
 
 }
+
+def cpauthException(msg: String) = new CpauthException(msg) with NoStackTrace

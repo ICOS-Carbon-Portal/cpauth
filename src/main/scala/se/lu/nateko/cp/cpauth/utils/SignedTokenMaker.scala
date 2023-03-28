@@ -10,11 +10,11 @@ import org.joda.time.DateTime
 
 import se.lu.nateko.cp.cpauth.Envri.Envri
 import se.lu.nateko.cp.cpauth.PrivateAuthConfig
-import se.lu.nateko.cp.cpauth.core._
+import se.lu.nateko.cp.cpauth.core.*
 
 class SignedTokenMaker private(key: RSAPrivateKey, validity: Int){
 
-	def makeToken(userId: UserId, source: AuthSource.Value): SignedToken = {
+	def makeToken(userId: UserId, source: AuthSource): SignedToken = {
 		val expiryTime = new DateTime().getMillis + 1000 * validity
 		val token = AuthToken(userId, expiryTime, source)
 		val signature = Crypto.signMessage(token.toString, key)

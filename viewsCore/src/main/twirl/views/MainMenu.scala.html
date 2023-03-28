@@ -67,7 +67,7 @@
 }
 
 @itemClass(isTop: Boolean, hasChildren: Boolean) = @{
-	if(isTop && hasChildren) "is_topnode"
+	if(isTop && hasChildren) "is_topnode" else ""
 }
 
 @link(uri: String) = @{

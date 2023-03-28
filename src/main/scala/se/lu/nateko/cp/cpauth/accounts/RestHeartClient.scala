@@ -1,9 +1,5 @@
 package se.lu.nateko.cp.cpauth.accounts
 
-import scala.concurrent.Future
-import scala.util.Success
-import scala.util.Try
-
 import akka.Done
 import akka.http.scaladsl.HttpExt
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
@@ -16,6 +12,7 @@ import akka.http.scaladsl.model.RequestEntity
 import akka.http.scaladsl.model.StatusCode
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.model.Uri
+import akka.http.scaladsl.model.headers
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.stream.Materializer
 import se.lu.nateko.cp.cpauth.Envri.Envri
@@ -25,8 +22,14 @@ import se.lu.nateko.cp.cpauth.utils.SprayJsonUtils._
 import se.lu.nateko.cp.cpauth.utils.Utils
 import spray.json._
 
-class RestHeartClient(val config: RestHeartConfig, http: HttpExt)(implicit m: Materializer) {
+import scala.concurrent.Future
+import scala.util.Failure
+import scala.util.Success
+import scala.util.Try
+
+class RestHeartClient(val config: RestHeartConfig, http: HttpExt)(using Materializer) {
 	import http.system.dispatcher
+	def log = http.system.log
 
 	def init: Future[Done] = Future.sequence(
 		config.dbNames.keys.map{implicit envri =>
@@ -34,55 +37,62 @@ class RestHeartClient(val config: RestHeartConfig, http: HttpExt)(implicit m: Ma
 		}
 	).map(_ => Done)
 
-	def dbUri(implicit envri: Envri): Uri = {
+	def dbUri(using Envri): Uri = {
 		import config._
 		Uri(s"$baseUri/$dbName")
 	}
 
-	def usersCollUri(implicit envri: Envri): Uri = {
+	def usersCollUri(using Envri): Uri = {
 		val db = dbUri
 		db.withPath(db.path / config.usersCollection)
 	}
 
-	def portalUsageCollUri(implicit envri: Envri): Uri = {
+	def portalUsageCollUri(using Envri): Uri = {
 		val db = dbUri
 		db.withPath(db.path / config.usageCollection)
 	}
 	private val KeepIdsOnly = "keys" -> "{\"_id\": 1}"
 	private def pageSizeQpar(size: Int) = "pagesize" -> size.toString
 
-	def getUserUri(uid: UserId)(implicit envri: Envri): Uri = usersCollUri.withPath(usersCollUri.path / uid.email)
+	def getUserUri(uid: UserId)(using Envri): Uri = usersCollUri.withPath(usersCollUri.path / uid.email)
 
-	def createUserIfNew(uid: UserId, givenName: String, surname: String)(implicit envri: Envri): Future[Done] =
-		userExists(uid).flatMap{exists =>
-			if(exists) ok
-			else {
-				val payload = JsObject("profile" -> JsObject(
-					"givenName" -> JsString(givenName),
-					"surname" -> JsString(surname)
-				))
-				createUser(uid, payload)
-			}
+	def createUserIfNew(uid: UserId, givenName: String, surname: String)(using Envri): Future[Done] =
+		userExists(uid).flatMap{
+			exists => if(exists) ok else createNewUser(uid, givenName, surname)
+		}.andThen{
+			case Failure(exc) => log.error(exc, s"Problem creating user ${uid.email}")
 		}
 
-	private def createUser(uid: UserId, payload: JsObject)(implicit envri: Envri): Future[Done] =
-		writeUser(uid, payload, HttpMethods.PUT).flatMap{status =>
+	private def createNewUser(uid: UserId, givenName: String, surname: String)(using Envri): Future[Done] =
+		val payload = JsObject(
+			"_id" -> JsString(uid.email),
+			"profile" -> JsObject(
+				"givenName" -> JsString(givenName),
+				"surname" -> JsString(surname)
+			),
+			"cart" -> JsObject(
+				"_items" -> JsArray.empty
+			)
+		)
+		val createStatus = for(
+			entity <- Marshal(payload).to[RequestEntity];
+			req = HttpRequest(
+				method = HttpMethods.POST,
+				uri = usersCollUri,
+				entity = entity,
+				headers = Seq(headers.`Content-Type`(ContentTypes.`application/json`))
+			);
+			status <- requestDiscardResp(req)
+		) yield status
+
+		createStatus.flatMap{status =>
 			if(status.isSuccess()) ok
 			else fail(
 				s"Could not create user ${uid.email}, got response ${status.defaultMessage()}"
 			)
 		}
 
-	private def writeUser(uid: UserId, payload: JsObject, verb: HttpMethod)(implicit envri: Envri): Future[StatusCode] = {
-		val uri = getUserUri(uid)
-		for(
-			entity <- Marshal(payload).to[RequestEntity];
-			req = HttpRequest(method = verb, uri = uri, entity = entity);
-			status <- requestDiscardResp(req)
-		) yield status
-	}
-
-	def userExists(uid: UserId)(implicit envri: Envri): Future[Boolean] = {
+	def userExists(uid: UserId)(using Envri): Future[Boolean] = {
 		val query = Uri.Query(KeepIdsOnly)
 		val req = HttpRequest(uri = getUserUri(uid).withQuery(query))
 
@@ -95,7 +105,7 @@ class RestHeartClient(val config: RestHeartConfig, http: HttpExt)(implicit m: Ma
 		}
 	}
 
-	def getUserProps(uid: UserId, projections: Seq[String] = Nil)(implicit envri: Envri): Future[JsObject] = {
+	def getUserProps(uid: UserId, projections: Seq[String] = Nil)(using Envri): Future[JsObject] = {
 		val query = if(projections.isEmpty)
 			Uri.Query.Empty
 		else {
@@ -110,7 +120,7 @@ class RestHeartClient(val config: RestHeartConfig, http: HttpExt)(implicit m: Ma
 		) yield userObj
 	}
 
-	def getGivenAndSurName(uid: UserId)(implicit envri: Envri): Future[(String, String)] =
+	def getGivenAndSurName(uid: UserId)(using Envri): Future[(String, String)] =
 		getUserProps(uid, Seq("profile.givenName", "profile.surname")).flatMap{userObj =>
 
 			val profileVal = getFieldOpt[JsValue](userObj, "profile").getOrElse(JsObject.empty);
@@ -124,7 +134,7 @@ class RestHeartClient(val config: RestHeartConfig, http: HttpExt)(implicit m: Ma
 			)
 		}
 
-	def findUsers(filter: Map[String, String])(implicit envri: Envri): Future[Seq[UserId]] = {
+	def findUsers(filter: Map[String, String])(using Envri): Future[Seq[UserId]] = {
 
 		val filterParam: String = filter.map{
 			case (path, value) => s""""$path": "$value""""
@@ -141,18 +151,16 @@ class RestHeartClient(val config: RestHeartConfig, http: HttpExt)(implicit m: Ma
 
 	private def parseFilteredUsersList(v: JsValue): Try[Seq[UserId]] = {
 		for(
-			obj <- ensure[JsObject](v);
-			returned <- getField[JsNumber](obj, "_returned")
+			returned <- ensure[JsArray](v);
+			uidObjs <- getElements[JsObject](returned)
 		) yield
-			if(returned.value == 0) Success(Nil)
+			if(uidObjs.size == 0) Success(Nil)
 			else for(
-				arr <- getField[JsArray](obj, "_embedded");
-				uidObjs <- getElements[JsObject](arr);
 				ids <- Utils.tryseq(uidObjs.map(getStringField(_, "_id")))
-			) yield ids.map(UserId)
+			) yield ids.map(UserId.apply)
 	}.flatten
 
-	private def createDbIfNotExists(implicit envri: Envri): Future[Done] =
+	private def createDbIfNotExists(using Envri): Future[Done] =
 		createIfNotExists("Mongo db", dbUri, dbUri)
 
 	private def createCollIfNotExists(collUri: Uri, thing: String): Future[Done] = {
@@ -160,12 +168,12 @@ class RestHeartClient(val config: RestHeartConfig, http: HttpExt)(implicit m: Ma
 		createIfNotExists(thing, checkUri, collUri)
 	}
 
-	private def createUsersCollIfNotExists(implicit envri: Envri): Future[Done] =
+	private def createUsersCollIfNotExists(using Envri): Future[Done] =
 		createDbIfNotExists.flatMap{_ =>
 			createCollIfNotExists(usersCollUri, "users collection")
 		}
 
-	private def createPortalUsageCollIfNotExists(implicit envri: Envri): Future[Done] =
+	private def createPortalUsageCollIfNotExists(using Envri): Future[Done] =
 		createDbIfNotExists.flatMap{_ =>
 			createCollIfNotExists(portalUsageCollUri, "portal usage collection")
 		}
