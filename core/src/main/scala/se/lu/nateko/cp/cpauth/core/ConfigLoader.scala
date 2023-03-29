@@ -6,7 +6,7 @@ import spray.json._
 import com.typesafe.config.ConfigRenderOptions
 
 object ConfigLoader {
-	import JsonSupport.pubAuthConfigFormat
+	import JsonSupport.given
 
 	lazy val appConfig: Config = {
 		val confFile = new java.io.File("application.conf").getAbsoluteFile

@@ -161,7 +161,7 @@ object ConfigReader extends DefaultJsonProtocol{
 	given RootJsonFormat[DatabaseConfig] = jsonFormat4(DatabaseConfig.apply)
 
 	given RootJsonFormat[PrivateAuthConfig] = jsonFormat2(PrivateAuthConfig.apply)
-	import se.lu.nateko.cp.cpauth.core.JsonSupport.pubAuthConfigFormat
+	import se.lu.nateko.cp.cpauth.core.JsonSupport.given
 	given RootJsonFormat[AuthConfig] = jsonFormat5(AuthConfig.apply)
 	given RootJsonFormat[RestHeartConfig] = jsonFormat5(RestHeartConfig.apply)
 	given RootJsonFormat[CredentialsConfig] = jsonFormat2(CredentialsConfig.apply)
