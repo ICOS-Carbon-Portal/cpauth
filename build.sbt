@@ -1,18 +1,18 @@
-val defaultScala = "3.2.0"
+val defaultScala = "3.2.2"
+
+val defaultScalacOptions = Seq(
+	"-Xtarget:11",
+	"-encoding", "UTF-8",
+	"-unchecked",
+	"-feature",
+	"-deprecation"
+)
 
 val commonSettings = Seq(
 	organization := "se.lu.nateko.cp",
 	scalaVersion := defaultScala,
-
-	libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.13" % "test",
-
-	scalacOptions ++= Seq(
-		"-Xtarget:11",
-		"-encoding", "UTF-8",
-		"-unchecked",
-		"-feature",
-		"-deprecation"
-	)
+	libraryDependencies += "org.scalatest" %%% "scalatest" % "3.2.15" % "test",
+	scalacOptions ++= defaultScalacOptions
 )
 
 val publishingSettings = Seq(
@@ -26,12 +26,25 @@ val publishingSettings = Seq(
 	credentials += Credentials(Path.userHome / ".ivy2" / ".credentials")
 )
 
-lazy val cpauthCore = (project in file("core"))
+lazy val envri = crossProject(JSPlatform, JVMPlatform)
+	.crossType(CrossType.Pure)
+	.in(file("envri"))
+	.settings(commonSettings: _*)
+	.settings(publishingSettings: _*)
+	.settings(
+		name := "envri",
+		organization := "eu.icoscp",
+		version := "0.1.0"
+	)
+
+lazy val cpauthCore = project
+	.in(file("core"))
+	.dependsOn(envri.jvm)
 	.settings(commonSettings: _*)
 	.settings(publishingSettings: _*)
 	.settings(
 		name := "cpauth-core",
-		version := "0.8.0",
+		version := "0.9.0",
 		libraryDependencies ++= Seq(
 			"io.spray"              %% "spray-json"         % "1.3.6",
 			"com.typesafe"           % "config"             % "1.4.2"
@@ -40,13 +53,13 @@ lazy val cpauthCore = (project in file("core"))
 
 
 lazy val viewsCore = (project in file("viewsCore"))
-	.dependsOn(cpauthCore)
+	.dependsOn(cpauthCore, envri.jvm)
 	.settings(commonSettings: _*)
 	.settings(publishingSettings: _*)
 	.enablePlugins(SbtTwirl)
 	.settings(
 		name := "views-core",
-		version := "0.6.7",
+		version := "0.7.0",
 		libraryDependencies ++= Seq(
 			"io.spray"              %% "spray-json"                         % "1.3.6"
 		),

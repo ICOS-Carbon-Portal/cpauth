@@ -16,6 +16,8 @@
 .vscode/
 project/.bloop/
 project/metals.sbt
+envri/.jvm
+envri/.js
 
 #Cpauth DB
 db/

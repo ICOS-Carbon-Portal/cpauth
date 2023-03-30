@@ -2,10 +2,11 @@ package se.lu.nateko.cp.cpauth.core
 
 import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
-import spray.json._
 import com.typesafe.config.ConfigRenderOptions
+import eu.icoscp.envri.Envri
+import spray.json.enrichString
 
-object ConfigLoader {
+object ConfigLoader:
 	import JsonSupport.given
 
 	lazy val appConfig: Config = {
@@ -18,13 +19,10 @@ object ConfigLoader {
 				.resolve
 	}
 
-	def subConfigAsJson(path: String): JsValue = {
-		val renderOpts = ConfigRenderOptions.concise.setJson(true)
-		appConfig.getValue(path).render(renderOpts).parseJson
-	}
+	private val renderOpts = ConfigRenderOptions.concise.setJson(true)
 
-	//TODO Add notion of Envri on the cpauth-core level already, make Envri -> PublicAuthConfig map
-	def icosPubAuthConfig = subConfigAsJson("cpauthAuthPub").convertTo[PublicAuthConfig]
-	def sitesPubAuthConfig = subConfigAsJson("fieldsitesAuthPub").convertTo[PublicAuthConfig]
-
-}
+	def authPubConfig: Map[Envri,PublicAuthConfig] = appConfig
+		.getValue("authPub")
+		.render(renderOpts)
+		.parseJson
+		.convertTo[Map[Envri,PublicAuthConfig]]
