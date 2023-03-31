@@ -15,7 +15,7 @@ import akka.http.scaladsl.model.Uri
 import akka.http.scaladsl.model.headers
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.stream.Materializer
-import se.lu.nateko.cp.cpauth.Envri.Envri
+import eu.icoscp.envri.Envri
 import se.lu.nateko.cp.cpauth.RestHeartConfig
 import se.lu.nateko.cp.cpauth.core.UserId
 import se.lu.nateko.cp.cpauth.utils.SprayJsonUtils._
@@ -31,7 +31,7 @@ class RestHeartClient(val config: RestHeartConfig, http: HttpExt)(using Material
 	import http.system.dispatcher
 	def log = http.system.log
 
-	def init: Future[Done] = Future.sequence(
+	def init: Future[Done] = if config.skipInit then Future.successful(Done) else Future.sequence(
 		config.dbNames.keys.map{implicit envri =>
 			createUsersCollIfNotExists.zip(createPortalUsageCollIfNotExists)
 		}

@@ -5,7 +5,7 @@ import akka.http.scaladsl.server.Directives.*
 import akka.http.scaladsl.model.StatusCodes
 import play.twirl.api.Html
 import se.lu.nateko.cp.cpauth.CpauthConfig
-import se.lu.nateko.cp.cpauth.Envri.Envri
+import eu.icoscp.envri.Envri
 
 trait StaticRouting extends CpauthDirectives{
 

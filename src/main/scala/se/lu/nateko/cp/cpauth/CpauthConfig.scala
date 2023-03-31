@@ -8,18 +8,10 @@ import com.typesafe.config.ConfigRenderOptions
 import com.typesafe.config.ConfigFactory
 import se.lu.nateko.cp.cpauth.core.ConfigLoader
 import se.lu.nateko.cp.cpauth.core.PublicAuthConfig
-import Envri.Envri
-import OAuthProvider.OAuthProvider
+import eu.icoscp.envri.Envri
 
-object Envri extends Enumeration{
-	type Envri = Value
-	val ICOS, SITES = Value
-}
-
-object OAuthProvider extends Enumeration{
-	type OAuthProvider = Value
-	val facebook, orcidid = Value
-}
+enum OAuthProvider:
+	case facebook, orcidid
 
 case class HttpConfig(
 	serviceInterface: String,
@@ -70,7 +62,8 @@ case class RestHeartConfig(
 	dbNames: Map[Envri, String],
 	usersCollection: String,
 	usageCollection: String,
-	ipsToIgnore: Seq[String]
+	ipsToIgnore: Seq[String],
+	skipInit: Boolean
 ){
 	def dbName(implicit envri: Envri) = dbNames(envri)
 }
@@ -125,8 +118,8 @@ case class OAuthProviderConfig(clientId: String, clientSecret: String, redirectP
 
 object ConfigReader extends DefaultJsonProtocol{
 
-	given RootJsonFormat[Envri] = CpauthJsonProtocol.enumFormat(Envri)
-	given RootJsonFormat[OAuthProvider] = CpauthJsonProtocol.enumFormat(OAuthProvider)
+	import se.lu.nateko.cp.cpauth.core.JsonSupport.{enumFormat, given}
+	given RootJsonFormat[OAuthProvider] = enumFormat(OAuthProvider.valueOf, OAuthProvider.values)
 
 	given RootJsonFormat[URI] with {
 		def write(uri: URI): JsValue = JsString(uri.toString)
@@ -163,7 +156,7 @@ object ConfigReader extends DefaultJsonProtocol{
 	given RootJsonFormat[PrivateAuthConfig] = jsonFormat2(PrivateAuthConfig.apply)
 	import se.lu.nateko.cp.cpauth.core.JsonSupport.given
 	given RootJsonFormat[AuthConfig] = jsonFormat5(AuthConfig.apply)
-	given RootJsonFormat[RestHeartConfig] = jsonFormat5(RestHeartConfig.apply)
+	given RootJsonFormat[RestHeartConfig] = jsonFormat6(RestHeartConfig.apply)
 	given RootJsonFormat[CredentialsConfig] = jsonFormat2(CredentialsConfig.apply)
 	given RootJsonFormat[PostgresConfig] = jsonFormat5(PostgresConfig.apply)
 	given RootJsonFormat[EmailConfig] = jsonFormat5(EmailConfig.apply)

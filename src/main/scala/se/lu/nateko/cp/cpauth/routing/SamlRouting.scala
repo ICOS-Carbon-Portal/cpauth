@@ -19,7 +19,7 @@ import play.twirl.api.Html
 import se.lu.nateko.cp.cpauth.services.CookieFactory
 import se.lu.nateko.cp.cpauth.utils.{Saml, TargetUrlLookup}
 import se.lu.nateko.cp.cpauth.SamlConfig
-import se.lu.nateko.cp.cpauth.Envri.Envri
+import eu.icoscp.envri.Envri
 import spray.json.DefaultJsonProtocol.immSeqFormat
 
 trait SamlRouting extends CpauthDirectives{

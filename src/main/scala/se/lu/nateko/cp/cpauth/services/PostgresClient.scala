@@ -4,7 +4,7 @@ import akka.Done
 import org.apache.commons.dbcp2.datasources.SharedPoolDataSource
 import org.postgresql.ds.PGConnectionPoolDataSource
 import se.lu.nateko.cp.cpauth.CredentialsConfig
-import se.lu.nateko.cp.cpauth.Envri.Envri
+import eu.icoscp.envri.Envri
 import se.lu.nateko.cp.cpauth.PostgresConfig
 import se.lu.nateko.cp.cpauth.core.*
 

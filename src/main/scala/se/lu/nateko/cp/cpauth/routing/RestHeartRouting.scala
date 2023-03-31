@@ -8,7 +8,7 @@ import akka.http.scaladsl.server.Directive0
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import se.lu.nateko.cp.cpauth.CpauthJsonProtocol.given
-import se.lu.nateko.cp.cpauth.Envri.Envri
+import eu.icoscp.envri.Envri
 import se.lu.nateko.cp.cpauth.core.UserId
 import spray.json.DefaultJsonProtocol.{immSeqFormat, tuple2Format, StringJsonFormat}
 

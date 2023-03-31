@@ -17,7 +17,7 @@ import se.lu.nateko.cp.cpauth.services.PortalLogger
 import spray.json.JsObject
 import spray.json.JsString
 import spray.json.JsValue
-import se.lu.nateko.cp.cpauth.Envri.Envri
+import eu.icoscp.envri.Envri
 
 
 trait PortalLogRouting extends CpauthDirectives{

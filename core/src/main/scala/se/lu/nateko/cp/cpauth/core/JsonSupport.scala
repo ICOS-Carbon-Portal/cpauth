@@ -6,12 +6,14 @@ import eu.icoscp.envri.Envri
 object JsonSupport extends DefaultJsonProtocol:
 
 	given RootJsonFormat[PublicAuthConfig] = jsonFormat4(PublicAuthConfig.apply)
+	given RootJsonFormat[Envri] = enumFormat(Envri.valueOf, Envri.values)
 
-	given JsonFormat[Envri] with
-		override def read(json: JsValue): Envri = json match
-			case JsString(str) =>
-				try Envri.valueOf(str)
-				catch case _ => deserializationError(s"Unknown ENVRI $str")
-			case _ => deserializationError(s"Expected JSON string, got $json")
+	def enumFormat[T <: reflect.Enum](valueOf: String => T, values: Array[T]) = new RootJsonFormat[T]:
+		def write(v: T) = JsString(v.toString)
 
-		override def write(e: Envri): JsValue = JsString(e.toString)
+		def read(value: JsValue): T = value match
+			case JsString(s) =>
+				try valueOf(s)
+				catch case _: IllegalArgumentException =>
+					deserializationError("Expected one of: " + values.mkString("'", "', '", "'"))
+			case _ => deserializationError("Expected a JSON string")

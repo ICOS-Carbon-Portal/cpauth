@@ -12,7 +12,7 @@ import se.lu.nateko.cp.cpauth.core.UserId
 import se.lu.nateko.cp.cpauth.oauth.FacebookAuthenticationService
 import se.lu.nateko.cp.cpauth.oauth.OrcidAuthenticationService
 import se.lu.nateko.cp.cpauth.services.CookieFactory
-import se.lu.nateko.cp.cpauth.Envri.Envri
+import eu.icoscp.envri.Envri
 import se.lu.nateko.cp.cpauth.CpauthConfig
 import akka.actor.ActorSystem
 import se.lu.nateko.cp.cpauth.OAuthProvider

@@ -1,7 +1,7 @@
 package se.lu.nateko.cp.cpauth.services
 
 import akka.actor.ActorSystem
-import se.lu.nateko.cp.cpauth.Envri.Envri
+import eu.icoscp.envri.Envri
 import se.lu.nateko.cp.cpauth.{RestHeartConfig}
 import spray.json.{JsObject, JsString}
 import CpGeoClient.given

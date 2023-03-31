@@ -19,7 +19,7 @@ import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.server.StandardRoute
 import play.twirl.api.Html
 import se.lu.nateko.cp.cpauth.AuthConfig
-import se.lu.nateko.cp.cpauth.Envri.Envri
+import eu.icoscp.envri.Envri
 import se.lu.nateko.cp.cpauth.accounts.RestHeartClient
 import se.lu.nateko.cp.cpauth.accounts.UsersIo
 import se.lu.nateko.cp.cpauth.core.AuthSource

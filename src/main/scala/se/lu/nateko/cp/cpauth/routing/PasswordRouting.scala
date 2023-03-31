@@ -1,13 +1,11 @@
 package se.lu.nateko.cp.cpauth.routing
 
-import scala.util.Failure
-
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives.*
 import akka.http.scaladsl.server.Route
+import eu.icoscp.envri.Envri
 import play.twirl.api.Html
 import se.lu.nateko.cp.cpauth.CpauthJsonProtocol.given
-import se.lu.nateko.cp.cpauth.Envri
 import se.lu.nateko.cp.cpauth.accounts.UserEntry
 import se.lu.nateko.cp.cpauth.core.AuthSource
 import se.lu.nateko.cp.cpauth.core.UserId
@@ -15,7 +13,9 @@ import se.lu.nateko.cp.cpauth.services.CookieFactory
 import se.lu.nateko.cp.cpauth.services.PasswordLifecycleHandler
 import spray.json.DefaultJsonProtocol.immSeqFormat
 
-trait PasswordRouting extends CpauthDirectives {
+import scala.util.Failure
+
+trait PasswordRouting extends CpauthDirectives:
 
 	def cookieFactory: CookieFactory
 	def passwordHandler: PasswordLifecycleHandler
@@ -134,10 +134,10 @@ trait PasswordRouting extends CpauthDirectives {
 		}
 	}
 
-	private def logInWithPasswordCookie(user: UserId)(implicit envri: Envri.Value) = {
+	private def logInWithPasswordCookie(user: UserId)(using Envri) =
 		cookieFactory.makeTokenBase64(user, AuthSource.Password).fold(failWith, token => {
 			val cookie = cookieFactory.makeAuthCookie(token)
 			setCookie(cookie)(complete(StatusCodes.OK))
 		})
-	}
-}
+
+end PasswordRouting

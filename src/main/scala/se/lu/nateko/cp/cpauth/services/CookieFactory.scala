@@ -19,7 +19,7 @@ import se.lu.nateko.cp.cpauth.opensaml.ValidatedAssertion
 import se.lu.nateko.cp.cpauth.core.AuthSource
 import se.lu.nateko.cp.cpauth.CpauthConfig
 import se.lu.nateko.cp.cpauth.utils.SignedTokenMaker
-import se.lu.nateko.cp.cpauth.Envri.Envri
+import eu.icoscp.envri.Envri
 
 class CookieFactory(config: CpauthConfig) {
 	

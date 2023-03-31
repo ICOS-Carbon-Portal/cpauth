@@ -14,7 +14,7 @@ import org.opensaml.xml.encryption.InlineEncryptedKeyResolver
 import org.opensaml.xml.security.keyinfo.StaticKeyInfoCredentialResolver
 import org.opensaml.xml.security.x509.BasicX509Credential
 
-import se.lu.nateko.cp.cpauth.Envri.Envri
+import eu.icoscp.envri.Envri
 import se.lu.nateko.cp.cpauth.SamlConfig
 import se.lu.nateko.cp.cpauth.core.Crypto
 import se.lu.nateko.cp.cpauth.utils.Utils.SafeJavaCollectionWrapper

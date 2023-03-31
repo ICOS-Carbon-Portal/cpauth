@@ -6,7 +6,7 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.marshalling.Marshal
 import akka.http.scaladsl.model.headers.Accept
 import akka.http.scaladsl.model._
-import se.lu.nateko.cp.cpauth.Envri.Envri
+import eu.icoscp.envri.Envri
 import se.lu.nateko.cp.cpauth.RestHeartConfig
 import spray.json.JsObject
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._

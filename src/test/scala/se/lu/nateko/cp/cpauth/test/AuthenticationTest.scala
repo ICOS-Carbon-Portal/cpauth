@@ -4,11 +4,11 @@ import org.scalatest.funsuite.AnyFunSuite
 import se.lu.nateko.cp.cpauth.core.*
 import se.lu.nateko.cp.cpauth.utils.SignedTokenMaker
 import se.lu.nateko.cp.cpauth.PrivateAuthConfig
-import se.lu.nateko.cp.cpauth.Envri
+import eu.icoscp.envri.Envri
 
 class AuthenticationTest extends AnyFunSuite{
 	import Envri.ICOS
-	given Envri.Envri = ICOS
+	given Envri = ICOS
 
 	val user = UserId("vasja.pupkin@mail.org")
 	val pubAuthConfig = PublicAuthConfig(

@@ -14,7 +14,7 @@ import se.lu.nateko.cp.cpauth.core.UserId
 import se.lu.nateko.cp.cpauth.core.AuthSource
 import se.lu.nateko.cp.cpauth.utils.Utils
 import se.lu.nateko.cp.cpauth.services.CookieFactory
-import se.lu.nateko.cp.cpauth.Envri.Envri
+import eu.icoscp.envri.Envri
 
 
 object Playground {

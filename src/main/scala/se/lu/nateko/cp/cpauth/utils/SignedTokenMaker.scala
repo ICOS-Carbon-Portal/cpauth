@@ -8,7 +8,7 @@ import scala.util.Try
 
 import org.joda.time.DateTime
 
-import se.lu.nateko.cp.cpauth.Envri.Envri
+import eu.icoscp.envri.Envri
 import se.lu.nateko.cp.cpauth.PrivateAuthConfig
 import se.lu.nateko.cp.cpauth.core.*
 

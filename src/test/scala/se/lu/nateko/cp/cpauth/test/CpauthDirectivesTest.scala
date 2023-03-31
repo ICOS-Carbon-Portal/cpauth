@@ -14,10 +14,11 @@ import se.lu.nateko.cp.cpauth.routing.BadCpauthCookieRejection
 import se.lu.nateko.cp.cpauth.routing.CpauthCookieMissingRejection
 import se.lu.nateko.cp.cpauth.routing.CpauthDirectives
 import se.lu.nateko.cp.cpauth.services.CookieFactory
+import eu.icoscp.envri.Envri
 
 class CpauthDirectivesTest extends AnyFunSpec with ScalatestRouteTest {
 	import Envri.ICOS
-	given Envri.Envri = ICOS
+	given Envri = ICOS
 
 	def getConfig(privKeyPath: String) = CpauthConfig(
 		auth = AuthConfig(
@@ -49,7 +50,8 @@ class CpauthDirectivesTest extends AnyFunSpec with ScalatestRouteTest {
 			dbNames = Map(ICOS -> "db"),
 			usersCollection = "users",
 			usageCollection = "portaluse",
-			ipsToIgnore = Nil
+			ipsToIgnore = Nil,
+			skipInit = true
 		),
 		postgres = null,
 		mailing = null,
