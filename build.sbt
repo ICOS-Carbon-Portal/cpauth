@@ -53,7 +53,7 @@ lazy val cpauthCore = project
 
 
 lazy val viewsCore = (project in file("viewsCore"))
-	.dependsOn(cpauthCore, envri.jvm)
+	.dependsOn(envri.jvm)
 	.settings(commonSettings: _*)
 	.settings(publishingSettings: _*)
 	.enablePlugins(SbtTwirl)
