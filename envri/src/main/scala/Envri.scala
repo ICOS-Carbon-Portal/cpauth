@@ -1,24 +1,9 @@
 package eu.icoscp.envri
 
-enum Envri derives CanEqual:
-	case ICOS, SITES, ICOSCities
-
-case class EnvriConfig(
-	shortName: String,
-	longName: String
-)
-
-val Config = Map(
-	Envri.ICOS -> EnvriConfig(
-		shortName = "ICOS",
-		longName = "Integrated Carbon Observation System"
-	),
-	Envri.SITES -> EnvriConfig(
-		shortName = "SITES",
-		longName = "Swedish Infrastructure for Ecosystem Science"
-	),
-	Envri.ICOSCities -> EnvriConfig(
-		shortName = "ICOS Cities",
-		longName = "Pilot Applications in Urban Landscapes"
-	)
-)
+enum Envri(
+	val shortName: String,
+	val longName: String
+) derives CanEqual:
+	case ICOS extends Envri("ICOS", "Integrated Carbon Observation System")
+	case SITES extends Envri("SITES", "Swedish Infrastructure for Ecosystem Science")
+	case ICOSCities extends Envri("ICOS Cities", "Pilot Applications in Urban Landscapes")
