@@ -13,6 +13,8 @@ import scala.util.Try
 import scala.collection.mutable.Buffer
 import scala.util.Failure
 import scala.util.Success
+import java.net.URI
+import akka.http.scaladsl.model.Uri
 
 object Utils {
 
@@ -89,3 +91,5 @@ object Utils {
 		}.get
 	}
 }
+
+given uriJavaToAkka: Conversion[URI, Uri] = uri => Uri(uri.toString)

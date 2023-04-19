@@ -5,8 +5,7 @@ import akka.http.scaladsl.server.Route
 
 trait RestHeartDirectives extends CpauthDirectives with ProxyDirectives{
 
-	def restheartProxy: Route = ctxt => {
-		val baseUri = Uri(restHeart.config.baseUri)
+	def restheartProxy(baseUri: Uri): Route = ctxt => {
 		val req = ctxt.request
 		val newUri = req.uri.withScheme(baseUri.scheme).withAuthority(baseUri.authority)
 		proxyToUri(req, newUri)

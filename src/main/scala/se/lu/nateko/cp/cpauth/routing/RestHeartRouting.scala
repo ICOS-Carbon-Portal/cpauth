@@ -1,27 +1,32 @@
 package se.lu.nateko.cp.cpauth.routing
 
-import akka.http.scaladsl.model.{ HttpMethods, StatusCodes }
+import akka.http.scaladsl.model.HttpMethods
 import akka.http.scaladsl.model.HttpRequest
+import akka.http.scaladsl.model.StatusCodes
+import akka.http.scaladsl.model.Uri
 import akka.http.scaladsl.model.Uri.Path
 import akka.http.scaladsl.model.headers._
 import akka.http.scaladsl.server.Directive0
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
-import se.lu.nateko.cp.cpauth.CpauthJsonProtocol.given
 import eu.icoscp.envri.Envri
+import se.lu.nateko.cp.cpauth.CpauthJsonProtocol.given
 import se.lu.nateko.cp.cpauth.core.UserId
-import spray.json.DefaultJsonProtocol.{immSeqFormat, tuple2Format, StringJsonFormat}
+import se.lu.nateko.cp.cpauth.utils.uriJavaToAkka
+import spray.json.DefaultJsonProtocol.StringJsonFormat
+import spray.json.DefaultJsonProtocol.immSeqFormat
+import spray.json.DefaultJsonProtocol.tuple2Format
 
 trait RestHeartRouting extends RestHeartDirectives{
 
 	val restheartRoute: Route = extractEnvri{implicit envri =>
 
 		val config = restHeart.config
+		val usersCollUri: Uri = uriJavaToAkka(config.usersCollection(envri))
 
 		def injectUsersCollection(req: HttpRequest) = req.withUri{
 			val oldPathPart = req.uri.path.tail.tail.tail.tail
-			val newPath = Path./(config.dbName) / config.usersCollection ++ oldPathPart
-			req.uri.withPath(newPath)
+			req.uri.withPath(usersCollUri.path ++ oldPathPart)
 		}
 
 		path("db" / "users" / Segment){ email =>
@@ -40,7 +45,7 @@ trait RestHeartRouting extends RestHeartDirectives{
 				(validateUser(email, token.userId) | ifUserIsAdmin(token)) {
 					addAccessControlAllowOrigin(envri){
 						mapRequest(injectUsersCollection){
-							restheartProxy
+							restheartProxy(usersCollUri)
 						}
 					}
 				} ~

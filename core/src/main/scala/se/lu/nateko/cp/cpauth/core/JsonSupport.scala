@@ -1,7 +1,9 @@
 package se.lu.nateko.cp.cpauth.core
 
-import spray.json.*
 import eu.icoscp.envri.Envri
+import spray.json.*
+
+import java.net.URI
 
 object JsonSupport extends DefaultJsonProtocol:
 
@@ -17,3 +19,14 @@ object JsonSupport extends DefaultJsonProtocol:
 				catch case _: IllegalArgumentException =>
 					deserializationError("Expected one of: " + values.mkString("'", "', '", "'"))
 			case _ => deserializationError("Expected a JSON string")
+
+	given RootJsonFormat[URI] with
+		def write(uri: URI): JsValue = JsString(uri.toString)
+
+		def read(value: JsValue): URI = value match
+			case JsString(uri) =>
+				try new URI(uri)
+				catch case err: Throwable =>
+					deserializationError(s"Could not parse URI from $uri", err)
+
+			case _ => deserializationError("URI string expected")

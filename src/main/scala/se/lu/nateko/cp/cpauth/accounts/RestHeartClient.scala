@@ -20,6 +20,7 @@ import se.lu.nateko.cp.cpauth.RestHeartConfig
 import se.lu.nateko.cp.cpauth.core.UserId
 import se.lu.nateko.cp.cpauth.utils.SprayJsonUtils._
 import se.lu.nateko.cp.cpauth.utils.Utils
+import se.lu.nateko.cp.cpauth.utils.uriJavaToAkka
 import spray.json._
 
 import scala.concurrent.Future
@@ -31,30 +32,28 @@ class RestHeartClient(val config: RestHeartConfig, http: HttpExt)(using Material
 	import http.system.dispatcher
 	def log = http.system.log
 
-	def init: Future[Done] = if config.skipInit then Future.successful(Done) else Future.sequence(
-		config.dbNames.keys.map{implicit envri =>
-			createUsersCollIfNotExists.zip(createPortalUsageCollIfNotExists)
+	def init: Future[Done] = if config.skipInit then Future.successful(Done) else
+		val usageCollUris = config.usageCollection.values.map(uriJavaToAkka)
+		val usersCollUris = config.usersCollection.values.map(uriJavaToAkka)
+
+		val dbUris = (usageCollUris ++ usersCollUris).map(getDbUri).toSeq.distinct
+
+		val createDbs = dbUris.map(dbUri => createIfNotExists("Mongo db", dbUri, dbUri))
+
+		val createUsageColls = usageCollUris.map{
+			createCollIfNotExists(_, "portal use collection")
 		}
-	).map(_ => Done)
+		val createUsersColls = usersCollUris.map{
+			createCollIfNotExists(_, "user collection")
+		}
+		Future.sequence(createDbs ++ createUsageColls ++ createUsersColls).map(_ => Done)
 
-	def dbUri(using Envri): Uri = {
-		import config._
-		Uri(s"$baseUri/$dbName")
-	}
-
-	def usersCollUri(using Envri): Uri = {
-		val db = dbUri
-		db.withPath(db.path / config.usersCollection)
-	}
-
-	def portalUsageCollUri(using Envri): Uri = {
-		val db = dbUri
-		db.withPath(db.path / config.usageCollection)
-	}
 	private val KeepIdsOnly = "keys" -> "{\"_id\": 1}"
 	private def pageSizeQpar(size: Int) = "pagesize" -> size.toString
 
-	def getUserUri(uid: UserId)(using Envri): Uri = usersCollUri.withPath(usersCollUri.path / uid.email)
+	def getUserUri(uid: UserId)(using Envri): Uri =
+		val coll = config.usersCollUri
+		coll.withPath(coll.path / uid.email)
 
 	def createUserIfNew(uid: UserId, givenName: String, surname: String)(using Envri): Future[Done] =
 		userExists(uid).flatMap{
@@ -78,7 +77,7 @@ class RestHeartClient(val config: RestHeartConfig, http: HttpExt)(using Material
 			entity <- Marshal(payload).to[RequestEntity];
 			req = HttpRequest(
 				method = HttpMethods.POST,
-				uri = usersCollUri,
+				uri = config.usersCollUri,
 				entity = entity,
 				headers = Seq(headers.`Content-Type`(ContentTypes.`application/json`))
 			);
@@ -141,7 +140,7 @@ class RestHeartClient(val config: RestHeartConfig, http: HttpExt)(using Material
 		}.mkString("{", ", ", "}")
 
 		val qParams: Map[String, String] = if(filter.nonEmpty) Map("filter" -> filterParam) else Map.empty
-		val uri = usersCollUri.withQuery(Uri.Query(qParams + KeepIdsOnly + pageSizeQpar(1000)))
+		val uri = config.usersCollUri.withQuery(Uri.Query(qParams + KeepIdsOnly + pageSizeQpar(1000)))
 		for(
 			resp <- http.singleRequest(HttpRequest(uri = uri));
 			usersListResp <- Unmarshal(resp.entity.withContentType(ContentTypes.`application/json`)).to[JsValue];
@@ -160,23 +159,10 @@ class RestHeartClient(val config: RestHeartConfig, http: HttpExt)(using Material
 			) yield ids.map(UserId.apply)
 	}.flatten
 
-	private def createDbIfNotExists(using Envri): Future[Done] =
-		createIfNotExists("Mongo db", dbUri, dbUri)
-
 	private def createCollIfNotExists(collUri: Uri, thing: String): Future[Done] = {
 		val checkUri = collUri.withPath(collUri.path / "_indexes")
 		createIfNotExists(thing, checkUri, collUri)
 	}
-
-	private def createUsersCollIfNotExists(using Envri): Future[Done] =
-		createDbIfNotExists.flatMap{_ =>
-			createCollIfNotExists(usersCollUri, "users collection")
-		}
-
-	private def createPortalUsageCollIfNotExists(using Envri): Future[Done] =
-		createDbIfNotExists.flatMap{_ =>
-			createCollIfNotExists(portalUsageCollUri, "portal usage collection")
-		}
 
 	private def createIfNotExists(thing: String, checkUri: Uri, putUri: Uri): Future[Done] =
 		requestDiscardResp(HttpRequest(uri = checkUri)).flatMap{
@@ -203,4 +189,11 @@ class RestHeartClient(val config: RestHeartConfig, http: HttpExt)(using Material
 	private val ok = Future.successful(Done)
 
 	private def fail[T](msg: String) = Future.failed[T](new Exception(msg))
+
+	private def getDbUri(collUri: Uri): Uri = collUri.withPath{
+		import Uri.Path.{Slash, Segment, Empty}
+		collUri.path match
+			case Slash(Segment(head, _)) => Slash(Segment(head, Empty))
+			case _ => throw new IllegalArgumentException(s"Not a proper RestHeart collection URI: collUri")
+	}
 }

@@ -2,14 +2,17 @@ package se.lu.nateko.cp.cpauth.services
 
 import akka.actor.ActorSystem
 import eu.icoscp.envri.Envri
-import se.lu.nateko.cp.cpauth.{RestHeartConfig}
-import spray.json.{JsObject, JsString}
-import CpGeoClient.given
-import spray.json.*
 import se.lu.nateko.cp.cpauth.PostgresConfig
-import scala.util.Success
-import scala.util.Failure
+import se.lu.nateko.cp.cpauth.RestHeartConfig
 import se.lu.nateko.cp.cpauth.core.*
+import spray.json.JsObject
+import spray.json.JsString
+import spray.json.*
+
+import scala.util.Failure
+import scala.util.Success
+
+import CpGeoClient.given
 
 class PortalLogger(
 	geoClient: CpGeoClient, confRestheart: RestHeartConfig, confPg: PostgresConfig
@@ -55,10 +58,9 @@ class PortalLogger(
 			geo => geo.toJson.asJsObject
 		)
 		val logEntry = JsObject(entry.fields ++ geoJs.fields)
-		val coll = confRestheart.usageCollection
 
-		restHeartLogClient.log(logEntry, coll).failed.foreach{err =>
-			system.log.error(err, s"Could not log portal usage info ${logEntry.compactPrint} to RestHeart collection $coll")
+		restHeartLogClient.logPortalUsage(logEntry).failed.foreach{err =>
+			system.log.error(err, s"Could not log portal usage info ${logEntry.compactPrint} to RestHeart")
 		}
 	}
 

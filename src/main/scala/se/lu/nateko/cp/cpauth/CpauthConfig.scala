@@ -9,6 +9,7 @@ import com.typesafe.config.ConfigFactory
 import se.lu.nateko.cp.cpauth.core.ConfigLoader
 import se.lu.nateko.cp.cpauth.core.PublicAuthConfig
 import eu.icoscp.envri.Envri
+import akka.http.scaladsl.model.Uri
 
 enum OAuthProvider:
 	case facebook, orcidid
@@ -58,15 +59,17 @@ case class AuthConfig(
 )
 
 case class RestHeartConfig(
-	baseUri: String,
-	dbNames: Map[Envri, String],
-	usersCollection: String,
-	usageCollection: String,
+	usersCollection: Map[Envri, URI],
+	usageCollection: Map[Envri, URI],
 	ipsToIgnore: Seq[String],
 	skipInit: Boolean
-){
-	def dbName(implicit envri: Envri) = dbNames(envri)
-}
+):
+	import se.lu.nateko.cp.cpauth.utils.uriJavaToAkka
+	import scala.language.implicitConversions
+
+	def usersCollUri(using envri: Envri): Uri = usersCollection(envri)
+	def portalUsageCollUri(using envri: Envri): Uri = usageCollection(envri)
+
 
 case class CredentialsConfig(username: String, password: String)
 
@@ -121,19 +124,6 @@ object ConfigReader extends DefaultJsonProtocol{
 	import se.lu.nateko.cp.cpauth.core.JsonSupport.{enumFormat, given}
 	given RootJsonFormat[OAuthProvider] = enumFormat(OAuthProvider.valueOf, OAuthProvider.values)
 
-	given RootJsonFormat[URI] with {
-		def write(uri: URI): JsValue = JsString(uri.toString)
-
-		def read(value: JsValue): URI = value match{
-			case JsString(uri) => try{
-				new URI(uri)
-			}catch{
-				case err: Throwable => deserializationError(s"Could not parse URI from $uri", err)
-			}
-			case _ => deserializationError("URI string expected")
-		}
-	}
-
 	def getDefault: Try[CpauthConfig] = Try(fromAppConfig(ConfigLoader.appConfig))
 
 	def getAppConfig: Config = {
@@ -156,7 +146,7 @@ object ConfigReader extends DefaultJsonProtocol{
 	given RootJsonFormat[PrivateAuthConfig] = jsonFormat2(PrivateAuthConfig.apply)
 	import se.lu.nateko.cp.cpauth.core.JsonSupport.given
 	given RootJsonFormat[AuthConfig] = jsonFormat5(AuthConfig.apply)
-	given RootJsonFormat[RestHeartConfig] = jsonFormat6(RestHeartConfig.apply)
+	given RootJsonFormat[RestHeartConfig] = jsonFormat4(RestHeartConfig.apply)
 	given RootJsonFormat[CredentialsConfig] = jsonFormat2(CredentialsConfig.apply)
 	given RootJsonFormat[PostgresConfig] = jsonFormat5(PostgresConfig.apply)
 	given RootJsonFormat[EmailConfig] = jsonFormat5(EmailConfig.apply)

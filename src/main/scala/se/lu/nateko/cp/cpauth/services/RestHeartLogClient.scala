@@ -3,26 +3,25 @@ package se.lu.nateko.cp.cpauth.services
 import akka.Done
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
+import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
 import akka.http.scaladsl.marshalling.Marshal
-import akka.http.scaladsl.model.headers.Accept
 import akka.http.scaladsl.model._
+import akka.http.scaladsl.model.headers.Accept
 import eu.icoscp.envri.Envri
 import se.lu.nateko.cp.cpauth.RestHeartConfig
 import spray.json.JsObject
-import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
 
 import scala.concurrent.Future
 
-class RestHeartLogClient(conf: RestHeartConfig)(implicit system: ActorSystem) {
+class RestHeartLogClient(conf: RestHeartConfig)(using system: ActorSystem):
 
 	import system.dispatcher
-
-	val baseUrl = Uri(conf.baseUri)
 	private val http = Http()
 
-	def log(logEntry: JsObject, logCollection: String)(implicit envri: Envri): Future[Done] = {
+	def logPortalUsage(logEntry: JsObject)(using Envri) =
+		log(logEntry, conf.portalUsageCollUri)
 
-		val restheartLogUri = baseUrl.withPath(baseUrl.path / conf.dbName / logCollection)
+	private def log(logEntry: JsObject, restheartLogUri: Uri)(using Envri): Future[Done] =
 
 		val requestFut = Marshal(logEntry).to[RequestEntity].map{ent =>
 			HttpRequest(
@@ -40,5 +39,3 @@ class RestHeartLogClient(conf: RestHeartConfig)(implicit system: ActorSystem) {
 			else
 				Future.failed(new Exception(resp.status.defaultMessage))
 		}
-	}
-}
