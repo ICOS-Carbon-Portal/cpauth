@@ -78,7 +78,7 @@ resolvers := {
 }
 
 lazy val cpauth = (project in file("."))
-	.dependsOn(viewsCore)
+	.dependsOn(viewsCore, cpauthCore)
 	.settings(commonSettings: _*)
 	.enablePlugins(SbtTwirl, IcosCpSbtDeployPlugin)
 	.settings(
