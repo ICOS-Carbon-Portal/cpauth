@@ -2,7 +2,7 @@ package se.lu.nateko.cp.cpauth.services
 
 import akka.actor.ActorSystem
 import eu.icoscp.envri.Envri
-import se.lu.nateko.cp.cpauth.PostgresConfig
+import se.lu.nateko.cp.cpauth.PostgresConfigs
 import se.lu.nateko.cp.cpauth.RestHeartConfig
 import se.lu.nateko.cp.cpauth.core.*
 import spray.json.JsObject
@@ -15,7 +15,7 @@ import scala.util.Success
 import CpGeoClient.given
 
 class PortalLogger(
-	geoClient: CpGeoClient, confRestheart: RestHeartConfig, confPg: PostgresConfig
+	geoClient: CpGeoClient, confRestheart: RestHeartConfig, confPg: PostgresConfigs
 )(using system: ActorSystem){
 
 	import system.dispatcher

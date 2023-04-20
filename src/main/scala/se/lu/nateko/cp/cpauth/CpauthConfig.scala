@@ -76,7 +76,7 @@ case class CredentialsConfig(username: String, password: String)
 case class PostgresConfig(
 	hostname: String,
 	port: Int,
-	dbNames: Map[Envri, String],
+	dbName: String,
 	writer: CredentialsConfig,
 	dbAccessPoolSize: Int
 )
@@ -91,13 +91,15 @@ case class EmailConfig(
 	logBccAddress: Option[String]
 )
 
+type PostgresConfigs = Map[Envri, PostgresConfig]
+
 case class CpauthConfig(
 	http: HttpConfig,
 	saml: SamlConfig,
 	database: DatabaseConfig,
 	auth: AuthConfig,
 	restheart: RestHeartConfig,
-	postgres: PostgresConfig,
+	postgres: PostgresConfigs,
 	mailing: EmailConfig,
 	oauth: CpauthConfig.OAuthConfig,
 	geoip: CpGeoConfig

@@ -15,6 +15,7 @@ import se.lu.nateko.cp.cpauth.routing.CpauthCookieMissingRejection
 import se.lu.nateko.cp.cpauth.routing.CpauthDirectives
 import se.lu.nateko.cp.cpauth.services.CookieFactory
 import eu.icoscp.envri.Envri
+import java.net.URI
 
 class CpauthDirectivesTest extends AnyFunSpec with ScalatestRouteTest {
 	import Envri.ICOS
@@ -46,10 +47,8 @@ class CpauthDirectivesTest extends AnyFunSpec with ScalatestRouteTest {
 			serviceInterface = "localhost"
 		),
 		restheart = RestHeartConfig(
-			baseUri = "http://127.0.0.1:8088",
-			dbNames = Map(ICOS -> "db"),
-			usersCollection = "users",
-			usageCollection = "portaluse",
+			usersCollection = Map(ICOS -> new URI("http://127.0.0.1:8088/db/users")),
+			usageCollection = Map(ICOS -> new URI("http://127.0.0.1:8088/db/portaluse")),
 			ipsToIgnore = Nil,
 			skipInit = true
 		),
