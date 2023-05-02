@@ -99,7 +99,7 @@ lazy val cpauth = (project in file("."))
 			"org.joda"               %  "joda-convert"                       % "1.7",
 			"org.hsqldb"             %  "hsqldb"                             % "2.3.4",
 			"com.sun.mail"           %  "jakarta.mail"                       % "1.6.7",
-			"org.postgresql"         % "postgresql"                          % "42.2.12",
+			"org.postgresql"         % "postgresql"                          % "42.6.0",
 			"org.apache.commons"     % "commons-dbcp2"                       % "2.7.0" exclude("commons-logging", "commons-logging")
 		),
 
