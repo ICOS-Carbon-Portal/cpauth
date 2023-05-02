@@ -6,6 +6,8 @@
 /target/
 /core/target/
 /viewsCore/target/
+/envri/.js/
+/envri/.jvm/
 /project/project/
 /project/target/
 
