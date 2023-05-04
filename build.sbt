@@ -83,7 +83,7 @@ lazy val cpauth = (project in file("."))
 	.enablePlugins(SbtTwirl, IcosCpSbtDeployPlugin)
 	.settings(
 		name := "cpauth",
-		version := "0.6.1",
+		version := "0.7.0",
 		libraryDependencies ++= Seq(
 			"com.typesafe.akka"      %% "akka-http-spray-json"               % akkaHttpVersion excludeAll("io.spray") cross CrossVersion.for3Use2_13,
 			"com.typesafe.akka"      %% "akka-http-testkit"                  % akkaHttpVersion % "test" cross CrossVersion.for3Use2_13,
@@ -108,6 +108,9 @@ lazy val cpauth = (project in file("."))
 		cpDeployTarget := "cpauth",
 		cpDeployBuildInfoPackage := "se.lu.nateko.cp.cpauth",
 		cpDeployPreAssembly := Def.sequential(Test / test, fetchIdpList).value,
+		cpDeployPlaybook := "cities.yml",
+		cpDeployPermittedInventories := Some(Seq("staging")),
+		cpDeployInfraBranch := "cities-deployment",
 
 		fetchIdpList := {
 			import java.nio.file.{StandardCopyOption, Files, Paths}
