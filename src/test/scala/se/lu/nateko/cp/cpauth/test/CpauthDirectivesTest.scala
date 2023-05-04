@@ -49,6 +49,8 @@ class CpauthDirectivesTest extends AnyFunSpec with ScalatestRouteTest {
 		restheart = RestHeartConfig(
 			usersCollection = Map(ICOS -> new URI("http://127.0.0.1:8088/db/users")),
 			usageCollection = Map(ICOS -> new URI("http://127.0.0.1:8088/db/portaluse")),
+			username = "",
+			password = "",
 			ipsToIgnore = Nil,
 			skipInit = true
 		),

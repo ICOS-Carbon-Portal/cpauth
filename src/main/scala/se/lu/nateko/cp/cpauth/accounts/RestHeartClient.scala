@@ -50,6 +50,7 @@ class RestHeartClient(val config: RestHeartConfig, http: HttpExt)(using Material
 
 	private val KeepIdsOnly = "keys" -> "{\"_id\": 1}"
 	private def pageSizeQpar(size: Int) = "pagesize" -> size.toString
+	private val httpCredentials = headers.BasicHttpCredentials(config.username, config.password)
 
 	def getUserUri(uid: UserId)(using Envri): Uri =
 		val coll = config.usersCollUri
@@ -181,7 +182,7 @@ class RestHeartClient(val config: RestHeartConfig, http: HttpExt)(using Material
 		}
 
 	private def requestDiscardResp(req: HttpRequest): Future[StatusCode] =
-		http.singleRequest(req).map{resp =>
+		http.singleRequest(req.addCredentials(httpCredentials)).map{resp =>
 			resp.discardEntityBytes()
 			resp.status
 		}

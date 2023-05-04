@@ -61,6 +61,8 @@ case class AuthConfig(
 case class RestHeartConfig(
 	usersCollection: Map[Envri, URI],
 	usageCollection: Map[Envri, URI],
+	username: String,
+	password: String,
 	ipsToIgnore: Seq[String],
 	skipInit: Boolean
 ):
@@ -148,7 +150,7 @@ object ConfigReader extends DefaultJsonProtocol{
 	given RootJsonFormat[PrivateAuthConfig] = jsonFormat2(PrivateAuthConfig.apply)
 	import se.lu.nateko.cp.cpauth.core.JsonSupport.given
 	given RootJsonFormat[AuthConfig] = jsonFormat5(AuthConfig.apply)
-	given RootJsonFormat[RestHeartConfig] = jsonFormat4(RestHeartConfig.apply)
+	given RootJsonFormat[RestHeartConfig] = jsonFormat6(RestHeartConfig.apply)
 	given RootJsonFormat[CredentialsConfig] = jsonFormat2(CredentialsConfig.apply)
 	given RootJsonFormat[PostgresConfig] = jsonFormat5(PostgresConfig.apply)
 	given RootJsonFormat[EmailConfig] = jsonFormat5(EmailConfig.apply)
