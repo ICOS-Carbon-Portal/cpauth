@@ -13,6 +13,7 @@ import akka.http.scaladsl.model.StatusCode
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.model.Uri
 import akka.http.scaladsl.model.headers
+import akka.http.scaladsl.model.headers.BasicHttpCredentials
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.stream.Materializer
 import eu.icoscp.envri.Envri
@@ -33,24 +34,21 @@ class RestHeartClient(val config: RestHeartConfig, http: HttpExt)(using Material
 	def log = http.system.log
 
 	def init: Future[Done] = if config.skipInit then Future.successful(Done) else
-		val usageCollUris = config.usageCollection.values.map(uriJavaToAkka)
-		val usersCollUris = config.usersCollection.values.map(uriJavaToAkka)
 
-		val dbUris = (usageCollUris ++ usersCollUris).map(getDbUri).toSeq.distinct
-
-		val createDbs = dbUris.map(dbUri => createIfNotExists("Mongo db", dbUri, dbUri))
-
-		val createUsageColls = usageCollUris.map{
-			createCollIfNotExists(_, "portal use collection")
-		}
-		val createUsersColls = usersCollUris.map{
-			createCollIfNotExists(_, "user collection")
-		}
-		Future.sequence(createDbs ++ createUsageColls ++ createUsersColls).map(_ => Done)
+		Future.sequence(
+			config.db.flatMap { (envri, db) =>
+				val httpCredentials = BasicHttpCredentials(db.username, db.password)
+				val uri = uriJavaToAkka(db.uri)
+				Seq(
+					createIfNotExists("Mongo db", uri, uri, httpCredentials),
+					createCollIfNotExists(config.portalUsageCollUri(using envri), "portal use collection", httpCredentials),
+					createCollIfNotExists(config.usersCollUri(using envri), "user collection", httpCredentials)
+				)
+			}
+		).map(_ => Done)
 
 	private val KeepIdsOnly = "keys" -> "{\"_id\": 1}"
 	private def pageSizeQpar(size: Int) = "pagesize" -> size.toString
-	private val httpCredentials = headers.BasicHttpCredentials(config.username, config.password)
 
 	def getUserUri(uid: UserId)(using Envri): Uri =
 		val coll = config.usersCollUri
@@ -82,7 +80,8 @@ class RestHeartClient(val config: RestHeartConfig, http: HttpExt)(using Material
 				entity = entity,
 				headers = Seq(headers.`Content-Type`(ContentTypes.`application/json`))
 			);
-			status <- requestDiscardResp(req)
+			httpCredentials = BasicHttpCredentials(config.username, config.password);
+			status <- requestDiscardResp(req, httpCredentials)
 		) yield status
 
 		createStatus.flatMap{status =>
@@ -95,8 +94,9 @@ class RestHeartClient(val config: RestHeartConfig, http: HttpExt)(using Material
 	def userExists(uid: UserId)(using Envri): Future[Boolean] = {
 		val query = Uri.Query(KeepIdsOnly)
 		val req = HttpRequest(uri = getUserUri(uid).withQuery(query))
+		val httpCredentials = BasicHttpCredentials(config.username, config.password);
 
-		requestDiscardResp(req).flatMap{status =>
+		requestDiscardResp(req, httpCredentials).flatMap{status =>
 			if(status.isSuccess()) Future.successful(true)
 			else if(status == StatusCodes.NotFound) Future.successful(false)
 			else fail(
@@ -113,8 +113,9 @@ class RestHeartClient(val config: RestHeartConfig, http: HttpExt)(using Material
 			Uri.Query("keys" -> keys)
 		}
 		val uri = getUserUri(uid).withQuery(query)
+		val httpCredentials = BasicHttpCredentials(config.username, config.password);
 		for(
-			resp <- http.singleRequest(HttpRequest(uri = uri));
+			resp <- http.singleRequest(HttpRequest(uri = uri).addCredentials(httpCredentials));
 			userVal <- Unmarshal(resp.entity.withContentType(ContentTypes.`application/json`)).to[JsValue];
 			userObj <- Future.fromTry(ensure[JsObject](userVal))
 		) yield userObj
@@ -142,8 +143,9 @@ class RestHeartClient(val config: RestHeartConfig, http: HttpExt)(using Material
 
 		val qParams: Map[String, String] = if(filter.nonEmpty) Map("filter" -> filterParam) else Map.empty
 		val uri = config.usersCollUri.withQuery(Uri.Query(qParams + KeepIdsOnly + pageSizeQpar(1000)))
+		val httpCredentials = BasicHttpCredentials(config.username, config.password);
 		for(
-			resp <- http.singleRequest(HttpRequest(uri = uri));
+			resp <- http.singleRequest(HttpRequest(uri = uri).addCredentials(httpCredentials));
 			usersListResp <- Unmarshal(resp.entity.withContentType(ContentTypes.`application/json`)).to[JsValue];
 			users <- Future.fromTry(parseFilteredUsersList(usersListResp))
 		) yield users
@@ -160,17 +162,17 @@ class RestHeartClient(val config: RestHeartConfig, http: HttpExt)(using Material
 			) yield ids.map(UserId.apply)
 	}.flatten
 
-	private def createCollIfNotExists(collUri: Uri, thing: String): Future[Done] = {
+	private def createCollIfNotExists(collUri: Uri, thing: String, httpCredentials: BasicHttpCredentials): Future[Done] = {
 		val checkUri = collUri.withPath(collUri.path / "_indexes")
-		createIfNotExists(thing, checkUri, collUri)
+		createIfNotExists(thing, checkUri, collUri, httpCredentials)
 	}
 
-	private def createIfNotExists(thing: String, checkUri: Uri, putUri: Uri): Future[Done] =
-		requestDiscardResp(HttpRequest(uri = checkUri)).flatMap{
+	private def createIfNotExists(thing: String, checkUri: Uri, putUri: Uri, httpCredentials: BasicHttpCredentials): Future[Done] =
+		requestDiscardResp(HttpRequest(uri = checkUri), httpCredentials).flatMap{
 			case StatusCodes.OK => ok
 
 			case StatusCodes.NotFound =>
-				requestDiscardResp(HttpRequest(HttpMethods.PUT, uri = putUri)).flatMap{
+				requestDiscardResp(HttpRequest(HttpMethods.PUT, uri = putUri), httpCredentials).flatMap{
 					case StatusCodes.Created => ok
 					case status => fail(
 						s"Could not create $thing at $putUri, got response $status"
@@ -181,7 +183,7 @@ class RestHeartClient(val config: RestHeartConfig, http: HttpExt)(using Material
 			)
 		}
 
-	private def requestDiscardResp(req: HttpRequest): Future[StatusCode] =
+	private def requestDiscardResp(req: HttpRequest, httpCredentials: BasicHttpCredentials): Future[StatusCode] =
 		http.singleRequest(req.addCredentials(httpCredentials)).map{resp =>
 			resp.discardEntityBytes()
 			resp.status

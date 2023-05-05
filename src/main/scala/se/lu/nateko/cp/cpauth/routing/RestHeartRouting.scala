@@ -22,7 +22,7 @@ trait RestHeartRouting extends RestHeartDirectives{
 	val restheartRoute: Route = extractEnvri{implicit envri =>
 
 		val config = restHeart.config
-		val usersCollUri: Uri = uriJavaToAkka(config.usersCollection(envri))
+		val usersCollUri: Uri = config.usersCollUri
 
 		def injectUsersCollection(req: HttpRequest) = req.withUri{
 			val oldPathPart = req.uri.path.tail.tail.tail.tail

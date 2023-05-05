@@ -58,19 +58,27 @@ case class AuthConfig(
 	masterAdminPass: String
 )
 
-case class RestHeartConfig(
-	usersCollection: Map[Envri, URI],
-	usageCollection: Map[Envri, URI],
+case class RestHeartDBConfig(
+	uri: URI,
 	username: String,
-	password: String,
+	password: String
+)
+
+case class RestHeartConfig(
+	db: Map[Envri, RestHeartDBConfig],
+	portalUsageCollection: String,
+	usersCollection: String,
 	ipsToIgnore: Seq[String],
 	skipInit: Boolean
 ):
 	import se.lu.nateko.cp.cpauth.utils.uriJavaToAkka
 	import scala.language.implicitConversions
 
-	def usersCollUri(using envri: Envri): Uri = usersCollection(envri)
-	def portalUsageCollUri(using envri: Envri): Uri = usageCollection(envri)
+	def dbUri(using envri: Envri): Uri = db(envri).uri
+	def username(using envri: Envri): String = db(envri).username
+	def password(using envri: Envri): String = db(envri).password
+	def portalUsageCollUri(using envri: Envri): Uri = dbUri.withPath(dbUri.path / portalUsageCollection)
+	def usersCollUri(using envri: Envri): Uri = dbUri.withPath(dbUri.path / usersCollection)
 
 
 case class CredentialsConfig(username: String, password: String)
@@ -146,11 +154,12 @@ object ConfigReader extends DefaultJsonProtocol{
 	given RootJsonFormat[HttpConfig] = jsonFormat5(HttpConfig.apply)
 	given RootJsonFormat[SamlConfig] = jsonFormat5(SamlConfig.apply)
 	given RootJsonFormat[DatabaseConfig] = jsonFormat4(DatabaseConfig.apply)
+	given RootJsonFormat[RestHeartDBConfig] = jsonFormat3(RestHeartDBConfig.apply)
 
 	given RootJsonFormat[PrivateAuthConfig] = jsonFormat2(PrivateAuthConfig.apply)
 	import se.lu.nateko.cp.cpauth.core.JsonSupport.given
 	given RootJsonFormat[AuthConfig] = jsonFormat5(AuthConfig.apply)
-	given RootJsonFormat[RestHeartConfig] = jsonFormat6(RestHeartConfig.apply)
+	given RootJsonFormat[RestHeartConfig] = jsonFormat5(RestHeartConfig.apply)
 	given RootJsonFormat[CredentialsConfig] = jsonFormat2(CredentialsConfig.apply)
 	given RootJsonFormat[PostgresConfig] = jsonFormat5(PostgresConfig.apply)
 	given RootJsonFormat[EmailConfig] = jsonFormat5(EmailConfig.apply)
