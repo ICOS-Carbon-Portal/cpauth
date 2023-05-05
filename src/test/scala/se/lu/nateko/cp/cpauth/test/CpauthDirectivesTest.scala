@@ -49,8 +49,8 @@ class CpauthDirectivesTest extends AnyFunSpec with ScalatestRouteTest {
 		restheart = RestHeartConfig(
 			db = Map(ICOS -> RestHeartDBConfig(
 				uri = new URI("http://127.0.0.1:8088/db/"),
-				username = "",
-				password = ""
+				username = None,
+				password = None
 			)),
 			portalUsageCollection = "",
 			usersCollection = "",
