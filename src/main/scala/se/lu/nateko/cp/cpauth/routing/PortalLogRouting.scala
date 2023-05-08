@@ -1,4 +1,4 @@
-package se.lu.nateko.cp.cpauth.routing
+package se.lu.nateko.cp.geoipclient
 
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
 import akka.http.scaladsl.model.HttpMethods
@@ -12,17 +12,17 @@ import akka.http.scaladsl.server.MalformedRequestContentRejection
 import akka.http.scaladsl.server.MissingHeaderRejection
 import akka.http.scaladsl.server.RejectionHandler
 import akka.http.scaladsl.server.Route
-import se.lu.nateko.cp.cpauth.core.DownloadEventInfo
-import se.lu.nateko.cp.cpauth.services.PortalLogger
+import se.lu.nateko.cp.cpauth.services.RestHeartLogger
 import spray.json.JsObject
 import spray.json.JsString
 import spray.json.JsValue
 import eu.icoscp.envri.Envri
+import se.lu.nateko.cp.cpauth.routing.CpauthDirectives
 
 
-trait PortalLogRouting extends CpauthDirectives{
+trait PortalLogRouting extends CpauthDirectives:
 
-	def portalLogger: PortalLogger
+	def restheartLogger: RestHeartLogger
 
 	val portalLogRoute = extractEnvri{ implicit envri =>
 		val controlOrigins = controlOriginsDir
@@ -37,7 +37,7 @@ trait PortalLogRouting extends CpauthDirectives{
 										val anonId = anonymizeCpUser(uid)
 										JsObject(js.asJsObject.fields + ("cpUser" -> JsString(anonId)))
 									}
-									portalLogger.logUsage(usage, ip)
+									restheartLogger.logUsageToRestheart(usage, Left(ip))
 									complete(StatusCodes.OK)
 								}
 							}
@@ -57,20 +57,11 @@ trait PortalLogRouting extends CpauthDirectives{
 					complete(StatusCodes.BadRequest -> "Expected data-portal associated HTTP Origin")
 				} ~
 				complete(StatusCodes.BadRequest -> "Expecting only HTTP POST or OPTIONS on this path")
-			} ~
-			path("downloads"){
-				(post & failOnParsingErrors("Expected DownloadEventInfo, got something else")){
-					entity(as[DownloadEventInfo]){dlInfo =>
-						portalLogger.logDl(dlInfo)
-						complete(StatusCodes.OK)
-					}
-				} ~
-				complete(StatusCodes.BadRequest -> "Expecting only HTTP POST on this path")
 			}
 		}
 	}
 
-	val getClientIp: Directive1[String] = {
+	val getClientIp: Directive1[String] =
 
 		val errMsg = "Missing 'X-Real-Ip' header, bad reverse proxy configuration on the server"
 
@@ -79,14 +70,12 @@ trait PortalLogRouting extends CpauthDirectives{
 		}.result()
 
 		handleRejections(rejHandler) & headerValueByType(`X-Real-Ip`).map(_.value)
-	}
 
-	def failOnParsingErrors(msg: String): Directive0 = {
+	def failOnParsingErrors(msg: String): Directive0 =
 		val rejHandler = RejectionHandler.newBuilder().handle{
 			case MalformedRequestContentRejection(error, _) => complete((StatusCodes.BadRequest, s"$msg : $error"))
 		}.result()
 		handleRejections(rejHandler)
-	}
 
 
 	private def controlOriginsDir(implicit envri: Envri): Directive0 = headerValueByType(Origin).tflatMap{
@@ -97,4 +86,4 @@ trait PortalLogRouting extends CpauthDirectives{
 		case _ => reject
 	}
 
-}
+end PortalLogRouting

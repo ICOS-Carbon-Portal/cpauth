@@ -42,12 +42,15 @@ lazy val cpauthCore = project
 	.dependsOn(envri.jvm)
 	.settings(commonSettings: _*)
 	.settings(publishingSettings: _*)
+	.enablePlugins(SbtTwirl)
 	.settings(
 		name := "cpauth-core",
-		version := "0.9.0",
+		version := "0.10.0-SNAPSHOT",
 		libraryDependencies ++= Seq(
 			"io.spray"              %% "spray-json"         % "1.3.6",
-			"com.typesafe"           % "config"             % "1.4.2"
+			"com.typesafe"           % "config"             % "1.4.2",
+			"com.typesafe.akka"      %% "akka-slf4j"                         % akkaVersion cross CrossVersion.for3Use2_13,
+			"com.sun.mail"           %  "jakarta.mail"                       % "1.6.7",
 		)
 	)
 
@@ -65,10 +68,27 @@ lazy val viewsCore = (project in file("viewsCore"))
 		),
 	)
 
-
 val akkaVersion = "2.6.19"
 val akkaHttpVersion = "10.2.9"
 val cpauthMain = Some("se.lu.nateko.cp.cpauth.Main")
+
+lazy val geoIpClient = (project in file("geoIpClient"))
+	.dependsOn(envri.jvm, cpauthCore)
+	.settings(commonSettings: _*)
+	.settings(publishingSettings: _*)
+	.settings(
+		name := "geoip-client",
+		version := "0.1.0-SNAPSHOT",
+		libraryDependencies ++= Seq(
+			"io.spray"              %% "spray-json"                         % "1.3.6",
+			"com.typesafe.akka"      %% "akka-http-spray-json"               % akkaHttpVersion excludeAll("io.spray") cross CrossVersion.for3Use2_13,
+			"com.typesafe.akka"      %% "akka-stream-testkit"                % akkaVersion     % "test" cross CrossVersion.for3Use2_13,
+			"com.typesafe.akka"      %% "akka-stream"                        % akkaVersion cross CrossVersion.for3Use2_13,
+			"com.typesafe.akka"      %% "akka-slf4j"                         % akkaVersion cross CrossVersion.for3Use2_13,
+			"org.postgresql"         % "postgresql"                          % "42.6.0",
+			"org.apache.commons"     % "commons-dbcp2"                       % "2.7.0" exclude("commons-logging", "commons-logging")
+		),
+	)
 
 lazy val fetchIdpList = taskKey[Unit]("Fetches SAML IdP list from SWAMID")
 
@@ -78,7 +98,7 @@ resolvers := {
 }
 
 lazy val cpauth = (project in file("."))
-	.dependsOn(viewsCore, cpauthCore)
+	.dependsOn(viewsCore, cpauthCore, geoIpClient)
 	.settings(commonSettings: _*)
 	.enablePlugins(SbtTwirl, IcosCpSbtDeployPlugin)
 	.settings(

@@ -57,10 +57,8 @@ class CpauthDirectivesTest extends AnyFunSpec with ScalatestRouteTest {
 			ipsToIgnore = Nil,
 			skipInit = true
 		),
-		postgres = null,
 		mailing = null,
 		oauth = null,
-		geoip = null
 	)
 
 	val config = getConfig("src/test/resources/private1.der")

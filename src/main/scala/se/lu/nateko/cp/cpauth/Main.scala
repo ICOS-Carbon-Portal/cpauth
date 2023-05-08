@@ -22,9 +22,10 @@ import scala.util.Success
 import scala.util.Failure
 import utils.Utils.CrasheableTry
 import akka.actor.Scheduler
+import se.lu.nateko.cp.cpauth.core.EmailSender
 
 object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
-		with StaticRouting with RestHeartRouting with OAuthRouting with PortalLogRouting {
+		with StaticRouting with RestHeartRouting with OAuthRouting {
 
 	given system: ActorSystem = ActorSystem("cpauth")
 	given dispatcher: ExecutionContext = system.dispatcher
@@ -50,18 +51,11 @@ object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
 
 	val emailSender = new EmailSender(config.mailing)
 
-	val geoClient = {
-		val errorMailer = new ErrorEmailer(config.geoip.emailErrorsTo, "Resolving IP to location failed", emailSender)
-		new CpGeoClient(config.geoip, errorMailer)
-	}
-
 	val passwordHandler = {
 		implicit val exeCtxt = system.dispatchers.lookup("my-blocking-dispatcher")
 		new PasswordLifecycleHandler(emailSender, cookieFactory, userDb, config.http, config.auth)
 	}
 	val targetLookup: TargetUrlLookup = new MapBasedUrlLookup
-
-	val portalLogger = new PortalLogger(geoClient, config.restheart, config.postgres)
 
 	val cpauthExceptionHandler = ExceptionHandler{
 		case AuthenticationFailedException =>
@@ -73,7 +67,6 @@ object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
 
 	val route = handleExceptions(cpauthExceptionHandler){
 		staticRoute ~
-		portalLogRoute ~
 		samlRoute ~
 		passwordRoute ~
 		drupalRoute ~

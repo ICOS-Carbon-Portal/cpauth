@@ -10,6 +10,7 @@ import se.lu.nateko.cp.cpauth.core.ConfigLoader
 import se.lu.nateko.cp.cpauth.core.PublicAuthConfig
 import eu.icoscp.envri.Envri
 import akka.http.scaladsl.model.Uri
+import se.lu.nateko.cp.cpauth.core.EmailConfig
 
 enum OAuthProvider:
 	case facebook, orcidid
@@ -83,25 +84,7 @@ case class RestHeartConfig(
 
 case class CredentialsConfig(username: String, password: String)
 
-case class PostgresConfig(
-	hostname: String,
-	port: Int,
-	dbName: String,
-	writer: CredentialsConfig,
-	dbAccessPoolSize: Int
-)
-
 case class CpGeoConfig(baseUri: String, maxAgeDays: Int, emailErrorsTo: String)
-
-case class EmailConfig(
-	smtpServer: String,
-	username: String,
-	password: String,
-	fromAddress: String,
-	logBccAddress: Option[String]
-)
-
-type PostgresConfigs = Map[Envri, PostgresConfig]
 
 case class CpauthConfig(
 	http: HttpConfig,
@@ -109,10 +92,8 @@ case class CpauthConfig(
 	database: DatabaseConfig,
 	auth: AuthConfig,
 	restheart: RestHeartConfig,
-	postgres: PostgresConfigs,
 	mailing: EmailConfig,
 	oauth: CpauthConfig.OAuthConfig,
-	geoip: CpGeoConfig
 )
 
 object CpauthConfig{
@@ -161,12 +142,10 @@ object ConfigReader extends DefaultJsonProtocol{
 	given RootJsonFormat[AuthConfig] = jsonFormat5(AuthConfig.apply)
 	given RootJsonFormat[RestHeartConfig] = jsonFormat5(RestHeartConfig.apply)
 	given RootJsonFormat[CredentialsConfig] = jsonFormat2(CredentialsConfig.apply)
-	given RootJsonFormat[PostgresConfig] = jsonFormat5(PostgresConfig.apply)
 	given RootJsonFormat[EmailConfig] = jsonFormat5(EmailConfig.apply)
 	given RootJsonFormat[OAuthProviderConfig] = jsonFormat3(OAuthProviderConfig.apply)
-	given RootJsonFormat[CpGeoConfig] = jsonFormat3(CpGeoConfig.apply)
 
-	given RootJsonFormat[CpauthConfig] = jsonFormat9(CpauthConfig.apply)
+	given RootJsonFormat[CpauthConfig] = jsonFormat7(CpauthConfig.apply)
 
 	def fromAppConfig(applicationConfig: Config): CpauthConfig = {
 		val renderOpts = ConfigRenderOptions.concise.setJson(true)

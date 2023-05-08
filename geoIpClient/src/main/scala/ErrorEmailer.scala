@@ -1,14 +1,19 @@
-package se.lu.nateko.cp.cpauth.services
+package se.lu.nateko.cp.geoipclient
 
 import akka.actor.ActorSystem
-import akka.stream.{Materializer, OverflowStrategy, QueueOfferResult}
-import akka.stream.scaladsl.{Keep, Sink, Source}
+import akka.stream.Materializer
+import akka.stream.OverflowStrategy
+import akka.stream.QueueOfferResult
+import akka.stream.scaladsl.Keep
+import akka.stream.scaladsl.Sink
+import akka.stream.scaladsl.Source
+import se.lu.nateko.cp.cpauth.core.EmailSender
 
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationInt
 
 
-class ErrorEmailer(to: String, subject: String, emailSender: EmailSender)(implicit system: ActorSystem, mat: Materializer) {
+class ErrorEmailer(to: String, subject: String, emailSender: EmailSender)(implicit system: ActorSystem, mat: Materializer):
 
 	private val errorLog = Source.queue[Throwable](10, OverflowStrategy.dropTail)
 		.map((java.time.Instant.now, _))
@@ -30,4 +35,4 @@ class ErrorEmailer(to: String, subject: String, emailSender: EmailSender)(implic
 
 	def enqueue(error: Throwable): Future[QueueOfferResult] = errorLog.offer(error)
 
-}
+

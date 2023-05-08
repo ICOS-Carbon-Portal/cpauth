@@ -26,7 +26,6 @@ import se.lu.nateko.cp.cpauth.core.AuthSource
 import se.lu.nateko.cp.cpauth.core.AuthToken
 import se.lu.nateko.cp.cpauth.core.Authenticator
 import se.lu.nateko.cp.cpauth.core.CookieToToken
-import se.lu.nateko.cp.cpauth.core.DownloadEventInfo
 import se.lu.nateko.cp.cpauth.core.UserId
 import se.lu.nateko.cp.cpauth.utils.TemplatePageMarshalling
 import se.lu.nateko.cp.cpauth.utils.Utils
@@ -41,6 +40,7 @@ import scala.util.Success
 import scala.util.Try
 
 import SprayJsonSupport.sprayJsValueMarshaller
+import se.lu.nateko.cp.cpauth.core.DownloadEventInfo
 
 
 trait CpauthDirectives {

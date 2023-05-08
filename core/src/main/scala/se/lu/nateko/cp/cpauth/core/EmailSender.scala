@@ -1,6 +1,5 @@
-package se.lu.nateko.cp.cpauth.services
+package se.lu.nateko.cp.cpauth.core
 
-import se.lu.nateko.cp.cpauth.EmailConfig
 import play.twirl.api.Html
 import javax.mail._
 import javax.mail.internet._
@@ -8,7 +7,15 @@ import java.util.Date
 import java.util.Properties
 import org.slf4j.LoggerFactory
 
-class EmailSender(config: EmailConfig) {
+case class EmailConfig(
+	smtpServer: String,
+	username: String,
+	password: String,
+	fromAddress: String,
+	logBccAddress: Option[String]
+)
+
+class EmailSender(config: EmailConfig):
 
 	private val log = LoggerFactory.getLogger(getClass)
 
@@ -18,7 +25,7 @@ class EmailSender(config: EmailConfig) {
 	def sendText(to: Seq[String], subject: String, body: String, cc: Seq[String] = Nil): Unit =
 		privateSend(to, subject, body, "text/plain; charset=utf-8", cc)
 
-	private def privateSend(to: Seq[String], subject: String, body: String, mimeType: String, cc: Seq[String]): Unit = {
+	private def privateSend(to: Seq[String], subject: String, body: String, mimeType: String, cc: Seq[String]): Unit =
 		try{
 			val message: Message = {
 				val properties = new Properties()
@@ -50,5 +57,3 @@ class EmailSender(config: EmailConfig) {
 				log.error("Mail sending failed", err)
 				throw err
 		}
-	}
-}

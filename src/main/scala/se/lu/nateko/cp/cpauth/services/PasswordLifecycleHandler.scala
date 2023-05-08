@@ -14,6 +14,7 @@ import java.net.URI
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationInt
+import se.lu.nateko.cp.cpauth.core.EmailSender
 
 class PasswordLifecycleHandler(
 	emailSender: EmailSender,
