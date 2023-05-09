@@ -19,8 +19,6 @@ import scala.concurrent.Future
 import scala.util.Failure
 import scala.util.control.NoStackTrace
 
-case class CpGeoConfig(baseUri: String, maxAgeDays: Int, emailErrorsTo: String)
-
 sealed trait GeoIpResponse
 case class GeoIpInfo(
 	ip: String,
