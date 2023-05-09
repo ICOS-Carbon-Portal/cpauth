@@ -16,6 +16,7 @@ import se.lu.nateko.cp.cpauth.routing.CpauthDirectives
 import se.lu.nateko.cp.cpauth.services.CookieFactory
 import eu.icoscp.envri.Envri
 import java.net.URI
+import se.lu.nateko.cp.cpauth.core.PublicAuthConfig
 
 class CpauthDirectivesTest extends AnyFunSpec with ScalatestRouteTest {
 	import Envri.ICOS

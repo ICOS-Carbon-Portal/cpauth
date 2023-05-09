@@ -4,6 +4,7 @@ import scala.util.Try
 import scala.util.Success
 import java.security.interfaces.RSAPublicKey
 import java.time.Instant
+import se.lu.nateko.cp.cpauth.core.PublicAuthConfig
 
 case class UserId(email: String)
 

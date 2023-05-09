@@ -5,6 +5,7 @@ import se.lu.nateko.cp.cpauth.core.*
 import se.lu.nateko.cp.cpauth.utils.SignedTokenMaker
 import se.lu.nateko.cp.cpauth.PrivateAuthConfig
 import eu.icoscp.envri.Envri
+import se.lu.nateko.cp.cpauth.core.PublicAuthConfig
 
 class AuthenticationTest extends AnyFunSuite{
 	import Envri.ICOS

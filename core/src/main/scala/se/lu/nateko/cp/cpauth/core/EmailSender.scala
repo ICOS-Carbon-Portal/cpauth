@@ -6,14 +6,7 @@ import javax.mail.internet._
 import java.util.Date
 import java.util.Properties
 import org.slf4j.LoggerFactory
-
-case class EmailConfig(
-	smtpServer: String,
-	username: String,
-	password: String,
-	fromAddress: String,
-	logBccAddress: Option[String]
-)
+import se.lu.nateko.cp.cpauth.core.EmailConfig
 
 class EmailSender(config: EmailConfig):
 

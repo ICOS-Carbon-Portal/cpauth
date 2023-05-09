@@ -5,6 +5,7 @@ import com.typesafe.config.ConfigFactory
 import com.typesafe.config.ConfigRenderOptions
 import eu.icoscp.envri.Envri
 import spray.json.enrichString
+import se.lu.nateko.cp.cpauth.core.{PublicAuthConfig, CoreConfig}
 
 object ConfigLoader:
 	import JsonSupport.given
@@ -26,3 +27,9 @@ object ConfigLoader:
 		.render(renderOpts)
 		.parseJson
 		.convertTo[Map[Envri,PublicAuthConfig]]
+
+	def cpauthCoreConfig: CoreConfig = appConfig
+		.getValue("cpauthCore")
+		.render(renderOpts)
+		.parseJson
+		.convertTo[CoreConfig]
