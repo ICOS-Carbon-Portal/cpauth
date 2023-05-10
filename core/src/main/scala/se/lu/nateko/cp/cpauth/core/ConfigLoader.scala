@@ -5,6 +5,8 @@ import com.typesafe.config.ConfigFactory
 import com.typesafe.config.ConfigRenderOptions
 import eu.icoscp.envri.Envri
 import spray.json.enrichString
+import spray.json.RootJsonReader
+import com.typesafe.config.ConfigValue
 
 object ConfigLoader:
 	import JsonSupport.given
@@ -21,8 +23,8 @@ object ConfigLoader:
 
 	private val renderOpts = ConfigRenderOptions.concise.setJson(true)
 
-	def authPubConfig: Map[Envri,PublicAuthConfig] = appConfig
-		.getValue("authPub")
-		.render(renderOpts)
-		.parseJson
-		.convertTo[Map[Envri,PublicAuthConfig]]
+	extension(conf: ConfigValue)
+		def parseAs[T: RootJsonReader]: T =
+			conf.render(renderOpts).parseJson.convertTo[T]
+
+	def authPubConfig = appConfig.getValue("authPub").parseAs[Map[Envri,PublicAuthConfig]]

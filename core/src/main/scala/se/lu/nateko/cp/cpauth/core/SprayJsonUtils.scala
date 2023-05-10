@@ -1,4 +1,4 @@
-package se.lu.nateko.cp.cpauth.utils
+package se.lu.nateko.cp.cpauth.core
 
 import scala.util.Failure
 import scala.util.Success
@@ -35,7 +35,7 @@ object SprayJsonUtils {
 	def getStringFieldOpt(o: JsObject, field: String): Option[String] = getFieldOpt[JsString](o, field).map(_.value)
 
 	def getElements[T <: JsValue : ClassTag](arr: JsArray): Try[Seq[T]] = {
-		Utils.tryseq(arr.elements.map(ensure[T]))
+		CoreUtils.tryseq(arr.elements.map(ensure[T]))
 	}
 
 }

@@ -5,7 +5,7 @@
 # sbt specific
 /target/
 /core/target/
-/geoIpClient/target/
+/georestheart/target/
 /viewsCore/target/
 /project/project/
 /project/target/

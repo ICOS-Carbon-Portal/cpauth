@@ -66,20 +66,6 @@ object Utils {
 			case err => after(time, scheduler, ex, () => Future.failed(err))
 		}
 
-	def tryseq[T](tries: Iterable[Try[T]]): Try[Seq[T]] = {
-		val successes = Buffer.empty[T]
-		var error: Option[Failure[Seq[T]]] = None
-		val iter = tries.iterator
-
-		while(error.isEmpty && iter.hasNext){
-			iter.next() match{
-				case Success(t) => successes += t
-				case Failure(err) => error = Some(Failure(err))
-			}
-		}
-		error.getOrElse(Success(successes.toVector))
-	}
-
 	implicit class CrasheableTry[T](val inner: Try[T]) extends AnyVal{
 		import scala.concurrent.Await
 		import scala.concurrent.duration.Duration
@@ -92,7 +78,3 @@ object Utils {
 	}
 }
 
-given uriJavaToAkka: Conversion[URI, Uri] = uri => Uri(uri.toString)
-
-extension (uri: Uri)
-	def appendPathSegment(segment: String): Uri = uri.withPath(uri.path / segment)

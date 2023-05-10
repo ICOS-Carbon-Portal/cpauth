@@ -1,4 +1,4 @@
-package se.lu.nateko.cp.geoipclient
+package eu.icoscp.geoipclient
 
 import akka.actor.ActorSystem
 import akka.event.LoggingAdapter

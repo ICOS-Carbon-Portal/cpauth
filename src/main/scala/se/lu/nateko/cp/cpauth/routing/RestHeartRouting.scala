@@ -12,7 +12,7 @@ import akka.http.scaladsl.server.Route
 import eu.icoscp.envri.Envri
 import se.lu.nateko.cp.cpauth.CpauthJsonProtocol.given
 import se.lu.nateko.cp.cpauth.core.UserId
-import se.lu.nateko.cp.cpauth.utils.uriJavaToAkka
+import eu.icoscp.utils.akkauri.uriJavaToAkka
 import spray.json.DefaultJsonProtocol.StringJsonFormat
 import spray.json.DefaultJsonProtocol.immSeqFormat
 import spray.json.DefaultJsonProtocol.tuple2Format

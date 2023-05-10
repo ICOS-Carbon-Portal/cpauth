@@ -14,8 +14,8 @@ import akka.http.scaladsl.model.headers.Accept
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.stream.Materializer
 import se.lu.nateko.cp.cpauth.OAuthProviderConfig
-import se.lu.nateko.cp.cpauth.utils.SprayJsonUtils._
-import spray.json._
+import se.lu.nateko.cp.cpauth.core.SprayJsonUtils.*
+import spray.json.*
 
 
 class OrcidAuthenticationService(config: OAuthProviderConfig)(implicit system: ActorSystem, mat: Materializer) {
@@ -75,7 +75,7 @@ class OrcidAuthenticationService(config: OAuthProviderConfig)(implicit system: A
 	}
 
 	private def getUserEmails(orcidId: String): Future[Seq[EmailInfo]] = {
-		import se.lu.nateko.cp.cpauth.utils.Utils.tryseq
+		import se.lu.nateko.cp.cpauth.core.CoreUtils.tryseq
 
 		val request = HttpRequest(
 			uri = s"https://pub.orcid.org/v2.0/$orcidId/email/",

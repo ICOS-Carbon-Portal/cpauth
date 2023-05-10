@@ -16,9 +16,9 @@ import se.lu.nateko.cp.cpauth.routing.*
 import se.lu.nateko.cp.cpauth.services.*
 import se.lu.nateko.cp.cpauth.utils.MapBasedUrlLookup
 import se.lu.nateko.cp.cpauth.utils.TargetUrlLookup
-import se.lu.nateko.cp.geoipclient.CpGeoClient
-import se.lu.nateko.cp.geoipclient.ErrorEmailer
-import se.lu.nateko.cp.geoipclient.PortalLogRouting
+import eu.icoscp.geoipclient.CpGeoClient
+import eu.icoscp.geoipclient.ErrorEmailer
+import se.lu.nateko.cp.cpauth.routing.PortalLogRouting
 
 import java.sql.DriverManager
 import scala.concurrent.Await
@@ -41,7 +41,6 @@ object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
 
 	val (httpConfig, authConfig, samlConfig, oauthConfig) = (config.http, config.auth, config.saml, config.oauth)
 	val http = Http()
-	val restHeart = new RestHeartClient(config.restheart, http)
 
 	val idpLib: IdpLibrary = IdpLibrary.fromConfig(samlConfig).getOrCrash("Try running 'fetchIdpList' in SBT.")
 	val cookieFactory = new CookieFactory(config)
@@ -57,9 +56,9 @@ object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
 
 	val emailSender = EmailSender(config.mailing)
 
-	val restheartLogger =
-		val geoClient = CpGeoClient(config.geoip, emailSender)
-		RestHeartLogger(geoClient, config.restheart)
+	val restHeart =
+		val geoClient = CpGeoClient(emailSender)
+		new RestHeartClient(config.restheart, geoClient, http)
 
 	val passwordHandler =
 		given ExecutionContext = system.dispatchers.lookup("my-blocking-dispatcher")

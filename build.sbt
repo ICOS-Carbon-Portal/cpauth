@@ -72,12 +72,13 @@ val akkaVersion = "2.6.19"
 val akkaHttpVersion = "10.2.9"
 val cpauthMain = Some("se.lu.nateko.cp.cpauth.Main")
 
-lazy val geoIpClient = (project in file("geoIpClient"))
+lazy val georestheart = (project in file("georestheart"))
 	.dependsOn(cpauthCore)
 	.settings(commonSettings: _*)
 	.settings(publishingSettings: _*)
 	.settings(
-		name := "geoip-client",
+		name := "georestheart",
+		organization := "eu.icoscp",
 		version := "0.1.0-SNAPSHOT",
 		libraryDependencies ++= Seq(
 			"com.typesafe.akka"      %% "akka-http-spray-json"               % akkaHttpVersion excludeAll("io.spray") cross CrossVersion.for3Use2_13,
@@ -93,7 +94,7 @@ resolvers := {
 }
 
 lazy val cpauth = (project in file("."))
-	.dependsOn(viewsCore, geoIpClient)
+	.dependsOn(viewsCore, georestheart)
 	.settings(commonSettings: _*)
 	.enablePlugins(SbtTwirl, IcosCpSbtDeployPlugin)
 	.settings(

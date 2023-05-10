@@ -1,4 +1,4 @@
-package se.lu.nateko.cp.geoipclient
+package eu.icoscp.geoipclient
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
@@ -75,13 +75,14 @@ end CpGeoClient
 
 object CpGeoClient extends DefaultJsonProtocol:
 
+	def apply(mailer: EmailSender)(using ActorSystem) = new CpGeoClient(CpGeoConfig.load, mailer)
+
 	class GeoError(msg: String) extends Exception(msg) with NoStackTrace
 	class QuotaError extends GeoError("Geo IP provider usage quota has been exceeded")
 
 	given RootJsonFormat[GeoIpInfo] = jsonFormat5(GeoIpInfo.apply)
 	given RootJsonFormat[GeoIpError] = jsonFormat1(GeoIpError.apply)
 	given RootJsonFormat[GeoIpInnerError] = jsonFormat2(GeoIpInnerError.apply)
-	given confFormat: RootJsonFormat[CpGeoConfig] = jsonFormat3(CpGeoConfig.apply)
 
 	given geoIpResponseFormat: RootJsonFormat[GeoIpResponse] with
 		override def read(json: JsValue): GeoIpResponse =

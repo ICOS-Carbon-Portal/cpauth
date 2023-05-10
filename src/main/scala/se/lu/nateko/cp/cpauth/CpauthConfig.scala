@@ -8,12 +8,12 @@ import eu.icoscp.envri.Envri
 import se.lu.nateko.cp.cpauth.core.ConfigLoader
 import se.lu.nateko.cp.cpauth.core.EmailConfig
 import se.lu.nateko.cp.cpauth.core.PublicAuthConfig
-import se.lu.nateko.cp.cpauth.utils.appendPathSegment
-import se.lu.nateko.cp.geoipclient.CpGeoConfig
 import spray.json.*
 
 import java.net.URI
 import scala.util.Try
+import eu.icoscp.georestheart.RestHeartConfig
+import eu.icoscp.geoipclient.CpGeoConfig
 
 enum OAuthProvider:
 	case facebook, orcidid
@@ -62,32 +62,6 @@ case class AuthConfig(
 	masterAdminPass: String
 )
 
-case class RestHeartDBConfig(
-	uri: URI,
-	username: Option[String],
-	password: Option[String]
-)
-
-case class RestHeartConfig(
-	db: Map[Envri, RestHeartDBConfig],
-	portalUsageCollection: String,
-	usersCollection: String,
-	ipsToIgnore: Seq[String],
-	skipInit: Boolean
-):
-	import se.lu.nateko.cp.cpauth.utils.uriJavaToAkka
-	import scala.language.implicitConversions
-
-	def portalUsageCollUri(using Envri): Uri = dbConf.uri.appendPathSegment(portalUsageCollection)
-	def usersCollUri(using Envri): Uri = dbConf.uri.appendPathSegment(usersCollection)
-
-	private def dbConf(using envri: Envri): RestHeartDBConfig = db.getOrElse(
-		envri, throw new Exception(s"RestHeart db config for $envri not found")
-	)
-end RestHeartConfig
-
-case class CredentialsConfig(username: String, password: String)
-
 case class CpauthConfig(
 	http: HttpConfig,
 	saml: SamlConfig,
@@ -96,7 +70,6 @@ case class CpauthConfig(
 	restheart: RestHeartConfig,
 	mailing: EmailConfig,
 	oauth: CpauthConfig.OAuthConfig,
-	geoip: CpGeoConfig
 )
 
 object CpauthConfig{
@@ -115,21 +88,14 @@ case class OAuthProviderConfig(clientId: String, clientSecret: String, redirectP
 	def public = this.copy(clientSecret = "")
 }
 
-object ConfigReader extends DefaultJsonProtocol{
+object ConfigReader extends DefaultJsonProtocol:
 
 	import se.lu.nateko.cp.cpauth.core.JsonSupport.{enumFormat, given}
 	given RootJsonFormat[OAuthProvider] = enumFormat(OAuthProvider.valueOf, OAuthProvider.values)
 
-	def getDefault: Try[CpauthConfig] = Try(fromAppConfig(ConfigLoader.appConfig))
-
-	def getAppConfig: Config = {
-		val confFile = new java.io.File("application.conf").getAbsoluteFile
-		if(!confFile.exists) ConfigFactory.load
-		else
-			ConfigFactory.parseFile(confFile)
-				.withFallback(ConfigFactory.defaultApplication)
-				.withFallback(ConfigFactory.defaultReferenceUnresolved)
-				.resolve
+	def getDefault: Try[CpauthConfig] = Try{
+		import ConfigLoader.{appConfig, parseAs}
+		appConfig.getValue("cpauth").parseAs[CpauthConfig]
 	}
 
 	given RootJsonFormat[SamlSpConfig] = jsonFormat3(SamlSpConfig.apply)
@@ -138,24 +104,10 @@ object ConfigReader extends DefaultJsonProtocol{
 	given RootJsonFormat[HttpConfig] = jsonFormat5(HttpConfig.apply)
 	given RootJsonFormat[SamlConfig] = jsonFormat5(SamlConfig.apply)
 	given RootJsonFormat[DatabaseConfig] = jsonFormat4(DatabaseConfig.apply)
-	given RootJsonFormat[RestHeartDBConfig] = jsonFormat3(RestHeartDBConfig.apply)
 
 	given RootJsonFormat[PrivateAuthConfig] = jsonFormat2(PrivateAuthConfig.apply)
-	import se.lu.nateko.cp.cpauth.core.JsonSupport.given
 	given RootJsonFormat[AuthConfig] = jsonFormat5(AuthConfig.apply)
-	given RootJsonFormat[RestHeartConfig] = jsonFormat5(RestHeartConfig.apply)
-	given RootJsonFormat[CredentialsConfig] = jsonFormat2(CredentialsConfig.apply)
 	given RootJsonFormat[EmailConfig] = jsonFormat5(EmailConfig.apply)
 	given RootJsonFormat[OAuthProviderConfig] = jsonFormat3(OAuthProviderConfig.apply)
 
-	import se.lu.nateko.cp.geoipclient.CpGeoClient.confFormat
-
-	given RootJsonFormat[CpauthConfig] = jsonFormat8(CpauthConfig.apply)
-
-	def fromAppConfig(applicationConfig: Config): CpauthConfig = {
-		val renderOpts = ConfigRenderOptions.concise.setJson(true)
-		val cpConfJson: String = applicationConfig.getValue("cpauth").render(renderOpts)
-		cpConfJson.parseJson.convertTo[CpauthConfig]
-	}
-
-}
+	given RootJsonFormat[CpauthConfig] = jsonFormat7(CpauthConfig.apply)

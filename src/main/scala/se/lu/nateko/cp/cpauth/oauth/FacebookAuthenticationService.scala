@@ -13,7 +13,7 @@ import akka.http.scaladsl.model.Uri
 import akka.http.scaladsl.model.headers.Accept
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import se.lu.nateko.cp.cpauth.OAuthProviderConfig
-import se.lu.nateko.cp.cpauth.utils.SprayJsonUtils.*
+import se.lu.nateko.cp.cpauth.core.SprayJsonUtils.*
 import spray.json.*
 
 

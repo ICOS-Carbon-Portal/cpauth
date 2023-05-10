@@ -16,6 +16,8 @@ import se.lu.nateko.cp.cpauth.routing.CpauthDirectives
 import se.lu.nateko.cp.cpauth.services.CookieFactory
 import eu.icoscp.envri.Envri
 import java.net.URI
+import eu.icoscp.georestheart.RestHeartConfig
+import eu.icoscp.georestheart.RestHeartDBConfig
 
 class CpauthDirectivesTest extends AnyFunSpec with ScalatestRouteTest {
 	import Envri.ICOS
@@ -58,7 +60,6 @@ class CpauthDirectivesTest extends AnyFunSpec with ScalatestRouteTest {
 			skipInit = true
 		),
 		mailing = null,
-		geoip = null,
 		oauth = null,
 	)
 

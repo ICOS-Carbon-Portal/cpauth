@@ -18,46 +18,31 @@ import akka.http.scaladsl.model.headers.BasicHttpCredentials
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.stream.Materializer
 import eu.icoscp.envri.Envri
-import se.lu.nateko.cp.cpauth.RestHeartConfig
 import se.lu.nateko.cp.cpauth.core.UserId
-import se.lu.nateko.cp.cpauth.utils.SprayJsonUtils._
-import se.lu.nateko.cp.cpauth.utils.Utils
-import se.lu.nateko.cp.cpauth.utils.uriJavaToAkka
-import spray.json._
+import se.lu.nateko.cp.cpauth.core.SprayJsonUtils.*
+import spray.json.*
 
 import scala.concurrent.Future
 import scala.util.Failure
 import scala.util.Success
 import scala.util.Try
+import eu.icoscp.georestheart.RestHeartConfig
+import eu.icoscp.utils.akkauri.uriJavaToAkka
+import eu.icoscp.georestheart.RestHeartClientBase
+import se.lu.nateko.cp.cpauth.core.CoreUtils
+import eu.icoscp.geoipclient.CpGeoClient
 
-class RestHeartClient(val config: RestHeartConfig, http: HttpExt)(using Materializer):
+class RestHeartClient(
+	val config: RestHeartConfig, geoip: CpGeoClient, http: HttpExt
+)(using Materializer) extends RestHeartClientBase(config, geoip, http):
+
 	import http.system.dispatcher
 	def log = http.system.log
 
-	def init: Future[Done] = if config.skipInit then Future.successful(Done) else
+	def init: Future[Done] = createDbsAndColls
 
-		Future.sequence(
-			config.db.flatMap { (envri, db) =>
-				given Envri = envri
-				val uri = uriJavaToAkka(db.uri)
-				Seq(
-					createIfNotExists("Mongo db", uri, uri),
-					createCollIfNotExists(config.portalUsageCollUri, "portal use collection"),
-					createCollIfNotExists(config.usersCollUri, "user collection")
-				)
-			}
-		).map(_ => Done)
-
-	private val httpCreds: Map[Envri, BasicHttpCredentials] = config.db.flatMap{(envri, conf) =>
-		for user <- conf.username; pass <- conf.password
-		yield envri -> BasicHttpCredentials(user, pass)
-	}
 	private val KeepIdsOnly = "keys" -> "{\"_id\": 1}"
 	private def pageSizeQpar(size: Int) = "pagesize" -> size.toString
-
-	def getUserUri(uid: UserId)(using Envri): Uri =
-		val coll = config.usersCollUri
-		coll.withPath(coll.path / uid.email)
 
 	def createUserIfNew(uid: UserId, givenName: String, surname: String)(using Envri): Future[Done] =
 		userExists(uid).flatMap{
@@ -108,20 +93,6 @@ class RestHeartClient(val config: RestHeartConfig, http: HttpExt)(using Material
 		}
 	}
 
-	def getUserProps(uid: UserId, projections: Seq[String] = Nil)(using Envri): Future[JsObject] = {
-		val query = if(projections.isEmpty)
-			Uri.Query.Empty
-		else {
-			val keys = projections.map(proj => "\"" + proj + "\": 1").mkString("{", ", ", "}")
-			Uri.Query("keys" -> keys)
-		}
-		val uri = getUserUri(uid).withQuery(query)
-		for(
-			resp <- singleRequest(HttpRequest(uri = uri));
-			userVal <- Unmarshal(resp.entity.withContentType(ContentTypes.`application/json`)).to[JsValue];
-			userObj <- Future.fromTry(ensure[JsObject](userVal))
-		) yield userObj
-	}
 
 	def getGivenAndSurName(uid: UserId)(using Envri): Future[(String, String)] =
 		getUserProps(uid, Seq("profile.givenName", "profile.surname")).flatMap{userObj =>
@@ -159,43 +130,10 @@ class RestHeartClient(val config: RestHeartConfig, http: HttpExt)(using Material
 		) yield
 			if(uidObjs.size == 0) Success(Nil)
 			else for(
-				ids <- Utils.tryseq(uidObjs.map(getStringField(_, "_id")))
+				ids <- CoreUtils.tryseq(uidObjs.map(getStringField(_, "_id")))
 			) yield ids.map(UserId.apply)
 	}.flatten
 
-	private def createCollIfNotExists(collUri: Uri, thing: String)(using Envri): Future[Done] = {
-		val checkUri = collUri.withPath(collUri.path / "_indexes")
-		createIfNotExists(thing, checkUri, collUri)
-	}
 
-	private def createIfNotExists(thing: String, checkUri: Uri, putUri: Uri)(using Envri): Future[Done] =
-		requestDiscardResp(HttpRequest(uri = checkUri)).flatMap{
-			case StatusCodes.OK => ok
-
-			case StatusCodes.NotFound =>
-				requestDiscardResp(HttpRequest(HttpMethods.PUT, uri = putUri)).flatMap{
-					case StatusCodes.Created => ok
-					case status => fail(
-						s"Could not create $thing at $putUri, got response $status"
-					)
-				}
-			case status => fail(
-				s"Got Unexpected status $status when trying to check if $thing exists at $checkUri"
-			)
-		}
-
-	private def requestDiscardResp(req: HttpRequest)(using Envri): Future[StatusCode] =
-		singleRequest(req).map{resp =>
-			resp.discardEntityBytes()
-			resp.status
-		}
-
-	private def singleRequest(req: HttpRequest)(using envri: Envri): Future[HttpResponse] =
-		val credRequest = httpCreds.get(envri).fold(req)(req.addCredentials(_))
-		http.singleRequest(credRequest)
-
-	private val ok = Future.successful(Done)
-
-	private def fail[T](msg: String) = Future.failed[T](new Exception(msg))
 
 end RestHeartClient

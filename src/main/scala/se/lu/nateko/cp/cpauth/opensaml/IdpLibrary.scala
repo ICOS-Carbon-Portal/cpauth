@@ -18,6 +18,7 @@ import se.lu.nateko.cp.cpauth.utils.Utils.SafeJavaCollectionWrapper
 import se.lu.nateko.cp.cpauth.SamlConfig
 import se.lu.nateko.cp.cpauth.core.Crypto
 import se.lu.nateko.cp.cpauth.utils.Utils
+import se.lu.nateko.cp.cpauth.core.CoreUtils
 import org.opensaml.saml2.metadata.LocalizedString
 import org.opensaml.xml.security.credential.UsageType
 
@@ -82,7 +83,7 @@ object IdpLibrary {
 
 	private def idpToPublicKeys(idp: IDPSSODescriptor): Try[Seq[PublicKey]] = for(
 		certs <- idpToCertsInBase64(idp);
-		keys <- Utils.tryseq(certs.map(Crypto.publicKeyFromX509Cert))
+		keys <- CoreUtils.tryseq(certs.map(Crypto.publicKeyFromX509Cert))
 	) yield keys
 	
 	private def idpToCertsInBase64(idp: IDPSSODescriptor): Try[Seq[String]] = Try{

@@ -1,6 +1,8 @@
 package se.lu.nateko.cp.cpauth.core
 
 import java.io.ByteArrayOutputStream
+import java.net.URI
+import java.nio.file.FileSystems
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.Base64
@@ -9,9 +11,12 @@ import java.util.zip.DeflaterOutputStream
 import java.util.zip.Inflater
 import java.util.zip.InflaterOutputStream
 import scala.Iterator
+import scala.collection.mutable.Buffer
 import scala.io.Source
-import java.nio.file.FileSystems
-import java.net.URI
+import scala.util.Failure
+import scala.util.Success
+import scala.util.Try
+
 
 object CoreUtils {
 
@@ -83,6 +88,20 @@ object CoreUtils {
 		inflStream.close()
 
 		byteStream.toByteArray
+	}
+
+	def tryseq[T](tries: Iterable[Try[T]]): Try[Seq[T]] = {
+		val successes = Buffer.empty[T]
+		var error: Option[Failure[Seq[T]]] = None
+		val iter = tries.iterator
+
+		while(error.isEmpty && iter.hasNext){
+			iter.next() match{
+				case Success(t) => successes += t
+				case Failure(err) => error = Some(Failure(err))
+			}
+		}
+		error.getOrElse(Success(successes.toVector))
 	}
 
 }

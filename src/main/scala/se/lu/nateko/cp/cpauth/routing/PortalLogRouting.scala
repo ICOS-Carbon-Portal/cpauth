@@ -1,4 +1,4 @@
-package se.lu.nateko.cp.geoipclient
+package se.lu.nateko.cp.cpauth.routing
 
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
 import akka.http.scaladsl.model.HttpMethods
@@ -12,7 +12,6 @@ import akka.http.scaladsl.server.MalformedRequestContentRejection
 import akka.http.scaladsl.server.MissingHeaderRejection
 import akka.http.scaladsl.server.RejectionHandler
 import akka.http.scaladsl.server.Route
-import se.lu.nateko.cp.cpauth.services.RestHeartLogger
 import spray.json.JsObject
 import spray.json.JsString
 import spray.json.JsValue
@@ -21,8 +20,6 @@ import se.lu.nateko.cp.cpauth.routing.CpauthDirectives
 
 
 trait PortalLogRouting extends CpauthDirectives:
-
-	def restheartLogger: RestHeartLogger
 
 	val portalLogRoute = extractEnvri{ implicit envri =>
 		val controlOrigins = controlOriginsDir
@@ -37,7 +34,7 @@ trait PortalLogRouting extends CpauthDirectives:
 										val anonId = anonymizeCpUser(uid)
 										JsObject(js.asJsObject.fields + ("cpUser" -> JsString(anonId)))
 									}
-									restheartLogger.logUsage(usage, ip)
+									restHeart.logPortalUsage(usage, ip)
 									complete(StatusCodes.OK)
 								}
 							}
