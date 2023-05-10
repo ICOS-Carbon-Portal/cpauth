@@ -1,17 +1,19 @@
 package se.lu.nateko.cp.cpauth
 
+import akka.http.scaladsl.model.Uri
+import com.typesafe.config.Config
+import com.typesafe.config.ConfigFactory
+import com.typesafe.config.ConfigRenderOptions
+import eu.icoscp.envri.Envri
+import se.lu.nateko.cp.cpauth.core.ConfigLoader
+import se.lu.nateko.cp.cpauth.core.EmailConfig
+import se.lu.nateko.cp.cpauth.core.PublicAuthConfig
+import se.lu.nateko.cp.cpauth.utils.appendPathSegment
+import se.lu.nateko.cp.geoipclient.CpGeoConfig
+import spray.json.*
+
 import java.net.URI
 import scala.util.Try
-import com.typesafe.config.Config
-import spray.json._
-import com.typesafe.config.ConfigRenderOptions
-import com.typesafe.config.ConfigFactory
-import se.lu.nateko.cp.cpauth.core.ConfigLoader
-import se.lu.nateko.cp.cpauth.core.PublicAuthConfig
-import eu.icoscp.envri.Envri
-import akka.http.scaladsl.model.Uri
-import se.lu.nateko.cp.cpauth.core.EmailConfig
-import se.lu.nateko.cp.geoipclient.CpGeoConfig
 
 enum OAuthProvider:
 	case facebook, orcidid
@@ -62,8 +64,8 @@ case class AuthConfig(
 
 case class RestHeartDBConfig(
 	uri: URI,
-	username: String,
-	password: String
+	username: Option[String],
+	password: Option[String]
 )
 
 case class RestHeartConfig(
@@ -76,12 +78,13 @@ case class RestHeartConfig(
 	import se.lu.nateko.cp.cpauth.utils.uriJavaToAkka
 	import scala.language.implicitConversions
 
-	def dbUri(using envri: Envri): Uri = db(envri).uri
-	def username(using envri: Envri): String = db(envri).username
-	def password(using envri: Envri): String = db(envri).password
-	def portalUsageCollUri(using envri: Envri): Uri = dbUri.withPath(dbUri.path / portalUsageCollection)
-	def usersCollUri(using envri: Envri): Uri = dbUri.withPath(dbUri.path / usersCollection)
+	def portalUsageCollUri(using Envri): Uri = dbConf.uri.appendPathSegment(portalUsageCollection)
+	def usersCollUri(using Envri): Uri = dbConf.uri.appendPathSegment(usersCollection)
 
+	private def dbConf(using envri: Envri): RestHeartDBConfig = db.getOrElse(
+		envri, throw new Exception(s"RestHeart db config for $envri not found")
+	)
+end RestHeartConfig
 
 case class CredentialsConfig(username: String, password: String)
 
