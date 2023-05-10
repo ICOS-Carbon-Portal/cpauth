@@ -5,18 +5,17 @@ import org.scalatest.funspec.AnyFunSpec
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.model.headers.Cookie
 import akka.http.scaladsl.model.headers.HttpCookie
-import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.server.Directives.*
 import akka.http.scaladsl.testkit.ScalatestRouteTest
 import akka.stream.Materializer
-import se.lu.nateko.cp.cpauth._
-import se.lu.nateko.cp.cpauth.core._
+import se.lu.nateko.cp.cpauth.*
+import se.lu.nateko.cp.cpauth.core.*
 import se.lu.nateko.cp.cpauth.routing.BadCpauthCookieRejection
 import se.lu.nateko.cp.cpauth.routing.CpauthCookieMissingRejection
 import se.lu.nateko.cp.cpauth.routing.CpauthDirectives
 import se.lu.nateko.cp.cpauth.services.CookieFactory
 import eu.icoscp.envri.Envri
 import java.net.URI
-import se.lu.nateko.cp.cpauth.core.PublicAuthConfig
 
 class CpauthDirectivesTest extends AnyFunSpec with ScalatestRouteTest {
 	import Envri.ICOS
@@ -59,6 +58,7 @@ class CpauthDirectivesTest extends AnyFunSpec with ScalatestRouteTest {
 			skipInit = true
 		),
 		mailing = null,
+		geoip = null,
 		oauth = null,
 	)
 

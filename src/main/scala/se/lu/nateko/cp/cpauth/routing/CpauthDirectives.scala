@@ -40,7 +40,7 @@ import scala.util.Success
 import scala.util.Try
 
 import SprayJsonSupport.sprayJsValueMarshaller
-import se.lu.nateko.cp.cpauth.core.DownloadEventInfo
+import se.lu.nateko.cp.cpauth.core.AnonId
 
 
 trait CpauthDirectives {
@@ -55,10 +55,9 @@ trait CpauthDirectives {
 	given ToResponseMarshaller[Html] = TemplatePageMarshalling.marshaller[Html]
 	given [T: RootJsonWriter]: ToEntityMarshaller[T] = SprayJsonSupport.sprayJsonMarshaller
 
-	def publicAuthConfig(implicit envri: Envri) = authConfig.pub(envri)
-	def authenticator(implicit envri: Envri): Try[Authenticator] = Authenticator(publicAuthConfig)
-	def anonymizeCpUser(uid: UserId): DownloadEventInfo.AnonId =
-		DownloadEventInfo.anonymizeCpUser(uid, authConfig.secretUserSalt)
+	def publicAuthConfig(using envri: Envri) = authConfig.pub(envri)
+	def authenticator(using Envri): Try[Authenticator] = Authenticator(publicAuthConfig)
+	def anonymizeCpUser(uid: UserId): AnonId = AnonId(uid, authConfig.secretUserSalt)
 
 	val extractEnvri: Directive1[Envri] = extractHost.flatMap{h =>
 		hostToEnvri(h) match{

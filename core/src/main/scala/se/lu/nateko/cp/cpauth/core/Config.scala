@@ -14,7 +14,3 @@ case class EmailConfig(
 	fromAddress: String,
 	logBccAddress: Option[String]
 )
-
-case class CoreConfig(
-	mailing: EmailConfig
-)

@@ -37,7 +37,7 @@ trait PortalLogRouting extends CpauthDirectives:
 										val anonId = anonymizeCpUser(uid)
 										JsObject(js.asJsObject.fields + ("cpUser" -> JsString(anonId)))
 									}
-									restheartLogger.logUsageToRestheart(usage, Left(ip))
+									restheartLogger.logUsage(usage, ip)
 									complete(StatusCodes.OK)
 								}
 							}

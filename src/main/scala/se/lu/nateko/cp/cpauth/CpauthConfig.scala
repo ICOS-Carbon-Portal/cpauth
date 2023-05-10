@@ -11,6 +11,7 @@ import se.lu.nateko.cp.cpauth.core.PublicAuthConfig
 import eu.icoscp.envri.Envri
 import akka.http.scaladsl.model.Uri
 import se.lu.nateko.cp.cpauth.core.EmailConfig
+import se.lu.nateko.cp.geoipclient.CpGeoConfig
 
 enum OAuthProvider:
 	case facebook, orcidid
@@ -84,8 +85,6 @@ case class RestHeartConfig(
 
 case class CredentialsConfig(username: String, password: String)
 
-case class CpGeoConfig(baseUri: String, maxAgeDays: Int, emailErrorsTo: String)
-
 case class CpauthConfig(
 	http: HttpConfig,
 	saml: SamlConfig,
@@ -94,6 +93,7 @@ case class CpauthConfig(
 	restheart: RestHeartConfig,
 	mailing: EmailConfig,
 	oauth: CpauthConfig.OAuthConfig,
+	geoip: CpGeoConfig
 )
 
 object CpauthConfig{
@@ -145,7 +145,9 @@ object ConfigReader extends DefaultJsonProtocol{
 	given RootJsonFormat[EmailConfig] = jsonFormat5(EmailConfig.apply)
 	given RootJsonFormat[OAuthProviderConfig] = jsonFormat3(OAuthProviderConfig.apply)
 
-	given RootJsonFormat[CpauthConfig] = jsonFormat7(CpauthConfig.apply)
+	import se.lu.nateko.cp.geoipclient.CpGeoClient.confFormat
+
+	given RootJsonFormat[CpauthConfig] = jsonFormat8(CpauthConfig.apply)
 
 	def fromAppConfig(applicationConfig: Config): CpauthConfig = {
 		val renderOpts = ConfigRenderOptions.concise.setJson(true)

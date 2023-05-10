@@ -6,12 +6,7 @@ import spray.json.JsObject
 import eu.icoscp.envri.Envri
 import spray.json.JsString
 import se.lu.nateko.cp.geoipclient.GeoIpInfo
-import se.lu.nateko.cp.cpauth.core.DownloadEventInfo
 import se.lu.nateko.cp.geoipclient.CpGeoClient
-import se.lu.nateko.cp.cpauth.core.DlEventForMongo
-import se.lu.nateko.cp.cpauth.core.CsvDownloadInfo
-import se.lu.nateko.cp.cpauth.core.CpbDownloadInfo
-import se.lu.nateko.cp.cpauth.core.ZipExtractionInfo
 import spray.json.enrichAny
 import se.lu.nateko.cp.geoipclient.CpGeoClient.given_RootJsonFormat_GeoIpInfo
 import scala.util.Failure
@@ -21,6 +16,9 @@ class RestHeartLogger(geoClient: CpGeoClient, confRestheart: RestHeartConfig)(us
 
 	import system.dispatcher
 	private val restHeartLogClient = new RestHeartLogClient(confRestheart)
+
+	def logUsage(entry: JsObject, ip: String)(using Envri): Unit =
+		logInternally(ip)(logUsageToRestheart(entry, _))
 
 	private def logInternally(ip: String)(logAction: Either[String, GeoIpInfo] => Unit): Unit = if (!confRestheart.ipsToIgnore.contains(ip)){
 		geoClient.lookup(ip).onComplete{
@@ -32,19 +30,7 @@ class RestHeartLogger(geoClient: CpGeoClient, confRestheart: RestHeartConfig)(us
 		}
 	}
 
-	def logDl(entry: DlEventForMongo)(using Envri): Unit = logInternally(entry.ip){ipinfo =>
-		entry match
-			case csv: CsvDownloadInfo =>
-				logUsageToRestheart(JsObject("csvDownload" -> csv.toJson), ipinfo)
-
-			case cpb: CpbDownloadInfo =>
-				logUsageToRestheart(JsObject("cpbDownload" -> cpb.toJson), ipinfo)
-			
-			case zip: ZipExtractionInfo =>
-				logUsageToRestheart(JsObject("zipExtraction" -> zip.toJson), ipinfo)
-	}
-
-	def logUsageToRestheart(entry: JsObject, ipinfo: Either[String, GeoIpInfo])(using Envri): Unit = {
+	private def logUsageToRestheart(entry: JsObject, ipinfo: Either[String, GeoIpInfo])(using Envri): Unit =
 		val geoJs = ipinfo.fold(
 			ip => JsObject("ip" -> JsString(ip)),
 			geo => geo.toJson.asJsObject
@@ -54,4 +40,5 @@ class RestHeartLogger(geoClient: CpGeoClient, confRestheart: RestHeartConfig)(us
 		restHeartLogClient.logPortalUsage(logEntry).failed.foreach{err =>
 			system.log.error(err, s"Could not log portal usage info ${logEntry.compactPrint} to RestHeart")
 		}
-	}
+
+end RestHeartLogger

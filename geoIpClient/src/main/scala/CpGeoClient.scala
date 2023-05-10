@@ -1,14 +1,11 @@
 package se.lu.nateko.cp.geoipclient
 
-// import spray.json.*
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport.*
 import akka.http.scaladsl.model.*
 import akka.http.scaladsl.settings.ConnectionPoolSettings
 import akka.http.scaladsl.unmarshalling.Unmarshal
-import akka.stream.Materializer.matFromSystem
-import akka.stream.QueueOfferResult
 import spray.json.DefaultJsonProtocol
 import spray.json.JsValue
 import spray.json.RootJsonFormat
@@ -18,8 +15,10 @@ import spray.json.enrichAny
 import scala.concurrent.Future
 import scala.util.Failure
 import scala.util.control.NoStackTrace
+import se.lu.nateko.cp.cpauth.core.EmailSender
 
 sealed trait GeoIpResponse
+
 case class GeoIpInfo(
 	ip: String,
 	latitude: Double,
@@ -31,17 +30,12 @@ case class GeoIpInfo(
 case class GeoIpError(error: String) extends GeoIpResponse
 case class GeoIpInnerError(msg: String, code: Int) extends GeoIpResponse
 
-class CpGeoClient(conf: CpGeoConfig, errorEmailer: ErrorEmailer)(using system: ActorSystem) extends DefaultJsonProtocol:
-	import CpGeoClient._
-
-	given RootJsonFormat[CpGeoConfig] = jsonFormat3(CpGeoConfig.apply)
-	given RootJsonFormat[GeoIpError] = jsonFormat1(GeoIpError.apply)
-	given RootJsonFormat[GeoIpInnerError] = jsonFormat2(GeoIpInnerError.apply)
-
-	import system.dispatcher
+class CpGeoClient(conf: CpGeoConfig, mailer: EmailSender)(using system: ActorSystem):
+	import CpGeoClient.{*, given}
+	import system.{dispatcher, log}
 
 	private val baseUrl = Uri(conf.baseUri)
-	private given RootJsonReader[GeoIpResponse] = CpGeoClient.geoIpResponseFormat
+	private val errorEmailer = ErrorEmailer(conf.emailErrorsTo, "Resolving IP to location failed", mailer, log)
 
 	def lookup(ip: String): Future[GeoIpInfo] = ipError(ip) match
 		case None =>
@@ -87,6 +81,7 @@ object CpGeoClient extends DefaultJsonProtocol:
 	given RootJsonFormat[GeoIpInfo] = jsonFormat5(GeoIpInfo.apply)
 	given RootJsonFormat[GeoIpError] = jsonFormat1(GeoIpError.apply)
 	given RootJsonFormat[GeoIpInnerError] = jsonFormat2(GeoIpInnerError.apply)
+	given confFormat: RootJsonFormat[CpGeoConfig] = jsonFormat3(CpGeoConfig.apply)
 
 	given geoIpResponseFormat: RootJsonFormat[GeoIpResponse] with
 		override def read(json: JsValue): GeoIpResponse =
@@ -100,7 +95,6 @@ object CpGeoClient extends DefaultJsonProtocol:
 			case e: GeoIpError => e.toJson
 			case e: GeoIpInnerError => e.toJson
 			case i: GeoIpInfo => i.toJson
-
 
 
 	def ipError(ip: String): Option[String] =

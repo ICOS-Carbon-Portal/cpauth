@@ -34,7 +34,7 @@ lazy val envri = crossProject(JSPlatform, JVMPlatform)
 	.settings(
 		name := "envri",
 		organization := "eu.icoscp",
-		version := "0.1.0"
+		version := "0.1.0-SNAPSHOT",
 	)
 
 lazy val cpauthCore = project
@@ -45,12 +45,12 @@ lazy val cpauthCore = project
 	.enablePlugins(SbtTwirl)
 	.settings(
 		name := "cpauth-core",
-		version := "0.10.0-SNAPSHOT",
+		version := "0.9.0-SNAPSHOT",
 		libraryDependencies ++= Seq(
 			"io.spray"              %% "spray-json"         % "1.3.6",
 			"com.typesafe"           % "config"             % "1.4.2",
-			"com.typesafe.akka"      %% "akka-slf4j"                         % akkaVersion cross CrossVersion.for3Use2_13,
-			"com.sun.mail"           %  "jakarta.mail"                       % "1.6.7",
+			"com.sun.mail"           % "jakarta.mail"       % "1.6.7",
+			"org.slf4j"              % "slf4j-api"          % "1.7.36",
 		)
 	)
 
@@ -62,7 +62,7 @@ lazy val viewsCore = (project in file("viewsCore"))
 	.enablePlugins(SbtTwirl)
 	.settings(
 		name := "views-core",
-		version := "0.7.0",
+		version := "0.7.0-SNAPSHOT",
 		libraryDependencies ++= Seq(
 			"io.spray"              %% "spray-json"                         % "1.3.6"
 		),
@@ -73,20 +73,15 @@ val akkaHttpVersion = "10.2.9"
 val cpauthMain = Some("se.lu.nateko.cp.cpauth.Main")
 
 lazy val geoIpClient = (project in file("geoIpClient"))
-	.dependsOn(envri.jvm, cpauthCore)
+	.dependsOn(cpauthCore)
 	.settings(commonSettings: _*)
 	.settings(publishingSettings: _*)
 	.settings(
 		name := "geoip-client",
 		version := "0.1.0-SNAPSHOT",
 		libraryDependencies ++= Seq(
-			"io.spray"              %% "spray-json"                         % "1.3.6",
 			"com.typesafe.akka"      %% "akka-http-spray-json"               % akkaHttpVersion excludeAll("io.spray") cross CrossVersion.for3Use2_13,
-			"com.typesafe.akka"      %% "akka-stream-testkit"                % akkaVersion     % "test" cross CrossVersion.for3Use2_13,
 			"com.typesafe.akka"      %% "akka-stream"                        % akkaVersion cross CrossVersion.for3Use2_13,
-			"com.typesafe.akka"      %% "akka-slf4j"                         % akkaVersion cross CrossVersion.for3Use2_13,
-			"org.postgresql"         % "postgresql"                          % "42.6.0",
-			"org.apache.commons"     % "commons-dbcp2"                       % "2.7.0" exclude("commons-logging", "commons-logging")
 		),
 	)
 
@@ -98,14 +93,13 @@ resolvers := {
 }
 
 lazy val cpauth = (project in file("."))
-	.dependsOn(viewsCore, cpauthCore, geoIpClient)
+	.dependsOn(viewsCore, geoIpClient)
 	.settings(commonSettings: _*)
 	.enablePlugins(SbtTwirl, IcosCpSbtDeployPlugin)
 	.settings(
 		name := "cpauth",
 		version := "0.7.0",
 		libraryDependencies ++= Seq(
-			"com.typesafe.akka"      %% "akka-http-spray-json"               % akkaHttpVersion excludeAll("io.spray") cross CrossVersion.for3Use2_13,
 			"com.typesafe.akka"      %% "akka-http-testkit"                  % akkaHttpVersion % "test" cross CrossVersion.for3Use2_13,
 			"com.typesafe.akka"      %% "akka-stream-testkit"                % akkaVersion     % "test" cross CrossVersion.for3Use2_13,
 			"com.typesafe.akka"      %% "akka-stream"                        % akkaVersion cross CrossVersion.for3Use2_13,
@@ -118,9 +112,6 @@ lazy val cpauth = (project in file("."))
 			"net.jcip"               %  "jcip-annotations"                   % "1.0",
 			"org.joda"               %  "joda-convert"                       % "1.7",
 			"org.hsqldb"             %  "hsqldb"                             % "2.3.4",
-			"com.sun.mail"           %  "jakarta.mail"                       % "1.6.7",
-			"org.postgresql"         % "postgresql"                          % "42.6.0",
-			"org.apache.commons"     % "commons-dbcp2"                       % "2.7.0" exclude("commons-logging", "commons-logging")
 		),
 
 		fork := true,

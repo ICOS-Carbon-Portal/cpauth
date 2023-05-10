@@ -4,14 +4,12 @@ import eu.icoscp.envri.Envri
 import spray.json.*
 
 import java.net.URI
-import se.lu.nateko.cp.cpauth.core.{PublicAuthConfig, EmailConfig, CoreConfig}
 
 object JsonSupport extends DefaultJsonProtocol:
 
 	given RootJsonFormat[PublicAuthConfig] = jsonFormat4(PublicAuthConfig.apply)
 	given RootJsonFormat[Envri] = enumFormat(Envri.valueOf, Envri.values)
 	given RootJsonFormat[EmailConfig] = jsonFormat5(EmailConfig.apply)
-	given RootJsonFormat[CoreConfig] = jsonFormat1(CoreConfig.apply)
 
 	def enumFormat[T <: reflect.Enum](valueOf: String => T, values: Array[T]) = new RootJsonFormat[T]:
 		def write(v: T) = JsString(v.toString)
