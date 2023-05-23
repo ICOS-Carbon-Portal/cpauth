@@ -1,21 +1,25 @@
 package se.lu.nateko.cp.cpauth.routing
 
-import scala.concurrent.ExecutionContext
-import scala.concurrent.Future
+import akka.actor.ActorSystem
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.model.Uri
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
+import se.lu.nateko.cp.cpauth.CpauthConfig
+import se.lu.nateko.cp.cpauth.Envri.Envri
+import se.lu.nateko.cp.cpauth.OAuthProvider
 import se.lu.nateko.cp.cpauth.accounts.RestHeartClient
 import se.lu.nateko.cp.cpauth.core.AuthSource
 import se.lu.nateko.cp.cpauth.core.UserId
+import se.lu.nateko.cp.cpauth.oauth.AtmoAccessAuthenticationService
 import se.lu.nateko.cp.cpauth.oauth.FacebookAuthenticationService
 import se.lu.nateko.cp.cpauth.oauth.OrcidAuthenticationService
 import se.lu.nateko.cp.cpauth.services.CookieFactory
-import se.lu.nateko.cp.cpauth.Envri.Envri
-import se.lu.nateko.cp.cpauth.CpauthConfig
-import akka.actor.ActorSystem
-import se.lu.nateko.cp.cpauth.OAuthProvider
+
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
+import scala.util.Failure
+import scala.util.Success
 
 trait OAuthRouting extends CpauthDirectives{
 
@@ -24,11 +28,29 @@ trait OAuthRouting extends CpauthDirectives{
 	given system: ActorSystem
 	def restHeart: RestHeartClient
 
-	val facebookRoute: Route = (pathPrefix("oauth" / "facebook") & extractEnvri){implicit envri =>
+	val oauthRoute: Route = (pathPrefix("oauth") & extractEnvri) { implicit envri =>
+		facebookRoute ~
+		orcidRoute ~
+		pathPrefix("atmoAccess"){
+			atmoAccessAuthService match
+				case None => complete(StatusCodes.InternalServerError -> s"AtmoAccess authentication is not configured for $envri")
+				case Some(atmoService) =>
+					parameter("code"){code =>
+						//import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport.sprayJsValueMarshaller
+						onComplete(atmoService.getBasicInfo(code)){
+							case Success(value) => complete(value.prettyPrint)
+							case Failure(exception) => complete(StatusCodes.InternalServerError -> exception.getMessage)
+						}
+					}
+		} ~
+		complete(StatusCodes.NotFound)
+	}
+
+	private def facebookRoute(using Envri): Route = pathPrefix("facebook"){
 		oauthRoute(cpauthTokenFromFacebook, AuthSource.Facebook)
 	}
 
-	val orcidRoute: Route = (pathPrefix("oauth" / "orcidid") & extractEnvri){implicit envri =>
+	private def orcidRoute(using Envri): Route = pathPrefix("orcidid"){
 		oauthRoute(cpauthTokenFromOrcidId, AuthSource.Orcid)
 	}
 
@@ -92,5 +114,11 @@ trait OAuthRouting extends CpauthDirectives{
 	private def orcidIdAuthenticationService(using envri: Envri) = new OrcidAuthenticationService(
 		oauthConfig(envri)(OAuthProvider.orcidid)
 	)
+
+	private def atmoAccessAuthService(using envri: Envri): Option[AtmoAccessAuthenticationService] =
+		for
+			envriConf <- oauthConfig.get(envri)
+			conf <- envriConf.get(OAuthProvider.atmoAccess)
+		yield new AtmoAccessAuthenticationService(conf)
 
 }

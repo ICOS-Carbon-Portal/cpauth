@@ -17,7 +17,7 @@ object Envri extends Enumeration{
 
 object OAuthProvider extends Enumeration{
 	type OAuthProvider = Value
-	val facebook, orcidid = Value
+	val facebook, orcidid, atmoAccess = Value
 }
 
 case class HttpConfig(
@@ -69,7 +69,8 @@ case class RestHeartConfig(
 	dbNames: Map[Envri, String],
 	usersCollection: String,
 	usageCollection: String,
-	ipsToIgnore: Seq[String]
+	ipsToIgnore: Seq[String],
+	skipInit: Boolean
 ){
 	def dbName(implicit envri: Envri) = dbNames(envri)
 }
@@ -162,7 +163,7 @@ object ConfigReader extends DefaultJsonProtocol{
 	given RootJsonFormat[PublicAuthConfig] = jsonFormat4(PublicAuthConfig.apply)
 	given RootJsonFormat[PrivateAuthConfig] = jsonFormat2(PrivateAuthConfig.apply)
 	given RootJsonFormat[AuthConfig] = jsonFormat5(AuthConfig.apply)
-	given RootJsonFormat[RestHeartConfig] = jsonFormat5(RestHeartConfig.apply)
+	given RootJsonFormat[RestHeartConfig] = jsonFormat6(RestHeartConfig.apply)
 	given RootJsonFormat[CredentialsConfig] = jsonFormat2(CredentialsConfig.apply)
 	given RootJsonFormat[PostgresConfig] = jsonFormat5(PostgresConfig.apply)
 	given RootJsonFormat[EmailConfig] = jsonFormat5(EmailConfig.apply)

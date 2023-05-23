@@ -35,8 +35,8 @@
 				</li>
 
 				<li role="presentation" class="nav-item">
-					<a class="nav-link" href="#social-sign-in" id="social-sign-in-link" aria-controls="social-sign-in" role="tab" data-bs-toggle="tab">
-						Social sign in
+					<a class="nav-link" href="#oauth-sign-in" id="oauth-sign-in-link" aria-controls="oauth-sign-in" role="tab" data-bs-toggle="tab">
+						OAuth sign in
 					</a>
 				</li>
 
@@ -93,15 +93,18 @@
 
 				</div>
 
-				<div role="tabpanel" class="tab-pane" id="social-sign-in">
+				<div role="tabpanel" class="tab-pane" id="oauth-sign-in">
 
 					<table class="table">
 						<tbody>
 							<tr>
 								<td>
 									<a type="button" id="orcididLoginButton" style="display: inline-block; float: left; margin-right: 7px"><img src="/images/orcidid_login.png"/></a>
-									@if(envri == Envri.ICOS){
-									<span>To be able to login with your existing ORCID ID account, you need to make your email information public in the ORCID account settings. Alternatively, if you already have a Carbon Portal account that you can access using other sign-in mechanism (e.g. username/password), you can specify you ORCID ID in your CP user profile (About -> My CP, when logged in). Then you will be able to sign in to that CP account from here, using your ORCID account instead.</span>
+									@envri match{
+										case Envri.ICOS => {
+											@orcidExplanation
+										}
+										case Envri.SITES => {}
 									}
 								</td>
 							</tr>
@@ -109,7 +112,14 @@
 							<tr>
 								<td><a type="button" id="facebookLoginButton"><img src="/images/facebook_login.png"/></a></td>
 							</tr>
-
+							@envri match{
+								case Envri.ICOS => {
+									<tr>
+										<td><a type="button" id="atmoAccessLoginButton"><img src="/images/atmoAccess_login.png"/></a></td>
+									</tr>
+								}
+								case _ => {}
+							}
 						</tbody>
 					</table>
 
@@ -143,4 +153,8 @@
 		<p>You can sign in with your institutional login through eduGAIN (preferred) or, if that does not work, through the social or password login. For the password login you should first create an account here, using the tab on the right. Please be aware that the email address with which you sign in will be the user id that identifies you to our services.</p>
 	</div></div> <!-- col, row -->
 }
+}
+
+@orcidExplanation = {
+	<span>To be able to login with your existing ORCID ID account, you need to make your email information public in the ORCID account settings. Alternatively, if you already have a Carbon Portal account that you can access using other sign-in mechanism (e.g. username/password), you can specify you ORCID ID in your CP user profile (About -> My CP, when logged in). Then you will be able to sign in to that CP account from here, using your ORCID account instead.</span>
 }
