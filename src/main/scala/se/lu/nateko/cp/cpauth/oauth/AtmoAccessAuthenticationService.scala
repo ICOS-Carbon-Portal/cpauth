@@ -48,7 +48,7 @@ class AtmoAccessAuthenticationService(config: OAuthProviderConfig)(using system:
 					idToken <- getStringField(jso, "id_token")
 					idTokenParts = idToken.split('.')
 					_ = assert(idTokenParts.length >= 2, s"Invalid id_token received from $uri (expected at least 2 parts, got ${idTokenParts.length})")
-					payloadJsStr = CoreUtils.decodeBase64ToString(idTokenParts(1))
+					payloadJsStr = CoreUtils.decodeBase64UrlToString(idTokenParts(1))
 					payload <- ensure[JsObject](payloadJsStr.parseJson)
 					email <- getStringField(payload, "email")
 					givenName <- getStringField(payload, "given_name")
