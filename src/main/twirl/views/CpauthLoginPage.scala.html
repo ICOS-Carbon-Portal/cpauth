@@ -13,6 +13,16 @@
 	<script>
 		document.oauthConfig = @Html(oauthConfigJson);
 	</script>
+
+	<style>
+		.oauth-login-button {
+			float: left;
+			margin-right: 7px;
+		}
+		td.oauth-comment{
+			vertical-align: middle;
+		}
+	</style>
 }{
 	<div>
 		@Html(loginStrings.cookieNotice)
@@ -36,7 +46,7 @@
 
 				<li role="presentation" class="nav-item">
 					<a class="nav-link" href="#oauth-sign-in" id="oauth-sign-in-link" aria-controls="oauth-sign-in" role="tab" data-bs-toggle="tab">
-						OAuth sign in
+						Social/OAuth sign in
 					</a>
 				</li>
 
@@ -99,7 +109,11 @@
 						<tbody>
 							<tr>
 								<td>
-									<a type="button" id="orcididLoginButton" style="display: inline-block; float: left; margin-right: 7px"><img src="/images/orcidid_login.png"/></a>
+									<a type="button" id="orcididLoginButton" class="oauth-login-button">
+										<img src="/images/orcidid_login.png"/>
+									</a>
+								</td>
+								<td class="oauth-comment">
 									@envri match{
 										case Envri.ICOS => {
 											@orcidExplanation
@@ -107,18 +121,30 @@
 										case Envri.SITES => {}
 									}
 								</td>
-							</tr>
+						</tr>
 
 							<tr>
-								<td><a type="button" id="facebookLoginButton"><img src="/images/facebook_login.png"/></a></td>
+								<td>
+									<a type="button" id="facebookLoginButton" class="oauth-login-button">
+										<img src="/images/facebook_login.png"/>
+									</a>
+								</td>
+								<td></td>
 							</tr>
 							@envri match{
 								case Envri.ICOS => {
 									<tr>
-										<td><a type="button" id="atmoAccessLoginButton"><img src="/images/atmoAccess_login.png"/></a></td>
+										<td>
+											<a type="button" id="atmoAccessLoginButton" class="oauth-login-button">
+												<img src="/images/atmoAccess_login.png"/>
+											</a>
+										</td>
+										<td class="oauth-comment">
+											Proof of concept for now, using ICOS Keycloak instanse instead of the ATMO ACCESS one
+										</td>
 									</tr>
 								}
-								case _ => {}
+								case Envri.SITES => {}
 							}
 						</tbody>
 					</table>

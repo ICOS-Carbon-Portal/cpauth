@@ -13,6 +13,7 @@ import akka.http.scaladsl.model.StatusCode
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.model.Uri
 import akka.http.scaladsl.model.headers
+import akka.http.scaladsl.settings.ConnectionPoolSettings
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.stream.Materializer
 import se.lu.nateko.cp.cpauth.Envri.Envri
@@ -23,6 +24,7 @@ import se.lu.nateko.cp.cpauth.utils.Utils
 import spray.json._
 
 import scala.concurrent.Future
+import scala.concurrent.duration.DurationInt
 import scala.util.Failure
 import scala.util.Success
 import scala.util.Try
@@ -114,7 +116,7 @@ class RestHeartClient(val config: RestHeartConfig, http: HttpExt)(using Material
 		}
 		val uri = getUserUri(uid).withQuery(query)
 		for(
-			resp <- http.singleRequest(HttpRequest(uri = uri));
+			resp <- request(HttpRequest(uri = uri));
 			userVal <- Unmarshal(resp.entity.withContentType(ContentTypes.`application/json`)).to[JsValue];
 			userObj <- Future.fromTry(ensure[JsObject](userVal))
 		) yield userObj
@@ -143,7 +145,7 @@ class RestHeartClient(val config: RestHeartConfig, http: HttpExt)(using Material
 		val qParams: Map[String, String] = if(filter.nonEmpty) Map("filter" -> filterParam) else Map.empty
 		val uri = usersCollUri.withQuery(Uri.Query(qParams + KeepIdsOnly + pageSizeQpar(1000)))
 		for(
-			resp <- http.singleRequest(HttpRequest(uri = uri));
+			resp <- request(HttpRequest(uri = uri));
 			usersListResp <- Unmarshal(resp.entity.withContentType(ContentTypes.`application/json`)).to[JsValue];
 			users <- Future.fromTry(parseFilteredUsersList(usersListResp))
 		) yield users
@@ -195,7 +197,7 @@ class RestHeartClient(val config: RestHeartConfig, http: HttpExt)(using Material
 		}
 
 	private def requestDiscardResp(req: HttpRequest): Future[StatusCode] =
-		http.singleRequest(req).map{resp =>
+		request(req).map{resp =>
 			resp.discardEntityBytes()
 			resp.status
 		}
@@ -203,4 +205,11 @@ class RestHeartClient(val config: RestHeartConfig, http: HttpExt)(using Material
 	private val ok = Future.successful(Done)
 
 	private def fail[T](msg: String) = Future.failed[T](new Exception(msg))
+
+	val connPoolSetts =
+		val defaultSetts = ConnectionPoolSettings(http.system)
+		val connSetts = defaultSetts.connectionSettings.withConnectingTimeout(200.millis)
+		defaultSetts.withMaxRetries(1).withConnectionSettings(connSetts)
+
+	private def request(req: HttpRequest) = http.singleRequest(req, settings = connPoolSetts)
 }

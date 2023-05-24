@@ -35,6 +35,7 @@ object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
 	val (httpConfig, authConfig, samlConfig, oauthConfig) = (config.http, config.auth, config.saml, config.oauth)
 	val http = Http()
 	val restHeart = new RestHeartClient(config.restheart, http)
+	val proxyConnPoolSettings = restHeart.connPoolSetts
 
 	val idpLib: IdpLibrary = IdpLibrary.fromConfig(samlConfig).getOrCrash("Try running 'fetchIdpList' in SBT.")
 	val cookieFactory = new CookieFactory(config)
