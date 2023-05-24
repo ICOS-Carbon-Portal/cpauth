@@ -14,6 +14,7 @@ import akka.http.scaladsl.model.StatusCode
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.model.Uri
 import akka.http.scaladsl.model.headers.Accept
+import akka.http.scaladsl.model.headers
 import akka.http.scaladsl.model.headers.BasicHttpCredentials
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.stream.Materializer
@@ -35,6 +36,7 @@ import scala.util.Success
 class RestHeartClientBase(conf: RestHeartConfig, geoClient: CpGeoClient, http: HttpExt)(using Materializer):
 	import http.system.{dispatcher, log}
 
+	private val KeepIdsOnly = "keys" -> "{\"_id\": 1}"
 	private val httpCreds: Map[Envri, BasicHttpCredentials] = conf.db.flatMap{(envri, conf) =>
 		for user <- conf.username; pass <- conf.password
 		yield envri -> BasicHttpCredentials(user, pass)
@@ -62,6 +64,68 @@ class RestHeartClientBase(conf: RestHeartConfig, geoClient: CpGeoClient, http: H
 			)}
 			.map(_ => Done)
 
+	private def createNewUser(uid: UserId, givenName: String, surname: String)(using Envri): Future[Done] =
+		val payload = JsObject(
+			"_id" -> JsString(uid.email),
+			"profile" -> JsObject(
+				"givenName" -> JsString(givenName),
+				"surname" -> JsString(surname)
+			),
+			"cart" -> JsObject(
+				"_items" -> JsArray.empty
+			)
+		)
+		val createStatus = for(
+			entity <- Marshal(payload).to[RequestEntity];
+			req = HttpRequest(
+				method = HttpMethods.POST,
+				uri = conf.usersCollUri,
+				entity = entity,
+				headers = Seq(headers.`Content-Type`(ContentTypes.`application/json`))
+			);
+			status <- requestDiscardResp(req)
+		) yield status
+
+		createStatus.flatMap{status =>
+			if(status.isSuccess()) ok
+			else fail(
+				s"Could not create user ${uid.email}, got response ${status.defaultMessage()}"
+			)
+		}
+
+	def userExists(uid: UserId)(using Envri): Future[Boolean] = {
+		val query = Uri.Query(KeepIdsOnly)
+		val req = HttpRequest(uri = getUserUri(uid).withQuery(query))
+
+		requestDiscardResp(req).flatMap{status =>
+			if(status.isSuccess()) Future.successful(true)
+			else if(status == StatusCodes.NotFound) Future.successful(false)
+			else fail(
+				s"Failed checking user ${uid.email}, got response " + status.defaultMessage()
+			)
+		}
+	}
+
+	def createUserIfNew(uid: UserId, givenName: String, surname: String)(using Envri): Future[Done] =
+		userExists(uid).flatMap{
+			exists => if(exists) ok else createNewUser(uid, givenName, surname)
+		}.andThen{
+			case Failure(exc) => log.error(exc, s"Problem creating user ${uid.email}")
+		}
+
+	def getGivenAndSurName(uid: UserId)(using Envri): Future[(String, String)] =
+		getUserProps(uid, Seq("profile.givenName", "profile.surname")).flatMap{userObj =>
+
+			val profileVal = getFieldOpt[JsValue](userObj, "profile").getOrElse(JsObject.empty);
+
+			Future.fromTry(
+				for(
+					profile <- ensure[JsObject](profileVal);
+					givenName <- getStringField(profile, "givenName");
+					surname <- getStringField(profile, "surname")
+				) yield (givenName, surname)
+			)
+		}
 
 	def getUserUri(uid: UserId)(using Envri): Uri =
 		conf.usersCollUri.appendPathSegment(uid.email)
