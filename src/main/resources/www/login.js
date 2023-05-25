@@ -142,8 +142,8 @@ function orcididUrl(targetUrl){
 function atmoAccessUrl(targetUrl){
 	var config = document.oauthConfig.atmoAccess;
 	if (!config) return '';
-	//https://sso.aeris-data.fr/auth/realms/aeris/protocol/openid-connect/auth?client_id=
-	return 'https://keycloak.icos-cp.eu/realms/playground/protocol/openid-connect/auth?client_id='
+	//return 'https://keycloak.icos-cp.eu/realms/playground/protocol/openid-connect/auth?client_id='
+	return 'https://sso.aeris-data.fr/auth/realms/aeris/protocol/openid-connect/auth?client_id='
 		+ config.clientId
 		+ '&response_type=code&scope=openid&redirect_uri='
 		+ encodeURIComponent(config.redirectPath)
