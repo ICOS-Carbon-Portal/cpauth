@@ -19,6 +19,8 @@ import spray.json.DefaultJsonProtocol.tuple2Format
 
 trait RestHeartRouting extends RestHeartDirectives{
 
+	def restHeartCreds: Map[Envri, BasicHttpCredentials]
+
 	val restheartRoute: Route = extractEnvri{implicit envri =>
 
 		val config = restHeart.config
@@ -45,7 +47,7 @@ trait RestHeartRouting extends RestHeartDirectives{
 				(validateUser(email, token.userId) | ifUserIsAdmin(token)) {
 					addAccessControlAllowOrigin(envri){
 						mapRequest(injectUsersCollection){
-							restheartProxy(usersCollUri)
+							restheartProxy(usersCollUri, restHeartCreds.get(envri))
 						}
 					}
 				} ~

@@ -59,7 +59,7 @@ object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
 	val restHeart =
 		val geoClient = CpGeoClient(emailSender)
 		new RestHeartClient(config.restheart, geoClient, http)
-
+	val restHeartCreds = restHeart.httpCreds
 	val passwordHandler =
 		given ExecutionContext = system.dispatchers.lookup("my-blocking-dispatcher")
 		PasswordLifecycleHandler(emailSender, cookieFactory, userDb, config.http, config.auth)

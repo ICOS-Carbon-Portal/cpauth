@@ -9,6 +9,8 @@ import akka.http.scaladsl.server.RouteResult.Complete
 import akka.http.scaladsl.model.HttpRequest
 import scala.concurrent.Future
 import akka.http.scaladsl.server.RouteResult
+import akka.http.scaladsl.model.headers.BasicHttpCredentials
+import akka.http.scaladsl.model.headers.Host
 
 trait ProxyDirectives { this: CpauthDirectives =>
 
@@ -22,12 +24,13 @@ trait ProxyDirectives { this: CpauthDirectives =>
 		val finalPath = if(path.isEmpty) Uri.Path./ else path
 		val newQuery = mergeQueries(query, req.uri.query())
 		val newUri = Uri./.withScheme("http").withHost(host).withPort(port).withPath(finalPath).withQuery(newQuery)
-		proxyToUri(req, newUri)
+		proxyToUri(req, newUri, None)
 	}
 
-	protected def proxyToUri(req: HttpRequest, newUri: Uri): Future[RouteResult] = {
+	protected def proxyToUri(req: HttpRequest, newUri: Uri, creds: Option[BasicHttpCredentials]): Future[RouteResult] = {
 		val newReq = req.withUri(newUri).withProtocol(HttpProtocols.`HTTP/1.1`).withoutRedundantHeaders
-		http.singleRequest(newReq).map(response => Complete(response.withoutRedundantHeaders))
+		val credReq = creds.fold(newReq)(newReq.addCredentials(_))
+		http.singleRequest(credReq).map(response => Complete(response.withoutRedundantHeaders))
 	}
 }
 

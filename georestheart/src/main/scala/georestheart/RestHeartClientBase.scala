@@ -37,7 +37,7 @@ class RestHeartClientBase(conf: RestHeartConfig, geoClient: CpGeoClient, http: H
 	import http.system.{dispatcher, log}
 
 	private val KeepIdsOnly = "keys" -> "{\"_id\": 1}"
-	private val httpCreds: Map[Envri, BasicHttpCredentials] = conf.db.flatMap{(envri, conf) =>
+	val httpCreds: Map[Envri, BasicHttpCredentials] = conf.db.flatMap{(envri, conf) =>
 		for user <- conf.username; pass <- conf.password
 		yield envri -> BasicHttpCredentials(user, pass)
 	}
