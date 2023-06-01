@@ -110,13 +110,9 @@ object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
 	}
 
 	private val host2ToEnvri = httpConfig.serviceHosts.map{
-		case (envri, host) => (host2SecondLevel(host), envri)
+		case (envri, host) => (host, envri)
 	}
 
-	def hostToEnvri(host: String) = host2ToEnvri.get(host2SecondLevel(host))
-
-	private def host2SecondLevel(host: String): String = host.count(_ == '.') match
-		case 0 => host
-		case x => host.split('.').drop(x - 1).mkString(".")
+	def hostToEnvri(host: String) = host2ToEnvri.get(host)
 
 end Main
