@@ -1,11 +1,11 @@
 @import views.js.MainMenuJS
 @import se.lu.nateko.cp.viewscore.ImportVersions._
+@import eu.icoscp.envri.Envri
+@import se.lu.nateko.cp.viewscore.getConfig
 
 @(title: String,
-  bootstrapJavascript: Boolean = false,
-  authHost: String,
-  dataHost: String
-)(customHeader: Html)(body: Html)
+  bootstrapJavascript: Boolean = false
+)(customHeader: Html)(body: Html)(implicit envri: Envri)
 <!DOCTYPE html>
 <html lang="en">
 
@@ -24,7 +24,7 @@
 	@SitesStyle()
 
 	<script>
-	@Html(MainMenuJS(authHost, dataHost).body)
+	@Html(MainMenuJS().body)
 	</script>
 
 	@customHeader
@@ -43,7 +43,7 @@
 		<nav class="menu navbar navbar-expand-sm navbar-dark">
 			<div class="menu-content">
 				<ul class="navbar-nav nav mt-auto">
-					<li class="nav-item"><a class="nav-link" href="//@dataHost">Data catalogue</a></li>
+					<li class="nav-item"><a class="nav-link" href="//@(getConfig.dataHost)">Data catalogue</a></li>
 				</ul>
 				<ul class="menu-content-right navbar-nav nav">
 					<li class="nav-item account cart-link">

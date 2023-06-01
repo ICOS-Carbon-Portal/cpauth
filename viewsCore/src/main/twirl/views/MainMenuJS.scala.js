@@ -1,4 +1,7 @@
-@(authHost: String, dataHost: String)
+@import se.lu.nateko.cp.viewscore.getConfig
+@import eu.icoscp.envri.Envri
+
+@()(implicit envri: Envri)
 
 window.addEventListener("load", function(){
 
@@ -38,7 +41,7 @@ window.addEventListener("load", function(){
 		if (response.email) {
 			const email = response.email;
 
-			fetch(`https://@(authHost)/db/users/${email}?keys=${encodeURIComponent('{cart:1}')}`, { credentials: 'include' })
+			fetch(`https://@(conf.authHost)/db/users/${email}?keys=${encodeURIComponent('{cart:1}')}`, { credentials: 'include' })
 				.then(response => response.json())
 				.then(data => {
 
@@ -46,7 +49,7 @@ window.addEventListener("load", function(){
 					cartLinks.forEach(link => {
 						link.querySelector('.items-number').innerText = data.cart._items.length;
 						link.addEventListener('click', function () {
-							window.location = 'https://@(dataHost)/portal#{"route":"cart"}';
+							window.location = 'https://@(conf.dataHost)/portal#{"route":"cart"}';
 						});
 						link.style.display = 'block';
 					});
@@ -54,7 +57,7 @@ window.addEventListener("load", function(){
 					const accountLinks = document.querySelectorAll('.account-link');
 					accountLinks.forEach(link => {
 						link.addEventListener('click', function(){
-							window.location = 'https://@(authHost)/';
+							window.location = 'https://@(conf.authHost)/';
 						});
 						link.style.display = 'block';
 					});
@@ -120,7 +123,7 @@ window.addEventListener("load", function(){
 	});
 
 	const updateProfile = (email, data) => {
-		fetch(`https://@(authHost)/db/users/${email}`, {
+		fetch(`https://@(conf.authHost)/db/users/${email}`, {
 			credentials: 'include',
 			method: 'PATCH',
 			mode: 'cors',
@@ -132,7 +135,11 @@ window.addEventListener("load", function(){
 	};
 
 	const loginAndRedirect = (url) => {
-		window.location = 'https://@(authHost)/login/?targetUrl=' + encodeURIComponent(url);
+		window.location = 'https://@(conf.authHost)/login/?targetUrl=' + encodeURIComponent(url);
 	}
 
 });
+
+@conf = @{
+	getConfig
+}

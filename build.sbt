@@ -56,16 +56,13 @@ lazy val cpauthCore = project
 
 
 lazy val viewsCore = (project in file("viewsCore"))
-	.dependsOn(envri.jvm)
+	.dependsOn(envri.jvm, cpauthCore)
 	.settings(commonSettings: _*)
 	.settings(publishingSettings: _*)
 	.enablePlugins(SbtTwirl)
 	.settings(
 		name := "views-core",
 		version := "0.7.0-SNAPSHOT",
-		libraryDependencies ++= Seq(
-			"io.spray"              %% "spray-json"                         % "1.3.6"
-		),
 	)
 
 val akkaVersion = "2.6.19"

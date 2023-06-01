@@ -44,9 +44,9 @@
 
 @template = @{
 	if(envri == Envri.SITES)
-		SitesPage(title, bootstrapJavascript = true, "auth.fieldsites.se", dataHost = "data.fieldsites.se") _
+		SitesPage(title, bootstrapJavascript = true) _
 	else if(envri == Envri.ICOS)
-		CpCommonPage(title, authHost = "cpauth.icos-cp.eu", bootstrapJavascript = true, dataHost = "data.icos-cp.eu") _
+		CpCommonPage(title, bootstrapJavascript = true) _
 	else
-		CpCommonPage(title, authHost = "cpauthstaging.icos-cp.eu", bootstrapJavascript = true, dataHost = "citydata1.icos-cp.eu") _
+		CpCommonPage(title, bootstrapJavascript = true) _
 }

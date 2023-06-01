@@ -81,11 +81,16 @@
 
 }
 
-@name = @{ if(envri == Envri.SITES) "SITES" else "Carbon Portal" }
+@name = @{ 
+	envri match
+		case Envri.SITES => "SITES"
+		case Envri.ICOS => "Carbon Portal"
+		case Envri.ICOSCities => "ICOS Cities"
+	}
 @title = @{ name + " GÉANT privacy statement" }
 @template = @{
 if(envri == Envri.SITES)
-		SitesPage(title, authHost = "auth.fieldsites.se", dataHost = "data.fieldsites.se") _
+		SitesPage(title) _
 	else
-		CpCommonPage(title, authHost = "cpauth.icos-cp.eu", dataHost = "data.icos-cp.eu") _
+		CpCommonPage(title) _
 }

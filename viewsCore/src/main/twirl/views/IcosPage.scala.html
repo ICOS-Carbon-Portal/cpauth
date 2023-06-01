@@ -1,15 +1,14 @@
 @import se.lu.nateko.cp.viewscore._
 @import se.lu.nateko.cp.viewscore.ImportVersions._
 @import views.js.MainMenuJS
+@import eu.icoscp.envri.Envri
 
 @(
 	title: String,
 	menu: Seq[CpMenuItem] = CpMenu.default,
-	authHost: String,
 	styleConf: IcosStyleConfig,
 	bootstrapJavascript: Boolean = false,
-	dataHost: String
-)(customHeader: Html)(body: Html)
+)(customHeader: Html)(body: Html)(implicit envri: Envri)
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -22,7 +21,7 @@
 
 	@if(menu.nonEmpty){
 	<script>
-		@Html(MainMenuJS(authHost, dataHost).body)
+		@Html(MainMenuJS().body)
 	</script>
 	}
 

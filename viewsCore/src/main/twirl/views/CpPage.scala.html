@@ -1,10 +1,9 @@
 @import se.lu.nateko.cp.viewscore._
+@import eu.icoscp.envri.Envri
 
 @(
 	title: String,
 	menu: Seq[CpMenuItem] = CpMenu.default,
-	authHost: String,
 	bootstrapJavascript: Boolean = false,
-	dataHost: String
-)(customHeader: Html)(body: Html)
-@IcosPage(title, menu, authHost, CpStyleConfig, bootstrapJavascript, dataHost)(customHeader)(body)
+)(customHeader: Html)(body: Html)(implicit envri: Envri)
+@IcosPage(title, menu, CpStyleConfig, bootstrapJavascript)(customHeader)(body)
