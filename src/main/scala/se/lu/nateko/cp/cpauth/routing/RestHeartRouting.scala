@@ -19,17 +19,7 @@ import spray.json.DefaultJsonProtocol.tuple2Format
 
 trait RestHeartRouting extends RestHeartDirectives{
 
-	def restHeartCreds: Map[Envri, BasicHttpCredentials]
-
 	val restheartRoute: Route = extractEnvri{implicit envri =>
-
-		val config = restHeart.config
-		val usersCollUri: Uri = config.usersCollUri
-
-		def injectUsersCollection(req: HttpRequest) = req.withUri{
-			val oldPathPart = req.uri.path.tail.tail.tail.tail
-			req.uri.withPath(usersCollUri.path ++ oldPathPart)
-		}
 
 		path("db" / "users" / Segment){ email =>
 			options{
@@ -46,9 +36,7 @@ trait RestHeartRouting extends RestHeartDirectives{
 			token { token =>
 				(validateUser(email, token.userId) | ifUserIsAdmin(token)) {
 					addAccessControlAllowOrigin(envri){
-						mapRequest(injectUsersCollection){
-							restheartProxy(usersCollUri, restHeartCreds.get(envri))
-						}
+						restheartProxy(token.userId)
 					}
 				} ~
 				forbid("Access to other users' documents is forbidden")

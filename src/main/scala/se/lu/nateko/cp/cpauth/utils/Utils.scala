@@ -78,3 +78,11 @@ object Utils {
 	}
 }
 
+extension(uri: Uri)
+	def addSegment(segment: String): Uri = uri.withPath(uri.path / segment)
+
+extension(path: Uri.Path)
+	def drop(n: Int): Uri.Path = if n <= 0 then path else path match
+		case Uri.Path.Empty => Uri.Path.Empty
+		case Uri.Path.Slash(tail) => tail.drop(n - 1)
+		case Uri.Path.Segment(_, tail) => tail.drop(n - 1)
