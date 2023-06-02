@@ -28,10 +28,16 @@
 	</script>
 }{
 	<div class="page-header">
-		@if(envri == Envri.SITES) {
-		<h1>@title</h1>
-		} else {
-		<h1>ICOS Carbon Portal Authentication Service <small class="text-muted">@subheading</small></h1>
+		@envri match {
+			case Envri.SITES => {
+				<h1>@title</h1>
+			}
+			case Envri.ICOS => {
+				<h1>ICOS Carbon Portal Authentication Service <small class="text-muted">@subheading</small></h1>
+			}
+			case Envri.ICOSCities => {
+				<h1>@envri.shortName Authentication Service <small class="text-muted">@subheading</small></h1>
+			}
 		}
 	</div>
 
@@ -43,10 +49,7 @@
 }
 
 @template = @{
-	if(envri == Envri.SITES)
-		SitesPage(title, bootstrapJavascript = true) _
-	else if(envri == Envri.ICOS)
-		CpCommonPage(title, bootstrapJavascript = true) _
-	else
-		CpCommonPage(title, bootstrapJavascript = true) _
+	envri match
+		case Envri.SITES => SitesPage(title, bootstrapJavascript = true) _
+		case Envri.ICOS | Envri.ICOSCities => CpCommonPage(title, bootstrapJavascript = true) _
 }

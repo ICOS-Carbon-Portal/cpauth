@@ -109,10 +109,10 @@ object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
 			system.terminate()
 	}
 
-	private val host2ToEnvri = httpConfig.serviceHosts.map{
+	private val host2Envri = httpConfig.serviceHosts.map{
 		case (envri, host) => (host, envri)
 	}
 
-	def hostToEnvri(host: String) = host2ToEnvri.get(host)
+	def hostToEnvri(host: String) = host2Envri.get(host)
 
 end Main

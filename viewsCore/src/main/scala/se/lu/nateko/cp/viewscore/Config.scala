@@ -1,22 +1,18 @@
 package se.lu.nateko.cp.viewscore
 
-import se.lu.nateko.cp.cpauth.core.ConfigLoader
-import se.lu.nateko.cp.cpauth.core.ConfigLoader.parseAs
 import eu.icoscp.envri.Envri
 import spray.json.DefaultJsonProtocol.*
 import spray.json.RootJsonFormat
-import se.lu.nateko.cp.cpauth.core.JsonSupport.{ given RootJsonFormat[Envri] }
+import se.lu.nateko.cp.cpauth.core.JsonSupport.{given RootJsonFormat[Envri]}
+import se.lu.nateko.cp.cpauth.core.ConfigLoader.{appConfig, parseAs}
 
-case class ViewsCoreConfig(
-	authHost: String,
-	dataHost: String
-)
+case class ViewsCoreConfig(authHost: String, dataHost: String)
 
 given RootJsonFormat[ViewsCoreConfig] = jsonFormat2(ViewsCoreConfig.apply)
 
-lazy val viewsConfig = ConfigLoader.appConfig.getValue("viewsCore").parseAs[Map[Envri, ViewsCoreConfig]]
+lazy val envri2Config = appConfig.getValue("viewsCore").parseAs[Map[Envri, ViewsCoreConfig]]
 
-def getConfig(using envri: Envri) = viewsConfig.getOrElse(
-	envri, 
-	throw new Exception(s"viewscore config not configured for ENVRI $envri")
+def viewsConfig(using envri: Envri) = envri2Config.getOrElse(
+	envri,
+	throw Exception(s"viewscore is not configured for ENVRI '${envri.shortName}'")
 )

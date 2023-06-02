@@ -81,16 +81,16 @@
 
 }
 
-@name = @{ 
+@name = @{
 	envri match
-		case Envri.SITES => "SITES"
-		case Envri.ICOS => "Carbon Portal"
+		case Envri.SITES      => "SITES"
+		case Envri.ICOS       => "Carbon Portal"
 		case Envri.ICOSCities => "ICOS Cities"
-	}
+}
 @title = @{ name + " GÉANT privacy statement" }
 @template = @{
-if(envri == Envri.SITES)
-		SitesPage(title) _
-	else
-		CpCommonPage(title) _
+	envri match
+		case Envri.SITES      => SitesPage(title) _
+		case Envri.ICOS       => CpCommonPage(title) _
+		case Envri.ICOSCities => CpCommonPage(title) _
 }
