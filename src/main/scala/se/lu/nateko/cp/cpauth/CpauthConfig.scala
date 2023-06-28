@@ -16,7 +16,7 @@ import eu.icoscp.georestheart.RestHeartConfig
 import eu.icoscp.geoipclient.CpGeoConfig
 
 enum OAuthProvider:
-	case facebook, orcidid
+	case facebook, orcidid, atmoAccess
 
 case class HttpConfig(
 	serviceInterface: String,

@@ -60,6 +60,8 @@ object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
 		val geoClient = CpGeoClient(emailSender)
 		new RestHeartClient(config.restheart, geoClient, http)
 
+	val proxyConnPoolSettings = restHeart.connPoolSetts
+
 	val passwordHandler =
 		given ExecutionContext = system.dispatchers.lookup("my-blocking-dispatcher")
 		PasswordLifecycleHandler(emailSender, cookieFactory, userDb, config.http, config.auth)
@@ -81,8 +83,7 @@ object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
 		passwordRoute ~
 		drupalRoute ~
 		restheartRoute ~
-		facebookRoute ~
-		orcidRoute ~
+		oauthRoute ~
 		get{
 			path("logout")(logout) ~
 			path("whoami"){whoami} ~

@@ -2,6 +2,7 @@ package se.lu.nateko.cp.cpauth.core
 
 import java.io.ByteArrayOutputStream
 import java.net.URI
+import java.nio.charset.StandardCharsets.{UTF_8 => utf8}
 import java.nio.file.FileSystems
 import java.nio.file.Files
 import java.nio.file.Paths
@@ -20,23 +21,17 @@ import scala.util.Try
 
 object CoreUtils {
 
-	private[this] val utf8 = java.nio.charset.StandardCharsets.UTF_8
-	private[this] val base64Decoder = Base64.getDecoder
-	private[this] val base64Encoder = Base64.getEncoder
-	private[this] val whiteRegex = "\\s+".r
+	private val whiteRegex = "\\s+".r
 
-	def decodeBase64ToString(in: String): String =
-		new String(base64Decoder.decode(noWhite(in)), utf8)
+	def decodeBase64ToString(in: String) = new String(decodeBase64(in), utf8)
+	def decodeBase64UrlToString(in: String) = new String(decodeBase64Url(in), utf8)
 
-	def encodeToBase64String(in: Array[Byte]): String =
-		base64Encoder.encodeToString(in)
+	def encodeToBase64String(in: Array[Byte]): String = Base64.getEncoder.encodeToString(in)
 
-	def decodeBase64(in: String): Array[Byte] =
-		base64Decoder.decode(noWhite(in))
+	def decodeBase64(in: String): Array[Byte] = Base64.getDecoder.decode(noWhite(in))
+	def decodeBase64Url(in: String): Array[Byte] = Base64.getUrlDecoder.decode(noWhite(in))
 
-	def noWhite(s: String): String = {
-		whiteRegex.replaceAllIn(s, "")
-	}
+	def noWhite(s: String): String = whiteRegex.replaceAllIn(s, "")
 
 	def getResourceBytes(resourcePath: String): Array[Byte] = {
 		val res = getClass.getResource(resourcePath)

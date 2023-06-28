@@ -16,6 +16,7 @@ import akka.http.scaladsl.model.Uri
 import akka.http.scaladsl.model.headers.Accept
 import akka.http.scaladsl.model.headers
 import akka.http.scaladsl.model.headers.BasicHttpCredentials
+import akka.http.scaladsl.settings.ConnectionPoolSettings
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.stream.Materializer
 import eu.icoscp.envri.Envri
@@ -29,6 +30,7 @@ import spray.json.RootJsonFormat
 import spray.json.*
 
 import scala.concurrent.Future
+import scala.concurrent.duration.DurationInt
 import scala.util.Failure
 import scala.util.Success
 
@@ -185,9 +187,14 @@ class RestHeartClientBase(conf: RestHeartConfig, geoClient: CpGeoClient, http: H
 			resp.status
 		}
 
+	val connPoolSetts =
+		val defaultSetts = ConnectionPoolSettings(http.system)
+		val connSetts = defaultSetts.connectionSettings.withConnectingTimeout(200.millis)
+		defaultSetts.withMaxRetries(1).withConnectionSettings(connSetts)
+
 	protected def singleRequest(req: HttpRequest)(using envri: Envri): Future[HttpResponse] =
 		val credRequest = httpCreds.get(envri).fold(req)(req.addCredentials(_))
-		http.singleRequest(credRequest)
+		http.singleRequest(credRequest, settings = connPoolSetts)
 
 	protected val ok = Future.successful(Done)
 

@@ -9,7 +9,7 @@ import se.lu.nateko.cp.cpauth.core.PublicAuthConfig
 case class UserId(email: String)
 
 enum AuthSource:
-	case Password, PasswordReset, Saml, Orcid, Facebook
+	case Password, PasswordReset, Saml, Orcid, Facebook, AtmoAccess
 
 case class AuthToken(userId: UserId, expiresOn: Long, source: AuthSource)
 

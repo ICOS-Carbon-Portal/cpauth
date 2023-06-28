@@ -3,18 +3,21 @@ package se.lu.nateko.cp.cpauth.routing
 import akka.http.scaladsl.HttpExt
 import akka.http.scaladsl.model.HttpMessage
 import akka.http.scaladsl.model.HttpProtocols
+import akka.http.scaladsl.model.HttpRequest
 import akka.http.scaladsl.model.Uri
 import akka.http.scaladsl.server.Route
-import akka.http.scaladsl.server.RouteResult.Complete
-import akka.http.scaladsl.model.HttpRequest
-import scala.concurrent.Future
 import akka.http.scaladsl.server.RouteResult
+import akka.http.scaladsl.server.RouteResult.Complete
+import akka.http.scaladsl.settings.ConnectionPoolSettings
+
+import scala.concurrent.Future
 import akka.http.scaladsl.model.headers.BasicHttpCredentials
 import akka.http.scaladsl.model.headers.Host
 
 trait ProxyDirectives { this: CpauthDirectives =>
 
 	val http: HttpExt
+	def proxyConnPoolSettings: ConnectionPoolSettings
 
 	import ProxyDirectives._
 
@@ -30,7 +33,7 @@ trait ProxyDirectives { this: CpauthDirectives =>
 	protected def proxyToUri(req: HttpRequest, newUri: Uri, creds: Option[BasicHttpCredentials]): Future[RouteResult] = {
 		val newReq = req.withUri(newUri).withProtocol(HttpProtocols.`HTTP/1.1`).withoutRedundantHeaders
 		val credReq = creds.fold(newReq)(newReq.addCredentials(_))
-		http.singleRequest(credReq).map(response => Complete(response.withoutRedundantHeaders))
+		http.singleRequest(credReq, settings = proxyConnPoolSettings).map(response => Complete(response.withoutRedundantHeaders))
 	}
 }
 

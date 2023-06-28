@@ -39,7 +39,7 @@ class RestHeartClient(
 	import http.system.dispatcher
 	def log = http.system.log
 
-	def init: Future[Done] = createDbsAndColls
+	def init: Future[Done] = if config.skipInit then Future.successful(Done) else createDbsAndColls
 
 	private val KeepIdsOnly = "keys" -> "{\"_id\": 1}"
 	private def pageSizeQpar(size: Int) = "pagesize" -> size.toString

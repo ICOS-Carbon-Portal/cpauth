@@ -1,5 +1,8 @@
 package se.lu.nateko.cp.cpauth.core
 
+import spray.json.JsObject
+import spray.json.enrichString
+
 import java.io.ByteArrayInputStream
 import java.nio.charset.StandardCharsets
 import java.security.KeyFactory
@@ -11,8 +14,8 @@ import java.security.interfaces.RSAPrivateKey
 import java.security.interfaces.RSAPublicKey
 import java.security.spec.PKCS8EncodedKeySpec
 import java.security.spec.X509EncodedKeySpec
-
 import scala.util.Failure
+import scala.util.Success
 import scala.util.Try
 
 
@@ -20,7 +23,7 @@ case class Signature(bytes: Array[Byte]){
 	def base64: String = CoreUtils.encodeToBase64String(bytes)
 }
 
-object Crypto{
+object Crypto:
 
 	def sha256sum(s: String): Array[Byte] = MessageDigest
 		.getInstance("SHA-256")
@@ -76,4 +79,13 @@ object Crypto{
 		}else Failure(new Exception(s"Expected key specification to start with $prologue line, end with $epilogue line, and have body"))
 	}
 
-}
+	def parseJWTpayload(allBase64Url: String): Try[JsObject] =
+		val parts = allBase64Url.split('.')
+		if parts.length != 3 then Failure(Exception("JWT must have 3 parts"))
+		else Try(CoreUtils.decodeBase64UrlToString(parts(1))).flatMap(
+			_.parseJson match
+				case obj: JsObject => Success(obj)
+				case _ => Failure(Exception("JWT payload must be a JSON object"))
+		)
+
+end Crypto

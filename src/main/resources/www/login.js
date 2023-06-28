@@ -139,6 +139,18 @@ function orcididUrl(targetUrl){
 		+ encodeURIComponent(targetUrl) : '');
 }
 
+function atmoAccessUrl(targetUrl){
+	var config = document.oauthConfig.atmoAccess;
+	if (!config) return '';
+	//return 'https://keycloak.icos-cp.eu/realms/playground/protocol/openid-connect/auth?client_id='
+	return 'https://sso.aeris-data.fr/auth/realms/aeris/protocol/openid-connect/auth?client_id='
+		+ config.clientId
+		+ '&response_type=code&scope=openid&redirect_uri='
+		+ encodeURIComponent(config.redirectPath)
+		+ (targetUrl ? '&state='
+		+ encodeURIComponent(targetUrl) : '');
+}
+
 $(function(){
 	$idpInput = $("#idpUrlInput");
 	$idpBtn = $("#signonBtn");
@@ -164,6 +176,7 @@ $(function(){
 
 	$("#facebookLoginButton").attr('href', facebookUrl(targetUrl));
 	$("#orcididLoginButton").attr('href', orcididUrl(targetUrl));
+	$("#atmoAccessLoginButton").attr('href', atmoAccessUrl(targetUrl));
 
 	$('#swamid-link').click(hideMessage);
 	$('#plain-link').click(hideMessage);
