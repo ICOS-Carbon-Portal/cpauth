@@ -1,4 +1,4 @@
-val defaultScala = "3.2.2"
+val defaultScala = "3.3.0"
 
 val defaultScalacOptions = Seq(
 	"-Xtarget:11",
@@ -34,7 +34,7 @@ lazy val envri = crossProject(JSPlatform, JVMPlatform)
 	.settings(
 		name := "envri",
 		organization := "eu.icoscp",
-		version := "0.1.0-SNAPSHOT",
+		version := "0.1.0",
 	)
 
 lazy val cpauthCore = project
@@ -45,7 +45,7 @@ lazy val cpauthCore = project
 	.enablePlugins(SbtTwirl)
 	.settings(
 		name := "cpauth-core",
-		version := "0.9.0-SNAPSHOT",
+		version := "0.9.0",
 		libraryDependencies ++= Seq(
 			"io.spray"              %% "spray-json"         % "1.3.6",
 			"com.typesafe"           % "config"             % "1.4.2",
@@ -62,7 +62,7 @@ lazy val viewsCore = (project in file("viewsCore"))
 	.enablePlugins(SbtTwirl)
 	.settings(
 		name := "views-core",
-		version := "0.7.0-SNAPSHOT",
+		version := "0.7.0",
 	)
 
 val akkaVersion = "2.6.19"
@@ -76,7 +76,7 @@ lazy val georestheart = (project in file("georestheart"))
 	.settings(
 		name := "georestheart",
 		organization := "eu.icoscp",
-		version := "0.1.0-SNAPSHOT",
+		version := "0.1.0",
 		libraryDependencies ++= Seq(
 			"com.typesafe.akka"      %% "akka-http-spray-json"               % akkaHttpVersion excludeAll("io.spray") cross CrossVersion.for3Use2_13,
 			"com.typesafe.akka"      %% "akka-stream"                        % akkaVersion cross CrossVersion.for3Use2_13,
@@ -117,9 +117,9 @@ lazy val cpauth = (project in file("."))
 		cpDeployTarget := "cpauth",
 		cpDeployBuildInfoPackage := "se.lu.nateko.cp.cpauth",
 		cpDeployPreAssembly := Def.sequential(Test / test, fetchIdpList).value,
-		cpDeployPlaybook := "cities.yml",
+		cpDeployPlaybook := "core.yml",
 		cpDeployPermittedInventories := Some(Seq("staging", "production")),
-		cpDeployInfraBranch := "cities-deployment",
+		cpDeployInfraBranch := "master",
 
 		fetchIdpList := {
 			import java.nio.file.{StandardCopyOption, Files, Paths}
