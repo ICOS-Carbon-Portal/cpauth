@@ -6,7 +6,8 @@ import scala.util.Success
 
 object MenuProvider:
 
-	private var _menu: Option[Seq[CpMenuItem]] = None
+	private var _cpMenu: Option[Seq[CpMenuItem]] = None
+	private var _citiesMenu: Option[Seq[CpMenuItem]] = None
 
 	private val executor =
 		val pool = new ScheduledThreadPoolExecutor(0)
@@ -14,12 +15,19 @@ object MenuProvider:
 		pool.setKeepAliveTime(1, TimeUnit.MINUTES)
 		pool
 
-	private val task = new Runnable:
-		def run(): Unit = MenuFetcher.getMenu match
-			case Success(newMenu) => _menu = Some(newMenu)
+	private val getCpMenuTask = new Runnable:
+		def run(): Unit = MenuFetcher.getMenu(CpMenu.cpMenuApi) match
+			case Success(newMenu) => _cpMenu = Some(newMenu)
+			case _ =>
+
+	private val getCitiesMenuTask = new Runnable:
+		def run(): Unit = MenuFetcher.getMenu(CpMenu.citiesMenuApi) match
+			case Success(newMenu) => _citiesMenu = Some(newMenu)
 			case _ =>
 
 
-	executor.scheduleAtFixedRate(task, 0, 12, TimeUnit.HOURS)
+	executor.scheduleAtFixedRate(getCpMenuTask, 0, 12, TimeUnit.HOURS)
+	executor.scheduleAtFixedRate(getCitiesMenuTask, 0, 12, TimeUnit.HOURS)
 
-	def menu = _menu
+	def cpMenu = _cpMenu
+	def citiesMenu = _citiesMenu

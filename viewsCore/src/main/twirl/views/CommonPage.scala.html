@@ -1,0 +1,15 @@
+@import se.lu.nateko.cp.viewscore._
+@import eu.icoscp.envri.Envri
+
+@(
+	title: String,
+	bootstrapJavascript: Boolean = false,
+)(customHeader: Html)(body: Html)(implicit envri: Envri)
+@template(customHeader)(body)
+
+@template = @{
+	envri match
+		case Envri.SITES      => SitesPage(title, bootstrapJavascript) _
+		case Envri.ICOS       => CpCommonPage(title, CpMenu.default, bootstrapJavascript) _
+		case Envri.ICOSCities => CitiesPage(title, bootstrapJavascript) _
+}

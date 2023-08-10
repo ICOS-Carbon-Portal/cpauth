@@ -1,11 +1,15 @@
 @import se.lu.nateko.cp.viewscore._
 @import eu.icoscp.envri.Envri
 
-@(title: String,
-  menu: Seq[CpMenuItem] = CpMenu.default,
-  bootstrapJavascript: Boolean = false,
+@(
+	title: String,
+	menu: Seq[CpMenuItem] = CpMenu.default,
+	bootstrapJavascript: Boolean = false,
 )(customHeader: Html)(body: Html)(implicit envri: Envri)
-@CpPage(title, menu, bootstrapJavascript){
-  <link rel="shortcut icon" type="image/png" href="https://static.icos-cp.eu/images/favicon.png"/>
-  @customHeader
-}(body)
+@IcosPage(
+  title,
+  menu,
+  CpStyleConfig,
+  CpFooter(),
+  bootstrapJavascript,
+)(customHeader)(body)

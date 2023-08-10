@@ -9,6 +9,6 @@ object MenuFetcher:
 
 	given JsonFormat[CpMenuItem] = lazyFormat(jsonFormat(CpMenuItem.apply, "title", "url", "children"))
 
-	def getMenu: Try[Seq[CpMenuItem]] = Try {
-		scala.io.Source.fromURL(CpMenu.cpMenuApi).mkString.parseJson.convertTo[Seq[CpMenuItem]]
+	def getMenu(menuApi: String): Try[Seq[CpMenuItem]] = Try {
+		scala.io.Source.fromURL(menuApi).mkString.parseJson.convertTo[Seq[CpMenuItem]]
 	}

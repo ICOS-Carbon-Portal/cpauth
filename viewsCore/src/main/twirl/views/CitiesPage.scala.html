@@ -1,0 +1,28 @@
+@import se.lu.nateko.cp.viewscore._
+@import eu.icoscp.envri.Envri
+
+@(
+	title: String,
+	bootstrapJavascript: Boolean = false,
+)(customHeader: Html)(body: Html)(implicit envri: Envri)
+@IcosPage(
+	title,
+	CpMenu.cities,
+	CitiesStyleConfig,
+	CitiesFooter(),
+	bootstrapJavascript,
+){
+	<style>
+		body {
+			background: white;
+		}
+		#cp-header {
+			height: 280px;
+			background-position: bottom -8px center;
+			background-repeat: no-repeat;
+			background-color: var(--bs-link-color);
+			background-size: auto 152px;
+		}
+	</style>
+	@customHeader
+}(body)
