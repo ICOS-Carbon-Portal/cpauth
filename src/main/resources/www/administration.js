@@ -43,12 +43,6 @@ function logInAs() {
 
 function validateNewUserCredentials() {
 
-	if (! emailIsValid($('#newaccmail').val())) {
-		$('#newaccmail').parent().addClass('has-error');
-		reportError('Valid email address must be provided!');
-		return false;
-	}
-
 	if ($('#password').val().length < 6) {
 		$('#password').parent().addClass('has-error');
 		reportError('Password was too short!');
