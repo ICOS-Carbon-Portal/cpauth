@@ -116,7 +116,15 @@ lazy val cpauth = (project in file("."))
 
 		cpDeployTarget := "cpauth",
 		cpDeployBuildInfoPackage := "se.lu.nateko.cp.cpauth",
-		cpDeployPreAssembly := Def.sequential(Test / test, fetchIdpList).value,
+		cpDeployPreAssembly := Def.sequential(
+			envri / clean,
+			cpauthCore / clean,
+			viewsCore / clean,
+			georestheart / clean,
+			clean,
+			Test / test,
+			fetchIdpList
+		).value,
 		cpDeployPlaybook := "core.yml",
 		cpDeployPermittedInventories := Some(Seq("staging", "production")),
 		cpDeployInfraBranch := "master",
