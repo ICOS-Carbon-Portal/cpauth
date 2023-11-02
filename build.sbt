@@ -117,7 +117,8 @@ lazy val cpauth = (project in file("."))
 		cpDeployTarget := "cpauth",
 		cpDeployBuildInfoPackage := "se.lu.nateko.cp.cpauth",
 		cpDeployPreAssembly := Def.sequential(
-			envri / clean,
+			envri.js / clean,
+			envri.jvm / clean,
 			cpauthCore / clean,
 			viewsCore / clean,
 			georestheart / clean,
