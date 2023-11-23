@@ -13,6 +13,7 @@ import scala.concurrent.duration.DurationInt
 
 import se.lu.nateko.cp.cpauth.core.UserId
 import se.lu.nateko.cp.cpauth.core.AuthenticationFailedException
+import se.lu.nateko.cp.cpauth.core.cpauthException
 
 
 trait UsersIo{
@@ -28,7 +29,7 @@ trait UsersIo{
 }
 
 
-class JdbcUsers(getConnection: () => Connection)(using ExecutionContext) extends UsersIo {
+class JdbcUsers(getConnection: () => Connection)(using ExecutionContext) extends UsersIo:
 
 	private def execute(statement: String): Future[Unit] = withConnection{ conn =>
 		val st = conn.createStatement
@@ -79,33 +80,35 @@ class JdbcUsers(getConnection: () => Connection)(using ExecutionContext) extends
 		ps.executeQuery().next()
 	}
 
-	def authenticateUser(uid: UserId, password: String): Future[UserEntry] = withConnection { conn =>
+	def authenticateUser(uid: UserId, password: String): Future[UserEntry] = withConnection: conn =>
 		val ps = conn.prepareStatement("select isadmin from users where mail = ? and password = ?")
 		ps.setString(1, uid.email)
 		ps.setString(2, hash(uid.email, password))
 
 		val rs = ps.executeQuery()
-		if (rs.next()) {
+		if  rs.next() then
 			UserEntry(uid, rs.getBoolean("isAdmin"))
-		}
-		else {
+		else
 			throw AuthenticationFailedException
-		}
-	}
 
-	def updateUser(oldUid: UserId, ue: UserEntry, newPass: String):Future[Unit] = withConnection { conn =>
-		val ps = conn.prepareStatement("update users set isadmin=?, password=? where mail=?")
-		ps.setBoolean(1, ue.isAdmin)
-		ps.setString(2, hash(ue.id.email, newPass))
-		ps.setString(3, oldUid.email)
-		ps.executeUpdate()
-		}
 
-	def dropUser(uid: UserId): Future[Unit] = withConnection { conn =>
-		val ps = conn.prepareStatement("delete from users where mail = ?")
-		ps.setString(1, uid.email)
-		ps.executeUpdate()
-	}
+	def updateUser(oldUid: UserId, ue: UserEntry, newPass: String): Future[Unit] =
+		withConnection: conn =>
+			val ps = conn.prepareStatement("update users set isadmin=?, password=? where mail=?")
+			ps.setBoolean(1, ue.isAdmin)
+			ps.setString(2, hash(ue.id.email, newPass))
+			ps.setString(3, oldUid.email)
+			ps.executeUpdate()
+		.controlUserUpdate(oldUid)
+
+
+	def dropUser(uid: UserId): Future[Unit] =
+		withConnection: conn =>
+			val ps = conn.prepareStatement("delete from users where mail = ?")
+			ps.setString(1, uid.email)
+			ps.executeUpdate()
+		.controlUserUpdate(uid, "deleted")
+
 
 	def listUsers: Future[Seq[UserEntry]] = withConnection{conn =>
 		val st = conn.createStatement
@@ -119,18 +122,24 @@ class JdbcUsers(getConnection: () => Connection)(using ExecutionContext) extends
 		result.toVector
 	}
 
-	def userIsAdmin(uid: UserId) = withConnection { conn =>
+	def userIsAdmin(uid: UserId): Future[Boolean] = withConnection: conn =>
 		val ps = conn.prepareStatement("select 1 from users where mail = ? and isadmin")
 		ps.setString(1, uid.email)
 		ps.executeQuery().next()
-	}
-
-	def setAdminRights(uid: UserId, isAdmin: Boolean): Future[Unit] = withConnection { conn =>
-		val ps = conn.prepareStatement("update users set isadmin = ? where mail = ?")
-		ps.setBoolean(1, isAdmin)
-		ps.setString(2, uid.email)
-		ps.executeUpdate()
-	}
 
 
-}
+	def setAdminRights(uid: UserId, isAdmin: Boolean): Future[Unit] =
+		withConnection: conn =>
+			val ps = conn.prepareStatement("update users set isadmin = ? where mail = ?")
+			ps.setBoolean(1, isAdmin)
+			ps.setString(2, uid.email)
+			ps.executeUpdate()
+		.controlUserUpdate(uid)
+
+	extension(f: Future[Int])
+		private def controlUserUpdate(user: UserId, op: String = "updated"): Future[Unit] = f.flatMap: nUpdated =>
+			if nUpdated == 1 then Future.successful(())
+			else if nUpdated == 0 then Future.failed(cpauthException(s"User ${user.email} not found"))
+			else Future.failed(cpauthException(s"Unexpectedly $op $nUpdated users instead of 1"))
+
+end JdbcUsers

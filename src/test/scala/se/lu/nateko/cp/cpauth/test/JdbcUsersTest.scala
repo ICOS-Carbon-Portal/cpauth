@@ -65,10 +65,8 @@ class JdbcUsersTest extends AnyFunSuite with ScalaFutures {
 		jdu.setAdminRights(aid, true).futureValue
 		assertResult(true)    { jdu.userIsAdmin(aid).futureValue }
 
-		// You can make nonexisting users admin.
+		// nonexisting users are not admins
 		val c = UserId("nosuchuser")
-		jdu.setAdminRights(c, true).futureValue
-		// But it doesn't let them authenticate
 		assertResult(false)    { jdu.userIsAdmin(c).futureValue }
 
 		// Check password

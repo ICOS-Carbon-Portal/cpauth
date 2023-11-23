@@ -42,7 +42,8 @@ trait PasswordRouting extends CpauthDirectives:
 
 						logInWithPasswordCookie(uEntry.id)
 					}
-				}
+				} ~
+				complete(StatusCodes.BadRequest -> "Expected 'mail' and 'password' posted as application/x-www-form-urlencoded form fields")
 			} ~
 			path("changepassword"){
 				user(uid =>

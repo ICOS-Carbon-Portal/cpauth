@@ -90,7 +90,7 @@ function populateAccountsList() {
 
 
 function deleteAccount(mail) {
-	$.post("/password/deleteaccount", 'mail=' + mail)
+	$.post("/password/deleteaccount", 'mail=' + encodeURIComponent(mail))
 		.done(function() {
 			reportSuccess(mail + ' has been removed');
 		})
@@ -99,7 +99,7 @@ function deleteAccount(mail) {
 }
 
 function makeAdmin(mail) {
-	$.post("/password/makeadmin", 'mail=' + mail)
+	$.post("/password/makeadmin", 'mail=' + encodeURIComponent(mail))
 		.done(function() {
 			reportSuccess(mail + ' is now an administrator');
 		})
@@ -108,7 +108,7 @@ function makeAdmin(mail) {
 }
 
 function unmakeAdmin(mail) {
-	$.post("/password/unmakeadmin", 'mail=' + mail)
+	$.post("/password/unmakeadmin", 'mail=' + encodeURIComponent(mail))
 		.done(function() {
 			reportSuccess(mail + ' is not an administrator any longer');
 		})
