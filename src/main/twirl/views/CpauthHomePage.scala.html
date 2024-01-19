@@ -40,25 +40,27 @@
 						@TextValueControl("First name", "givenName", "First name")
 						@TextValueControl("Last name", "surname", "Last name")
 						@TextValueControl("ORCID id", "orcid", "ORCID")
-						@TextValueControl("Affiliation", "affiliation", "Affiliation")
-						@TextValueControl("Secondary affiliation", "affiliation2", "Secondary affiliation")
-						@TextValueControl("Telephone (work)", "workPhone", "+XX XXX XXXX")
-						@TextValueControl("Mobile phone", "mobilePhone", "+XX XXX XXXX")
-						@ValueWidget("Address"){
-							@TextValueControl("Street address", "streetAddress", "Street address (work)")
-							@TextValueControl("City", "city", "City")
-							@TextValueControl("Zip code", "zipCode", "Zip code")
-							@TextValueControl("Country", "country", "Country")
-						}
-						@ValueWidget("Gender"){
-							<select id="gender" class="form-select">
-								<option value="">unspecified</option>
-								<option value="Female">Female</option>
-								<option value="Male">Male</option>
-							</select>
-						}
-						@ValueWidget("Year of birth"){
-							<input id="birthYear" type="text" class="form-control" placeholder="nnnn" pattern="[12][09][0-9]{2}">
+						@if(envri != Envri.SITES){
+							@TextValueControl("Affiliation", "affiliation", "Affiliation")
+							@TextValueControl("Secondary affiliation", "affiliation2", "Secondary affiliation")
+							@TextValueControl("Telephone (work)", "workPhone", "+XX XXX XXXX")
+							@TextValueControl("Mobile phone", "mobilePhone", "+XX XXX XXXX")
+							@ValueWidget("Address"){
+								@TextValueControl("Street address", "streetAddress", "Street address (work)")
+								@TextValueControl("City", "city", "City")
+								@TextValueControl("Zip code", "zipCode", "Zip code")
+								@TextValueControl("Country", "country", "Country")
+							}
+							@ValueWidget("Gender"){
+								<select id="gender" class="form-select">
+									<option value="">unspecified</option>
+									<option value="Female">Female</option>
+									<option value="Male">Male</option>
+								</select>
+							}
+							@ValueWidget("Year of birth"){
+								<input id="birthYear" type="text" class="form-control" placeholder="nnnn" pattern="[12][09][0-9]{2}">
+							}
 						}
 					</div>
 					<div class="col-md-2">

@@ -8,6 +8,7 @@ object MenuProvider:
 
 	private var _cpMenu: Option[Seq[CpMenuItem]] = None
 	private var _citiesMenu: Option[Seq[CpMenuItem]] = None
+	private var _sitesMenu: Option[Seq[CpMenuItem]] = None
 
 	private val executor =
 		val pool = new ScheduledThreadPoolExecutor(0)
@@ -25,9 +26,16 @@ object MenuProvider:
 			case Success(newMenu) => _citiesMenu = Some(newMenu)
 			case _ =>
 
+	private val getSitesMenuTask = new Runnable:
+		def run(): Unit = MenuFetcher.getMenu(CpMenu.sitesMenuApi) match
+			case Success(newMenu) => _sitesMenu = Some(newMenu)
+			case _ =>
+
 
 	executor.scheduleAtFixedRate(getCpMenuTask, 0, 12, TimeUnit.HOURS)
 	executor.scheduleAtFixedRate(getCitiesMenuTask, 0, 12, TimeUnit.HOURS)
+	executor.scheduleAtFixedRate(getSitesMenuTask, 0, 12, TimeUnit.HOURS)
 
 	def cpMenu = _cpMenu
 	def citiesMenu = _citiesMenu
+	def sitesMenu = _sitesMenu

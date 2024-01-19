@@ -1,7 +1,7 @@
 @import views.js.MainMenuJS
 @import se.lu.nateko.cp.viewscore.ImportVersions._
 @import eu.icoscp.envri.Envri
-@import se.lu.nateko.cp.viewscore.viewsConfig
+@import se.lu.nateko.cp.viewscore._
 
 @(title: String,
   bootstrapJavascript: Boolean = false
@@ -15,8 +15,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 
 	<link rel="stylesheet" href="https://static.icos-cp.eu/css/bootstrap/@{bootstrapCSS}/sites-bootstrap.css">
-	<link rel="stylesheet" href="https://static.icos-cp.eu/constant/fontawesome/@{fontAwesome}/css/fontawesome.min.css">
-	<link rel="stylesheet" href="https://static.icos-cp.eu/constant/fontawesome/@{fontAwesome}/css/solid.min.css">
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v@{fontAwesome}/css/all.css">
 
 	<link rel="icon" type="image/x-icon" href="//static.icos-cp.eu/images/sites-favicon.ico">
 	<link rel="stylesheet" href="//static.icos-cp.eu/css/fonts/source-sans-pro.css">
@@ -34,47 +33,64 @@
 </head>
 
 <body>
-	<header class="header">
-		<a href="https://www.fieldsites.se">
-			<div class="logo">
-				<img src="https://static.icos-cp.eu/images/sites-logo.jpg">
-			</div>
-		</a>
-		<nav class="menu navbar navbar-expand-sm navbar-dark">
-			<div class="menu-content">
-				<ul class="navbar-nav nav mt-auto">
-					<li class="nav-item"><a class="nav-link" href="//@(viewsConfig.dataHost)">Data catalogue</a></li>
-				</ul>
-				<ul class="menu-content-right navbar-nav nav">
-					<li class="nav-item account cart-link">
-						<a class="nav-link"><i class="fas fa-shopping-cart"></i> Cart
-							<span class="badge rounded-pill bg-light text-secondary">
-								<span class="items-number">0</span>
-								<span class="visually-hidden">items in cart</span>
-							</span>
-						</a>
-					</li>
-					<li class="nav-item account account-link">
-						<a class="nav-link"><i class="fas fa-user"></i> My Account</a>
-					</li>
-					<li class="nav-item account login-link">
-						<a class="nav-link"><i class="fas fa-sign-out-alt"></i> Log in</a>
-					</li>
-				</ul>
+	<header class="header layout-container">
+		<nav class="navbar navbar-expand-lg navbar-dark">
+			<div class="container-xl">
+				<a href="https://www.fieldsites.se" class="pb-3">
+					<img src="https://static.icos-cp.eu/images/SITES-logo.svg" width=149 height=49 alt="SITES logo">
+				</a>
+				<button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvas-menu" aria-controls="offcanvas-menu" aria-expanded="false" aria-label="Toggle navigation">
+					<span class="navbar-toggler-icon"></span>
+				</button>
+				<div class="offcanvas-lg offcanvas-end" tabindex="-1" id="offcanvas-menu" aria-labelledby="offcanvasDarkNavbarLabel" data-bs-theme="dark">
+					<div class="offcanvas-header">
+						<h5 class="offcanvas-title" id="offcanvasNavbarLabel">SITES</h5>
+						<button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" data-bs-target="#offcanvas-menu" aria-label="Close"></button>
+					</div>
+					<div class="offcanvas-body">
+						@SitesMenu(CpMenu.sites)
+					</div>
+				</div>
 			</div>
 		</nav>
 	</header>
 
-	<div class="page sites-page pt-4">
-		<div class="container-fluid">
+	<div class="page sites-page py-4 bg-white">
+		<div class="container-xl">
 			@body
 		</div>
 	</div>
 
-	<div class="footer">
-		<p>SITES (Swedish Infrastructure for Ecosystem Science) is a national research infrastructure for terrestrial and limnological field research that will help to strengthen Swedish research based on measurements and experiments carried out in the field.</p>
-		<p><a href="https://www.fieldsites.se/en-GB/about/about-sites-32652196">About SITES</a> • <a href="mailto:info@@fieldsites.se">info@@fieldsites.se</a></p>
-	</div>
+	<footer class="site-footer" role="contentinfo">
+		<div class="container-xl p-3 d-flex justify-content-between gap-5">
+			<div class="region region-footer-first flex-grow-1">
+				<a href="https://www.fieldsites.se"><img src="https://static.icos-cp.eu/images/SITES-logo.svg" width=149 height=49 alt="SITES logo"></a>
+			</div>
+
+			<div class="region region-footer-second">
+				<h2>Help</h2>
+				<p class="marked-link"><a class="link-light link-underline-opacity-0 link-underline-opacity-100-hover" href="/privacy">Privacy Policy</a></p>
+				<p class="marked-link"><a class="link-light link-underline-opacity-0 link-underline-opacity-100-hover" href="/privacy">Data licence</a></p>
+				<p class="marked-link"><a class="link-light link-underline-opacity-0 link-underline-opacity-100-hover" href="/about/contacts">Contact us</a></p>
+			</div>
+
+			<div class="region region-footer-third">
+				<h2>Follow SITES</h2>
+					<p class="marked-link"><a class="link-light link-underline-opacity-0 link-underline-opacity-100-hover" href="/newsletter">Subscribe to the SITES newsletter</a></p>
+					<p class="marked-link"><a class="link-light link-underline-opacity-0 link-underline-opacity-100-hover" href="/news">News archive</a></p>
+					<p class="pt-2">
+						<a class="fab fa-twitter-square link-light text-decoration-none fs-3 ps-1 pe-2" href="https://twitter.com/fieldSITES">&nbsp;</a>
+						&nbsp;
+						<a class="fab fa-facebook-square link-light text-decoration-none fs-3 pe-2" href="https://www.facebook.com/SITESinfrastructure/">&nbsp;</a>
+						&nbsp;
+						<a class="fab fa-youtube-square link-light text-decoration-none fs-3 pe-2" href="https://www.youtube.com/channel/UCU7eWFJVIp6elh0XSI0xYOQ">&nbsp;</a>
+						&nbsp;
+						<a class="fab fa-linkedin link-light text-decoration-none fs-3 pe-2" href="https://www.linkedin.com/company/swedish-infrastructure-for-ecosystem-science-sites/">&nbsp;</a>
+					</p>
+				</div>
+			</div>
+		</div>
+	</footer>
 
 	@if(bootstrapJavascript){
 		<script src="https://cdn.jsdelivr.net/npm/bootstrap@@@{bootstrapJS}/dist/js/bootstrap.bundle.min.js"

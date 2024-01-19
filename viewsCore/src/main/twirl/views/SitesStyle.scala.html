@@ -1,8 +1,14 @@
 @()
 <style>
+	:root {
+		--sites-green: #61AB43;
+		--sites-gray: #43474B;
+	}
+
 	body {
 		font-family: "SourceSansPro", sans-serif;
 		font-size: 16px;
+		background-color: var(--sites-gray);
 	}
 
 	a,
@@ -41,62 +47,22 @@
 
 	.header {
 		position: relative;
-		width: 1400px;
-		max-width: 100%;
-		height: 175px;
 		margin: 0 auto;
-		background: url(https://static.icos-cp.eu/images/sites-header-background.jpg) #61AB43 no-repeat center top;
-		border-top: 22px solid #818185;
-	}
-
-	.logo {
-		display: inline-block;
-		background: white;
-		width: 144px;
-		height: 108px;
-		margin-top: -22px;
-		position: relative;
-		margin-left: 10%;
-		max-width: 30%;
-	}
-
-	.logo img {
-		width: 90%;
-		height: auto;
-		position: absolute;
-		bottom: 13px;
-		left: 7px;
+		padding: 1rem 0;
+		background: var(--sites-gray);
+		border-top: 8px solid var(--sites-green);
+		z-index: 1;
 	}
 
 	.menu {
-		position: absolute;
 		bottom: 0;
-		width: 100%;
-		max-width: 1400px;
-		margin: 0 auto;
 	}
 
 	.menu-content ul {
 		padding: 0 1rem;
 	}
 
-	.menu a {
-		color: #fff;
-		font-size: 1.125em;
-		cursor: pointer;
-	}
-
-	.menu-content {
-		display: flex;
-		justify-content: space-between;
-		width: 100%;
-	}
-
-	.menu-content-right {
-		display: flex;
-	}
-
-	.menu-content-right .account {
+	.nav-item.account {
 		display: none;
 	}
 
@@ -104,18 +70,79 @@
 		vertical-align: 1px;
 	}
 
-	.page,
-	.footer {
-		margin: 0 auto;
-		max-width: 1400px;
+	.primary-nav-menu-item-has-children {
+		position: relative;
 	}
 
-	.footer {
-		padding: 20px 5px 5px;
-		max-width: 780px;
-		font-size: 13px;
-		color: #7a7a7a;
-		line-height: 1.3;
-		text-align: center;
+	.primary-nav-menu-item-has-children.open .navbar-nav {
+		display: block;
 	}
+
+	.nav-link {
+		color: rgba(255,255,255,0.85);
+		cursor: pointer;
+	}
+
+	@@media all and (max-width: 980px) {
+		.primary-nav-menu-item-has-children > .nav-link::after {
+			float: right;
+		}
+		.primary-nav-menu-item-has-children .navbar-nav {
+			padding-left: 2rem;
+		}
+		.dropdown-item:hover,
+		.dropdown-item:focus {
+			background-color: transparent;
+		}
+	}
+
+	@@media all and (min-width: 980px) {
+		.primary-nav-menu-item-has-children:hover .navbar-nav {
+			display: block;
+		}
+		.primary-nav-menu-item-has-children .navbar-nav {
+			position: absolute;
+		}
+		.primary-nav-menu-item-has-children .navbar-nav {
+			box-shadow: 0 1px 36px rgba(0, 0, 0, 0.08);
+			z-index: 1;
+			min-width: 150px;
+		}
+
+		.primary-nav-menu-item-has-children>.nav-link::after {
+			font-family: "Font Awesome 5 Free";
+			content: "\f078";
+			font-size: 0.7rem;
+			font-weight: 900;
+			margin: 0 0.3rem;
+		}
+
+		.primary-nav-menu-item-has-children .navbar-nav {
+			display: none;
+		}
+	}
+
+	.site-footer {
+		background: var(--sites-gray);
+		padding: 2rem 0;
+		color: white;
+
+		& h2 {
+			font-size: 1.75rem;
+			margin-top: 0;
+		}
+
+		& p {
+			margin-bottom: 0.5rem;
+		}
+	}
+
+	.marked-link:before {
+		font-family: "Font Awesome 5 Free";
+		content: "\f105";
+		font-weight: 900;
+		margin: 0 0.3rem;
+		color: white;
+	}
+
 </style>

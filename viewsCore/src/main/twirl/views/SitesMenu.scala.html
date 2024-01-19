@@ -1,0 +1,56 @@
+@import se.lu.nateko.cp.viewscore._
+@import CpMenu.sitesHome
+@import java.net.URI
+
+@(menuItems: Seq[CpMenuItem])
+@if(!menuItems.isEmpty){
+	<ul class="navbar-nav">
+		@for(item <- menuItems){
+			@menuItem(item, true)
+		}
+		<li class="nav-item account account-link">
+			<a class="nav-link"><i class="fas fa-user"></i></a>
+		</li>
+		<li class="nav-item account cart-link">
+			<a class="nav-link position-relative"><i class="fas fa-shopping-cart"></i>
+				<span class="badge rounded-pill bg-danger position-absolute start-100 translate-middle">
+					<span class="items-number">0</span>
+					<span class="visually-hidden">items in cart</span>
+				</span>
+			</a>
+		</li>
+		<li class="nav-item account login-link">
+			<a class="nav-link"><i class="fas fa-sign-out-alt"></i> Log in</a>
+		</li>
+	</ul>
+}
+
+
+@menuItem(item: CpMenuItem, isTop: Boolean) = {
+	@defining(!item.children.isEmpty){ hasChildren =>
+	<li class="navbar-item @itemClass(hasChildren, isTop)">
+		@anchor(item, isTop, hasChildren)
+		@if(hasChildren) {
+			<ul class="navbar-nav me-auto dropdown-menu">
+			@for(item <- item.children){
+				@menuItem(item, false)
+			}
+			</ul>
+		}
+	</li>
+	}
+}
+
+@anchor(item: CpMenuItem, isTop: Boolean, hasChildren: Boolean) = {
+	<a class="nav-link text-nowrap" href="@link(item.url)">
+		@item.title
+	</a>
+}
+
+@itemClass(isTop: Boolean, hasChildren: Boolean) = @{
+	if(isTop && hasChildren) "primary-nav-menu-item-has-children dropdown" else ""
+}
+
+@link(uri: String) = @{
+	if(uri.startsWith("https://") || uri.startsWith("http://")) uri else sitesHome + uri
+}
