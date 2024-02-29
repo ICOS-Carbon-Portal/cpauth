@@ -1,10 +1,12 @@
 package se.lu.nateko.cp.cpauth.test
 
+import eu.icoscp.envri.Envri
 import org.scalatest.funsuite.AnyFunSuite
+import se.lu.nateko.cp.cpauth.PrivateAuthConfig
 import se.lu.nateko.cp.cpauth.core.*
 import se.lu.nateko.cp.cpauth.utils.SignedTokenMaker
-import se.lu.nateko.cp.cpauth.PrivateAuthConfig
-import eu.icoscp.envri.Envri
+
+import java.security.SignatureException
 
 class AuthenticationTest extends AnyFunSuite{
 	import Envri.ICOS
@@ -48,33 +50,29 @@ class AuthenticationTest extends AnyFunSuite{
 		assert(errMessage.contains("expired"))
 	}
 
-	test("Token originating from an untrusted source is rejected"){
+	test("Token originating from an untrusted source is rejected"):
 		val token = SignedTokenMaker(PrivateAuthConfig(
 			authTokenValiditySeconds = 10,
 			privateKeyPaths = Map(ICOS -> private1)
 		)).get.makeToken(user, AuthSource.Saml)
 
-		val unwrappedToken = Authenticator(pubAuthConfig).get.unwrapTrustedToken(token, Set(AuthSource.Password))
+		val err = intercept[CpauthException]:
+			Authenticator(pubAuthConfig).get
+				.unwrapTrustedToken(token, Set(AuthSource.Password)).get
 
-		assert(unwrappedToken.isFailure)
+		assert(err.getMessage.contains("not trusted"))
 
-		val errMessage: String = unwrappedToken.failed.get.getMessage
-		assert(errMessage.contains("not trusted"))
-	}
 
-	test("Token signed with a wrong key fails to authenticate"){
+	test("Token signed with a wrong key fails to authenticate"):
 
-		val tokenMaker = SignedTokenMaker(PrivateAuthConfig(
+		val wrongTokenMaker = SignedTokenMaker(PrivateAuthConfig(
 			authTokenValiditySeconds = 10,
 			privateKeyPaths = Map(ICOS -> samlPrivate)
 		)).get
 
-		val auth = Authenticator(pubAuthConfig).get
+		assertThrows[SignatureException]:
+			val wrongToken = wrongTokenMaker.makeToken(user, AuthSource.Password)
+			Authenticator(pubAuthConfig).get
+				.unwrapToken(wrongToken).get
 
-		val unwrappedToken = auth.unwrapToken(tokenMaker.makeToken(user, AuthSource.Password))
-
-		assert(unwrappedToken.isFailure)
-		val errMessage: String = unwrappedToken.failed.get.getMessage
-		assert(errMessage.contains("not correct"))
-	}
 }
