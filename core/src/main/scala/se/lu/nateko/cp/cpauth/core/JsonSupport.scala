@@ -4,6 +4,7 @@ import eu.icoscp.envri.Envri
 import spray.json.*
 
 import java.net.URI
+import java.time.Instant
 
 object JsonSupport extends DefaultJsonProtocol:
 
@@ -31,3 +32,15 @@ object JsonSupport extends DefaultJsonProtocol:
 					deserializationError(s"Could not parse URI from $uri", err)
 
 			case _ => deserializationError("URI string expected")
+
+	given RootJsonFormat[Instant] with
+		def write(instant: Instant) = JsString(instant.toString)
+		def read(value: JsValue): Instant = value match
+			case JsString(s) => Instant.parse(s)
+			case _ => deserializationError("String representation of a time instant is expected")
+
+	given JsonFormat[UserId] with
+		def write(uid: UserId) = JsString(uid.email)
+		def read(js: JsValue) = js match
+			case JsString(uidStr) => UserId(uidStr)
+			case _ => deserializationError("Expected UserId as JsString")
