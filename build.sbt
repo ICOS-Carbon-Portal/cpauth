@@ -1,4 +1,4 @@
-val defaultScala = "3.3.0"
+val defaultScala = "3.3.3"
 
 val defaultScalacOptions = Seq(
 	"-Xtarget:11",
@@ -132,7 +132,7 @@ lazy val cpauth = (project in file("."))
 
 		fetchIdpList := {
 			import java.nio.file.{StandardCopyOption, Files, Paths}
-			val url = new java.net.URL("http://mds.swamid.se/md/swamid-idp-transitive.xml")
+			val url = new java.net.URI("http://mds.swamid.se/md/swamid-idp-transitive.xml").toURL()
 			val file = Paths.get("./src/main/resources/swamid-idps.xml")
 			streams.value.log.info("Fetching SAML identity provider list from SWAMID...")
 			Files.copy(url.openStream(), file, StandardCopyOption.REPLACE_EXISTING)

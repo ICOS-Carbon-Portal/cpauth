@@ -5,7 +5,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.UUID
 import scala.xml.Elem
-import java.net.URL
+import java.net.URI
 import org.opensaml.saml2.core.NameIDType
 import java.util.TimeZone
 import akka.http.scaladsl.model.Uri
@@ -13,7 +13,7 @@ import se.lu.nateko.cp.cpauth.SamlSpConfig
 
 object Saml {
 
-	def getAuthUri(idpHttpRedirectUrl: URL, reqXml: Elem): Uri = {
+	def getAuthUri(idpHttpRedirectUrl: URI, reqXml: Elem): Uri = {
 
 		val trimmedReqStr = scala.xml.Utility.trim(reqXml).toString
 		val authRequestBase64 = Utils.compressAndBase64ForSaml(trimmedReqStr)

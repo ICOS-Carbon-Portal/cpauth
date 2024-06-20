@@ -3,7 +3,6 @@
 package se.lu.nateko.cp.cpauth.opensaml
 
 import java.net.URI
-import java.net.URL
 import java.security.PublicKey
 import scala.util.Failure
 import scala.util.Success
@@ -24,7 +23,7 @@ import org.opensaml.xml.security.credential.UsageType
 
 case class IdpInfo(name: String, id: String)
 
-class IdpProps(val name: String, val keys: Seq[PublicKey], val ssoRedirect: URL)
+class IdpProps(val name: String, val keys: Seq[PublicKey], val ssoRedirect: URI)
 
 trait IdpLibrary{
 
@@ -96,13 +95,13 @@ object IdpLibrary {
 			.toVector
 	}
 	
-	private def idpToSsoRedirect(idp: IDPSSODescriptor): Try[URL] = Try{
+	private def idpToSsoRedirect(idp: IDPSSODescriptor): Try[URI] = Try{
 		val redirectSss = idp.getSingleSignOnServices.toSafeIterable.find{
 			_.getBinding == SAMLConstants.SAML2_REDIRECT_BINDING_URI
 		}
 		redirectSss match {
 			case None => throw new MetadataProviderException("HTTP-Redirect binding is not supported")
-			case Some(sss) => new URL(sss.getLocation)
+			case Some(sss) => new URI(sss.getLocation)
 		}
 	}
 
