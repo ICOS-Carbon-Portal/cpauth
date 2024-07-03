@@ -3,9 +3,7 @@
 @import eu.icoscp.envri.Envri
 @import se.lu.nateko.cp.viewscore._
 
-@(title: String,
-  bootstrapJavascript: Boolean = false
-)(customHeader: Html)(body: Html)(implicit envri: Envri)
+@(title: String)(customHeader: Html)(body: Html)(implicit envri: Envri)
 <!DOCTYPE html>
 <html lang="en">
 
@@ -92,12 +90,10 @@
 		</div>
 	</footer>
 
-	@if(bootstrapJavascript){
-		<script src="https://cdn.jsdelivr.net/npm/bootstrap@@@{bootstrapJS}/dist/js/bootstrap.bundle.min.js"
-			integrity="@{bootstrapJSIntegrity}"
-			crossorigin="anonymous">
-		</script>
-	}
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@@@{bootstrapJS}/dist/js/bootstrap.bundle.min.js"
+		integrity="@{bootstrapJSIntegrity}"
+		crossorigin="anonymous">
+	</script>
 
 	<script defer data-domain="data.fieldsites.se" src="https://plausible.fieldsites.se/js/script.js"></script>
 

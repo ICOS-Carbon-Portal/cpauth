@@ -50,7 +50,7 @@
 
 @template = @{
 	envri match
-		case Envri.SITES => SitesPage(title, bootstrapJavascript = true) _
+		case Envri.SITES => SitesPage(title) _
 		case Envri.ICOS => CpCommonPage(title, bootstrapJavascript = true) _
 		case Envri.ICOSCities => CitiesPage(title, bootstrapJavascript = true) _
 }
