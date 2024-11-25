@@ -17,6 +17,7 @@
 	<link rel="stylesheet" href="https://static.icos-cp.eu/css/bootstrap/@{bootstrapCSS}/icos-bootstrap.css">
 	<link rel="stylesheet" href="https://static.icos-cp.eu/constant/fontawesome/@{fontAwesome}/css/all.min.css">
 	@IcosStyle(menu.nonEmpty, styleConf)
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orestbida/cookieconsent@@3.0.1/dist/cookieconsent.css">
 
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
@@ -71,7 +72,7 @@
 		@MainMenu(menu)
 	</div>
 
-	<div id="cp-main-content">
+	<div class="py-4 bg-white">
 		<div class="container-fluid">
 			@body
 		</div>
@@ -89,6 +90,7 @@
 	<!-- Matomo -->
 	<script>
 		var _paq = window._paq = window._paq || [];
+		_paq.push(['requireCookieConsent']);
 		/* tracker methods like "setCustomDimension" should be called before "trackPageView" */
 		_paq.push(['trackPageView']);
 		_paq.push(['enableLinkTracking']);
@@ -101,6 +103,8 @@
 		})();
 	</script>
 	<!-- End Matomo Code -->
+
+	<script type="module" src="https://static.icos-cp.eu/share/cookie-consent/cookieconsent-config.js"></script>
 
 </body>
 </html>
