@@ -1,4 +1,4 @@
-val defaultScala = "3.3.3"
+val defaultScala = "3.3.4"
 
 val defaultScalacOptions = Seq(
 	"-Xtarget:11",
@@ -133,9 +133,13 @@ lazy val cpauth = (project in file("."))
 		fetchIdpList := {
 			import java.nio.file.{StandardCopyOption, Files, Paths}
 			val url = new java.net.URI("http://mds.swamid.se/md/swamid-idp-transitive.xml").toURL()
-			val file = Paths.get("./src/main/resources/swamid-idps.xml")
-			streams.value.log.info("Fetching SAML identity provider list from SWAMID...")
+			val classDirFolder = (Compile / classDirectory).value
+			val file = classDirFolder.toPath.resolve("swamid-idps.xml")
+			streams.value.log.info(s"Fetching SAML identity provider list from SWAMID to $file ...")
 			Files.copy(url.openStream(), file, StandardCopyOption.REPLACE_EXISTING)
+			//TODO Remove next two lines in the future when no one has the xml in the old location
+			val oldLocation = Paths.get("./src/main/resources/swamid-idps.xml")
+			Files.deleteIfExists(oldLocation)
 		},
 
 		//initialCommands in console := """""",
