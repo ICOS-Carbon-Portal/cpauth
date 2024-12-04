@@ -132,14 +132,20 @@ lazy val cpauth = (project in file("."))
 
 		fetchIdpList := {
 			import java.nio.file.{StandardCopyOption, Files, Paths}
+			val fname = "swamid-idps.xml"
 			val url = new java.net.URI("http://mds.swamid.se/md/swamid-idp-transitive.xml").toURL()
-			val classDirFolder = (Compile / classDirectory).value
-			val file = classDirFolder.toPath.resolve("swamid-idps.xml")
+			val resourcesFolder = (Compile / resourceDirectory).value
+			val file = resourcesFolder.toPath.resolve(fname)
 			streams.value.log.info(s"Fetching SAML identity provider list from SWAMID to $file ...")
-			Files.copy(url.openStream(), file, StandardCopyOption.REPLACE_EXISTING)
-			//TODO Remove next two lines in the future when no one has the xml in the old location
-			val oldLocation = Paths.get("./src/main/resources/swamid-idps.xml")
-			Files.deleteIfExists(oldLocation)
+			try{
+				Files.copy(url.openStream(), file, StandardCopyOption.REPLACE_EXISTING)
+				val classDirFolder = (Compile / classDirectory).value
+				val targetFile = classDirFolder.toPath.resolve(fname)
+				Files.copy(file, targetFile, StandardCopyOption.REPLACE_EXISTING)
+			} catch{
+				case _: Throwable =>
+					streams.value.log.warn(s"SAML IdP list fetch failed, will use stale list if available (check that it is!)")
+			}
 		},
 
 		//initialCommands in console := """""",
