@@ -9,7 +9,7 @@ object CpMenu:
 	val citiesHome = "https://www.icos-cities.eu"
 	val citiesMenuApi = "https://www.icos-cp.eu/api/menu/cities"
 	val sitesHome = "https://www.fieldsites.se"
-	val sitesMenuApi = "https://demo.fieldsites.se/api/menu/main"
+	val sitesMenuApi = "https://www.fieldsites.se/api/menu/main"
 
 	val fallback = Seq(CpMenuItem("Home", cpHome, Nil))
 
