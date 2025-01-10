@@ -139,7 +139,7 @@ public class XmlDigitalSignatureGenerator {
             signedInfo = xmlSigFactory.newSignedInfo(
                     xmlSigFactory.newCanonicalizationMethod(CanonicalizationMethod.INCLUSIVE,
                     (C14NMethodParameterSpec) null),
-                    xmlSigFactory.newSignatureMethod(SignatureMethod.RSA_SHA1, null),
+                    xmlSigFactory.newSignatureMethod(SignatureMethod.ECDSA_SHA256, null),
                     Collections.singletonList(ref));
         } catch (NoSuchAlgorithmException ex) {
             ex.printStackTrace();

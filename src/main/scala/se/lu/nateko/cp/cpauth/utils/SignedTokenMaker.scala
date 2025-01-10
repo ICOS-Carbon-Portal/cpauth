@@ -2,7 +2,7 @@ package se.lu.nateko.cp.cpauth.utils
 
 import java.nio.file.Files
 import java.nio.file.Paths
-import java.security.interfaces.RSAPrivateKey
+import java.security.interfaces.ECPrivateKey
 
 import scala.util.Try
 
@@ -12,7 +12,7 @@ import eu.icoscp.envri.Envri
 import se.lu.nateko.cp.cpauth.PrivateAuthConfig
 import se.lu.nateko.cp.cpauth.core.*
 
-class SignedTokenMaker private(key: RSAPrivateKey, validity: Int){
+class SignedTokenMaker private(key: ECPrivateKey, validity: Int){
 
 	def makeToken(userId: UserId, source: AuthSource): SignedToken = {
 		val expiryTime = new DateTime().getMillis + 1000 * validity
@@ -28,7 +28,7 @@ object SignedTokenMaker {
 	def apply(config: PrivateAuthConfig)(implicit envri: Envri): Try[SignedTokenMaker] = {
 		val keyBytes = Files.readAllBytes(Paths.get(config.privateKeyPath))
 		for(
-			key <- Crypto.rsaPrivateFromDerBytes(keyBytes)
+			key <- Crypto.ecPrivateFromDerBytes(keyBytes)
 		) yield new SignedTokenMaker(key, config.authTokenValiditySeconds)
 	}
 

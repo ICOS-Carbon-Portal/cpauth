@@ -4,26 +4,26 @@ import scala.util.Try
 import org.scalatest.funsuite.AnyFunSuite
 import se.lu.nateko.cp.cpauth.core.CoreUtils
 import se.lu.nateko.cp.cpauth.core.Crypto
-import java.security.interfaces.RSAPrivateKey
-import java.security.interfaces.RSAPublicKey
+import java.security.interfaces.ECPrivateKey
+import java.security.interfaces.ECPublicKey
 
 class CryptoTest extends AnyFunSuite {
 
-	val privateKey: Try[RSAPrivateKey] = {
+	val privateKey: Try[ECPrivateKey] = {
 		val keyBytes = CoreUtils.getResourceBytes("/private1.der")
-		Crypto.rsaPrivateFromDerBytes(keyBytes)
+		Crypto.ecPrivateFromDerBytes(keyBytes)
 	}
 	
-	val publicKey: Try[RSAPublicKey] = {
+	val publicKey: Try[ECPublicKey] = {
 		val keyFileLines = CoreUtils.getResourceLines("/public1.pem")
-		Crypto.rsaPublicFromPemLines(keyFileLines.toIndexedSeq)
+		Crypto.ecPublicFromPemLines(keyFileLines.toIndexedSeq)
 	}
 	
-	test("Public RSA key creation from file works"){
+	test("Public EC key creation from file works"){
 		assert(publicKey.isSuccess)
 	}
 	
-	test("Private RSA key creation from file works"){
+	test("Private EC key creation from file works"){
 		assert(privateKey.isSuccess)
 	}
 	
@@ -44,7 +44,7 @@ class CryptoTest extends AnyFunSuite {
 		val certStr: String = CoreUtils.getResourceAsString("/certX509base64.txt")
 		val key = Crypto.publicKeyFromX509Cert(certStr).get
 		
-		assert(key.getAlgorithm === "RSA")
+		assert(key.getAlgorithm === "EC")
 	}
 
 }

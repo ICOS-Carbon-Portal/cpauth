@@ -105,7 +105,7 @@ lazy val cpauth = (project in file("."))
 			"ch.qos.logback"         %  "logback-classic"                    % "1.1.3",
 			"org.opensaml"           %  "opensaml"                           % "2.6.6",
 			"org.scala-lang.modules" %% "scala-xml"                          % "2.1.0",
-			"org.apache.santuario"   %  "xmlsec"                             % "2.0.7", //to force a newer version
+			"org.apache.santuario"   %  "xmlsec"                             % "2.3.5", //to force a newer version
 //			"xalan"                  %  "serializer"                         % "2.7.2", //for DOM serialization to strings during debug
 			"net.jcip"               %  "jcip-annotations"                   % "1.0",
 			"org.joda"               %  "joda-convert"                       % "1.7",

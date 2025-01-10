@@ -2,7 +2,7 @@ package se.lu.nateko.cp.cpauth.opensaml
 
 import java.nio.file.Files
 import java.nio.file.Paths
-import java.security.interfaces.RSAPrivateKey
+import java.security.interfaces.ECPrivateKey
 
 import scala.util.Try
 
@@ -21,7 +21,7 @@ import se.lu.nateko.cp.cpauth.utils.Utils.SafeJavaCollectionWrapper
 
 //import org.apache.xml.serializer.dom3.LSSerializerImpl
 
-class AssertionExtractor(key: RSAPrivateKey){
+class AssertionExtractor(key: ECPrivateKey){
 	import AssertionExtractor._
 
 	lazy val decrypter: AssertionDecrypter = {
@@ -57,7 +57,7 @@ object AssertionExtractor {
 
 	def fromPrivateKeyAt(path: String): Try[AssertionExtractor] = {
 		val keyBytes = Files.readAllBytes(Paths.get(path))
-		val privateKey = Crypto.rsaPrivateFromDerBytes(keyBytes)
+		val privateKey = Crypto.ecPrivateFromDerBytes(keyBytes)
 		privateKey.map(key => new AssertionExtractor(key))
 	}
 

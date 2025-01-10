@@ -28,7 +28,7 @@ public class KryptoUtil {
     /**
      * Name of the algorithm
      */
-    private static final String ALGORITHM = "RSA";
+    private static final String ALGORITHM = "EC";
 
     /**
      * This method is used to generate key pair based upon the provided
@@ -128,7 +128,7 @@ public class KryptoUtil {
         PKCS8EncodedKeySpec encodedPrivateKey = new PKCS8EncodedKeySpec(keydata);
         KeyFactory keyFactory = null;
         try {
-            keyFactory = KeyFactory.getInstance("RSA");
+            keyFactory = KeyFactory.getInstance("EC");
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
@@ -151,7 +151,7 @@ public class KryptoUtil {
         byte[] keydata = getKeyData(filePath);
         KeyFactory keyFactory = null;
         try {
-            keyFactory = KeyFactory.getInstance("RSA");
+            keyFactory = KeyFactory.getInstance("EC");
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         }

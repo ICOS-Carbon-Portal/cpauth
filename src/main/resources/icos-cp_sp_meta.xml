@@ -42,29 +42,22 @@
                <ds:X509Data>
                   <ds:X509SubjectName>CN=cpauth.icos-cp.eu</ds:X509SubjectName>
                   <ds:X509Certificate>
-                     MIIEJzCCAw+gAwIBAgIJANC3VWNs7fbTMA0GCSqGSIb3DQEBCwUAMIGpMQswCQYD
-VQQGEwJTRTERMA8GA1UECAwIU2vDg8KlbmUxDTALBgNVBAcMBEx1bmQxGzAZBgNV
-BAoMEklDT1MgQ2FyYm9uIFBvcnRhbDEfMB0GA1UECwwWQXV0aGVudGljYXRpb24g
-U2VydmljZTEaMBgGA1UEAwwRY3BhdXRoLmljb3MtY3AuZXUxHjAcBgkqhkiG9w0B
-CQEWD2luZm9AaWNvcy1jcC5ldTAeFw0xNTAyMDUxMjI0MzZaFw0yNTAyMDIxMjI0
-MzZaMIGpMQswCQYDVQQGEwJTRTERMA8GA1UECAwIU2vDg8KlbmUxDTALBgNVBAcM
-BEx1bmQxGzAZBgNVBAoMEklDT1MgQ2FyYm9uIFBvcnRhbDEfMB0GA1UECwwWQXV0
-aGVudGljYXRpb24gU2VydmljZTEaMBgGA1UEAwwRY3BhdXRoLmljb3MtY3AuZXUx
-HjAcBgkqhkiG9w0BCQEWD2luZm9AaWNvcy1jcC5ldTCCASIwDQYJKoZIhvcNAQEB
-BQADggEPADCCAQoCggEBAM2QN1jaZJeuPAH+4sVMZKk7vg4JIbUuTMKk0+KIAg5M
-XiVsRiEUjY+LtIncrvA/kf2CIySI0WkbwZMjcDd03hNj4kLWhuyxfOCwDO6DsUbG
-MbyI6HIYWXJp5ljfEEFgtMqT3dDtD5vwq8h4Zy20ukxOoIokKczrAvn4JjkMsj6Z
-0CEAFBC29o4E8PWQbUBgvt6Z+2ao+RHMLD7nZVBx98Occ9KfnYnDDd9Oi1XFe009
-zaSbcqY2RpN8I9hcW/KQf3KnGW5xZ5dr4rhGklCkYr+h0W3xKu+hin8bk91t1Dkr
-gaKl/N7M3Oof3k+7ZBlwaV97es5InWCeNgDxCGkBRNsCAwEAAaNQME4wHQYDVR0O
-BBYEFDcD7MVudooGaNRYqXBYqQi3VzGxMB8GA1UdIwQYMBaAFDcD7MVudooGaNRY
-qXBYqQi3VzGxMAwGA1UdEwQFMAMBAf8wDQYJKoZIhvcNAQELBQADggEBABS02eZS
-weXGMJ2fEIy2JH0VhCbjuX/rz+8Hfh9LjzNb3QwKHuwP83yvPqRulV9FYmvOoK8T
-fMou5aW0mZ+QgJNKOrxY5vFxUq6pn3OiYbBu3m1C9ajbU/nx2evzt4+qUwTfHFb+
-ZgXpOtmxRekFzVvGZ18BSPJKwAAqqZ11X7skT/NwEAhbgplVPv9WkDmDzqNvHqQJ
-nyRgD2ZqUPU9nEOjGy0gI07dciVcYZQ+CiZeSECIWgQwjDEBDuwMCVAZA6gfdz6C
-KJuN+RUSKPEcxPxle1MiB4MU0ei5X4xUbvLWKn9Ok7TOXg2BpnMAv6eON1wVo0Aa
-D265cqy6Le/toVg=
+                     MIIC5TCCAmygAwIBAgIUXRhcggyTJirz3rIQhX+YbcnkOI0wCgYIKoZIzj0EAwIw
+gakxCzAJBgNVBAYTAlNFMREwDwYDVQQIDAhTa8ODwqVuZTENMAsGA1UEBwwETHVu
+ZDEbMBkGA1UECgwSSUNPUyBDYXJib24gUG9ydGFsMR8wHQYDVQQLDBZBdXRoZW50
+aWNhdGlvbiBTZXJ2aWNlMRowGAYDVQQDDBFjcGF1dGguaWNvcy1jcC5ldTEeMBwG
+CSqGSIb3DQEJARYPaW5mb0BpY29zLWNwLmV1MB4XDTI1MDExMDE2MzAwNloXDTM1
+MDExODE2MzAwNlowgakxCzAJBgNVBAYTAlNFMREwDwYDVQQIDAhTa8ODwqVuZTEN
+MAsGA1UEBwwETHVuZDEbMBkGA1UECgwSSUNPUyBDYXJib24gUG9ydGFsMR8wHQYD
+VQQLDBZBdXRoZW50aWNhdGlvbiBTZXJ2aWNlMRowGAYDVQQDDBFjcGF1dGguaWNv
+cy1jcC5ldTEeMBwGCSqGSIb3DQEJARYPaW5mb0BpY29zLWNwLmV1MHYwEAYHKoZI
+zj0CAQYFK4EEACIDYgAEWQNEO4DoIcEz/reLcyNAZWZ6odwexu/nf/v/Wbo/9acC
+9LQvJilR/mBfkbcO96gw4uLrnMV9P9I7hCgPsPWqhwPp+j4NIBaurPSVaBCwD27s
+YQfdY9nzjzoPL3Ycx1YUo1MwUTAdBgNVHQ4EFgQUB7j9OKFnrGHOqPXSQE/ceO8v
+1d0wHwYDVR0jBBgwFoAUB7j9OKFnrGHOqPXSQE/ceO8v1d0wDwYDVR0TAQH/BAUw
+AwEB/zAKBggqhkjOPQQDAgNnADBkAjAQ3iMI9BoklIhCEGWCCK3DCVT/mZ0GDvq5
+NVU2gbcm3hA+nWbt9qJoi/QC7E316XYCMH85gVdLQsMgvRAgjZRpvFcb5+iiJpiR
+NbO/cPwuS4UHx8KkqiC7Mb972Rg6sZE2Fg==
                   </ds:X509Certificate>
                </ds:X509Data>
             </ds:KeyInfo>
@@ -110,34 +103,22 @@ D265cqy6Le/toVg=
    <Signature xmlns="http://www.w3.org/2000/09/xmldsig#">
       <SignedInfo>
          <CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>
-         <SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
+         <SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha256"/>
          <Reference URI="">
             <Transforms>
                <Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
             </Transforms>
             <DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
-            <DigestValue>EQFpg3pnvHH6Swgzrf8SL/+HuRs=</DigestValue>
+            <DigestValue>t+DMKZudtrx9bC4bxXn5efbjXtk=</DigestValue>
          </Reference>
       </SignedInfo>
-      <SignatureValue>
-         kUIOilY7Umk+9VwwLzSKfERwh1HlrOGC5NEoBjrjVhQWpo9/swiQqoDJIxFUKIxLESM9kGMxTd+L
-c4jVhCX9DQmyVi+PExg8lyDjtUCyHqEMHzHqhSczU9GDLS0ajbOsybRuv/ycHZdwFUDsqH7rP4l7
-ZH3TbOoaiBgxr9amzjapTdZZn/xUvUIo3n00MTpPvK4EHm6+j4vP8UMEnSjEJym9MwYWh+/B1g7S
-CnDbKvH/FA1D36jqrGwTUWtPAYUhL9wVCaHXA916CGwN6aeHO33sUvJn9M26u+da8uEXEvp465Pi
-VWW+M/6t1OBErlZnAlagZ8IQdPNIes6K9R/ggg==
-      </SignatureValue>
+      <SignatureValue>zQacppoHgQkQQ80h5NExYT0m64kDFdo2QvDVTx7IZk8C94bFfznikjPzrWI//Y/elqtnpJQIPDog 7Puz5LgajqsC+JECp8R++lTvMzTr1hkCmK55Pm2y7wwkWigrph/z</SignatureValue>
       <KeyInfo>
          <KeyValue>
-            <RSAKeyValue>
-               <Modulus>
-                  zZA3WNpkl648Af7ixUxkqTu+DgkhtS5MwqTT4ogCDkxeJWxGIRSNj4u0idyu8D+R/YIjJIjRaRvB
-kyNwN3TeE2PiQtaG7LF84LAM7oOxRsYxvIjochhZcmnmWN8QQWC0ypPd0O0Pm/CryHhnLbS6TE6g
-iiQpzOsC+fgmOQyyPpnQIQAUELb2jgTw9ZBtQGC+3pn7Zqj5EcwsPudlUHH3w5xz0p+dicMN306L
-VcV7TT3NpJtypjZGk3wj2Fxb8pB/cqcZbnFnl2viuEaSUKRiv6HRbfEq76GKfxuT3W3UOSuBoqX8
-3szc6h/eT7tkGXBpX3t6zkidYJ42APEIaQFE2w==
-               </Modulus>
-               <Exponent>AQAB</Exponent>
-            </RSAKeyValue>
+            <ECKeyValue xmlns="http://www.w3.org/2009/xmldsig11#">
+               <NamedCurve URI="urn:oid:1.3.132.0.34"/>
+               <PublicKey>BFkDRDuA6CHBM/63i3MjQGVmeqHcHsbv53/7/1m6P/WnAvS0LyYpUf5gX5G3DveoMOLi65zFfT/S O4QoD7D1qocD6fo+DSAWrqz0lWgQsA9u7GEH3WPZ8486Dy92HMdWFA==</PublicKey>
+            </ECKeyValue>
          </KeyValue>
       </KeyInfo>
    </Signature>

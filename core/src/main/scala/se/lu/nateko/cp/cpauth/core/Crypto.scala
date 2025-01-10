@@ -10,8 +10,8 @@ import java.security.MessageDigest
 import java.security.PublicKey
 import java.security.cert.CertificateFactory
 import java.security.cert.X509Certificate
-import java.security.interfaces.RSAPrivateKey
-import java.security.interfaces.RSAPublicKey
+import java.security.interfaces.ECPrivateKey
+import java.security.interfaces.ECPublicKey
 import java.security.spec.PKCS8EncodedKeySpec
 import java.security.spec.X509EncodedKeySpec
 import scala.util.Failure
@@ -37,18 +37,18 @@ object Crypto:
 		cert.getPublicKey
 	}
 
-	def rsaPrivateFromDerBytes(keyBytes: Array[Byte]): Try[RSAPrivateKey] = Try{
+	def ecPrivateFromDerBytes(keyBytes: Array[Byte]): Try[ECPrivateKey] = Try{
 		val privateKeySpec = new PKCS8EncodedKeySpec(keyBytes)
-		KeyFactory.getInstance("RSA").generatePrivate(privateKeySpec).asInstanceOf[RSAPrivateKey]
+		KeyFactory.getInstance("EC").generatePrivate(privateKeySpec).asInstanceOf[ECPrivateKey]
 	}
 	
-	def rsaPublicFromPemLines(lines: IndexedSeq[String]): Try[RSAPublicKey] =
+	def ecPublicFromPemLines(lines: IndexedSeq[String]): Try[ECPublicKey] =
 		keyBytesFromPemLines(lines, "PUBLIC").flatMap(keyBytes => Try{
 			val publicKeySpec = new X509EncodedKeySpec(keyBytes)
-			KeyFactory.getInstance("RSA").generatePublic(publicKeySpec).asInstanceOf[RSAPublicKey]
+			KeyFactory.getInstance("EC").generatePublic(publicKeySpec).asInstanceOf[ECPublicKey]
 		})
 	
-	def signMessage(msg: String, key: RSAPrivateKey): Signature = {
+	def signMessage(msg: String, key: ECPrivateKey): Signature = {
 		val signer = getSigner
 		signer.initSign(key)
 		signer.update(getMessageBytes(msg))
@@ -56,14 +56,14 @@ object Crypto:
 		new Signature(signBytes)
 	}
 	
-	def verifySignature(msg: String, key: RSAPublicKey, signature: Signature): Try[Boolean] = Try{
+	def verifySignature(msg: String, key: ECPublicKey, signature: Signature): Try[Boolean] = Try{
 		val signer = getSigner
 		signer.initVerify(key)
 		signer.update(getMessageBytes(msg))
 		signer.verify(signature.bytes)
 	}
 	
-	private def getSigner = java.security.Signature.getInstance("SHA1withRSA")
+	private def getSigner = java.security.Signature.getInstance("SHA256withECDSA")
 	private def getMessageBytes(msg: String): Array[Byte] = msg.getBytes(StandardCharsets.UTF_8)
 	
 	private def keyBytesFromPemLines(lines: IndexedSeq[String], keyType: String): Try[Array[Byte]] = {
