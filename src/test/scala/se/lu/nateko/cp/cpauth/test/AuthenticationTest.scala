@@ -21,14 +21,14 @@ class AuthenticationTest extends AnyFunSuite{
 	)
 
 	val private1 = "src/test/resources/private1.der"
-	val samlPrivate = "src/test/resources/saml/test_private_key.der"
+	val private2 = "src/test/resources/private2.der"
 
 	test("Properly formed fresh token validates successfully"){
 
 		val token = SignedTokenMaker(PrivateAuthConfig(
 			authTokenValiditySeconds = 10,
 			privateKeyPaths = Map(ICOS -> private1)
-		)).get.makeToken(user, AuthSource.Password)
+		), "EC").get.makeToken(user, AuthSource.Password)
 		
 		val unwrappedToken = Authenticator(pubAuthConfig).get.unwrapToken(token)
 
@@ -40,7 +40,7 @@ class AuthenticationTest extends AnyFunSuite{
 		val token = SignedTokenMaker(PrivateAuthConfig(
 			authTokenValiditySeconds = -1,
 			privateKeyPaths = Map(ICOS -> private1)
-		)).get.makeToken(user, AuthSource.Password)
+		), "EC").get.makeToken(user, AuthSource.Password)
 		
 		val unwrappedToken = Authenticator(pubAuthConfig).get.unwrapToken(token)
 
@@ -54,7 +54,7 @@ class AuthenticationTest extends AnyFunSuite{
 		val token = SignedTokenMaker(PrivateAuthConfig(
 			authTokenValiditySeconds = 10,
 			privateKeyPaths = Map(ICOS -> private1)
-		)).get.makeToken(user, AuthSource.Saml)
+		), "EC").get.makeToken(user, AuthSource.Saml)
 
 		val err = intercept[CpauthException]:
 			Authenticator(pubAuthConfig).get
@@ -67,12 +67,13 @@ class AuthenticationTest extends AnyFunSuite{
 
 		val wrongTokenMaker = SignedTokenMaker(PrivateAuthConfig(
 			authTokenValiditySeconds = 10,
-			privateKeyPaths = Map(ICOS -> samlPrivate)
-		)).get
+			privateKeyPaths = Map(ICOS -> private2)
+		), "EC").get
 
-		assertThrows[SignatureException]:
-			val wrongToken = wrongTokenMaker.makeToken(user, AuthSource.Password)
-			Authenticator(pubAuthConfig).get
-				.unwrapToken(wrongToken).get
+		val wrongToken = wrongTokenMaker.makeToken(user, AuthSource.Password)
+		val unwrapped = Authenticator(pubAuthConfig).get.unwrapToken(wrongToken)
+		assert(unwrapped.isFailure)
+		val errMessage = unwrapped.failed.get.getMessage
+		assert(errMessage.contains("signature is invalid"))
 
 }

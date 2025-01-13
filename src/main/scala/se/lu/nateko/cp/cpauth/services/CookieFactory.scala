@@ -23,7 +23,7 @@ import eu.icoscp.envri.Envri
 
 class CookieFactory(config: CpauthConfig) {
 	
-	private[this] def tokenMakerTry(implicit envri: Envri) = SignedTokenMaker(config.auth.priv)
+	private def tokenMakerTry(using Envri) = SignedTokenMaker(config.auth.priv, "EC")
 
 	def getLastIdpCookie(idpId: String)(implicit envri: Envri): HttpCookie = HttpCookie(
 		name = config.saml.idpCookieName,

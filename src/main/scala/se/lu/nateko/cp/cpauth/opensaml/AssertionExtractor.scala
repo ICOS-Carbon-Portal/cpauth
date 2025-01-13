@@ -2,7 +2,7 @@ package se.lu.nateko.cp.cpauth.opensaml
 
 import java.nio.file.Files
 import java.nio.file.Paths
-import java.security.interfaces.ECPrivateKey
+import java.security.PrivateKey
 
 import scala.util.Try
 
@@ -21,7 +21,7 @@ import se.lu.nateko.cp.cpauth.utils.Utils.SafeJavaCollectionWrapper
 
 //import org.apache.xml.serializer.dom3.LSSerializerImpl
 
-class AssertionExtractor(key: ECPrivateKey){
+class AssertionExtractor(key: PrivateKey){
 	import AssertionExtractor._
 
 	lazy val decrypter: AssertionDecrypter = {
@@ -50,14 +50,16 @@ class AssertionExtractor(key: ECPrivateKey){
 object AssertionExtractor {
 
 	type AssertionDecrypter = EncryptedAssertion => Assertion
+	import Crypto.KeyType
 
 	OpenSamlUtils.bootstrapOpenSaml()
 
-	def apply(conf: SamlConfig)(implicit envri: Envri): Try[AssertionExtractor] = fromPrivateKeyAt(conf.privateKeyPath)
+	def apply(conf: SamlConfig, ktype: KeyType)(using Envri): Try[AssertionExtractor] =
+		fromPrivateKeyAt(conf.privateKeyPath, ktype)
 
-	def fromPrivateKeyAt(path: String): Try[AssertionExtractor] = {
+	def fromPrivateKeyAt(path: String, ktype: KeyType): Try[AssertionExtractor] = {
 		val keyBytes = Files.readAllBytes(Paths.get(path))
-		val privateKey = Crypto.ecPrivateFromDerBytes(keyBytes)
+		val privateKey = Crypto.privateFromDerBytes(keyBytes, ktype)
 		privateKey.map(key => new AssertionExtractor(key))
 	}
 

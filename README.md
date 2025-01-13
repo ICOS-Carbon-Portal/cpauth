@@ -13,11 +13,12 @@ SAML metadata: /saml/cpauth
 
 ## Useful openssl commands for developers
 
-Generate a key pair for a cpauth domain (such as icos-cp.eu och fieldsites.se):
-`$ openssl ecparam -name secp384r1 -genkey -out cpauth_private.pem`
+Generate a key pair for a cpauth domain (such as cpauth.icos-cp.eu or auth.fieldsites.se;
+note that cityauth.icos-cp.eu shares authentication service with ICOS):
+`$ openssl ecparam -name secp384r1 -genkey -out private.pem`
 
 Extract the public key from the keypair:
-`$ openssl ec -pubout -in private_key.pem -out public_key.pem`
+`$ openssl ec -pubout -in private.pem -out public.pem`
 
 Convert PEM private key to DER format:
 `$ openssl ec -outform DER -in private.pem -out private.der`
@@ -28,16 +29,21 @@ Convert private key from PKCS#1 to PKCS#8:
 Convert PEM public key to DER format:
 `$ openssl ec -pubin -pubout -outform DER -in public.pem -out public.der`
 
+Both formats of the public key shall be copied to `core/src/main/resources/cpauthCore/crypto/`,
+the names should be prefixed with cpauth domain, e.g. `cpauth_public.pem` and `cpauth_public.der`.
+
 Generate a certificate for SAML SP:
 `$ openssl req -keyform DER -key private.der -new -x509 -days 3650 -out self_signed.crt`
 
-Inspect a public key:
-`$ openssl ec -pubin -in public.pem -text`
-
-Inspect an x509 certificate:
-`$ openssl x509 -in self_signed.crt -text -noout`
-
+The resulting contents of the certificate shall be pasted into the corresponding
+`..._unsigned.xml` file in `src/main/resources`.
 
 To produce SAML SP metadata, edit and run
 `se.lu.nateko.cp.cpauth.xmldsig.SpSamlMetadataProducer.produceSignedMetadata()`
-in Scala REPL.
+in Scala REPL (before that edit the corresponding `..._unsigned.xml` file in `src/main/resources`).
+
+To inspect a public key:
+`$ openssl ec -pubin -in public.pem -text`
+
+To inspect an x509 certificate:
+`$ openssl x509 -in self_signed.crt -text -noout`

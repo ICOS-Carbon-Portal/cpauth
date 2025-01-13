@@ -30,7 +30,7 @@ trait SamlRouting extends CpauthDirectives{
 	def targetLookup: TargetUrlLookup
 	given system: ActorSystem
 
-	private def assExtractorTry(using Envri): Try[AssertionExtractor] = AssertionExtractor(samlConfig)
+	private def assExtractorTry(using Envri): Try[AssertionExtractor] = AssertionExtractor(samlConfig, "EC")
 
 	lazy val idpInfos: Seq[IdpInfo] = idpLib.getInfos.toSeq.sortBy(_.name)
 

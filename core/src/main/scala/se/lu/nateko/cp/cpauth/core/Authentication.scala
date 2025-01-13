@@ -2,7 +2,7 @@ package se.lu.nateko.cp.cpauth.core
 
 import scala.util.Try
 import scala.util.Success
-import java.security.interfaces.ECPublicKey
+import java.security.PublicKey
 import java.time.Instant
 import se.lu.nateko.cp.cpauth.core.PublicAuthConfig
 
@@ -15,7 +15,7 @@ case class AuthToken(userId: UserId, expiresOn: Long, source: AuthSource)
 
 case class SignedToken(token: AuthToken, signature: Signature)
 
-class Authenticator(key: ECPublicKey){
+class Authenticator(key: PublicKey){
 
 	def unwrapTrustedToken(token: SignedToken, trustedSources: Set[AuthSource]): Try[AuthToken] =
 		if(!trustedSources.contains(token.token.source))
@@ -41,7 +41,7 @@ object Authenticator{
 	def apply(authConfig: PublicAuthConfig): Try[Authenticator] = {
 		val keyLines = CoreUtils.getResourceLines(authConfig.publicKeyPath)
 		for(
-			key <- Crypto.ecPublicFromPemLines(keyLines.toIndexedSeq)
+			key <- Crypto.publicFromPemLines(keyLines.toIndexedSeq, "EC")
 		) yield new Authenticator(key)
 	}
 

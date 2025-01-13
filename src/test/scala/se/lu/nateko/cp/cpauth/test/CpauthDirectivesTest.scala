@@ -135,7 +135,7 @@ class CpauthDirectivesTest extends AnyFunSpec with ScalatestRouteTest {
 		}
 
 		describe("when the cookie has been signed with a wrong private key"){
-			val wrongConfig = getConfig("src/test/resources/saml/test_private_key.der")
+			val wrongConfig = getConfig("src/test/resources/private2.der")
 			val cookie = makeCookie("test2", wrongConfig)
 
 			it("rejects the request with 'CredentialsRejected' rejection"){

@@ -6,6 +6,9 @@ import org.scalatest.funsuite.AnyFunSuite
 import se.lu.nateko.cp.cpauth.utils.Utils
 import se.lu.nateko.cp.cpauth.opensaml.AssertionExtractor
 import se.lu.nateko.cp.cpauth.opensaml.Parser
+import java.nio.file.Paths
+import java.nio.file.Files
+import se.lu.nateko.cp.cpauth.core.Crypto
 
 class AssertionExtractorTest extends AnyFunSuite{
 
@@ -13,7 +16,7 @@ class AssertionExtractorTest extends AnyFunSuite{
 
 	test("Assertions from TestShib get extracted and decrypted correctly"){
 
-		val analyzer = AssertionExtractor.fromPrivateKeyAt("src/test/resources/saml/test_private_key.der")
+		val analyzer = AssertionExtractor.fromPrivateKeyAt("src/test/resources/saml/test_private_key.der", "RSA")
 		val assertions = analyzer.get.extractAssertions(response)
 
 		assert(assertions.size === 1)
@@ -21,7 +24,7 @@ class AssertionExtractorTest extends AnyFunSuite{
 	
 	test("Attempt to extract assertions with a wrong private key fails"){
 
-		val analyzer = AssertionExtractor.fromPrivateKeyAt("src/test/resources/private1.der")
+		val analyzer = AssertionExtractor.fromPrivateKeyAt("src/test/resources/private1.der", "EC")
 
 		val enableLogging = Utils.disableLogging()
 

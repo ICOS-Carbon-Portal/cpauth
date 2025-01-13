@@ -37,7 +37,7 @@ class AssertionValidatorTest extends AnyFunSuite{
 	
 	test("Attempt to validate against a wrong public key fails"){
 		val keyLines = CoreUtils.getResourceLines("/public1.pem")
-		val key = Crypto.ecPublicFromPemLines(keyLines.toIndexedSeq).get
+		val key = Crypto.publicFromPemLines(keyLines.toIndexedSeq, "EC").get
 		val validator = new AssertionValidator(key :: Nil)
 
 		val error: Option[String] = validator.validate(getAssertion, getResponse).error

@@ -10,8 +10,8 @@ import java.security.MessageDigest
 import java.security.PublicKey
 import java.security.cert.CertificateFactory
 import java.security.cert.X509Certificate
-import java.security.interfaces.ECPrivateKey
-import java.security.interfaces.ECPublicKey
+import java.security.PrivateKey
+import java.security.PublicKey
 import java.security.spec.PKCS8EncodedKeySpec
 import java.security.spec.X509EncodedKeySpec
 import scala.util.Failure
@@ -25,6 +25,8 @@ case class Signature(bytes: Array[Byte]){
 
 object Crypto:
 
+	type KeyType = "EC" | "RSA"
+
 	def sha256sum(s: String): Array[Byte] = MessageDigest
 		.getInstance("SHA-256")
 		.digest(getMessageBytes(s))
@@ -37,18 +39,18 @@ object Crypto:
 		cert.getPublicKey
 	}
 
-	def ecPrivateFromDerBytes(keyBytes: Array[Byte]): Try[ECPrivateKey] = Try{
+	def privateFromDerBytes(keyBytes: Array[Byte], ktype: KeyType): Try[PrivateKey] = Try{
 		val privateKeySpec = new PKCS8EncodedKeySpec(keyBytes)
-		KeyFactory.getInstance("EC").generatePrivate(privateKeySpec).asInstanceOf[ECPrivateKey]
+		KeyFactory.getInstance(ktype).generatePrivate(privateKeySpec)
 	}
 	
-	def ecPublicFromPemLines(lines: IndexedSeq[String]): Try[ECPublicKey] =
+	def publicFromPemLines(lines: IndexedSeq[String], ktype: KeyType): Try[PublicKey] =
 		keyBytesFromPemLines(lines, "PUBLIC").flatMap(keyBytes => Try{
 			val publicKeySpec = new X509EncodedKeySpec(keyBytes)
-			KeyFactory.getInstance("EC").generatePublic(publicKeySpec).asInstanceOf[ECPublicKey]
+			KeyFactory.getInstance(ktype).generatePublic(publicKeySpec)
 		})
 	
-	def signMessage(msg: String, key: ECPrivateKey): Signature = {
+	def signMessage(msg: String, key: PrivateKey): Signature = {
 		val signer = getSigner
 		signer.initSign(key)
 		signer.update(getMessageBytes(msg))
@@ -56,7 +58,7 @@ object Crypto:
 		new Signature(signBytes)
 	}
 	
-	def verifySignature(msg: String, key: ECPublicKey, signature: Signature): Try[Boolean] = Try{
+	def verifySignature(msg: String, key: PublicKey, signature: Signature): Try[Boolean] = Try{
 		val signer = getSigner
 		signer.initVerify(key)
 		signer.update(getMessageBytes(msg))
