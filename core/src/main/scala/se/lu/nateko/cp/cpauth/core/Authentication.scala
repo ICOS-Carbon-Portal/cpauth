@@ -5,6 +5,8 @@ import scala.util.Success
 import java.security.PublicKey
 import java.time.Instant
 import se.lu.nateko.cp.cpauth.core.PublicAuthConfig
+import eu.icoscp.envri.Envri
+import se.lu.nateko.cp.cpauth.core.Crypto.KeyType
 
 case class UserId(email: String)
 
@@ -36,13 +38,20 @@ class Authenticator(key: PublicKey){
 
 }
 
-object Authenticator{
+object Authenticator:
 
-	def apply(authConfig: PublicAuthConfig): Try[Authenticator] = {
-		val keyLines = CoreUtils.getResourceLines(authConfig.publicKeyPath)
-		for(
-			key <- Crypto.publicFromPemLines(keyLines.toIndexedSeq, "EC")
-		) yield new Authenticator(key)
-	}
+	def apply(keyType: KeyType, pubAuthConfig: PublicAuthConfig): Try[Authenticator] =
+		pubKey(keyType, pubAuthConfig).map(new Authenticator(_))
 
-}
+	def apply(keyType: KeyType)(using envri: Envri): Try[Authenticator] =
+		pubKey(keyType).map(new Authenticator(_))
+
+	def pubKey(keyType: KeyType)(using envri: Envri): Try[PublicKey] =
+		Try(ConfigLoader.authPubConfig(envri))
+			.flatMap(pubKey(keyType, _))
+
+	def pubKey(keyType: KeyType, pubAuthConfig: PublicAuthConfig): Try[PublicKey] =
+		Try:
+			CoreUtils.getResourceLines(pubAuthConfig.publicKeyPath).toIndexedSeq
+		.flatMap: keyLines =>
+			Crypto.publicFromPemLines(keyLines, keyType)

@@ -40,8 +40,8 @@ case class SamlConfig(
 	spConfigs: Map[Envri, SamlSpConfig],
 	attributes: SamlAttrConfig
 ){
-	def spConfig(implicit envri: Envri) = spConfigs(envri)
-	def privateKeyPath(implicit envri: Envri) = privateKeyPaths(envri)
+	def spConfig(using envri: Envri) = spConfigs(envri)
+	def privateKeyPath(using envri: Envri) = privateKeyPaths(envri)
 }
 
 case class DatabaseConfig(
@@ -52,7 +52,7 @@ case class DatabaseConfig(
 )
 
 case class PrivateAuthConfig(authTokenValiditySeconds: Int, privateKeyPaths: Map[Envri, String]){
-	def privateKeyPath(implicit envri: Envri) = privateKeyPaths(envri)
+	def privateKeyPath(using envri: Envri) = privateKeyPaths(envri)
 }
 case class AuthConfig(
 	priv: PrivateAuthConfig,

@@ -10,7 +10,6 @@
     <alg:DigestMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#sha384"/>
     <alg:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/>
     <alg:DigestMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#sha224"/>
-    <alg:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
     <alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha512"/>
     <alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha384"/>
     <alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha256"/>
@@ -19,9 +18,6 @@
     <alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha384"/>
     <alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>
     <alg:SigningMethod Algorithm="http://www.w3.org/2009/xmldsig11#dsa-sha256"/>
-    <alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha1"/>
-    <alg:SigningMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
-    <alg:SigningMethod Algorithm="http://www.w3.org/2000/09/xmldsig#dsa-sha1"/>
     <mdattr:EntityAttributes>
       <samla:Attribute NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" Name="http://macedir.org/entity-category">
         <samla:AttributeValue>http://www.geant.net/uri/dataprotection-code-of-conduct/v1</samla:AttributeValue>
@@ -104,19 +100,19 @@ ut7vQ9gFxIHIfE526gVIlHUomwr6JGU=</ds:X509Certificate>
     <md:OrganizationURL xml:lang="sv">https://www.fieldsites.se/sv-SE</md:OrganizationURL>
   </md:Organization>
   <md:ContactPerson contactType="technical">
-    <md:GivenName>Oleg</md:GivenName>
-    <md:SurName>Mirzov</md:SurName>
-    <md:EmailAddress>mailto:oleg.mirzov@nateko.lu.se</md:EmailAddress>
+    <md:GivenName>Jonathan</md:GivenName>
+    <md:SurName>Thiry</md:SurName>
+    <md:EmailAddress>jonathan.thiry@nateko.lu.se</md:EmailAddress>
   </md:ContactPerson>
   <md:ContactPerson contactType="administrative">
     <md:GivenName>Holger</md:GivenName>
     <md:SurName>Villwock</md:SurName>
-    <md:EmailAddress>mailto:holger.villwock@slu.se</md:EmailAddress>
+    <md:EmailAddress>holger.villwock@slu.se</md:EmailAddress>
   </md:ContactPerson>
   <md:ContactPerson contactType="support">
     <md:GivenName>Jonathan</md:GivenName>
     <md:SurName>Thiry</md:SurName>
-    <md:EmailAddress>mailto:jonathan.thiry@nateko.lu.se</md:EmailAddress>
+    <md:EmailAddress>jonathan.thiry@nateko.lu.se</md:EmailAddress>
   </md:ContactPerson>
 </md:EntityDescriptor>
 

@@ -24,7 +24,10 @@ class SignedTokenMaker private(key: PrivateKey, validity: Int):
 object SignedTokenMaker:
 
 	def apply(config: PrivateAuthConfig, ktype: Crypto.KeyType)(using Envri): Try[SignedTokenMaker] =
-		val keyBytes = Files.readAllBytes(Paths.get(config.privateKeyPath))
-		for(
-			key <- Crypto.privateFromDerBytes(keyBytes, ktype)
-		) yield new SignedTokenMaker(key, config.authTokenValiditySeconds)
+		privKey(config, ktype).map(new SignedTokenMaker(_, config.authTokenValiditySeconds))
+
+	def privKey(config: PrivateAuthConfig, ktype: Crypto.KeyType)(using Envri): Try[PrivateKey] =
+		Try:
+			Files.readAllBytes(Paths.get(config.privateKeyPath))
+		.flatMap: keyBytes =>
+			Crypto.privateFromDerBytes(keyBytes, ktype)

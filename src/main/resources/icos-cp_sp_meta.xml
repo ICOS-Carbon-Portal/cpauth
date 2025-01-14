@@ -11,7 +11,6 @@
          <alg:DigestMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#sha384"/>
          <alg:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/>
          <alg:DigestMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#sha224"/>
-         <alg:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
          <alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha512"/>
          <alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha384"/>
          <alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha256"/>
@@ -20,9 +19,6 @@
          <alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha384"/>
          <alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>
          <alg:SigningMethod Algorithm="http://www.w3.org/2009/xmldsig11#dsa-sha256"/>
-         <alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha1"/>
-         <alg:SigningMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
-         <alg:SigningMethod Algorithm="http://www.w3.org/2000/09/xmldsig#dsa-sha1"/>
       </Extensions>
       <SPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
          <Extensions>
@@ -90,9 +86,14 @@ NbO/cPwuS4UHx8KkqiC7Mb972Rg6sZE2Fg==
          <OrganizationURL xml:lang="sv">https://www.icos-cp.eu/</OrganizationURL>
       </Organization>
       <ContactPerson contactType="technical">
-         <GivenName>Oleg</GivenName>
-         <SurName>Mirzov</SurName>
-         <EmailAddress>oleg.mirzov@nateko.lu.se</EmailAddress>
+         <GivenName>Jonathan</GivenName>
+         <SurName>Thiry</SurName>
+         <EmailAddress>jonathan.thiry@nateko.lu.se</EmailAddress>
+      </ContactPerson>
+      <ContactPerson contactType="support">
+         <GivenName>Andrew</GivenName>
+         <SurName>Debevec</SurName>
+         <EmailAddress>andrew.debevec@nateko.lu.se</EmailAddress>
       </ContactPerson>
       <ContactPerson contactType="administrative">
          <GivenName>Alex</GivenName>
@@ -108,11 +109,11 @@ NbO/cPwuS4UHx8KkqiC7Mb972Rg6sZE2Fg==
             <Transforms>
                <Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
             </Transforms>
-            <DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
-            <DigestValue>t+DMKZudtrx9bC4bxXn5efbjXtk=</DigestValue>
+            <DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/>
+            <DigestValue>G0McylZFuxQAzjrJERwV6bKsa3N/IKIEd4h/8ee/VNA=</DigestValue>
          </Reference>
       </SignedInfo>
-      <SignatureValue>zQacppoHgQkQQ80h5NExYT0m64kDFdo2QvDVTx7IZk8C94bFfznikjPzrWI//Y/elqtnpJQIPDog 7Puz5LgajqsC+JECp8R++lTvMzTr1hkCmK55Pm2y7wwkWigrph/z</SignatureValue>
+      <SignatureValue>R4g+RP1e9NYyWdqdWYZxem3A4cLZrZ8Dcvra9kENbJ+tyt/sw0/MDgekdnEuCfhff3I+wJLzZ75I yuNpNrG5x9JPhvu83sot0VMghYynEjkzqSs6HI5aVqMDVqxuijU3</SignatureValue>
       <KeyInfo>
          <KeyValue>
             <ECKeyValue xmlns="http://www.w3.org/2009/xmldsig11#">

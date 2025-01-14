@@ -27,4 +27,4 @@ object ConfigLoader:
 		def parseAs[T: RootJsonReader]: T =
 			conf.render(renderOpts).parseJson.convertTo[T]
 
-	def authPubConfig = appConfig.getValue("authPub").parseAs[Map[Envri,PublicAuthConfig]]
+	lazy val authPubConfig = appConfig.getValue("authPub").parseAs[Map[Envri,PublicAuthConfig]]

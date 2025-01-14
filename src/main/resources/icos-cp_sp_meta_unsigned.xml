@@ -17,7 +17,6 @@
 		<alg:DigestMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#sha384"/>
 		<alg:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/>
 		<alg:DigestMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#sha224"/>
-		<alg:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
 		<alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha512"/>
 		<alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha384"/>
 		<alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha256"/>
@@ -26,9 +25,6 @@
 		<alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha384"/>
 		<alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>
 		<alg:SigningMethod Algorithm="http://www.w3.org/2009/xmldsig11#dsa-sha256"/>
-		<alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha1"/>
-		<alg:SigningMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
-		<alg:SigningMethod Algorithm="http://www.w3.org/2000/09/xmldsig#dsa-sha1"/>
 	</Extensions>
 
 	<SPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
@@ -116,9 +112,15 @@ NbO/cPwuS4UHx8KkqiC7Mb972Rg6sZE2Fg==
 	</Organization>
 
 	<ContactPerson contactType="technical">
-		<GivenName>Oleg</GivenName>
-		<SurName>Mirzov</SurName>
-		<EmailAddress>oleg.mirzov@nateko.lu.se</EmailAddress>
+		<GivenName>Jonathan</GivenName>
+		<SurName>Thiry</SurName>
+		<EmailAddress>jonathan.thiry@nateko.lu.se</EmailAddress>
+	</ContactPerson>
+
+	<ContactPerson contactType="support">
+		<GivenName>Andrew</GivenName>
+		<SurName>Debevec</SurName>
+		<EmailAddress>andrew.debevec@nateko.lu.se</EmailAddress>
 	</ContactPerson>
 
 	<ContactPerson contactType="administrative">

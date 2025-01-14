@@ -30,7 +30,7 @@ class AuthenticationTest extends AnyFunSuite{
 			privateKeyPaths = Map(ICOS -> private1)
 		), "EC").get.makeToken(user, AuthSource.Password)
 		
-		val unwrappedToken = Authenticator(pubAuthConfig).get.unwrapToken(token)
+		val unwrappedToken = Authenticator("EC", pubAuthConfig).get.unwrapToken(token)
 
 		assert(unwrappedToken.isSuccess)
 		assert(unwrappedToken.get.userId === user)
@@ -42,7 +42,7 @@ class AuthenticationTest extends AnyFunSuite{
 			privateKeyPaths = Map(ICOS -> private1)
 		), "EC").get.makeToken(user, AuthSource.Password)
 		
-		val unwrappedToken = Authenticator(pubAuthConfig).get.unwrapToken(token)
+		val unwrappedToken = Authenticator("EC", pubAuthConfig).get.unwrapToken(token)
 
 		assert(unwrappedToken.isFailure)
 
@@ -57,7 +57,7 @@ class AuthenticationTest extends AnyFunSuite{
 		), "EC").get.makeToken(user, AuthSource.Saml)
 
 		val err = intercept[CpauthException]:
-			Authenticator(pubAuthConfig).get
+			Authenticator("EC", pubAuthConfig).get
 				.unwrapTrustedToken(token, Set(AuthSource.Password)).get
 
 		assert(err.getMessage.contains("not trusted"))
@@ -71,7 +71,7 @@ class AuthenticationTest extends AnyFunSuite{
 		), "EC").get
 
 		val wrongToken = wrongTokenMaker.makeToken(user, AuthSource.Password)
-		val unwrapped = Authenticator(pubAuthConfig).get.unwrapToken(wrongToken)
+		val unwrapped = Authenticator("EC", pubAuthConfig).get.unwrapToken(wrongToken)
 		assert(unwrapped.isFailure)
 		val errMessage = unwrapped.failed.get.getMessage
 		assert(errMessage.contains("signature is invalid"))
