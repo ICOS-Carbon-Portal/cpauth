@@ -45,7 +45,7 @@ lazy val cpauthCore = project
 	.enablePlugins(SbtTwirl)
 	.settings(
 		name := "cpauth-core",
-		version := "0.10.0",
+		version := "0.10.1",
 		libraryDependencies ++= Seq(
 			"io.spray"              %% "spray-json"         % "1.3.6",
 			"com.typesafe"           % "config"             % "1.4.2",

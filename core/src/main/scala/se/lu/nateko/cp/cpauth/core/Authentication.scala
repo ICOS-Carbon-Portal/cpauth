@@ -40,6 +40,8 @@ class Authenticator(key: PublicKey){
 
 object Authenticator:
 
+	def apply(pubAuthConfig: PublicAuthConfig): Try[Authenticator] = apply("EC", pubAuthConfig)
+
 	def apply(keyType: KeyType, pubAuthConfig: PublicAuthConfig): Try[Authenticator] =
 		pubKey(keyType, pubAuthConfig).map(new Authenticator(_))
 
