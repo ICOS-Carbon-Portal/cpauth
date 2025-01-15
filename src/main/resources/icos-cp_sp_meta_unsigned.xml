@@ -114,19 +114,19 @@ NbO/cPwuS4UHx8KkqiC7Mb972Rg6sZE2Fg==
 	<ContactPerson contactType="technical">
 		<GivenName>Jonathan</GivenName>
 		<SurName>Thiry</SurName>
-		<EmailAddress>jonathan.thiry@nateko.lu.se</EmailAddress>
+		<EmailAddress>mailto:jonathan.thiry@nateko.lu.se</EmailAddress>
 	</ContactPerson>
 
 	<ContactPerson contactType="support">
 		<GivenName>Andrew</GivenName>
 		<SurName>Debevec</SurName>
-		<EmailAddress>andrew.debevec@nateko.lu.se</EmailAddress>
+		<EmailAddress>mailto:andrew.debevec@nateko.lu.se</EmailAddress>
 	</ContactPerson>
 
 	<ContactPerson contactType="administrative">
 		<GivenName>Alex</GivenName>
 		<SurName>Vermeulen</SurName>
-		<EmailAddress>alex.vermeulen@nateko.lu.se</EmailAddress>
+		<EmailAddress>mailto:alex.vermeulen@nateko.lu.se</EmailAddress>
 	</ContactPerson>
 
 </EntityDescriptor>

@@ -56,7 +56,7 @@ trait CpauthDirectives {
 	given [T: RootJsonWriter]: ToEntityMarshaller[T] = SprayJsonSupport.sprayJsonMarshaller
 
 	def publicAuthConfig(using envri: Envri) = authConfig.pub(envri)
-	def authenticator(using Envri): Try[Authenticator] = Authenticator("EC")
+	def authenticator(using Envri): Try[Authenticator] = Authenticator("EC", publicAuthConfig)
 	def anonymizeCpUser(uid: UserId): AnonId = AnonId(uid, authConfig.secretUserSalt)
 
 	val extractEnvri: Directive1[Envri] = extractHost.flatMap{h =>

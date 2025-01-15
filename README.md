@@ -20,17 +20,15 @@ note that cityauth.icos-cp.eu shares authentication service with ICOS):
 Extract the public key from the keypair:
 `$ openssl ec -pubout -in private.pem -out public.pem`
 
+The public key shall be copied to `core/src/main/resources/cpauthCore/crypto/`,
+the names should be prefixed with cpauth domain, e.g. `cpauth_public.pem`.
+
 Convert PEM private key to DER format:
 `$ openssl ec -outform DER -in private.pem -out private.der`
 
 Convert private key from PKCS#1 to PKCS#8:
 `$ openssl pkcs8 -topk8 -inform DER -outform DER -in private.der -out private8.der -nocrypt`
 
-Convert PEM public key to DER format:
-`$ openssl ec -pubin -pubout -outform DER -in public.pem -out public.der`
-
-Both formats of the public key shall be copied to `core/src/main/resources/cpauthCore/crypto/`,
-the names should be prefixed with cpauth domain, e.g. `cpauth_public.pem` and `cpauth_public.der`.
 
 Generate a certificate for SAML SP:
 `$ openssl req -keyform DER -key private.der -new -x509 -days 3650 -out self_signed.crt`

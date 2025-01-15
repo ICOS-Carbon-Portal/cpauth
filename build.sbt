@@ -1,7 +1,7 @@
 val defaultScala = "3.3.4"
 
 val defaultScalacOptions = Seq(
-	"-Xtarget:11",
+	"-Xtarget:21",
 	"-encoding", "UTF-8",
 	"-unchecked",
 	"-feature",
@@ -45,7 +45,7 @@ lazy val cpauthCore = project
 	.enablePlugins(SbtTwirl)
 	.settings(
 		name := "cpauth-core",
-		version := "0.9.1",
+		version := "0.10.0",
 		libraryDependencies ++= Seq(
 			"io.spray"              %% "spray-json"         % "1.3.6",
 			"com.typesafe"           % "config"             % "1.4.2",
@@ -96,7 +96,7 @@ lazy val cpauth = (project in file("."))
 	.enablePlugins(SbtTwirl, IcosCpSbtDeployPlugin)
 	.settings(
 		name := "cpauth",
-		version := "0.7.0",
+		version := "0.8.0",
 		libraryDependencies ++= Seq(
 			"com.typesafe.akka"      %% "akka-http-testkit"                  % akkaHttpVersion % "test" cross CrossVersion.for3Use2_13,
 			"com.typesafe.akka"      %% "akka-stream-testkit"                % akkaVersion     % "test" cross CrossVersion.for3Use2_13,

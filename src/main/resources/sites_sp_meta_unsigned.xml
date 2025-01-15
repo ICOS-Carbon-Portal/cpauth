@@ -43,30 +43,23 @@
         <ds:KeyName>auth.fieldsites.se</ds:KeyName>
         <ds:X509Data>
           <ds:X509SubjectName>CN=auth.fieldsites.se</ds:X509SubjectName>
-          <ds:X509Certificate>MIIEYzCCA0ugAwIBAgIJAInunDnNa8QOMA0GCSqGSIb3DQEBCwUAMIHHMQswCQYD
-VQQGEwJTRTERMA8GA1UECAwIU2vDg8KlbmUxDTALBgNVBAcMBEx1bmQxNTAzBgNV
-BAoMLFN3ZWRpc2ggSW5mcmFzdHJ1Y3R1cmUgZm9yIEVjb3N5c3RlbSBTY2llbmNl
-MR8wHQYDVQQLDBZBdXRoZW50aWNhdGlvbiBTZXJ2aWNlMRswGQYDVQQDDBJhdXRo
-LmZpZWxkc2l0ZXMuc2UxITAfBgkqhkiG9w0BCQEWEmluZm9AZmllbGRzaXRlcy5z
-ZTAeFw0xODAzMTQxNTAxMjhaFw0yODAzMTExNTAxMjhaMIHHMQswCQYDVQQGEwJT
-RTERMA8GA1UECAwIU2vDg8KlbmUxDTALBgNVBAcMBEx1bmQxNTAzBgNVBAoMLFN3
-ZWRpc2ggSW5mcmFzdHJ1Y3R1cmUgZm9yIEVjb3N5c3RlbSBTY2llbmNlMR8wHQYD
-VQQLDBZBdXRoZW50aWNhdGlvbiBTZXJ2aWNlMRswGQYDVQQDDBJhdXRoLmZpZWxk
-c2l0ZXMuc2UxITAfBgkqhkiG9w0BCQEWEmluZm9AZmllbGRzaXRlcy5zZTCCASIw
-DQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAL57JL9mbGSUjK6UgD73yGK3FLmW
-9JSoob2BoiXlO5AEcnqVBgINzAhPHTDdEfrjh3LChz1tDSOjIubcGAEd9KAV7lmE
-6Xf+wnRXgKKsyqF2As+vlT5JQF3JbuD+ezuE8i4sTzW2o/ach0nptAh3SUT47Qc/
-4YE6YA7gQncdsFi1w4j69Z8tGAOJydl4Z/ATspGiNSCYw5e8vpjuK06QHOq3pE8n
-Bq7Qn9CYO9f3dPsLm6qQcDHeLGrwFlcXDjPRu3eefhTKOyoCq5Yvar6vGdnvE9XV
-7laikYCR/Eq8LibfNjs85jY+VzFsIOJHSLztWaBIhWUKGf6HswPxjATrDvECAwEA
-AaNQME4wHQYDVR0OBBYEFBgKc06pZUImnNxea4xv7FvcqJaLMB8GA1UdIwQYMBaA
-FBgKc06pZUImnNxea4xv7FvcqJaLMAwGA1UdEwQFMAMBAf8wDQYJKoZIhvcNAQEL
-BQADggEBAF9xJfdi7tErpxRe0yCw+M12SrkfiBWp/skwPSfps5DxrR5Kq3/D8H5X
-b8UpNU6UUQ12GBHhUP7OFv4VLz1OS3bwWxujRdMxjttW85rtjFCDnzjht2w1K3sJ
-+Wix+T8xHE8NVtg8wvEOr53/TKq0U1MwonVJLjbxRY8F3QexxXYGmDore/PtxDIb
-to63TmmP1EIbqrj1LGv23EngIG0wfhrKkV5cT1/TJ/0xJfLim6e66SO3crc9L2Q/
-r2UZOu21reg8IOKK+GgCBXVyc6ihEFpUF5sg/k4EThNjZM5PDDRYnwOwg8WdnOjF
-ut7vQ9gFxIHIfE526gVIlHUomwr6JGU=</ds:X509Certificate>
+          <ds:X509Certificate>MIIDIzCCAqigAwIBAgIUdP+S8hlKgM4qWilZ6u/fGvkCVNIwCgYIKoZIzj0EAwIw
+gccxCzAJBgNVBAYTAlNFMREwDwYDVQQIDAhTa8ODwqVuZTENMAsGA1UEBwwETHVu
+ZDE1MDMGA1UECgwsU3dlZGlzaCBJbmZyYXN0cnVjdHVyZSBmb3IgRWNvc3lzdGVt
+IFNjaWVuY2UxHzAdBgNVBAsMFkF1dGhlbnRpY2F0aW9uIFNlcnZpY2UxGzAZBgNV
+BAMMEmF1dGguZmllbGRzaXRlcy5zZTEhMB8GCSqGSIb3DQEJARYSaW5mb0BmaWVs
+ZHNpdGVzLnNlMB4XDTI1MDExNTEzMjcxMloXDTM1MDExMzEzMjcxMlowgccxCzAJ
+BgNVBAYTAlNFMREwDwYDVQQIDAhTa8ODwqVuZTENMAsGA1UEBwwETHVuZDE1MDMG
+A1UECgwsU3dlZGlzaCBJbmZyYXN0cnVjdHVyZSBmb3IgRWNvc3lzdGVtIFNjaWVu
+Y2UxHzAdBgNVBAsMFkF1dGhlbnRpY2F0aW9uIFNlcnZpY2UxGzAZBgNVBAMMEmF1
+dGguZmllbGRzaXRlcy5zZTEhMB8GCSqGSIb3DQEJARYSaW5mb0BmaWVsZHNpdGVz
+LnNlMHYwEAYHKoZIzj0CAQYFK4EEACIDYgAEn61cCfuM+4SimYT13UjQ8maFdnlo
+zFARer7BvXuHXKNWz+nw4JwIvW9YKgxhgxyCTNaMC4PjNbGDp8LyvsFWwPuOsBmN
+Ji6bgaRNMiu0zf9o5BTe6w/oKZNpRupJRLi8o1MwUTAdBgNVHQ4EFgQU5n6+mD64
+VfnEYxndf+6W0b5zGJEwHwYDVR0jBBgwFoAU5n6+mD64VfnEYxndf+6W0b5zGJEw
+DwYDVR0TAQH/BAUwAwEB/zAKBggqhkjOPQQDAgNpADBmAjEAk/Ud7iHhuzdF1xL3
+odaEL3ysSBSUVB+W6rrM/C9PN9t2W2XbtnVa27wzAHB1Kvn/AjEAvv9CGj1Kn0xe
+cP5RdMAFviHRu8BswXM/+yWI7Tjr/5qS+P1Ys/JaTtli3acu1xGN</ds:X509Certificate>
         </ds:X509Data>
       </ds:KeyInfo>
       <md:EncryptionMethod Algorithm="http://www.w3.org/2009/xmlenc11#aes128-gcm"/>
@@ -102,17 +95,17 @@ ut7vQ9gFxIHIfE526gVIlHUomwr6JGU=</ds:X509Certificate>
   <md:ContactPerson contactType="technical">
     <md:GivenName>Jonathan</md:GivenName>
     <md:SurName>Thiry</md:SurName>
-    <md:EmailAddress>jonathan.thiry@nateko.lu.se</md:EmailAddress>
+    <md:EmailAddress>mailto:jonathan.thiry@nateko.lu.se</md:EmailAddress>
   </md:ContactPerson>
   <md:ContactPerson contactType="administrative">
     <md:GivenName>Holger</md:GivenName>
     <md:SurName>Villwock</md:SurName>
-    <md:EmailAddress>holger.villwock@slu.se</md:EmailAddress>
+    <md:EmailAddress>mailto:holger.villwock@slu.se</md:EmailAddress>
   </md:ContactPerson>
   <md:ContactPerson contactType="support">
     <md:GivenName>Jonathan</md:GivenName>
     <md:SurName>Thiry</md:SurName>
-    <md:EmailAddress>jonathan.thiry@nateko.lu.se</md:EmailAddress>
+    <md:EmailAddress>mailto:jonathan.thiry@nateko.lu.se</md:EmailAddress>
   </md:ContactPerson>
 </md:EntityDescriptor>
 

@@ -10,7 +10,6 @@
          <alg:DigestMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#sha384"/>
          <alg:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/>
          <alg:DigestMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#sha224"/>
-         <alg:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
          <alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha512"/>
          <alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha384"/>
          <alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha256"/>
@@ -19,9 +18,6 @@
          <alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha384"/>
          <alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>
          <alg:SigningMethod Algorithm="http://www.w3.org/2009/xmldsig11#dsa-sha256"/>
-         <alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha1"/>
-         <alg:SigningMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
-         <alg:SigningMethod Algorithm="http://www.w3.org/2000/09/xmldsig#dsa-sha1"/>
          <mdattr:EntityAttributes>
             <samla:Attribute Name="http://macedir.org/entity-category" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
                <samla:AttributeValue>http://www.geant.net/uri/dataprotection-code-of-conduct/v1</samla:AttributeValue>
@@ -48,30 +44,23 @@
                <ds:X509Data>
                   <ds:X509SubjectName>CN=auth.fieldsites.se</ds:X509SubjectName>
                   <ds:X509Certificate>
-                     MIIEYzCCA0ugAwIBAgIJAInunDnNa8QOMA0GCSqGSIb3DQEBCwUAMIHHMQswCQYD
-VQQGEwJTRTERMA8GA1UECAwIU2vDg8KlbmUxDTALBgNVBAcMBEx1bmQxNTAzBgNV
-BAoMLFN3ZWRpc2ggSW5mcmFzdHJ1Y3R1cmUgZm9yIEVjb3N5c3RlbSBTY2llbmNl
-MR8wHQYDVQQLDBZBdXRoZW50aWNhdGlvbiBTZXJ2aWNlMRswGQYDVQQDDBJhdXRo
-LmZpZWxkc2l0ZXMuc2UxITAfBgkqhkiG9w0BCQEWEmluZm9AZmllbGRzaXRlcy5z
-ZTAeFw0xODAzMTQxNTAxMjhaFw0yODAzMTExNTAxMjhaMIHHMQswCQYDVQQGEwJT
-RTERMA8GA1UECAwIU2vDg8KlbmUxDTALBgNVBAcMBEx1bmQxNTAzBgNVBAoMLFN3
-ZWRpc2ggSW5mcmFzdHJ1Y3R1cmUgZm9yIEVjb3N5c3RlbSBTY2llbmNlMR8wHQYD
-VQQLDBZBdXRoZW50aWNhdGlvbiBTZXJ2aWNlMRswGQYDVQQDDBJhdXRoLmZpZWxk
-c2l0ZXMuc2UxITAfBgkqhkiG9w0BCQEWEmluZm9AZmllbGRzaXRlcy5zZTCCASIw
-DQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAL57JL9mbGSUjK6UgD73yGK3FLmW
-9JSoob2BoiXlO5AEcnqVBgINzAhPHTDdEfrjh3LChz1tDSOjIubcGAEd9KAV7lmE
-6Xf+wnRXgKKsyqF2As+vlT5JQF3JbuD+ezuE8i4sTzW2o/ach0nptAh3SUT47Qc/
-4YE6YA7gQncdsFi1w4j69Z8tGAOJydl4Z/ATspGiNSCYw5e8vpjuK06QHOq3pE8n
-Bq7Qn9CYO9f3dPsLm6qQcDHeLGrwFlcXDjPRu3eefhTKOyoCq5Yvar6vGdnvE9XV
-7laikYCR/Eq8LibfNjs85jY+VzFsIOJHSLztWaBIhWUKGf6HswPxjATrDvECAwEA
-AaNQME4wHQYDVR0OBBYEFBgKc06pZUImnNxea4xv7FvcqJaLMB8GA1UdIwQYMBaA
-FBgKc06pZUImnNxea4xv7FvcqJaLMAwGA1UdEwQFMAMBAf8wDQYJKoZIhvcNAQEL
-BQADggEBAF9xJfdi7tErpxRe0yCw+M12SrkfiBWp/skwPSfps5DxrR5Kq3/D8H5X
-b8UpNU6UUQ12GBHhUP7OFv4VLz1OS3bwWxujRdMxjttW85rtjFCDnzjht2w1K3sJ
-+Wix+T8xHE8NVtg8wvEOr53/TKq0U1MwonVJLjbxRY8F3QexxXYGmDore/PtxDIb
-to63TmmP1EIbqrj1LGv23EngIG0wfhrKkV5cT1/TJ/0xJfLim6e66SO3crc9L2Q/
-r2UZOu21reg8IOKK+GgCBXVyc6ihEFpUF5sg/k4EThNjZM5PDDRYnwOwg8WdnOjF
-ut7vQ9gFxIHIfE526gVIlHUomwr6JGU=
+                     MIIDIzCCAqigAwIBAgIUdP+S8hlKgM4qWilZ6u/fGvkCVNIwCgYIKoZIzj0EAwIw
+gccxCzAJBgNVBAYTAlNFMREwDwYDVQQIDAhTa8ODwqVuZTENMAsGA1UEBwwETHVu
+ZDE1MDMGA1UECgwsU3dlZGlzaCBJbmZyYXN0cnVjdHVyZSBmb3IgRWNvc3lzdGVt
+IFNjaWVuY2UxHzAdBgNVBAsMFkF1dGhlbnRpY2F0aW9uIFNlcnZpY2UxGzAZBgNV
+BAMMEmF1dGguZmllbGRzaXRlcy5zZTEhMB8GCSqGSIb3DQEJARYSaW5mb0BmaWVs
+ZHNpdGVzLnNlMB4XDTI1MDExNTEzMjcxMloXDTM1MDExMzEzMjcxMlowgccxCzAJ
+BgNVBAYTAlNFMREwDwYDVQQIDAhTa8ODwqVuZTENMAsGA1UEBwwETHVuZDE1MDMG
+A1UECgwsU3dlZGlzaCBJbmZyYXN0cnVjdHVyZSBmb3IgRWNvc3lzdGVtIFNjaWVu
+Y2UxHzAdBgNVBAsMFkF1dGhlbnRpY2F0aW9uIFNlcnZpY2UxGzAZBgNVBAMMEmF1
+dGguZmllbGRzaXRlcy5zZTEhMB8GCSqGSIb3DQEJARYSaW5mb0BmaWVsZHNpdGVz
+LnNlMHYwEAYHKoZIzj0CAQYFK4EEACIDYgAEn61cCfuM+4SimYT13UjQ8maFdnlo
+zFARer7BvXuHXKNWz+nw4JwIvW9YKgxhgxyCTNaMC4PjNbGDp8LyvsFWwPuOsBmN
+Ji6bgaRNMiu0zf9o5BTe6w/oKZNpRupJRLi8o1MwUTAdBgNVHQ4EFgQU5n6+mD64
+VfnEYxndf+6W0b5zGJEwHwYDVR0jBBgwFoAU5n6+mD64VfnEYxndf+6W0b5zGJEw
+DwYDVR0TAQH/BAUwAwEB/zAKBggqhkjOPQQDAgNpADBmAjEAk/Ud7iHhuzdF1xL3
+odaEL3ysSBSUVB+W6rrM/C9PN9t2W2XbtnVa27wzAHB1Kvn/AjEAvv9CGj1Kn0xe
+cP5RdMAFviHRu8BswXM/+yWI7Tjr/5qS+P1Ys/JaTtli3acu1xGN
                   </ds:X509Certificate>
                </ds:X509Data>
             </ds:KeyInfo>
@@ -106,9 +95,9 @@ ut7vQ9gFxIHIfE526gVIlHUomwr6JGU=
          <md:OrganizationURL xml:lang="sv">https://www.fieldsites.se/sv-SE</md:OrganizationURL>
       </md:Organization>
       <md:ContactPerson contactType="technical">
-         <md:GivenName>Oleg</md:GivenName>
-         <md:SurName>Mirzov</md:SurName>
-         <md:EmailAddress>mailto:oleg.mirzov@nateko.lu.se</md:EmailAddress>
+         <md:GivenName>Jonathan</md:GivenName>
+         <md:SurName>Thiry</md:SurName>
+         <md:EmailAddress>mailto:jonathan.thiry@nateko.lu.se</md:EmailAddress>
       </md:ContactPerson>
       <md:ContactPerson contactType="administrative">
          <md:GivenName>Holger</md:GivenName>
@@ -124,34 +113,22 @@ ut7vQ9gFxIHIfE526gVIlHUomwr6JGU=
    <Signature xmlns="http://www.w3.org/2000/09/xmldsig#">
       <SignedInfo>
          <CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>
-         <SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
+         <SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha256"/>
          <Reference URI="">
             <Transforms>
                <Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
             </Transforms>
-            <DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
-            <DigestValue>yOpcMC78Svv9RcqANXmJnDPeroY=</DigestValue>
+            <DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/>
+            <DigestValue>EVD6tY+pelafE9tV4ST+xSmWZb6QEhvVofrAVeTe+2w=</DigestValue>
          </Reference>
       </SignedInfo>
-      <SignatureValue>
-         dKlSqNJtY9+nN6ir3Oq4yZS2Tc7Z6+8Sda6DSkfVCeyBHVVhbNb65LsVeBEHn24U+2pxcehqbYRo
-gO4My8VL983mhH0GL/vA2u/RTaqg8bmLfejH2i7RGZvS3DcjQcLViW/+XU6OpyRsawx2Zd+ib9af
-cdYjdncFg8wAubGclwdCdw3nY8OuGwoEeCu94+1hm1mS1WN8NCAvD9UhOQ7uKKqKgdT1QccpC1BH
-Z2nYxOdgcFIovTlvRFwOelXXVHCbbpZnkzmxucROWe65FxVjeI/BVEEck71Bt/aYTJvpmnSj+o/a
-x9c5cgfYhfAHI3SbKqXI1Ov4O9K6JVAtQiGUtg==
-      </SignatureValue>
+      <SignatureValue>PrDnsP+AjsMwN7r/hpErKsJiWSQ38GGJ/zfN8KmnoT8W2/W740fPU1vJz8FAXIOWMt/+yysAexs4 /AezxPl6KhjbMRTn9/lC/HgFG6sUvbLWcj+2KmeNVd+fk3c68iFs</SignatureValue>
       <KeyInfo>
          <KeyValue>
-            <RSAKeyValue>
-               <Modulus>
-                  vnskv2ZsZJSMrpSAPvfIYrcUuZb0lKihvYGiJeU7kARyepUGAg3MCE8dMN0R+uOHcsKHPW0NI6Mi
-5twYAR30oBXuWYTpd/7CdFeAoqzKoXYCz6+VPklAXclu4P57O4TyLixPNbaj9pyHSem0CHdJRPjt
-Bz/hgTpgDuBCdx2wWLXDiPr1ny0YA4nJ2Xhn8BOykaI1IJjDl7y+mO4rTpAc6rekTycGrtCf0Jg7
-1/d0+wubqpBwMd4savAWVxcOM9G7d55+FMo7KgKrli9qvq8Z2e8T1dXuVqKRgJH8SrwuJt82Ozzm
-Nj5XMWwg4kdIvO1ZoEiFZQoZ/oezA/GMBOsO8Q==
-               </Modulus>
-               <Exponent>AQAB</Exponent>
-            </RSAKeyValue>
+            <ECKeyValue xmlns="http://www.w3.org/2009/xmldsig11#">
+               <NamedCurve URI="urn:oid:1.3.132.0.34"/>
+               <PublicKey>BJ+tXAn7jPuEopmE9d1I0PJmhXZ5aMxQEXq+wb17h1yjVs/p8OCcCL1vWCoMYYMcgkzWjAuD4zWx g6fC8r7BVsD7jrAZjSYum4GkTTIrtM3/aOQU3usP6CmTaUbqSUS4vA==</PublicKey>
+            </ECKeyValue>
          </KeyValue>
       </KeyInfo>
    </Signature>

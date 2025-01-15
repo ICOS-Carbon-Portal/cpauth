@@ -40,7 +40,7 @@ class CookieFactory(config: CpauthConfig) {
 		response: Response,
 		extractor: AssertionExtractor,
 		idpLib: IdpLibrary
-	)(implicit envri: Envri): Try[(HttpCookie, UserId, AllStatements)] = for(
+	)(using Envri): Try[(HttpCookie, UserId, AllStatements)] = for(
 		goodResponse <- ResponseStatusController.ensureSuccess(response);
 		validator <- AssertionValidator(goodResponse, idpLib);
 		assertions = extractor.extractAssertions(goodResponse).map(validator.validate(_, goodResponse));
@@ -58,7 +58,7 @@ class CookieFactory(config: CpauthConfig) {
 	) yield CookieToToken.constructCookieContent(token)
 
 
-	def makeAuthCookie(tokenBase64: String)(implicit envri: Envri) = HttpCookie(
+	def makeAuthCookie(tokenBase64: String)(using envri: Envri) = HttpCookie(
 		name = config.auth.pub(envri).authCookieName,
 		value = tokenBase64,
 		domain = Some(config.auth.pub(envri).authCookieDomain),

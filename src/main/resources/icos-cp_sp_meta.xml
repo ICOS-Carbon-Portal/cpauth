@@ -88,17 +88,17 @@ NbO/cPwuS4UHx8KkqiC7Mb972Rg6sZE2Fg==
       <ContactPerson contactType="technical">
          <GivenName>Jonathan</GivenName>
          <SurName>Thiry</SurName>
-         <EmailAddress>jonathan.thiry@nateko.lu.se</EmailAddress>
+         <EmailAddress>mailto:jonathan.thiry@nateko.lu.se</EmailAddress>
       </ContactPerson>
       <ContactPerson contactType="support">
          <GivenName>Andrew</GivenName>
          <SurName>Debevec</SurName>
-         <EmailAddress>andrew.debevec@nateko.lu.se</EmailAddress>
+         <EmailAddress>mailto:andrew.debevec@nateko.lu.se</EmailAddress>
       </ContactPerson>
       <ContactPerson contactType="administrative">
          <GivenName>Alex</GivenName>
          <SurName>Vermeulen</SurName>
-         <EmailAddress>alex.vermeulen@nateko.lu.se</EmailAddress>
+         <EmailAddress>mailto:alex.vermeulen@nateko.lu.se</EmailAddress>
       </ContactPerson>
    </EntityDescriptor>
    <Signature xmlns="http://www.w3.org/2000/09/xmldsig#">
@@ -110,10 +110,10 @@ NbO/cPwuS4UHx8KkqiC7Mb972Rg6sZE2Fg==
                <Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
             </Transforms>
             <DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/>
-            <DigestValue>G0McylZFuxQAzjrJERwV6bKsa3N/IKIEd4h/8ee/VNA=</DigestValue>
+            <DigestValue>XJVOPrOHbB0npn6qeaGsvVxiYc9zIil3yYA4N8ZEJSY=</DigestValue>
          </Reference>
       </SignedInfo>
-      <SignatureValue>R4g+RP1e9NYyWdqdWYZxem3A4cLZrZ8Dcvra9kENbJ+tyt/sw0/MDgekdnEuCfhff3I+wJLzZ75I yuNpNrG5x9JPhvu83sot0VMghYynEjkzqSs6HI5aVqMDVqxuijU3</SignatureValue>
+      <SignatureValue>R4oFmh8HkNWhMvlWw9Nyjg/yXZMKWmji67YqFgz4DVuESLwa+5yrIEgnpp6lUss4Whmccse8UMuN BoqkAsDZOKfI43G0aFtj68grkaewMxb1DrspbooPdFzaMuo0ApZf</SignatureValue>
       <KeyInfo>
          <KeyValue>
             <ECKeyValue xmlns="http://www.w3.org/2009/xmldsig11#">
