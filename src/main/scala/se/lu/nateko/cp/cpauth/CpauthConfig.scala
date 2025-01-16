@@ -14,6 +14,7 @@ import java.net.URI
 import scala.util.Try
 import eu.icoscp.georestheart.RestHeartConfig
 import eu.icoscp.geoipclient.CpGeoConfig
+import se.lu.nateko.cp.cpauth.core.Crypto
 
 enum OAuthProvider:
 	case facebook, orcidid, atmoAccess
@@ -33,15 +34,18 @@ case class SamlSpConfig(url: String, consumerServiceUrl: String, spMetaPath: Str
 case class ProxyConfig(ipv4Host: String, path: Option[String], port: Int)
 case class SamlAttrConfig(mail: Seq[String], givenName: Seq[String], surname: Seq[String])
 
+case class PrivateKeyInfo(filePath: String, keyType: Crypto.KeyType)
+case class PrivateKeys(primary: PrivateKeyInfo, fallback: Option[PrivateKeyInfo])
+
 case class SamlConfig(
 	idpMetadataFilePath: String,
 	idpCookieName: String,
-	privateKeyPaths: Map[Envri, String],
+	privateKeys: Map[Envri, PrivateKeys],
 	spConfigs: Map[Envri, SamlSpConfig],
 	attributes: SamlAttrConfig
 ){
 	def spConfig(using envri: Envri) = spConfigs(envri)
-	def privateKeyPath(using envri: Envri) = privateKeyPaths(envri)
+	def privateKeyInfo(using envri: Envri) = privateKeys(envri)
 }
 
 case class DatabaseConfig(
@@ -102,6 +106,8 @@ object ConfigReader extends DefaultJsonProtocol:
 	given RootJsonFormat[ProxyConfig] = jsonFormat3(ProxyConfig.apply)
 	given RootJsonFormat[SamlAttrConfig] = jsonFormat3(SamlAttrConfig.apply)
 	given RootJsonFormat[HttpConfig] = jsonFormat5(HttpConfig.apply)
+	given RootJsonFormat[PrivateKeyInfo] = jsonFormat2(PrivateKeyInfo.apply)
+	given RootJsonFormat[PrivateKeys] = jsonFormat2(PrivateKeys.apply)
 	given RootJsonFormat[SamlConfig] = jsonFormat5(SamlConfig.apply)
 	given RootJsonFormat[DatabaseConfig] = jsonFormat4(DatabaseConfig.apply)
 

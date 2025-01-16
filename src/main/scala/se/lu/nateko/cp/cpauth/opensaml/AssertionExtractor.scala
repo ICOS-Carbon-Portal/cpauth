@@ -18,26 +18,34 @@ import eu.icoscp.envri.Envri
 import se.lu.nateko.cp.cpauth.SamlConfig
 import se.lu.nateko.cp.cpauth.core.Crypto
 import se.lu.nateko.cp.cpauth.utils.Utils.SafeJavaCollectionWrapper
+import se.lu.nateko.cp.cpauth.PrivateKeyInfo
 
 //import org.apache.xml.serializer.dom3.LSSerializerImpl
 
-class AssertionExtractor(key: PrivateKey){
-	import AssertionExtractor._
+class AssertionExtractor(key: PrivateKey, fallbackKey: Option[PrivateKey]){
+	import AssertionExtractor.*
 
-	lazy val decrypter: AssertionDecrypter = {
-
+	private def innerDecrypter(pkey: PrivateKey): Decrypter =
 		val decryptionCredential = new BasicX509Credential()
 		decryptionCredential.setPrivateKey(key)
+		new Decrypter(null, new StaticKeyInfoCredentialResolver(decryptionCredential), new InlineEncryptedKeyResolver())
 
-		val decrypter = new Decrypter(null, new StaticKeyInfoCredentialResolver(decryptionCredential), new InlineEncryptedKeyResolver())
+	lazy val decrypter: AssertionDecrypter =
+		val decrypter = innerDecrypter(key)
 
 //		encrAss => {
 //			val ser = new LSSerializerImpl()
 //			println(ser.writeToString(encrAss.getDOM))
 //			decrypter.decrypt(encrAss)
 //		}
-		decrypter.decrypt
-	}
+		fallbackKey match
+			case None => decrypter.decrypt
+			case Some(fallbackKey) =>
+				val fallbackDecr = innerDecrypter(fallbackKey)
+				assertion =>
+					try decrypter.decrypt(assertion)
+					catch case _: Throwable => fallbackDecr.decrypt(assertion)
+
 
 	def extractAssertions(response: Response): Iterable[Assertion] = {
 		val decryptedAssertions = response.getEncryptedAssertions.toSafeIterable.map(decrypter)
@@ -47,20 +55,25 @@ class AssertionExtractor(key: PrivateKey){
 
 }
 
-object AssertionExtractor {
+object AssertionExtractor:
 
 	type AssertionDecrypter = EncryptedAssertion => Assertion
 	import Crypto.KeyType
 
 	OpenSamlUtils.bootstrapOpenSaml()
 
-	def apply(conf: SamlConfig, ktype: KeyType)(using Envri): Try[AssertionExtractor] =
-		fromPrivateKeyAt(conf.privateKeyPath, ktype)
+	def readPrivateKey(kinfo: PrivateKeyInfo): Try[PrivateKey] =
+		readPrivateKey(kinfo.filePath, kinfo.keyType)
 
-	def fromPrivateKeyAt(path: String, ktype: KeyType): Try[AssertionExtractor] = {
-		val keyBytes = Files.readAllBytes(Paths.get(path))
-		val privateKey = Crypto.privateFromDerBytes(keyBytes, ktype)
-		privateKey.map(key => new AssertionExtractor(key))
-	}
+	def readPrivateKey(filePath: String, keyType: KeyType): Try[PrivateKey] =
+		Try:
+			Files.readAllBytes(Paths.get(filePath))
+		.flatMap: keyBytes =>
+			Crypto.privateFromDerBytes(keyBytes, keyType)
 
-}
+	def apply(conf: SamlConfig)(using Envri): Try[AssertionExtractor] =
+		val kinfo = conf.privateKeyInfo
+		Try:
+			val key = readPrivateKey(kinfo.primary).get
+			val fallback = kinfo.fallback.map(ki => readPrivateKey(ki).get)
+			new AssertionExtractor(key, fallback)

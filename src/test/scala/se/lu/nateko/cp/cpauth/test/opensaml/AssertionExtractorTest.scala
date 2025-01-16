@@ -16,7 +16,8 @@ class AssertionExtractorTest extends AnyFunSuite{
 
 	test("Assertions from TestShib get extracted and decrypted correctly"){
 
-		val analyzer = AssertionExtractor.fromPrivateKeyAt("src/test/resources/saml/test_private_key.der", "RSA")
+		val analyzer = AssertionExtractor.readPrivateKey("src/test/resources/saml/test_private_key.der", "RSA")
+			.map(new AssertionExtractor(_, None))
 		val assertions = analyzer.get.extractAssertions(response)
 
 		assert(assertions.size === 1)
@@ -24,7 +25,8 @@ class AssertionExtractorTest extends AnyFunSuite{
 	
 	test("Attempt to extract assertions with a wrong private key fails"){
 
-		val analyzer = AssertionExtractor.fromPrivateKeyAt("src/test/resources/private1.der", "EC")
+		val analyzer = AssertionExtractor.readPrivateKey("src/test/resources/private1.der", "EC")
+			.map(new AssertionExtractor(_, None))
 
 		val enableLogging = Utils.disableLogging()
 

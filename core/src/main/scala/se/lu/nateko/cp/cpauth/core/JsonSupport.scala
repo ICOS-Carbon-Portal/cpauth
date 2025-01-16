@@ -44,3 +44,10 @@ object JsonSupport extends DefaultJsonProtocol:
 		def read(js: JsValue) = js match
 			case JsString(uidStr) => UserId(uidStr)
 			case _ => deserializationError("Expected UserId as JsString")
+
+	given JsonFormat[Crypto.KeyType] with
+		def write(kt: Crypto.KeyType) = JsString(kt)
+		def read(js: JsValue): Crypto.KeyType = js match
+			case JsString("RSA") => "RSA"
+			case JsString("EC") => "EC"
+			case _ => deserializationError("expected either EC or RSA JsString as KeyType")
