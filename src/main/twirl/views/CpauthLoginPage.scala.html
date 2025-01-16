@@ -27,12 +27,6 @@
 		@Html(loginStrings.cookieNotice)
 	</div>
 
-	<div class="alert alert-warning">
-		<i class="fas fa-exclamation-triangle me-2"></i>
-		The certificate has been recently renewed, and because of this the login will not work until your University's Identity
-		Provider picks up the change from SWAMID or eduGAIN.
-	</div>
-
 	<div class="card mb-4">
 		<div class="card-header">
 			<ul class="nav nav-tabs card-header-tabs" role="tablist">
@@ -72,6 +66,14 @@
 					<input id="targetUrl" class="targetUrlRelay" type="hidden" name="targetUrl">
 
 					<div class="col-md-5 form-group">
+
+						<div class="alert alert-warning">
+							<i class="fas fa-exclamation-triangle me-2"></i>
+							The SAML certificate has been renewed on 2025-01-16, and because of this the login will not work until your University's Identity
+							Provider picks up the change from SWAMID or eduGAIN. We are looking into an interim fallback solution.
+							In the meanwhile, we recommend using other authentication mechnisms.
+						</div>
+
 						<label class="form-label" for="idpUrlInput">University</label><br>
 						<input type="text" id="idpUrlInput" class="form-control" placeholder="Type to search university..."/>
 					</div>
@@ -145,7 +147,7 @@
 											</a>
 										</td>
 										<td class="oauth-comment">
-											To use STILT footprint calculator and viewer services, an ATMO ACCESS login is [going to be] required.
+											To use STILT footprint calculator and viewer services, an ATMO ACCESS login is required.
 										</td>
 									</tr>
 								}
@@ -187,5 +189,5 @@
 }
 
 @orcidExplanation = {
-	<span>To be able to login with your existing ORCID ID account, you need to make your email information public in the ORCID account settings. Alternatively, if you already have a Carbon Portal account that you can access using other sign-in mechanism (e.g. username/password), you can specify you ORCID ID in your CP user profile (About -> My CP, when logged in). Then you will be able to sign in to that CP account from here, using your ORCID account instead.</span>
+	<span>To be able to login with your existing ORCID ID account, you need to make your email information public in the ORCID account settings. Alternatively, if you already have a Carbon Portal account that you can access using other sign-in mechanism (e.g. username/password), you can specify you ORCID ID in your <a href="/home/">user profile</a> (when logged in). Then you will be able to sign in to that CP account from here, using your ORCID account instead.</span>
 }
