@@ -19,7 +19,7 @@ import eu.icoscp.envri.Envri
 
 object Playground {
 
-	Utils.setRootLoggingLevelToInfo()
+	//Utils.setRootLoggingLevelToInfo()
 
 	def getResponseSummary(response: Response, extractorTry: Try[AssertionExtractor], idpLib: IdpLibrary): Try[String] = for(
 		goodResponse <- ResponseStatusController.ensureSuccess(response);

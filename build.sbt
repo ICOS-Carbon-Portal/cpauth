@@ -87,7 +87,7 @@ lazy val fetchIdpList = taskKey[Unit]("Fetches SAML IdP list from SWAMID")
 
 resolvers := {
 	("ICOS CP Nexus repo" at "https://repo.icos-cp.eu/content/groups/public") +:
-#	("Shibboleth Releases" at "https://build.shibboleth.net/maven/releases/") +:
+	("Shibboleth Releases" at "https://build.shibboleth.net/maven/releases/") +:
 	resolvers.value
 }
 
@@ -103,13 +103,11 @@ lazy val cpauth = (project in file("."))
 			"com.typesafe.akka"      %% "akka-stream-testkit"                % akkaVersion     % "test" cross CrossVersion.for3Use2_13,
 			"com.typesafe.akka"      %% "akka-stream"                        % akkaVersion cross CrossVersion.for3Use2_13,
 			"com.typesafe.akka"      %% "akka-slf4j"                         % akkaVersion cross CrossVersion.for3Use2_13,
-			"ch.qos.logback"         %  "logback-classic"                    % "1.1.3",
-			"org.opensaml"           %  "opensaml-saml-impl"                 % "4.0.1",
-			"org.scala-lang.modules" %% "scala-xml"                          % "2.1.0",
-			"org.apache.santuario"   %  "xmlsec"                             % "2.0.7", //to force a newer version
+			"ch.qos.logback"         %  "logback-classic"                    % "1.5.16",
+			"org.opensaml"           %  "opensaml-saml-impl"                 % "4.3.2",
+			"org.scala-lang.modules" %% "scala-xml"                          % "2.3.0",
 //			"xalan"                  %  "serializer"                         % "2.7.2", //for DOM serialization to strings during debug
 			"net.jcip"               %  "jcip-annotations"                   % "1.0",
-			"org.joda"               %  "joda-convert"                       % "1.7",
 			"org.hsqldb"             %  "hsqldb"                             % "2.3.4",
 		),
 
@@ -152,6 +150,12 @@ lazy val cpauth = (project in file("."))
 		//initialCommands in console := """""",
 
 		assembly / mainClass  := cpauthMain,
+
+		assembly / assemblyMergeStrategy := {
+			case PathList(ps @ _*) if ps.last == "module-info.class" => MergeStrategy.discard
+			case x => ((assembly / assemblyMergeStrategy).value)(x)
+		},
+
 		Compile / mainClass := cpauthMain
 
 	)

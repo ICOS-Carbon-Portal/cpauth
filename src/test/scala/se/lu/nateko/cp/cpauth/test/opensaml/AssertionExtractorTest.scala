@@ -39,13 +39,13 @@ class AssertionExtractorTest extends AnyFunSuite{
 			val privKey = AssertionExtractor.readPrivateKey("src/test/resources/private1.der", "EC").get
 			new AssertionExtractor(getPublicKey.get, privKey)
 
-		val enableLogging = Utils.disableLogging()
+		//val enableLogging = Utils.disableLogging()
 
 		intercept[DecryptionException] {
 			analyzer.extractAssertions(response)
 		}
 
-		enableLogging()
+		//enableLogging()
 	}
 	
 	

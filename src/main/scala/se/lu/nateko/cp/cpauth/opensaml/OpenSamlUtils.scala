@@ -8,15 +8,15 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider
 object OpenSamlUtils {
 
 	val bootstrapOpenSaml: () => Unit = {
-		val rootLoggingLevel = Utils.getRootLoggingLevel
+		//val rootLoggingLevel = Utils.getRootLoggingLevel
 		
-		Utils.setRootLoggingLevelToInfo()
+		//Utils.setRootLoggingLevelToInfo()
 
 		Security.addProvider(new BouncyCastleProvider())
 
 		InitializationService.initialize()
 		
-		Utils.setRootLoggingLevel(rootLoggingLevel)
+		//Utils.setRootLoggingLevel(rootLoggingLevel)
 		
 		() => ()
 	}

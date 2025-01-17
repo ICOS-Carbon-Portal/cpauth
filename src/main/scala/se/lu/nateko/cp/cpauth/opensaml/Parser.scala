@@ -13,7 +13,7 @@ import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport
 object Parser {
 	
 	OpenSamlUtils.bootstrapOpenSaml()
-	Utils.setRootLoggingLevelToInfo()
+	//Utils.setRootLoggingLevelToInfo()
 
 	private[this] val parserPool: ParserPool = {
 		val parserPool = new BasicParserPool()

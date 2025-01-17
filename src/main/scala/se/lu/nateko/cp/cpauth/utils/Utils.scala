@@ -18,26 +18,26 @@ import akka.http.scaladsl.model.Uri
 
 object Utils {
 
-	import org.slf4j.LoggerFactory
-	import ch.qos.logback.classic.{Level, Logger}
-	
-	def setRootLoggingLevel(level: Level): Unit =
-		LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME)
-			.asInstanceOf[Logger]
-			.setLevel(level)
+	// import org.slf4j.LoggerFactory
+	// import ch.qos.logback.classic.{Level, Logger}
 
-	def setRootLoggingLevelToInfo(): Unit = setRootLoggingLevel(Level.INFO)
+	// def setRootLoggingLevel(level: Level): Unit =
+	// 	LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME)
+	// 		.asInstanceOf[Logger]
+	// 		.setLevel(level)
 
-	def disableLogging(): () => Unit = {
-		val originalLevel = getRootLoggingLevel
-		setRootLoggingLevel(Level.OFF)
-		() => setRootLoggingLevel(originalLevel)
-	}
+	// def setRootLoggingLevelToInfo(): Unit = setRootLoggingLevel(Level.INFO)
 
-	def getRootLoggingLevel: Level =
-		LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME)
-			.asInstanceOf[Logger]
-			.getLevel
+	// def disableLogging(): () => Unit = {
+	// 	val originalLevel = getRootLoggingLevel
+	// 	setRootLoggingLevel(Level.OFF)
+	// 	() => setRootLoggingLevel(originalLevel)
+	// }
+
+	// def getRootLoggingLevel: Level =
+	// 	LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME).
+	// 		.asInstanceOf[Logger]
+	// 		.getLevel
 
 	implicit class SafeJavaCollectionWrapper[T](val list: java.util.Collection[T]) extends AnyVal {
 		import scala.jdk.CollectionConverters._

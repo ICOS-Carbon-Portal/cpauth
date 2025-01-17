@@ -43,7 +43,7 @@ trait IdpLibrary{
 object IdpLibrary {
 
 	OpenSamlUtils.bootstrapOpenSaml()
-	Utils.setRootLoggingLevelToInfo()
+	//Utils.setRootLoggingLevelToInfo()
 
 
 	def fromConfig(config: SamlConfig): Try[IdpLibrary] = {
