@@ -3,7 +3,7 @@ package se.lu.nateko.cp.cpauth.services
 import scala.util.Failure
 import scala.util.Success
 import scala.util.Try
-import org.opensaml.saml2.core.Response
+import org.opensaml.saml.saml2.core.Response
 import akka.http.scaladsl.model.headers.HttpCookie
 import se.lu.nateko.cp.cpauth.core.CookieToToken
 import se.lu.nateko.cp.cpauth.core.Exceptions
@@ -43,7 +43,9 @@ class CookieFactory(config: CpauthConfig) {
 	)(using Envri): Try[(HttpCookie, UserId, AllStatements)] = for(
 		goodResponse <- ResponseStatusController.ensureSuccess(response);
 		validator <- AssertionValidator(goodResponse, idpLib);
+		_ = println(goodResponse);
 		assertions = extractor.extractAssertions(goodResponse).map(validator.validate(_, goodResponse));
+		_ = println(assertions);
 		statements <- StatementExtractor.extractAttributeStringValues(assertions);
 		userIdTry = getUserId(statements);
 		userId <- provideDebug(userIdTry, assertions);

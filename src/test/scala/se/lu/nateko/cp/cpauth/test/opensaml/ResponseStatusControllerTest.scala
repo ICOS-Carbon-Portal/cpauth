@@ -1,11 +1,11 @@
 package se.lu.nateko.cp.cpauth.test.opensaml
 
 import org.scalatest.funsuite.AnyFunSuite
-import org.opensaml.saml2.core.Response
+import org.opensaml.saml.saml2.core.Response
 import se.lu.nateko.cp.cpauth.opensaml.Parser
 import se.lu.nateko.cp.cpauth.opensaml.ResponseStatusController
 import scala.util.Try
-import org.opensaml.common.SAMLException
+import org.opensaml.saml.common.SAMLException
 
 class ResponseStatusControllerTest extends AnyFunSuite {
 

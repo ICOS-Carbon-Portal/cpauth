@@ -1,6 +1,9 @@
 package se.lu.nateko.cp.cpauth.opensaml
 
 import se.lu.nateko.cp.cpauth.utils.Utils
+import org.opensaml.core.config.InitializationService
+import java.security.Security
+import org.bouncycastle.jce.provider.BouncyCastleProvider
 
 object OpenSamlUtils {
 
@@ -8,15 +11,17 @@ object OpenSamlUtils {
 		val rootLoggingLevel = Utils.getRootLoggingLevel
 		
 		Utils.setRootLoggingLevelToInfo()
-		
-		org.opensaml.DefaultBootstrap.bootstrap()
+
+		Security.addProvider(new BouncyCastleProvider())
+
+		InitializationService.initialize()
 		
 		Utils.setRootLoggingLevel(rootLoggingLevel)
 		
 		() => ()
 	}
 
-	private[this] val domSerializer: org.w3c.dom.ls.LSSerializer = {
+	private val domSerializer: org.w3c.dom.ls.LSSerializer = {
 		import  org.w3c.dom.bootstrap.DOMImplementationRegistry
 		import  org.w3c.dom.ls.DOMImplementationLS
 		

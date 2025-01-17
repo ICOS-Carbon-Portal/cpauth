@@ -1,9 +1,9 @@
 package se.lu.nateko.cp.cpauth.opensaml
 
 import java.security.PublicKey
-import org.opensaml.saml2.core.Assertion
+import org.opensaml.saml.saml2.core.Assertion
 import se.lu.nateko.cp.cpauth.xmldsig.SignatureValidator
-import org.opensaml.saml2.core.Response
+import org.opensaml.saml.saml2.core.Response
 import scala.util.Try
 import java.net.URI
 

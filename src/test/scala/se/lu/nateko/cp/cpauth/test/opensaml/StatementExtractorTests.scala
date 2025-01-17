@@ -1,6 +1,6 @@
 package se.lu.nateko.cp.cpauth.test.opensaml
 
-import org.opensaml.saml2.core.Assertion
+import org.opensaml.saml.saml2.core.Assertion
 import org.scalatest.funsuite.AnyFunSuite
 
 import se.lu.nateko.cp.cpauth.opensaml.Parser

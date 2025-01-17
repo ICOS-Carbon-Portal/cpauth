@@ -4,8 +4,8 @@ import org.scalatest.funsuite.AnyFunSuite
 import se.lu.nateko.cp.cpauth.opensaml.IdpLibrary
 import java.net.URI
 import se.lu.nateko.cp.cpauth.opensaml.Parser
-import org.opensaml.saml2.core.Assertion
-import org.opensaml.saml2.core.Response
+import org.opensaml.saml.saml2.core.Assertion
+import org.opensaml.saml.saml2.core.Response
 import se.lu.nateko.cp.cpauth.opensaml.AssertionValidator
 import se.lu.nateko.cp.cpauth.core.CoreUtils
 import se.lu.nateko.cp.cpauth.core.Crypto

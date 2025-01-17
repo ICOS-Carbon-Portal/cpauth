@@ -3,9 +3,9 @@ package se.lu.nateko.cp.cpauth.opensaml
 import scala.util.Failure
 import scala.util.Success
 import scala.util.Try
-import org.opensaml.common.SAMLException
-import org.opensaml.saml2.core.Response
-import org.opensaml.saml2.core.StatusCode
+import org.opensaml.saml.saml2.core.Response
+import org.opensaml.saml.saml2.core.StatusCode
+import org.opensaml.saml.common.SAMLException
 
 object ResponseStatusController {
 
@@ -17,9 +17,9 @@ object ResponseStatusController {
 
 		statusCode <- Try(status.getStatusCode.getValue);
 
-		successfullResponse <- if(StatusCode.SUCCESS_URI != statusCode){
+		successfullResponse <- if(StatusCode.SUCCESS != statusCode){
 
-				val msg = Try(status.getStatusMessage.getMessage).getOrElse{
+				val msg = Try(status.getStatusMessage.getValue).getOrElse{
 
 					val idp = Try(response.getIssuer.getValue).getOrElse("the Identity provider")
 					val responseXml = Try(":\n" + OpenSamlUtils.xmlToStr(response.getDOM)).getOrElse("")

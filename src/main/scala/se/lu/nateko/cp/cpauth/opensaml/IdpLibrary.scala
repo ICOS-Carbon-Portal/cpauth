@@ -7,19 +7,19 @@ import java.security.PublicKey
 import scala.util.Failure
 import scala.util.Success
 import scala.util.Try
-import org.opensaml.common.xml.SAMLConstants
-import org.opensaml.saml2.metadata.EntitiesDescriptor
-import org.opensaml.saml2.metadata.EntityDescriptor
-import org.opensaml.saml2.metadata.IDPSSODescriptor
-import org.opensaml.saml2.metadata.provider.MetadataProviderException
-import org.opensaml.samlext.saml2mdui.UIInfo
+import org.opensaml.saml.common.xml.SAMLConstants
+import org.opensaml.saml.saml2.metadata.EntitiesDescriptor
+import org.opensaml.saml.saml2.metadata.EntityDescriptor
+import org.opensaml.saml.saml2.metadata.IDPSSODescriptor
 import se.lu.nateko.cp.cpauth.utils.Utils.SafeJavaCollectionWrapper
 import se.lu.nateko.cp.cpauth.SamlConfig
 import se.lu.nateko.cp.cpauth.core.Crypto
 import se.lu.nateko.cp.cpauth.utils.Utils
 import se.lu.nateko.cp.cpauth.core.CoreUtils
-import org.opensaml.saml2.metadata.LocalizedString
-import org.opensaml.xml.security.credential.UsageType
+import org.opensaml.security.credential.UsageType
+import org.opensaml.saml.ext.saml2mdui.UIInfo
+import org.opensaml.saml.saml2.metadata.LocalizedName
+import se.lu.nateko.cp.cpauth.core.CpauthException
 
 case class IdpInfo(name: String, id: String)
 
@@ -30,7 +30,7 @@ trait IdpLibrary{
 	protected val map: Map[URI, IdpProps]
 
 	def getIdpProps(idpId: URI): Try[IdpProps] = map.get(idpId) match {
-		case None => Failure(new MetadataProviderException("Unknown Identity Provider: " + idpId))
+		case None => Failure(new CpauthException("Unknown Identity Provider: " + idpId))
 		case Some(key) => Success(key)
 	}
 
@@ -100,7 +100,7 @@ object IdpLibrary {
 			_.getBinding == SAMLConstants.SAML2_REDIRECT_BINDING_URI
 		}
 		redirectSss match {
-			case None => throw new MetadataProviderException("HTTP-Redirect binding is not supported")
+			case None => throw new CpauthException("HTTP-Redirect binding is not supported")
 			case Some(sss) => new URI(sss.getLocation)
 		}
 	}
@@ -112,18 +112,18 @@ object IdpLibrary {
 	}
 
 	private def getDisplayName(ui: UIInfo): Option[String] = {
-		val candidates = ui.getDisplayNames.toSafeIterable.map(_.getName)
+		val candidates = ui.getDisplayNames.toSafeIterable
 		getBestName(candidates)
 	}
 
 	private def entityDescrToName(ed: EntityDescriptor): Try[String] = Try{
-		val candidates = ed.getOrganization.getDisplayNames.toSafeIterable.map(_.getName)
+		val candidates = ed.getOrganization.getDisplayNames.toSafeIterable
 		getBestName(candidates).get
 	}
 	
-	private def getBestName(names: Iterable[LocalizedString]): Option[String] = {
-		val english = names.find(_.getLanguage == "en").map(_.getLocalString)
-		english.orElse(names.map(_.getLocalString).headOption)
+	private def getBestName(names: Iterable[LocalizedName]): Option[String] = {
+		val english = names.find(_.getXMLLang == "en").map(_.getValue)
+		english.orElse(names.map(_.getValue).headOption)
 	}
 
 	private def getId(ed: EntityDescriptor): Try[URI] = Try{

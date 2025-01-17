@@ -1,10 +1,10 @@
 package se.lu.nateko.cp.cpauth.opensaml
 
-import org.opensaml.saml2.core.Assertion
+import org.opensaml.saml.saml2.core.Assertion
 import se.lu.nateko.cp.cpauth.utils.Utils.SafeJavaCollectionWrapper
-import org.opensaml.xml.schema.XSAny
-import org.opensaml.xml.schema.XSString
-import org.opensaml.saml2.core.Attribute
+import org.opensaml.core.xml.schema.XSAny
+import org.opensaml.core.xml.schema.XSString
+import org.opensaml.saml.saml2.core.Attribute
 import scala.util.Try
 import scala.util.Failure
 import scala.util.control.NoStackTrace

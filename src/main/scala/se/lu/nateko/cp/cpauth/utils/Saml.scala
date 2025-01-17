@@ -6,7 +6,7 @@ import java.util.Date
 import java.util.UUID
 import scala.xml.Elem
 import java.net.URI
-import org.opensaml.saml2.core.NameIDType
+import org.opensaml.saml.saml2.core.NameIDType
 import java.util.TimeZone
 import akka.http.scaladsl.model.Uri
 import se.lu.nateko.cp.cpauth.SamlSpConfig

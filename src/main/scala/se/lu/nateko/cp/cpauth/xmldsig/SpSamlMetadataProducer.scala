@@ -1,7 +1,7 @@
 package se.lu.nateko.cp.cpauth.xmldsig
 
 import eu.icoscp.envri.Envri
-import org.opensaml.saml2.metadata.EntitiesDescriptor
+import org.opensaml.saml.saml2.metadata.EntitiesDescriptor
 import org.w3c.dom.Document
 import org.xml.sax.SAXException
 import se.lu.nateko.cp.cpauth.ConfigReader

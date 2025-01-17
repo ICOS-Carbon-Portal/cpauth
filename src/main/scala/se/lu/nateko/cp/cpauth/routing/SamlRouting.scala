@@ -6,7 +6,7 @@ import scala.util.Try
 import se.lu.nateko.cp.cpauth.opensaml.IdpLibrary
 import se.lu.nateko.cp.cpauth.opensaml.IdpInfo
 import se.lu.nateko.cp.cpauth.CpauthJsonProtocol.given
-import org.opensaml.saml2.core.Response
+import org.opensaml.saml.saml2.core.Response
 import se.lu.nateko.cp.cpauth.opensaml.Parser
 import se.lu.nateko.cp.cpauth.opensaml.AssertionExtractor
 import akka.actor.ActorSystem

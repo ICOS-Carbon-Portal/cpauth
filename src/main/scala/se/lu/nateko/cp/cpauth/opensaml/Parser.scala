@@ -1,13 +1,14 @@
 package se.lu.nateko.cp.cpauth.opensaml
 
 import se.lu.nateko.cp.cpauth.core.CoreUtils
-import org.opensaml.xml.parse.ParserPool
-import org.opensaml.xml.parse.StaticBasicParserPool
 import org.w3c.dom.Document
 import java.io.StringReader
 import java.io.InputStream
-import org.opensaml.xml.XMLObject
+import org.opensaml.core.xml.XMLObject
 import se.lu.nateko.cp.cpauth.utils.Utils
+import net.shibboleth.utilities.java.support.xml.ParserPool
+import net.shibboleth.utilities.java.support.xml.BasicParserPool
+import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport
 
 object Parser {
 	
@@ -15,16 +16,14 @@ object Parser {
 	Utils.setRootLoggingLevelToInfo()
 
 	private[this] val parserPool: ParserPool = {
-		val parserPool = new StaticBasicParserPool()
+		val parserPool = new BasicParserPool()
 		parserPool.initialize()
 		parserPool
 	}
-	
-	private[this] val unmarshallerFactory = org.opensaml.xml.Configuration.getUnmarshallerFactory()
-	
+
 	def fromDocument[T <: XMLObject](doc: Document): T = {
 		val metadataRoot = doc.getDocumentElement()
-		val unmarshaller = unmarshallerFactory.getUnmarshaller(metadataRoot)
+		val unmarshaller = XMLObjectProviderRegistrySupport.getUnmarshallerFactory.getUnmarshaller(metadataRoot)
 		unmarshaller.unmarshall(metadataRoot).asInstanceOf[T]
 	}
 
