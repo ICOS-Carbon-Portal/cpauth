@@ -55,7 +55,7 @@ class AssertionExtractor(pubKey: PublicKey, privKey: PrivateKey){
 			new KeyInfoReferenceProvider()
 		).asJava
 		val staticKeyInfoResolver = new StaticKeyInfoCredentialResolver(decryptionCredential)
-		val kekKeyResolver = new ChainingKeyInfoCredentialResolver(Seq(
+		val keyResolver = new ChainingKeyInfoCredentialResolver(Seq(
 			new LocalKeyInfoCredentialResolver(keyInfoProviders, staticKeyInfoResolver),
 			staticKeyInfoResolver
 		).asJava)
@@ -65,8 +65,8 @@ class AssertionExtractor(pubKey: PublicKey, privKey: PrivateKey){
 			new SimpleRetrievalMethodEncryptedKeyResolver(),
 			new SimpleKeyInfoReferenceEncryptedKeyResolver()
 		).asJava)
-		val debugEncRes = new DebuggingEncKeyResolver(encKeyResolver)
-		val decr = new Decrypter(null, kekKeyResolver, debugEncRes)
+		//val debugEncRes = new DebuggingEncKeyResolver(encKeyResolver)
+		val decr = new Decrypter(keyResolver, keyResolver, encKeyResolver)
 		decr.setRootInNewDocument(true)
 		decr
 
@@ -112,14 +112,14 @@ object AssertionExtractor:
 		yield new AssertionExtractor(pubKey, privKey)
 
 
-class DebuggingEncKeyResolver(inner: EncryptedKeyResolver) extends EncryptedKeyResolver:
-	override def getRecipients(): ju.Set[String] = inner.getRecipients()
+// class DebuggingEncKeyResolver(inner: EncryptedKeyResolver) extends EncryptedKeyResolver:
+// 	override def getRecipients(): ju.Set[String] = inner.getRecipients()
 
-	override def resolve(encryptedData: EncryptedData): java.lang.Iterable[EncryptedKey] = {
-		val res = inner.resolve(encryptedData)
-		val keys = res.asScala.toIndexedSeq
-		println(s"Resolved encrypted keys: ${keys.size}")
-		keys.foreach(println)
-		println(s"Recipients: ${getRecipients().asScala.toIndexedSeq}")
-		res
-	}
+// 	override def resolve(encryptedData: EncryptedData): java.lang.Iterable[EncryptedKey] = {
+// 		val res = inner.resolve(encryptedData)
+// 		val keys = res.asScala.toIndexedSeq
+// 		println(s"Resolved encrypted keys: ${keys.size}")
+// 		keys.foreach(println)
+// 		println(s"Recipients: ${getRecipients().asScala.toIndexedSeq}")
+// 		res
+// 	}
