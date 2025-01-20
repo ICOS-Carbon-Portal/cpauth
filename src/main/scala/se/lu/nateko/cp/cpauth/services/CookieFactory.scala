@@ -12,7 +12,7 @@ import se.lu.nateko.cp.cpauth.opensaml.AllStatements
 import se.lu.nateko.cp.cpauth.opensaml.AssertionExtractor
 import se.lu.nateko.cp.cpauth.opensaml.AssertionValidator
 import se.lu.nateko.cp.cpauth.opensaml.IdpLibrary
-import se.lu.nateko.cp.cpauth.opensaml.OpenSamlUtils
+import se.lu.nateko.cp.cpauth.opensaml.OpenSamlUtils.xmlToStr
 import se.lu.nateko.cp.cpauth.opensaml.ResponseStatusController
 import se.lu.nateko.cp.cpauth.opensaml.StatementExtractor
 import se.lu.nateko.cp.cpauth.opensaml.ValidatedAssertion
@@ -54,7 +54,10 @@ class CookieFactory(config: CpauthConfig, log: LoggingAdapter) {
 			cookie = makeAuthCookie(tokenBase64)
 		) yield (cookie, userId, statements)
 		res match
-			case Failure(err) => log.error(err, s"Could not get user info from SAML IdP $idp")
+			case Failure(err) => log.error(
+				err,
+				s"Could not get user info from SAML IdP $idp, the response was:\n" + xmlToStr(response.getDOM)
+			)
 			case Success(_, user, _) => log.info(s"Successful SAML login by ${user.email} from $idp")
 		res
 
@@ -86,7 +89,7 @@ class CookieFactory(config: CpauthConfig, log: LoggingAdapter) {
 	private def provideDebug(uinfoTry: Try[UserId], assertions: => Iterable[ValidatedAssertion]): Try[UserId] = uinfoTry match {
 		case ok: Success[UserId] => ok
 		case Failure(err) => Exceptions.failure{
-			val assertionsAsString = assertions.map(_.assertion.getDOM).map(OpenSamlUtils.xmlToStr).mkString("\n")
+			val assertionsAsString = assertions.map(_.assertion.getDOM).map(xmlToStr).mkString("\n")
 			err.getMessage + "\nReturned assertions were:\n" + assertionsAsString
 		}
 	}
