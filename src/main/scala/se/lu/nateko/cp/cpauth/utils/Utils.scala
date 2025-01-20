@@ -15,8 +15,10 @@ import scala.util.Failure
 import scala.util.Success
 import java.net.URI
 import akka.http.scaladsl.model.Uri
+import scala.concurrent.Await
+import scala.concurrent.duration.Duration
 
-object Utils {
+object Utils:
 
 	// import org.slf4j.LoggerFactory
 	// import ch.qos.logback.classic.{Level, Logger}
@@ -39,14 +41,12 @@ object Utils {
 	// 		.asInstanceOf[Logger]
 	// 		.getLevel
 
-	implicit class SafeJavaCollectionWrapper[T](val list: java.util.Collection[T]) extends AnyVal {
-		import scala.jdk.CollectionConverters._
-
+	extension[T](list: java.util.Collection[T])
 		def toSafeIterable: Iterable[T] =
-			if(list == null)
-				Iterable.empty[T]
+			import scala.jdk.CollectionConverters.CollectionHasAsScala
+			if list == null
+			then Iterable.empty[T]
 			else list.asScala
-	}
 
 	def compressAndBase64ForSaml(s: String): String = {
 		val deflater = new Deflater(Deflater.DEFAULT_COMPRESSION, true);
@@ -61,22 +61,21 @@ object Utils {
 		new String(new Base64().encode(byteStream.toByteArray), utf8)
 	}
 
-	def slowFailureDown[T](future: Future[T], time: FiniteDuration)(implicit ex: ExecutionContext, scheduler: Scheduler): Future[T] =
+	def slowFailureDown[T](future: Future[T], time: FiniteDuration)(using ex: ExecutionContext, scheduler: Scheduler): Future[T] =
 		future.recoverWith{
 			case err => after(time, scheduler, ex, () => Future.failed(err))
 		}
 
-	implicit class CrasheableTry[T](val inner: Try[T]) extends AnyVal{
-		import scala.concurrent.Await
-		import scala.concurrent.duration.Duration
-		def getOrCrash(message: String)(implicit system: akka.actor.ActorSystem): T = inner.recover{
-			case err =>
-				system.log.error(err, message)
-				Await.ready(system.terminate(), Duration.Inf)
-				sys.exit(1)
-		}.get
-	}
-}
+	extension[T](inner: Try[T])
+		def getOrCrash(message: String)(using system: akka.actor.ActorSystem): T =
+			inner.recover{
+				case err =>
+					system.log.error(err, message)
+					Await.ready(system.terminate(), Duration.Inf)
+					sys.exit(1)
+			}.get
+
+end Utils
 
 extension(uri: Uri)
 	def addSegment(segment: String): Uri = uri.withPath(uri.path / segment)

@@ -20,12 +20,13 @@ import se.lu.nateko.cp.cpauth.core.AuthSource
 import se.lu.nateko.cp.cpauth.CpauthConfig
 import se.lu.nateko.cp.cpauth.utils.SignedTokenMaker
 import eu.icoscp.envri.Envri
+import akka.event.LoggingAdapter
 
-class CookieFactory(config: CpauthConfig) {
+class CookieFactory(config: CpauthConfig, log: LoggingAdapter) {
 	
 	private def tokenMakerTry(using Envri) = SignedTokenMaker(config.auth.priv, "EC")
 
-	def getLastIdpCookie(idpId: String)(implicit envri: Envri): HttpCookie = HttpCookie(
+	def getLastIdpCookie(idpId: String)(using envri: Envri): HttpCookie = HttpCookie(
 		name = config.saml.idpCookieName,
 		value = idpId,
 		secure = false,
@@ -40,16 +41,22 @@ class CookieFactory(config: CpauthConfig) {
 		response: Response,
 		extractor: AssertionExtractor,
 		idpLib: IdpLibrary
-	)(using Envri): Try[(HttpCookie, UserId, AllStatements)] = for(
-		goodResponse <- ResponseStatusController.ensureSuccess(response);
-		validator <- AssertionValidator(goodResponse, idpLib);
-		assertions = extractor.extractAssertions(goodResponse).map(validator.validate(_, goodResponse));
-		statements <- StatementExtractor.extractAttributeStringValues(assertions);
-		userIdTry = getUserId(statements);
-		userId <- provideDebug(userIdTry, assertions);
-		tokenBase64 <- makeTokenBase64(userId, AuthSource.Saml);
-		cookie = makeAuthCookie(tokenBase64)
-	) yield (cookie, userId, statements)
+	)(using Envri): Try[(HttpCookie, UserId, AllStatements)] =
+		val idp = response.getIssuer.getValue
+		val res = for(
+			goodResponse <- ResponseStatusController.ensureSuccess(response);
+			validator <- AssertionValidator(goodResponse, idpLib);
+			assertions = extractor.extractAssertions(goodResponse).map(validator.validate(_, goodResponse));
+			statements <- StatementExtractor.extractAttributeStringValues(assertions);
+			userIdTry = getUserId(statements);
+			userId <- provideDebug(userIdTry, assertions);
+			tokenBase64 <- makeTokenBase64(userId, AuthSource.Saml);
+			cookie = makeAuthCookie(tokenBase64)
+		) yield (cookie, userId, statements)
+		res match
+			case Failure(err) => log.error(err, s"Could not get user info from SAML IdP $idp")
+			case Success(_, user, _) => log.info(s"Successful SAML login by ${user.email} from $idp")
+		res
 
 
 	def makeTokenBase64(userId: UserId, source: AuthSource)(using Envri): Try[String] = for(

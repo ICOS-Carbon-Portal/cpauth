@@ -15,6 +15,7 @@ import se.lu.nateko.cp.cpauth.core.AuthSource
 import se.lu.nateko.cp.cpauth.utils.Utils
 import se.lu.nateko.cp.cpauth.services.CookieFactory
 import eu.icoscp.envri.Envri
+import akka.event.NoLogging
 
 
 object Playground {
@@ -54,7 +55,7 @@ object Playground {
 		val defConf = ConfigReader.getDefault.get
 		val privAuthConf = defConf.auth.priv.copy(authTokenValiditySeconds = validity)
 		val conf = defConf.copy(auth = defConf.auth.copy(priv = privAuthConf))
-		val factory = new CookieFactory(conf)
+		val factory = new CookieFactory(conf, NoLogging)
 		val uid = UserId(email)
 		factory.makeTokenBase64(uid, AuthSource.Password).get
 	}

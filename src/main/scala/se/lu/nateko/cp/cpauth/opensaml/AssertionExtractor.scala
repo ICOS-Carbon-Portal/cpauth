@@ -29,7 +29,7 @@ import se.lu.nateko.cp.cpauth.PrivateKeyInfo
 import se.lu.nateko.cp.cpauth.SamlConfig
 import se.lu.nateko.cp.cpauth.core.Authenticator
 import se.lu.nateko.cp.cpauth.core.Crypto
-import se.lu.nateko.cp.cpauth.utils.Utils.SafeJavaCollectionWrapper
+import se.lu.nateko.cp.cpauth.utils.Utils.toSafeIterable
 
 import java.nio.file.Files
 import java.nio.file.Paths

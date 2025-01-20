@@ -18,6 +18,7 @@ import eu.icoscp.envri.Envri
 import java.net.URI
 import eu.icoscp.georestheart.RestHeartConfig
 import eu.icoscp.georestheart.RestHeartDBConfig
+import akka.event.NoLogging
 
 class CpauthDirectivesTest extends AnyFunSpec with ScalatestRouteTest {
 	import Envri.ICOS
@@ -119,7 +120,7 @@ class CpauthDirectivesTest extends AnyFunSpec with ScalatestRouteTest {
 		}
 
 		def makeCookie(uid: String, config: CpauthConfig): HttpCookie = {
-			val factory = new CookieFactory(config)
+			val factory = new CookieFactory(config, NoLogging)
 			val token = factory.makeTokenBase64(UserId(uid), AuthSource.Password).get
 			factory.makeAuthCookie(token)
 		}

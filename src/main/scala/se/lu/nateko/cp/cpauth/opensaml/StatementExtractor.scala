@@ -1,7 +1,7 @@
 package se.lu.nateko.cp.cpauth.opensaml
 
 import org.opensaml.saml.saml2.core.Assertion
-import se.lu.nateko.cp.cpauth.utils.Utils.SafeJavaCollectionWrapper
+import se.lu.nateko.cp.cpauth.utils.Utils.toSafeIterable
 import org.opensaml.core.xml.schema.XSAny
 import org.opensaml.core.xml.schema.XSString
 import org.opensaml.saml.saml2.core.Attribute

@@ -27,7 +27,7 @@ import scala.concurrent.duration.DurationInt
 import scala.util.Failure
 import scala.util.Success
 
-import utils.Utils.CrasheableTry
+import utils.Utils.getOrCrash
 
 object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
 		with StaticRouting with RestHeartRouting with OAuthRouting with PortalLogRouting:
@@ -43,7 +43,7 @@ object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
 	val http = Http()
 
 	val idpLib: IdpLibrary = IdpLibrary.fromConfig(samlConfig).getOrCrash("Try running 'fetchIdpList' in SBT.")
-	val cookieFactory = new CookieFactory(config)
+	val cookieFactory = new CookieFactory(config, log)
 
 	Class.forName(config.database.driver)
 
