@@ -22,6 +22,17 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 
+	<!-- Matomo Tag Manager -->
+	<script>
+		var _mtm = window._mtm = window._mtm || [];
+		_mtm.push({ 'mtm.startTime': (new Date().getTime()), 'event': 'mtm.Start' });
+		(function () {
+			var d = document, g = d.createElement('script'), s = d.getElementsByTagName('script')[0];
+			g.async = true; g.src = 'https://matomo.icos-cp.eu/js/container_4oejbJ0i.js'; s.parentNode.insertBefore(g, s);
+		})();
+	</script>
+	<!-- End Matomo Tag Manager -->
+
 	@if(menu.nonEmpty){
 	<script>
 		@Html(MainMenuJS().body)
@@ -86,23 +97,6 @@
 			crossorigin="anonymous">
 		</script>
 	}
-
-	<!-- Matomo -->
-	<script>
-		var _paq = window._paq = window._paq || [];
-		_paq.push(['requireCookieConsent']);
-		/* tracker methods like "setCustomDimension" should be called before "trackPageView" */
-		_paq.push(['trackPageView']);
-		_paq.push(['enableLinkTracking']);
-		(function() {
-			var u="//matomo.icos-cp.eu/";
-			_paq.push(['setTrackerUrl', u+'matomo.php']);
-			_paq.push(['setSiteId', '@{styleConf.matomoId}']);
-			var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
-			g.async=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
-		})();
-	</script>
-	<!-- End Matomo Code -->
 
 	<script type="module" src="https://static.icos-cp.eu/share/cookie-consent/cookieconsent-config.js"></script>
 
