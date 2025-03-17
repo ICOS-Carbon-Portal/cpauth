@@ -33,7 +33,7 @@ class EmailSender(config: EmailConfig):
 			}
 
 			message.setFrom(new InternetAddress(config.fromAddress))
-			message.setReplyTo(Array(new InternetAddress("do_not_reply@icos-cp.eu")))
+			message.setReplyTo(Array(new InternetAddress(config.replyToAddress)))
 			message.setSentDate(new Date())
 			message.setSubject(subject)
 			message.setContent(body, mimeType)

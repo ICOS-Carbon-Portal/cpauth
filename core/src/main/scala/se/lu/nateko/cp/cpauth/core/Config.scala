@@ -12,5 +12,6 @@ case class EmailConfig(
 	username: String,
 	password: String,
 	fromAddress: String,
+	replyToAddress: String,
 	logBccAddress: Option[String]
 )
