@@ -113,7 +113,7 @@ object ConfigReader extends DefaultJsonProtocol:
 
 	given RootJsonFormat[PrivateAuthConfig] = jsonFormat2(PrivateAuthConfig.apply)
 	given RootJsonFormat[AuthConfig] = jsonFormat5(AuthConfig.apply)
-	given RootJsonFormat[EmailConfig] = jsonFormat5(EmailConfig.apply)
+	given RootJsonFormat[EmailConfig] = jsonFormat6(EmailConfig.apply)
 	given RootJsonFormat[OAuthProviderConfig] = jsonFormat3(OAuthProviderConfig.apply)
 
 	given RootJsonFormat[CpauthConfig] = jsonFormat7(CpauthConfig.apply)
