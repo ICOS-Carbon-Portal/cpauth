@@ -7,13 +7,13 @@ trait HomeStrings {
 }
 
 object IcosHomeStrings extends HomeStrings {
-	val title = "Welcome to Carbon Portal"
+	val title = "Your account"
 	val subheading = "Manage your account"
 	val licenceUrl = "https://data.icos-cp.eu/licence"
 }
 
 object SitesHomeStrings extends HomeStrings {
-	val title = "Account"
+	val title = "Your account"
 	val subheading = ""
 	val licenceUrl = "https://data.fieldsites.se/licence"
 }
