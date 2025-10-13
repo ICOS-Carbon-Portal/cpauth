@@ -35,7 +35,7 @@ class CpGeoClient(conf: CpGeoConfig, mailer: EmailSender)(using system: ActorSys
 	import system.{dispatcher, log}
 
 	private val baseUrl = Uri(conf.baseUri)
-	private val errorEmailer = ErrorEmailer(conf.emailErrorsTo, "Resolving IP to location failed", mailer, log)
+	//private val errorEmailer = ErrorEmailer(conf.emailErrorsTo, "Resolving IP to location failed", mailer, log)
 
 	def lookup(ip: String): Future[GeoIpInfo] = ipError(ip) match
 		case None =>
@@ -67,8 +67,8 @@ class CpGeoClient(conf: CpGeoConfig, mailer: EmailSender)(using system: ActorSys
 		}.flatMap{
 			case GeoIpInnerError(_, 104) => Future.failed(new QuotaError)
 			case x => Future.successful(x)
-		}.andThen{
-			case Failure(err) => errorEmailer.enqueue(err)
+		//}.andThen{
+		//	case Failure(err) => errorEmailer.enqueue(err)
 		}
 
 end CpGeoClient

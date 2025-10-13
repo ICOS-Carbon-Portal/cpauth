@@ -76,7 +76,7 @@ lazy val georestheart = (project in file("georestheart"))
 	.settings(
 		name := "georestheart",
 		organization := "eu.icoscp",
-		version := "0.1.0",
+		version := "0.1.1",
 		libraryDependencies ++= Seq(
 			"com.typesafe.akka"      %% "akka-http-spray-json"               % akkaHttpVersion excludeAll("io.spray") cross CrossVersion.for3Use2_13,
 			"com.typesafe.akka"      %% "akka-stream"                        % akkaVersion cross CrossVersion.for3Use2_13,
