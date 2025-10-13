@@ -11,6 +11,11 @@ Hosted on https://cpauth.icos-cp.eu/ and on https://auth.fieldsites.se/
 
 SAML metadata: /saml/cpauth
 
+## Views templates for ICOS services: viewsCore
+
+The viewsCore (or views-core) project is built from the `viewsCore` folder, and is used through scala as
+`se.lu.nateko.cp.viewscore` across other ICOS services.
+
 ## Useful openssl commands for developers
 
 Generate a key pair for a cpauth domain (such as cpauth.icos-cp.eu or auth.fieldsites.se;
