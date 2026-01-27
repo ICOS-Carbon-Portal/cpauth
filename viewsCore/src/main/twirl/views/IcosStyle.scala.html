@@ -18,10 +18,6 @@
 		font-size: 87.5%;
 	}
 
-	body {
-		background-color: var(--icos-grey-75);
-	}
-
 	h2:not(:first-child) {
 		margin-top: 2rem;
 	}
@@ -354,11 +350,16 @@
 	/** Footer **/
 
 	#cp-site-footer {
-		max-width: 1200px;
 		margin: auto;
 		padding: 4rem 1rem;
 		word-wrap: break-word;
 		box-sizing: border-box;
+		background-color: var(--icos-grey-75);
+	}
+	#cp-site-footer .layout-container {
+		max-width: 1200px;
+		margin: 0 auto;
+		padding: 0 15px;
 	}
 	#cp-site-footer .footer-box {
 		margin: 3rem 0;
