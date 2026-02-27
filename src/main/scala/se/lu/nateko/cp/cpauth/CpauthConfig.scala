@@ -74,6 +74,7 @@ case class CpauthConfig(
 	restheart: RestHeartConfig,
 	mailing: EmailConfig,
 	oauth: CpauthConfig.OAuthConfig,
+	showCarbonBadge: Boolean,
 )
 
 object CpauthConfig{
@@ -116,4 +117,4 @@ object ConfigReader extends DefaultJsonProtocol:
 	given RootJsonFormat[EmailConfig] = jsonFormat6(EmailConfig.apply)
 	given RootJsonFormat[OAuthProviderConfig] = jsonFormat3(OAuthProviderConfig.apply)
 
-	given RootJsonFormat[CpauthConfig] = jsonFormat7(CpauthConfig.apply)
+	given RootJsonFormat[CpauthConfig] = jsonFormat8(CpauthConfig.apply)

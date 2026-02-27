@@ -7,6 +7,10 @@ import se.lu.nateko.cp.cpauth.core.JsonSupport.{given RootJsonFormat[Envri]}
 import se.lu.nateko.cp.cpauth.core.ConfigLoader.{appConfig, parseAs}
 
 case class ViewsCoreConfig(authHost: String, dataHost: String)
+case class CarbonBadge(enabled: Boolean)
+
+object CarbonBadge:
+	given CarbonBadge = CarbonBadge(false)
 
 given RootJsonFormat[ViewsCoreConfig] = jsonFormat2(ViewsCoreConfig.apply)
 
