@@ -5,11 +5,11 @@
 	title: String,
 	menu: Seq[CpMenuItem] = CpMenu.default,
 	bootstrapJavascript: Boolean = false,
-)(customHeader: Html)(body: Html)(implicit envri: Envri, carbonBadge: CarbonBadge)
+)(customHeader: Html)(body: Html)(implicit envri: Envri, envSettings: EnvSettings)
 @IcosPage(
   title,
   menu,
   CpStyleConfig,
-  CpFooter(carbonBadge.enabled),
+  CpFooter(envSettings.showCarbonBadge),
   bootstrapJavascript,
 )(customHeader)(body)

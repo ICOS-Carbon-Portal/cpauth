@@ -4,7 +4,7 @@
 @(
 	title: String,
 	bootstrapJavascript: Boolean = false,
-)(customHeader: Html)(body: Html)(implicit envri: Envri, carbonBadge: CarbonBadge)
+)(customHeader: Html)(body: Html)(implicit envri: Envri, envSettings: EnvSettings)
 @template(customHeader)(body)
 
 @template = @{

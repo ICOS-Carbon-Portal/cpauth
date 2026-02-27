@@ -27,7 +27,7 @@ import scala.concurrent.duration.DurationInt
 import scala.util.Failure
 import scala.util.Success
 
-import se.lu.nateko.cp.viewscore.CarbonBadge
+import se.lu.nateko.cp.viewscore.EnvSettings
 import utils.Utils.getOrCrash
 
 object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
@@ -39,7 +39,10 @@ object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
 	given scheduler: Scheduler = system.scheduler
 
 	val config: CpauthConfig = ConfigReader.getDefault.getOrCrash("Problem reading/parsing config file")
-	given carbonBadge: CarbonBadge = CarbonBadge(config.showCarbonBadge)
+	given envSettings: EnvSettings = {
+		val es = config.envSettings
+		EnvSettings(devMode = es.devMode, envName = es.envName, showCarbonBadge = es.showCarbonBadge)
+	}
 
 	val (httpConfig, authConfig, samlConfig, oauthConfig) = (config.http, config.auth, config.saml, config.oauth)
 	val http = Http()

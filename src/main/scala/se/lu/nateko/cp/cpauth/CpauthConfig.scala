@@ -66,6 +66,12 @@ case class AuthConfig(
 	masterAdminPass: String
 )
 
+case class EnvSettingsConfig(
+	devMode: Boolean,
+	envName: Option[String],
+	showCarbonBadge: Boolean,
+)
+
 case class CpauthConfig(
 	http: HttpConfig,
 	saml: SamlConfig,
@@ -74,7 +80,7 @@ case class CpauthConfig(
 	restheart: RestHeartConfig,
 	mailing: EmailConfig,
 	oauth: CpauthConfig.OAuthConfig,
-	showCarbonBadge: Boolean,
+	envSettings: EnvSettingsConfig,
 )
 
 object CpauthConfig{
@@ -116,5 +122,6 @@ object ConfigReader extends DefaultJsonProtocol:
 	given RootJsonFormat[AuthConfig] = jsonFormat5(AuthConfig.apply)
 	given RootJsonFormat[EmailConfig] = jsonFormat6(EmailConfig.apply)
 	given RootJsonFormat[OAuthProviderConfig] = jsonFormat3(OAuthProviderConfig.apply)
+	given RootJsonFormat[EnvSettingsConfig] = jsonFormat3(EnvSettingsConfig.apply)
 
 	given RootJsonFormat[CpauthConfig] = jsonFormat8(CpauthConfig.apply)

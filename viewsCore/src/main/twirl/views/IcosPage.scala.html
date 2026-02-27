@@ -9,7 +9,7 @@
 	styleConf: IcosStyleConfig,
 	footer: Html,
 	bootstrapJavascript: Boolean = false,
-)(customHeader: Html)(body: Html)(implicit envri: Envri)
+)(customHeader: Html)(body: Html)(implicit envri: Envri, envSettings: EnvSettings)
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -41,16 +41,49 @@
 
 	@customHeader
 
-	<title>@title | @{envri.shortName}</title>
+	<title>@if(envSettings.devMode){🚧 }@title | @{envri.shortName}</title>
+
+	@if(envSettings.devMode) {
+	<style>
+		.dev-ribbon {
+			background: repeating-linear-gradient(
+				45deg,
+				#000,
+				#000 10px,
+				#fc0 10px,
+				#fc0 20px
+			);
+			color: #000;
+			text-align: center;
+			padding: 4px 0;
+			font-weight: bold;
+			font-size: 14px;
+			position: relative;
+			z-index: 9999;
+		}
+		.dev-ribbon span {
+			background: #fc0;
+			padding: 2px 12px;
+		}
+	</style>
+	}
 
 </head>
 
 <body>
+	@if(envSettings.devMode) {
+	<div class="dev-ribbon"><span>🚧 Development Environment@envSettings.envName.map(n => s" — $n").getOrElse("")</span></div>
+	}
 	<header id="cp-header">
 		<div class="layout-container">
 			<a href=@{styleConf.headerHomeLink} title="Home">
 				<img src=@{styleConf.headerLogo} alt=@{styleConf.headerLogoName}>
 			</a>
+			@for(name <- envSettings.envName) {
+			<div class="d-flex align-items-center ms-3">
+				<span class="badge bg-warning text-dark fs-6">@name</span>
+			</div>
+			}
 			<div class="header-links d-flex align-items-end flex-column justify-content-end pb-5 pe-3">
 				<ul class="d-flex lh-base">
 					<li class="header-link cart-link">

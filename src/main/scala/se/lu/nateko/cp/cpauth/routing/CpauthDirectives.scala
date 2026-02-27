@@ -41,7 +41,7 @@ import scala.util.Try
 
 import SprayJsonSupport.sprayJsValueMarshaller
 import se.lu.nateko.cp.cpauth.core.AnonId
-import se.lu.nateko.cp.viewscore.CarbonBadge
+import se.lu.nateko.cp.viewscore.EnvSettings
 
 
 trait CpauthDirectives {
@@ -53,7 +53,7 @@ trait CpauthDirectives {
 
 	given dispatcher: ExecutionContext
 	given scheduler: Scheduler
-	given carbonBadge: CarbonBadge
+	given envSettings: EnvSettings
 	given ToResponseMarshaller[Html] = TemplatePageMarshalling.marshaller[Html]
 	given [T: RootJsonWriter]: ToEntityMarshaller[T] = SprayJsonSupport.sprayJsonMarshaller
 
