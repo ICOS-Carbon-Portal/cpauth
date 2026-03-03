@@ -27,37 +27,16 @@
 	@customHeader
 
 	<title>@if(envSettings.devMode){🚧 }@title | SITES</title>
-
-	@if(envSettings.devMode) {
-	<style>
-		.dev-ribbon {
-			background: repeating-linear-gradient(
-				45deg,
-				#000,
-				#000 10px,
-				#fc0 10px,
-				#fc0 20px
-			);
-			color: #000;
-			text-align: center;
-			padding: 4px 0;
-			font-weight: bold;
-			font-size: 14px;
-			position: relative;
-			z-index: 9999;
-		}
-		.dev-ribbon span {
-			background: #fc0;
-			padding: 2px 12px;
-		}
-	</style>
-	}
+	@DevMode()
 
 </head>
 
 <body>
 	@if(envSettings.devMode) {
-	<div class="dev-ribbon"><span>🚧 Development Environment@envSettings.envName.map(n => s" — $n").getOrElse("")</span></div>
+	<div class="env-border"></div>
+	}
+	@for(name <- envSettings.envName) {
+	<div class="env-badge">@name</div>
 	}
 	<header class="header layout-container">
 		<nav class="navbar navbar-expand-lg navbar-dark">
@@ -65,9 +44,6 @@
 				<a href="https://www.fieldsites.se" class="pb-3">
 					<img src="https://static.icos-cp.eu/images/SITES-logo.svg" width=149 height=49 alt="SITES logo">
 				</a>
-				@for(name <- envSettings.envName) {
-				<span class="badge bg-warning text-dark fs-6 ms-3">@name</span>
-				}
 				<button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvas-menu" aria-controls="offcanvas-menu" aria-expanded="false" aria-label="Toggle navigation">
 					<span class="navbar-toggler-icon"></span>
 				</button>
