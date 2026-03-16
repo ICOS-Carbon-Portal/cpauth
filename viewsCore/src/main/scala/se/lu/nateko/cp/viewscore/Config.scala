@@ -8,14 +8,11 @@ import se.lu.nateko.cp.cpauth.core.ConfigLoader.{appConfig, parseAs}
 
 case class ViewsCoreConfig(authHost: String, dataHost: String)
 
-case class EnvSettings(
-	devMode: Boolean,
-	envName: Option[String],
+case class EnvironmentConfig(
+	showUnderConstruction: Boolean,
+	name: Option[String],
 	showCarbonBadge: Boolean,
 )
-
-object EnvSettings:
-	given EnvSettings = EnvSettings(devMode = false, envName = None, showCarbonBadge = false)
 
 given RootJsonFormat[ViewsCoreConfig] = jsonFormat2(ViewsCoreConfig.apply)
 

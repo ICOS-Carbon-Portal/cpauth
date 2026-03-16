@@ -4,7 +4,7 @@
 @(
 	title: String,
 	bootstrapJavascript: Boolean = false,
-)(customHeader: Html)(body: Html)(implicit envri: Envri, envSettings: EnvSettings)
+)(customHeader: Html)(body: Html)(implicit envri: Envri, environment: EnvironmentConfig)
 @IcosPage(
 	title,
 	CpMenu.cities,
