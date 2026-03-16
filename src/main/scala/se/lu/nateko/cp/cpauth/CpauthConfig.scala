@@ -15,6 +15,7 @@ import scala.util.Try
 import eu.icoscp.georestheart.RestHeartConfig
 import eu.icoscp.geoipclient.CpGeoConfig
 import se.lu.nateko.cp.cpauth.core.Crypto
+import se.lu.nateko.cp.viewscore.EnvironmentConfig
 
 enum OAuthProvider:
 	case facebook, orcidid, atmoAccess
@@ -64,12 +65,6 @@ case class AuthConfig(
 	secretUserSalt: String,
 	masterAdminUser: String,
 	masterAdminPass: String
-)
-
-case class EnvironmentConfig(
-	name: Option[String],
-	showUnderConstruction: Boolean,
-	showCarbonBadge: Boolean,
 )
 
 case class CpauthConfig(

@@ -9,8 +9,8 @@ import se.lu.nateko.cp.cpauth.core.ConfigLoader.{appConfig, parseAs}
 case class ViewsCoreConfig(authHost: String, dataHost: String)
 
 case class EnvironmentConfig(
-	showUnderConstruction: Boolean,
 	name: Option[String],
+	showUnderConstruction: Boolean,
 	showCarbonBadge: Boolean,
 )
 

@@ -39,10 +39,7 @@ object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
 	given scheduler: Scheduler = system.scheduler
 
 	val config: CpauthConfig = ConfigReader.getDefault.getOrCrash("Problem reading/parsing config file")
-	given environment: EnvironmentConfig = {
-		val es = config.environment
-		EnvironmentConfig(name = es.name, showUnderConstruction = es.showUnderConstruction, showCarbonBadge = es.showCarbonBadge)
-	}
+	given environment: EnvironmentConfig = config.environment
 
 	val (httpConfig, authConfig, samlConfig, oauthConfig) = (config.http, config.auth, config.saml, config.oauth)
 	val http = Http()
