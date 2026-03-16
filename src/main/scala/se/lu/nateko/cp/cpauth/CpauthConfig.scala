@@ -15,6 +15,7 @@ import scala.util.Try
 import eu.icoscp.georestheart.RestHeartConfig
 import eu.icoscp.geoipclient.CpGeoConfig
 import se.lu.nateko.cp.cpauth.core.Crypto
+import se.lu.nateko.cp.viewscore.EnvironmentConfig
 
 enum OAuthProvider:
 	case facebook, orcidid, atmoAccess
@@ -74,6 +75,7 @@ case class CpauthConfig(
 	restheart: RestHeartConfig,
 	mailing: EmailConfig,
 	oauth: CpauthConfig.OAuthConfig,
+	environment: EnvironmentConfig,
 )
 
 object CpauthConfig{
@@ -115,5 +117,6 @@ object ConfigReader extends DefaultJsonProtocol:
 	given RootJsonFormat[AuthConfig] = jsonFormat5(AuthConfig.apply)
 	given RootJsonFormat[EmailConfig] = jsonFormat6(EmailConfig.apply)
 	given RootJsonFormat[OAuthProviderConfig] = jsonFormat3(OAuthProviderConfig.apply)
+	given RootJsonFormat[EnvironmentConfig] = jsonFormat3(EnvironmentConfig.apply)
 
-	given RootJsonFormat[CpauthConfig] = jsonFormat7(CpauthConfig.apply)
+	given RootJsonFormat[CpauthConfig] = jsonFormat8(CpauthConfig.apply)

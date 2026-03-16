@@ -1,6 +1,7 @@
 @import eu.icoscp.envri.Envri
+@import se.lu.nateko.cp.viewscore.EnvironmentConfig
 
-@(title: String, subheading: String, scriptName: String)(customHeader: Html)(body: Html)(implicit envri: Envri)
+@(title: String, subheading: String, scriptName: String)(customHeader: Html)(body: Html)(implicit envri: Envri, environment: EnvironmentConfig)
 @template{
 	<script src="https://static.icos-cp.eu/constant/jquery/1.11.2/jquery.min.js"></script>
 	@customHeader

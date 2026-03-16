@@ -19,6 +19,7 @@ import java.net.URI
 import eu.icoscp.georestheart.RestHeartConfig
 import eu.icoscp.georestheart.RestHeartDBConfig
 import akka.event.NoLogging
+import se.lu.nateko.cp.viewscore.EnvironmentConfig
 
 class CpauthDirectivesTest extends AnyFunSpec with ScalatestRouteTest {
 	import Envri.ICOS
@@ -62,6 +63,7 @@ class CpauthDirectivesTest extends AnyFunSpec with ScalatestRouteTest {
 		),
 		mailing = null,
 		oauth = null,
+		environment = EnvironmentConfig(name = None, showUnderConstruction = false, showCarbonBadge = false),
 	)
 
 	val config = getConfig("src/test/resources/private1.der")
@@ -71,6 +73,7 @@ class CpauthDirectivesTest extends AnyFunSpec with ScalatestRouteTest {
 		val authConfig = config.auth
 		val dispatcher = system.dispatcher
 		val scheduler = system.scheduler
+		val environment = EnvironmentConfig(name = None, showUnderConstruction = false, showCarbonBadge = false)
 		val materializer = Materializer(system)
 		def hostToEnvri(host: String) = config.http.serviceHosts.map(_.swap).get(host)
 		val userDb = null

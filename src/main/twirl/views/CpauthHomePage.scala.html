@@ -1,7 +1,8 @@
 @import eu.icoscp.envri.Envri
 @import se.lu.nateko.cp.cpauth.views.ViewStrings.homeStrings
+@import se.lu.nateko.cp.viewscore.EnvironmentConfig
 
-@()(implicit envri: Envri)
+@()(implicit envri: Envri, environment: EnvironmentConfig)
 @CpauthPage(homeStrings.title, homeStrings.subheading, "home"){
 }{
 	<div id="hello" style="display: none">

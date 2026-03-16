@@ -8,6 +8,12 @@ import se.lu.nateko.cp.cpauth.core.ConfigLoader.{appConfig, parseAs}
 
 case class ViewsCoreConfig(authHost: String, dataHost: String)
 
+case class EnvironmentConfig(
+	name: Option[String],
+	showUnderConstruction: Boolean,
+	showCarbonBadge: Boolean,
+)
+
 given RootJsonFormat[ViewsCoreConfig] = jsonFormat2(ViewsCoreConfig.apply)
 
 lazy val envri2Config = appConfig.getValue("viewsCore").parseAs[Map[Envri, ViewsCoreConfig]]

@@ -9,7 +9,7 @@
 	styleConf: IcosStyleConfig,
 	footer: Html,
 	bootstrapJavascript: Boolean = false,
-)(customHeader: Html)(body: Html)(implicit envri: Envri)
+)(customHeader: Html)(body: Html)(implicit envri: Envri, environment: EnvironmentConfig)
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -41,11 +41,18 @@
 
 	@customHeader
 
-	<title>@title | @{envri.shortName}</title>
+	<title>@if(environment.showUnderConstruction){🚧 }@title | @{envri.shortName}</title>
+	@EnvironmentStyles()
 
 </head>
 
 <body>
+	@if(environment.showUnderConstruction) {
+	<div class="env-border"></div>
+	}
+	@for(name <- environment.name) {
+	<div class="env-badge">@name</div>
+	}
 	<header id="cp-header">
 		<div class="layout-container">
 			<a href=@{styleConf.headerHomeLink} title="Home">

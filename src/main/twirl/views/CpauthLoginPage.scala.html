@@ -1,7 +1,8 @@
 @import eu.icoscp.envri.Envri
 @import se.lu.nateko.cp.cpauth.views.ViewStrings.loginStrings
+@import se.lu.nateko.cp.viewscore.EnvironmentConfig
 
-@(oauthConfigJson: String)(implicit envri: Envri)
+@(oauthConfigJson: String)(implicit envri: Envri, environment: EnvironmentConfig)
 @CpauthPage(loginStrings.title, loginStrings.subheading, "login"){
 	<script src="https://static.icos-cp.eu/constant/cookies.js/1.2.1/cookies.min.js"></script>
 	<script src="https://static.icos-cp.eu/constant/jquery/plugins/autocomplete/1.11.4/jquery-ui.min.js"></script>
