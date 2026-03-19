@@ -21,6 +21,7 @@ import eu.icoscp.geoipclient.ErrorEmailer
 import se.lu.nateko.cp.cpauth.routing.PortalLogRouting
 
 import java.sql.DriverManager
+
 import scala.concurrent.Await
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.DurationInt
@@ -100,10 +101,16 @@ object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
 		http.newServerAt(httpConfig.serviceInterface, httpConfig.servicePrivatePort).bindFlow(route)
 	}.onComplete{
 		case Success(binding) =>
-			sys.addShutdownHook{
-				Await.result(binding.unbind(), 3.seconds)
-				println("cpauth has been taken offline successfully")
-			}
+		sys.addShutdownHook{
+			try{
+				val conn = DriverManager.getConnection(config.database.url, config.database.user, config.database.password)
+				try{
+					conn.createStatement().execute("SHUTDOWN")
+				} finally conn.close()
+			} catch case _: Exception => ()
+			Await.result(binding.unbind(), 3.seconds)
+			println("cpauth has been taken offline successfully")
+		}
 			log.info(s"Started cpauth: $binding")
 		case Failure(err) =>
 			log.error(err, "Could not start 'cpauth' service")
