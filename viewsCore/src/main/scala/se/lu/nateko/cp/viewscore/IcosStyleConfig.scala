@@ -12,7 +12,7 @@ trait IcosStyleConfig{
 
 object CpStyleConfig extends IcosStyleConfig{
 	val headerImage = new URI("https://static.icos-cp.eu/images/icos-header.jpg")
-	val headerLogo = new URI("https://static.icos-cp.eu/images/ICOS-logo.svg")
+	val headerLogo = new URI("https://www.icos-cp.eu/themes/cp_theme_d10/logo.svg")
 	val headerHomeLink = new URI(CpMenu.cpHome)
 	val headerLogoName = "ICOS Carbon Portal"
 	val matomoId = 3

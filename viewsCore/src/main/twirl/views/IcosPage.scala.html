@@ -46,42 +46,68 @@
 </head>
 
 <body>
+	<a href="#main-content" class="visually-hidden-focusable">
+		Skip to main content
+		</a>
 	<header id="cp-header">
-		<div class="layout-container">
-			<a href=@{styleConf.headerHomeLink} title="Home">
-				<img src=@{styleConf.headerLogo} alt=@{styleConf.headerLogoName}>
-			</a>
-			<div class="header-links d-flex align-items-end flex-column justify-content-end pb-5 pe-3">
-				<ul class="d-flex lh-base">
-					<li class="header-link cart-link">
-						<a><i class="fas fa-shopping-cart"></i> Cart
-						<span class="badge rounded-pill bg-secondary">
-							<span class="items-number">0</span>
-							<span class="visually-hidden">items in cart</span>
-						</span>
-					</a>
-					</li>
-					<li class="header-link header-link-separator account-link">
-						<a><i class="fas fa-user"></i> My Account</a>
-					</li>
-					<li class="header-link login-link">
-						<a><i class="fas fa-sign-in-alt"></i> Log in</a>
-					</li>
-				</ul>
-				<form method="get" action="https://www.icos-cp.eu/search" class="input-group">
-					<input type="search" class="form-control" name="q">
-					<button class="btn btn-light border-0" type="submit"><i class="fas fa-search"></i></button>
-				</form>
+		<div class="header d-flex justify-content-between py-3 px-4">
+			<div class="header-left d-flex align-items-center">
+				<a href=@{styleConf.headerHomeLink} title="Home" rel="home" class="navbar-brand">
+					<img src=@{styleConf.headerLogo} alt=@{styleConf.headerLogoName} class="d-inline-block align-top">
+				</a>
 			</div>
-			@if(menu.nonEmpty){
-			<div id="menu-button" class="btn btn-default"><span class="glyphicon glyphicon-menu-hamburger"></span><i class="fas fa-bars"></i></div>
-			}
+			<div class="header-right d-flex align-items-center">
+				<section class="row region region-header-right">
+
+					<ul class="d-flex lh-base">
+						<li class="header-link cart-link">
+							<a><i class="fas fa-shopping-cart"></i> Cart
+							<span class="badge rounded-pill bg-secondary">
+								<span class="items-number">0</span>
+								<span class="visually-hidden">items in cart</span>
+							</span>
+						</a>
+						</li>
+						<li class="header-link header-link-separator account-link">
+							<a><i class="fas fa-user"></i> My Account</a>
+						</li>
+						<li class="header-link login-link">
+							<a><i class="fas fa-sign-in-alt"></i> Log in</a>
+						</li>
+					</ul>
+
+					<div id="block-cp-theme-d10-cpsearch" class="search-block-form block-search block block-cp-search block-cp-search-block">
+						<div class="content">
+							<form action="@(CpMenu.cpHome)/search" method="get" id="search-block-form" class="input-group" accept-charset="UTF-8" data-drupal-form-fields="edit-keys">
+								<input data-drupal-selector="edit-keys" type="search" id="edit-keys" name="q" class="form-search form-control">
+								<button class="btn btn-light border-0" type="submit" id="edit-submit"><i class="fas fa-search"></i></button>
+							</form>
+						</div>
+					</div>
+				</section>
+				@if(menu.nonEmpty){
+					<nav class="navbar mobile py-0">
+						<div class="container-fluid">
+						<button class="navbar-toggler rounded" id="menu-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapsing-navbar" aria-controls="collapsing-navbar" aria-expanded="false" aria-label="Toggle navigation">
+							<span class="navbar-toggler-icon"></span>
+						</button>
+						</div>
+					</nav>
+				}
+			</div>
 		</div>
 	</header>
 
-	<div id="cp-main-menu">
-		@MainMenu(menu)
-	</div>
+	<nav class="navbar navbar-dark navbar-expand-lg border-top border-bottom py-0" id="navbar-main">
+		<div id="collapsing-navbar" class="collapse navbar-collapse">
+			<nav role="navigation" class="navigation menu--main">
+				<h2 class="visually-hidden">Main navigation</h2>
+				<div id="cp_theme_d10_menu" class="layout-container">
+					@MainMenu(menu)
+				</div>
+			</nav>
+		</div>
+	</nav>
 
 	<div class="py-4 bg-white">
 		<div class="container-fluid">

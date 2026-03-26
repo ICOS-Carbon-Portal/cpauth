@@ -1,73 +1,84 @@
 @import se.lu.nateko.cp.viewscore._
 @import CpMenu.cpHome
-@import java.net.URI
 
 @(menuItems: Seq[CpMenuItem])
 @if(!menuItems.isEmpty){
-	<ul>
+	<div class="nav navbar-nav justify-content-center px-4 was-ul">
 		@for(item <- menuItems){
-			@menuItem(item, true)
+			@menuItem(item, 0, "")
 		}
-		<li class="account cart-link">
+		<div class="account cart-link">
 			<a><i class="fas fa-shopping-cart"></i> Cart
 				<span class="badge rounded-pill bg-secondary">
 					<span class="items-number">0</span>
 					<span class="visually-hidden">items in cart</span>
 				</span>
 			</a>
-		</li>
-		<li class="account account-link">
+		</div>
+		<div class="account account-link">
 			<a><i class="fas fa-user"></i> My Account</a>
-		</li>
-		<li class="account login-link">
+		</div>
+		<div class="account login-link">
 			<a><i class="fas fa-sign-in-alt"></i> Log in</a>
-		</li>
-
-	</ul>
+		</div>
+	</div>
 }
 
 
-@menuItem(item: CpMenuItem, isTop: Boolean) = {
+@menuItem(item: CpMenuItem, depth: Int, lastLevel2Url: String) = {
 	@defining(!item.children.isEmpty){ hasChildren =>
-	<li class="@itemClass(hasChildren, isTop)">
-		@if(isTop && hasChildren) {
-		<div class="menu-item-text">
-			<span class="open_menu menu-icon">
-				<i class="fas fa-chevron-down"></i>
-			</span>
-			@anchor(item, isTop, hasChildren)
-		</div>
-		} else {
-			@anchor(item, isTop, hasChildren)
+	@defining(depth == 2 && lastLevel2Url.nonEmpty && item.url == lastLevel2Url){ hideLink =>
+	<div class="@itemClass(depth, hasChildren)">
+		@if(depth == 0) {
+			@if(hasChildren) {
+			<div class="dd-toggle text-dark py-2 px-3 w-100 d-flex justify-content-center top-link" role="button" tabindex="0">
+				<div>@item.title <span class="open-menu menu-icon"><i class="fas fa-chevron-down"></i></span></div>
+			</div>
+			} else {
+			<a href="@link(item.url)" class="text-dark py-2 px-3 w-100 d-flex justify-content-center top-link">
+				<div>@item.title</div>
+			</a>
+			}
+		} else if(depth >= 2) {
+			@if(hideLink) {
+			<div class="text-dark fw-semibold pt-3 pb-3 user-select-none">&nbsp;</div>
+			} else if(depth == 2) {
+			<a href="@link(item.url)" class="text-dark fw-semibold pt-3 pb-3">@item.title</a>
+			} else {
+			<a href="@link(item.url)" class="text-secondary pt-1 pb-2">@item.title</a>
+			}
 		}
 		@if(hasChildren) {
-			<ul>
-			@for(item <- item.children){
-				@menuItem(item, false)
+			@if(depth == 0) {
+				@defining(("" +: item.children.map(_.children.headOption.map(_.url).getOrElse("")).dropRight(1))){ prevUrls =>
+				<div class="dropdown-menu pt-3 pb-4 border rounded-0 justify-content-between">
+				@for((child, prevUrl) <- item.children.zip(prevUrls)){
+					@menuItem(child, 1, prevUrl)
+				}
+				</div>
+				}
+			} else if(depth == 1) {
+				@for(child <- item.children){
+					@menuItem(child, 2, lastLevel2Url)
+				}
+			} else {
+				@for(child <- item.children){
+					@menuItem(child, depth + 1, "")
+				}
 			}
-			</ul>
 		}
-	</li>
+	</div>
+	}
 	}
 }
 
-@anchor(item: CpMenuItem, isTop: Boolean, hasChildren: Boolean) = {
-	<a href="@link(item.url)">
-		@if(item.title == "Home") {
-			<i class="fas fa-home"></i>
-		} else {
-			@item.title
-		}
-		@if(!isTop && hasChildren) {
-		<span class="open_menu submenu-icon">
-			<i class="fas fa-chevron-right"></i>
-		</span>
-		}
-	</a>
-}
-
-@itemClass(isTop: Boolean, hasChildren: Boolean) = @{
-	if(isTop && hasChildren) "is_topnode" else ""
+@itemClass(depth: Int, hasChildren: Boolean) = @{
+	val base = depth match {
+		case 0 => Seq(if(hasChildren) "top-node" else "", "flex-grow-1")
+		case 1 => Seq("menu-col")
+		case _ => Seq("list-item")
+	}
+	(base :+ s"menu-level-$depth").filter(_.nonEmpty).mkString(" ")
 }
 
 @link(uri: String) = @{

@@ -1,52 +1,79 @@
 @import se.lu.nateko.cp.viewscore.CpMenu.cpHome
 
 @()
-<footer id="cp-site-footer" class="site-footer">
+<footer id="cp-site-footer" class="bg-primary text-light">
+	<div class="container">
+		<a class="navbar-brand" href="/" title="Home" rel="home">
+			<img src="@(cpHome)/themes/cp_theme_d10/logo-white.png" />
+		</a>
+		<hr />
+		<div class="row">
+			<section class="row region-footer region-footer-first col-lg-6">
+				<div class="content">
+					<h3 class="h6">Contact</h3>
+					<p><a href="mailto:info@@icos-ri.eu">info@@icos-ri.eu</a></p>
+					<ul class="social-media list-inline">
+						<li class="list-inline-item">
+							<a class="social-media-icon fab fa-x-twitter" href="https://twitter.com/icos_ri">&nbsp;</a>
+						</li>
+						<li class="list-inline-item">
+							<a class="social-media-icon fab fa-instagram" href="https://www.instagram.com/icosri/" >&nbsp;</a>
+						</li>
+						<li class="list-inline-item">
+							<a class="social-media-icon fab fa-youtube" href="https://www.youtube.com/c/ICOSRI" >&nbsp;</a>
+						</li>
+						<li class="list-inline-item">
+							<a class="social-media-icon fab fa-linkedin-in" href="https://www.linkedin.com/company/integrated-carbon-observation-system" >&nbsp;</a>
+						</li>
+						<li class="list-inline-item">
+							<a class="social-media-icon fa-brands fa-bluesky" href="https://bsky.app/profile/icos-ri.eu" >&nbsp;</a>
+						</li>
+					</ul>
+					<div id="wcb" class="carbonbadge text-start mt-4 wcb-d" style="filter: grayscale(1)"></div>
+					<script	src="https://unpkg.com/website-carbon-badges@@1.1.3/b.min.js" defer></script>
+				</div>
+			</section>
 
-	<div class="layout-container">
-	<img alt="ICOS Logo" src="https://static.icos-cp.eu/images/ICOS-logo.svg" style="height: 70px">
+			<section class="row region-footer region-footer-third col-lg">
+				<div class="content">
+					<h3 class="h6">Resources</h3>
+					<p><a href="@(cpHome)/contact-us">Contact</a></p>
+					<p><a href="/data-services/about-data-portal/data-license">Data Licence</a></p>
+					<p><a href="https://uptime.icos-cp.eu/status/core">Services status</a></p>
+					<p><a href="https://fileshare.icos-cp.eu">ICOS Fileshare (Nextcloud)</a></p>
+					<p><a href="@(cpHome)/news-and-events/newsletters">ICOS Newsletter</a></p>
+				</div>
+			</section>
 
-	<div class="site-footer-container">
-		<div class="region region-footer-first">
-			<div class="footer-box">
-				<h3>Resources</h3>
-				<p class="marked-link"><a href="@(cpHome)/contact-us">CONTACT</a></p>
-				<p class="marked-link"><a href="@(cpHome)/privacy">PRIVACY POLICY</a></p>
-				<p class="marked-link"><a href="@(cpHome)/data-services/about-data-portal/data-license">DATA LICENSE</a></p>
-				<p class="marked-link"><a href="@(cpHome)/terms-of-use">TERMS OF USE</a></p>
-				<p class="marked-link"><a href="" data-cc="show-preferencesModal">MANAGE COOKIE PREFERENCES</a></p>
-				<p class="marked-link"><a href="https://uptime.icos-cp.eu/status/core">SERVICES STATUS</a></p>
-				<div id="wcb" class="carbonbadge text-start mt-4 wcb-d" style="filter: grayscale(1);"></div>
-				<script src="https://unpkg.com/website-carbon-badges@@1.1.3/b.min.js" defer></script>
-			</div>
+			<section class="row region-footer region-footer-fourth col-lg">
+				<div class="content">
+					<h3 class="h6">Central Facility websites</h3>
+					<p><a href="https://icos-atc.lsce.ipsl.fr/">Atmosphere Thematic Centre (ATC)</a></p>
+					<p><a href="http://www.icos-etc.eu/">Ecosystem Thematic Centre (ETC)</a></p>
+					<p><a href="https://otc.icos-cp.eu/">Ocean Thematic Centre (OTC)</a></p>
+					<p><a href="https://www.icos-cal.eu/">Central Analytical Laboratories (CAL)</a></p>
+				</div>
+			</section>
 		</div>
-
-		<div class="region region-footer-second">
-			<div class="footer-box">
-				<h3>Central Facility websites</h3>
-				<p class="marked-link external-link"><a href="https://icos-atc.lsce.ipsl.fr/">Atmosphere Thematic Centre (ATC)</a></p>
-				<p class="marked-link external-link"><a href="http://www.icos-etc.eu/">Ecosystem Thematic Centre (ETC)</a></p>
-				<p class="marked-link external-link"><a href="https://otc.icos-cp.eu/">Ocean Thematic Centre (OTC)</a></p>
-				<p class="marked-link external-link"><a href="https://www.icos-cal.eu/">Central Analytical Laboratories (CAL)</a></p>
-				<h3 class="marked-link"><a href="@(cpHome)/observations/national-networks">National networks</a></h3>
-			</div>
-		</div>
-
-		<div class="region region-footer-third">
-			<div class="footer-box">
-				<h3>ICOS on social media</h3>
-				<p>
-					<a class="social-media-icon fab fa-twitter-square" href="https://twitter.com/icos_ri">&nbsp;</a>
-					<a class="social-media-icon fab fa-instagram" href="https://www.instagram.com/icosri/">&nbsp;</a>
-					<a class="social-media-icon fab fa-youtube-square" href="https://www.youtube.com/c/ICOSRI">&nbsp;</a>
-					<a class="social-media-icon fab fa-linkedin" href="https://www.linkedin.com/company/integrated-carbon-observation-system">&nbsp;</a>
-					<a class="social-media-icon fa-brands fa-square-bluesky" href="https://bsky.app/profile/icos-ri.eu">&nbsp;</a>
-				</p>
-				<h3 class="marked-link"><a href="@(cpHome)/news-and-events/newsletter">ICOS Newsletter</a></h3>
-				<h3 class="marked-link"><a href="https://fileshare.icos-cp.eu/">Nextcloud – ICOS Fileshare</a></h3>
-			</div>
+		<div class="row footer-bottom">
+			<section class="row region-footer region-footer-bottom-second col-lg">
+				<div class="content">
+					<ul class="list-inline">
+						<li class="list-inline-item">
+							<a href="@(cpHome)/terms-of-use">Terms of Use</a>
+						</li>
+						<li class="list-inline-item">
+							<a href="@(cpHome)/privacy">Privacy Policy</a>
+						</li>
+						<li class="list-inline-item">
+							<a href="" data-cc="show-preferencesModal" aria-haspopup="dialog">Cookie Preferences</a>
+						</li>
+						<li class="list-inline-item">
+							<a href="@(cpHome)/accessibility">Accessibility Statement</a>
+						</li>
+					</ul>
+				</div>
+			</section>
 		</div>
 	</div>
-	</div>
-
 </footer>

@@ -6,7 +6,7 @@
 window.addEventListener("load", function(){
 
 	const menuButton = document.getElementById("menu-button");
-
+ /* old JS:
 	if (menuButton !== null) {
 		menuButton.addEventListener('click', function() {
 			document.getElementById('cp-main-menu').classList.toggle('open');
@@ -20,6 +20,31 @@ window.addEventListener("load", function(){
 
 		elem.addEventListener("click", function(event){
 			this.parentElement.parentElement.classList.toggle('open');
+		});
+	}
+	*/
+	if (menuButton !== null) {
+		const ddToggle = document.querySelector("#cp_theme_d10_menu .top-node .dd-toggle");
+		const menuContainer = document.querySelector("#cp_theme_d10_menu");
+
+		ddToggle.addEventListener('click', function (event) {
+			let target = ddToggle.closest(".top-node");
+			target.classList.toggle("open");
+			event.preventDefault();
+		});
+
+		ddToggle.addEventListener('keyup', function (event) {
+			if(event.key === "Enter") {
+				let target = ddToggle.closest(".top-node");
+				target.classList.toggle("open");
+				event.preventDefault();
+			}
+		});
+
+		menuContainer.addEventListener('mouseout', function (event) {
+			if (event.target === document.activeElement) {
+				event.target.blur();
+			}
 		});
 	}
 

@@ -5,7 +5,7 @@ case class CpMenuItem(title: String, url: String, children: Seq[CpMenuItem])
 object CpMenu:
 
 	val cpHome = "https://www.icos-cp.eu"
-	val cpMenuApi = "" // temporarily disabled
+	val cpMenuApi = "https://www.icos-cp.eu/api/menu/main"
 	val citiesHome = "https://www.icos-cities.eu"
 	val citiesMenuApi = "https://www.icos-cp.eu/api/menu/cities"
 	val sitesHome = "https://www.fieldsites.se"
