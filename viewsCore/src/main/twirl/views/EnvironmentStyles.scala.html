@@ -1,7 +1,7 @@
-@import se.lu.nateko.cp.viewscore.EnvironmentConfig
+@import se.lu.nateko.cp.viewscore.ViewsCoreConfig
 
-@()(implicit environment: EnvironmentConfig)
-@if(environment.showUnderConstruction) {
+@()(implicit viewsCoreConfig: ViewsCoreConfig)
+@if(viewsCoreConfig.showUnderConstruction) {
 <style>
 	.env-border {
 		position: fixed;

@@ -3,7 +3,7 @@
 @import eu.icoscp.envri.Envri
 @import se.lu.nateko.cp.viewscore._
 
-@(title: String)(customHeader: Html)(body: Html)(implicit envri: Envri, environment: EnvironmentConfig)
+@(title: String)(customHeader: Html)(body: Html)(implicit envri: Envri, viewsCoreConfig: ViewsCoreConfig)
 <!DOCTYPE html>
 <html lang="en">
 
@@ -26,16 +26,16 @@
 
 	@customHeader
 
-	<title>@if(environment.showUnderConstruction){🚧 }@title | SITES</title>
+	<title>@if(viewsCoreConfig.showUnderConstruction){🚧 }@title | SITES</title>
 	@EnvironmentStyles()
 
 </head>
 
 <body>
-	@if(environment.showUnderConstruction) {
+	@if(viewsCoreConfig.showUnderConstruction) {
 	<div class="env-border"></div>
 	}
-	@for(name <- environment.name) {
+	@for(name <- viewsCoreConfig.environmentName) {
 	<div class="env-badge">@name</div>
 	}
 	<header class="header layout-container">

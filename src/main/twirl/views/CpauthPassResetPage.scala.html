@@ -1,7 +1,7 @@
 @import eu.icoscp.envri.Envri
-@import se.lu.nateko.cp.viewscore.EnvironmentConfig
+@import se.lu.nateko.cp.viewscore.ViewsCoreConfig
 
-@(email: String)(implicit envri: Envri, environment: EnvironmentConfig)
+@(email: String)(implicit envri: Envri, viewsCoreConfig: ViewsCoreConfig)
 @CpauthPage("Set your password", "Set password", "passwordreset"){
 }{
 	<div class="card">
@@ -35,4 +35,3 @@
 		</div>
 	</div>
 }
-
