@@ -62,7 +62,7 @@ lazy val viewsCore = (project in file("viewsCore"))
 	.enablePlugins(SbtTwirl)
 	.settings(
 		name := "views-core",
-		version := "0.8.0-SNAPSHOT",
+		version := "0.8.0",
 	)
 
 val akkaVersion = "2.6.19"
