@@ -57,34 +57,24 @@
 				</a>
 			</div>
 			<div class="header-right d-flex align-items-center">
-				<section class="row region region-header-right">
-
-					<ul class="d-flex lh-base">
-						<li class="header-link cart-link">
-							<a><i class="fas fa-shopping-cart"></i> Cart
-							<span class="badge rounded-pill bg-secondary">
-								<span class="items-number">0</span>
-								<span class="visually-hidden">items in cart</span>
-							</span>
-						</a>
-						</li>
-						<li class="header-link header-link-separator account-link">
-							<a><i class="fas fa-user"></i> My Account</a>
-						</li>
-						<li class="header-link login-link">
-							<a><i class="fas fa-sign-in-alt"></i> Log in</a>
-						</li>
-					</ul>
-
-					<div id="block-cp-theme-d10-cpsearch" class="search-block-form block-search block block-cp-search block-cp-search-block">
-						<div class="content">
-							<form action="@(CpMenu.cpHome)/search" method="get" id="search-block-form" class="input-group" accept-charset="UTF-8" data-drupal-form-fields="edit-keys">
-								<input data-drupal-selector="edit-keys" type="search" id="edit-keys" name="q" class="form-search form-control">
-								<button class="btn btn-light border-0" type="submit" id="edit-submit"><i class="fas fa-search"></i></button>
-							</form>
+				<div class="d-none cart-link fs-sm header-link">
+					<a><i class="fas fa-shopping-cart me-1"></i>Cart<div class="badge rounded-pill bg-secondary ms-1">
+							<span class="items-number">0</span>
+							<span class="visually-hidden">items in cart</span>
 						</div>
-					</div>
-				</section>
+					</a>
+					<div class="mx-1 fs-sm">|</div>
+				</div>
+				<div class="d-none account-link fs-sm header-link">
+					<a><i class="fas fa-user me-1"></i>My Account</a>
+				</div>
+				<div class="d-none login-link fs-sm header-link">
+					<a><i class="fas fa-sign-in-alt me-1"></i>Log in</a>
+				</div>
+				<form action="@(CpMenu.cpHome)/search" method="get" id="search-block-form" class="input-group w-auto" accept-charset="UTF-8">
+					<input type="search" id="edit-keys" name="q" class="form-search form-control">
+					<button class="btn btn-light border-0" type="submit" id="edit-submit"><i class="fas fa-search"></i></button>
+				</form>
 				@if(menu.nonEmpty){
 					<nav class="navbar mobile py-0">
 						<div class="container-fluid">

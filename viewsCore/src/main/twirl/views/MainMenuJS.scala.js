@@ -6,39 +6,25 @@
 window.addEventListener("load", function(){
 
 	const menuButton = document.getElementById("menu-button");
- /* old JS:
+
 	if (menuButton !== null) {
-		menuButton.addEventListener('click', function() {
-			document.getElementById('cp-main-menu').classList.toggle('open');
-		});
-	}
-
-	var menuGroups = document.getElementsByClassName("open_menu");
-
-	for(var idx = 0; idx < menuGroups.length; idx++){
-		var elem = menuGroups[idx];
-
-		elem.addEventListener("click", function(event){
-			this.parentElement.parentElement.classList.toggle('open');
-		});
-	}
-	*/
-	if (menuButton !== null) {
-		const ddToggle = document.querySelector("#cp_theme_d10_menu .top-node .dd-toggle");
+		const ddToggles = document.querySelectorAll("#cp_theme_d10_menu .top-node .dd-toggle");
 		const menuContainer = document.querySelector("#cp_theme_d10_menu");
 
-		ddToggle.addEventListener('click', function (event) {
-			let target = ddToggle.closest(".top-node");
-			target.classList.toggle("open");
-			event.preventDefault();
-		});
-
-		ddToggle.addEventListener('keyup', function (event) {
-			if(event.key === "Enter") {
+		ddToggles.forEach((ddToggle) => {
+			ddToggle.addEventListener('click', function (event) {
 				let target = ddToggle.closest(".top-node");
 				target.classList.toggle("open");
 				event.preventDefault();
-			}
+			});
+
+			ddToggle.addEventListener('keyup', function (event) {
+				if (event.key === "Enter") {
+					let target = ddToggle.closest(".top-node");
+					target.classList.toggle("open");
+					event.preventDefault();
+				}
+			});
 		});
 
 		menuContainer.addEventListener('mouseout', function (event) {
@@ -60,7 +46,7 @@ window.addEventListener("load", function(){
 		};
 	}
 
-	ajaxGet('/whoami', function(xhr){
+	ajaxGet('/whoami', function(xhr) {
 		var response = JSON.parse(xhr.response);
 
 		if (response.email) {
@@ -73,18 +59,14 @@ window.addEventListener("load", function(){
 					const cartLinks = document.querySelectorAll('.cart-link');
 					cartLinks.forEach(link => {
 						link.querySelector('.items-number').innerText = data.cart._items.length;
-						link.addEventListener('click', function () {
-							window.location = 'https://@(viewsConfig.dataHost)/portal#{"route":"cart"}';
-						});
-						link.style.display = 'block';
+						link.querySelector("a").href = 'https://@(viewsConfig.dataHost)/portal#{"route":"cart"}';;
+						link.classList.remove("d-none");
 					});
 
 					const accountLinks = document.querySelectorAll('.account-link');
 					accountLinks.forEach(link => {
-						link.addEventListener('click', function(){
-							window.location = 'https://@(viewsConfig.authHost)/';
-						});
-						link.style.display = 'block';
+						link.querySelector("a").href = 'https://@(viewsConfig.authHost)/';
+						link.classList.remove("d-none");
 					});
 
 					const addButton = document.getElementById("meta-add-to-cart-button");
@@ -135,13 +117,15 @@ window.addEventListener("load", function(){
 		} else {
 			const loginLinks = document.querySelectorAll('.login-link');
 			loginLinks.forEach(link => {
-				link.addEventListener('click', () => loginAndRedirect(window.location.href));
-				link.style.display = 'block';
+				link.querySelector("a").href = getRedirectUrl(window.location.href);
+				link.classList.remove("d-none");
 			});
 
 			const addButton = document.getElementById("meta-add-to-cart-button");
 			if (addButton) {
-				addButton.addEventListener("click", () => loginAndRedirect(window.location.href + "#add-to-cart"));
+				addButton.addEventListener("click", () => {
+					window.location = getRedirectUrl(window.location.href + "#add-to-cart")
+				});
 				addButton.classList.remove('d-none');
 			}
 		}
@@ -159,8 +143,6 @@ window.addEventListener("load", function(){
 		});
 	};
 
-	const loginAndRedirect = (url) => {
-		window.location = 'https://@(viewsConfig.authHost)/login/?targetUrl=' + encodeURIComponent(url);
-	}
+	const getRedirectUrl = (url) => 'https://@(viewsConfig.authHost)/login/?targetUrl=' + encodeURIComponent(url);
 
 });

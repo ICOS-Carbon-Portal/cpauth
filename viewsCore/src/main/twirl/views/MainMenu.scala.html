@@ -7,19 +7,18 @@
 		@for(item <- menuItems){
 			@menuItem(item, 0, "")
 		}
-		<div class="account cart-link">
-			<a><i class="fas fa-shopping-cart"></i> Cart
-				<span class="badge rounded-pill bg-secondary">
+		<div class="d-none cart-link menu-link mobile text-dark py-2 px-3 w-100">
+			<a><i class="fas fa-shopping-cart me-1"></i>Cart<div class="badge rounded-pill bg-secondary ms-1">
 					<span class="items-number">0</span>
 					<span class="visually-hidden">items in cart</span>
-				</span>
+				</div>
 			</a>
 		</div>
-		<div class="account account-link">
-			<a><i class="fas fa-user"></i> My Account</a>
+		<div class="d-none account-link menu-link mobile text-dark py-2 px-3 w-100">
+			<a><i class="fas fa-user me-2"></i>My Account</a>
 		</div>
-		<div class="account login-link">
-			<a><i class="fas fa-sign-in-alt"></i> Log in</a>
+		<div class="d-none login-link menu-link mobile text-dark py-2 px-3 w-100">
+			<a><i class="fas fa-sign-in-alt me-1"></i>Log in</a>
 		</div>
 	</div>
 }
