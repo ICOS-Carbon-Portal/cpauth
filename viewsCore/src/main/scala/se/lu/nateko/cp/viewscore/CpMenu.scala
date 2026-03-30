@@ -33,6 +33,10 @@ object CpMenu:
 					CpMenuItem("Jupyter Notebook", "/data-services/services/jupyter-notebook", Nil),
 					CpMenuItem("DOI minting", "https://doi.icos-cp.eu/", Nil),
 					CpMenuItem("Download statistics", "https://data.icos-cp.eu/stats", Nil),
+				)),
+			)),
+			CpMenuItem("Data & Services Column 2", "", Seq(
+				CpMenuItem("ICOS Services", "/data-services/services", Seq(
 					CpMenuItem("SPARQL endpoint", "https://meta.icos-cp.eu/sparqlclient/", Nil),
 					CpMenuItem("Upload to Data Portal", "/data-services/services/upload-data", Nil),
 					CpMenuItem("Forecast of backtrajectories", "/forecast", Nil),
@@ -40,7 +44,7 @@ object CpMenu:
 					CpMenuItem("Service status", "https://uptime.icos-cp.eu/status/core", Nil)
 				)),
 			)),
-			CpMenuItem("Data & Services Column 3", "", Seq(
+			CpMenuItem("Data & Services Column 4", "", Seq(
 				CpMenuItem("How to Cite and Acknowledge ICOS data", "/how-to-cite", Nil)
 			))
 		)),

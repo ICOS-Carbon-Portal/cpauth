@@ -4,12 +4,10 @@
 @(
 	title: String,
 	menu: Seq[CpMenuItem] = CpMenu.default,
-	bootstrapJavascript: Boolean = false,
 )(customHeader: Html)(body: Html)(implicit envri: Envri)
 @IcosPage(
   title,
   menu,
   CpStyleConfig,
   CpFooter(),
-  bootstrapJavascript,
 )(customHeader)(body)

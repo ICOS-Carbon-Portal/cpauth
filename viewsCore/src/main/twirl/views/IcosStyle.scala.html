@@ -182,11 +182,11 @@
 			color: var(--bs-light);
 		}
 
-		.content ul li.list-inline-item:not(:last-child) {
+		.footer-bottom .list-inline-item:not(:last-child) {
 			margin-right: 2rem;
 		}
 
-		.content ul.social-media li {
+		ul.social-media .list-inline-item:not(:last-child) {
 			margin-right: 0.875rem;
 		}
 
@@ -214,7 +214,7 @@
 			text-underline-position: from-font;
 		}
 
-		a:hover, a:focus-within {
+		a:hover, a:focus-within, a:not([class]):hover, a:not([class]):focus-within {
 			text-decoration-style: dashed;
 		}
 	}
@@ -268,37 +268,7 @@
 	}
 
 	/** Responsive media queries **/
-	
-	/* Larger than Bootstrap XXL breakpoint */
-	@@media all and (min-width: 1400px) {
-		.header {
-			width: 100%;
-			padding-left: calc((100% - 1400px)/2);
-			padding-right: calc((100% - 1400px)/2);
-		}
 
-		.menu--main {
-			width: 100%;
-			padding-left: calc((100% - 1400px)/2);
-			padding-right: calc((100% - 1400px)/2);
-		}
-
-		#cp_theme_d10_menu {
-			.top-node:hover .dropdown-menu,
-			.top-node:focus-within .dropdown-menu {
-				&>div {
-					width: 316px;
-				}
-			}
-
-			.top-node .dropdown-menu {
-				padding-left: calc((100% - 1400px)/2 + 1rem);
-				padding-right: calc((100% - 1400px)/2 + 1rem);
-			}
-		}
-	}
-
-	
 	/* Larger than Bootstrap L breakpoint */
 	@@media all and (min-width: 992px) {
 		.mobile {
@@ -414,6 +384,35 @@
 
 			#edit-submit {
 				border-radius: 100px;
+			}
+		}
+	}
+
+	/* Larger than Bootstrap XXL breakpoint */
+	@@media all and (min-width: 1400px) {
+		.header {
+			width: 100%;
+			padding-left: calc((100% - 1400px)/2);
+			padding-right: calc((100% - 1400px)/2);
+		}
+
+		.menu--main {
+			width: 100%;
+			padding-left: calc((100% - 1400px)/2);
+			padding-right: calc((100% - 1400px)/2);
+		}
+
+		#cp_theme_d10_menu {
+			.top-node:hover .dropdown-menu,
+			.top-node:focus-within .dropdown-menu {
+				&>div {
+					width: 316px;
+				}
+			}
+
+			.top-node .dropdown-menu {
+				padding-left: calc((100% - 1400px)/2 + 1rem);
+				padding-right: calc((100% - 1400px)/2 + 1rem);
 			}
 		}
 	}

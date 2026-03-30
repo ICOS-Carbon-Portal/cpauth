@@ -8,7 +8,6 @@
 	menu: Seq[CpMenuItem],
 	styleConf: IcosStyleConfig,
 	footer: Html,
-	bootstrapJavascript: Boolean = false,
 )(customHeader: Html)(body: Html)(implicit envri: Envri)
 <!DOCTYPE html>
 <html lang="en">
@@ -107,12 +106,10 @@
 
 	@footer
 
-	@if(bootstrapJavascript){
-		<script src="https://cdn.jsdelivr.net/npm/bootstrap@@@{bootstrapJS}/dist/js/bootstrap.bundle.min.js"
-			integrity="@{bootstrapJSIntegrity}"
-			crossorigin="anonymous">
-		</script>
-	}
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@@@{bootstrapJS}/dist/js/bootstrap.bundle.min.js"
+		integrity="@{bootstrapJSIntegrity}"
+		crossorigin="anonymous">
+	</script>
 
 	<script type="module" src="https://static.icos-cp.eu/share/cookie-consent/cookieconsent-config.js"></script>
 

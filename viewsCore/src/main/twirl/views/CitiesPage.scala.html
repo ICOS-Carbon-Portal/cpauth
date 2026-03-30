@@ -3,14 +3,12 @@
 
 @(
 	title: String,
-	bootstrapJavascript: Boolean = false,
 )(customHeader: Html)(body: Html)(implicit envri: Envri)
 @IcosPage(
 	title,
 	CpMenu.cities,
 	CitiesStyleConfig,
 	CitiesFooter(),
-	bootstrapJavascript,
 ){
 	<style>
 		body {
