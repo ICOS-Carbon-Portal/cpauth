@@ -12,15 +12,15 @@ trait IcosStyleConfig{
 
 object CpStyleConfig extends IcosStyleConfig{
 	val headerImage = new URI("https://static.icos-cp.eu/images/icos-header.jpg")
-	val headerLogo = new URI("https://www.icos-cp.eu/themes/cp_theme_d10/logo.svg")
+	val headerLogo = new URI("https://static.icos-cp.eu/images/icos-logo-regular.svg")
 	val headerHomeLink = new URI(CpMenu.cpHome)
 	val headerLogoName = "ICOS Carbon Portal"
 	val matomoId = 3
 }
 
 object CitiesStyleConfig extends IcosStyleConfig{
-	val headerImage = new URI("https://static.icos-cp.eu/images/icos-cities-banner.png")
-	val headerLogo = new URI("https://static.icos-cp.eu/images/ICOS-Cities-logo-nega.svg")
+	val headerImage = new URI("https://static.icos-cp.eu/images/ICOS-cities-europe-skyline.png")
+	val headerLogo = new URI("https://static.icos-cp.eu/images/ICOS-Cities-logo.svg")
 	val headerHomeLink = new URI(CpMenu.citiesHome)
 	val headerLogoName = "ICOS Cities"
 	val matomoId = 4
