@@ -4,7 +4,7 @@
 @(
 	title: String,
 	bootstrapJavascript: Boolean = false,
-)(customHeader: Html)(body: Html)(implicit envri: Envri, viewsCoreConfig: ViewsCoreConfig)
+)(customHeader: Html)(body: Html)(implicit envri: Envri)
 @template(customHeader)(body)
 
 @template = @{

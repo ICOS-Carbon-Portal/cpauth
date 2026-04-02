@@ -20,7 +20,7 @@ given RootJsonFormat[ViewsCoreConfig] = jsonFormat4(ViewsCoreConfig.apply)
 
 private val viewsCoreConfigRoot = appConfig.getConfig("viewsCore")
 
-lazy val viewsCoreConfig = viewsCoreConfigRoot.root().parseAs[ViewsCoreConfig]
+given viewsCoreConfig: ViewsCoreConfig = viewsCoreConfigRoot.root().parseAs[ViewsCoreConfig]
 
 def hostsConfig(using envri: Envri) = viewsCoreConfig.hosts.getOrElse(
 	envri,
