@@ -6,13 +6,23 @@ import spray.json.RootJsonFormat
 import se.lu.nateko.cp.cpauth.core.JsonSupport.{given RootJsonFormat[Envri]}
 import se.lu.nateko.cp.cpauth.core.ConfigLoader.{appConfig, parseAs}
 
-case class ViewsCoreConfig(authHost: String, dataHost: String)
+case class HostConfig(authHost: String, dataHost: String)
 
-given RootJsonFormat[ViewsCoreConfig] = jsonFormat2(ViewsCoreConfig.apply)
+case class ViewsCoreConfig(
+	environmentName: Option[String],
+	showUnderConstruction: Boolean,
+	showCarbonBadge: Boolean,
+	hosts: Map[Envri, HostConfig],
+)
 
-lazy val envri2Config = appConfig.getValue("viewsCore").parseAs[Map[Envri, ViewsCoreConfig]]
+given RootJsonFormat[HostConfig] = jsonFormat2(HostConfig.apply)
+given RootJsonFormat[ViewsCoreConfig] = jsonFormat4(ViewsCoreConfig.apply)
 
-def viewsConfig(using envri: Envri) = envri2Config.getOrElse(
+private val viewsCoreConfigRoot = appConfig.getConfig("viewsCore")
+
+lazy val viewsCoreConfig = viewsCoreConfigRoot.root().parseAs[ViewsCoreConfig]
+
+def hostsConfig(using envri: Envri) = viewsCoreConfig.hosts.getOrElse(
 	envri,
 	throw Exception(s"viewscore is not configured for ENVRI '${envri.shortName}'")
 )

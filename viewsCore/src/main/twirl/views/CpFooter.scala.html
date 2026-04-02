@@ -1,6 +1,6 @@
 @import se.lu.nateko.cp.viewscore.CpMenu.cpHome
 
-@()
+@(showCarbonBadge: Boolean)
 <footer id="cp-site-footer" class="site-footer">
 
 	<div class="layout-container">
@@ -16,8 +16,10 @@
 				<p class="marked-link"><a href="@(cpHome)/terms-of-use">TERMS OF USE</a></p>
 				<p class="marked-link"><a href="" data-cc="show-preferencesModal">MANAGE COOKIE PREFERENCES</a></p>
 				<p class="marked-link"><a href="https://uptime.icos-cp.eu/status/core">SERVICES STATUS</a></p>
+				@if(showCarbonBadge) {
 				<div id="wcb" class="carbonbadge text-start mt-4 wcb-d" style="filter: grayscale(1);"></div>
 				<script src="https://unpkg.com/website-carbon-badges@@1.1.3/b.min.js" defer></script>
+				}
 			</div>
 		</div>
 

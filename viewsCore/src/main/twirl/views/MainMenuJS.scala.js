@@ -1,4 +1,4 @@
-@import se.lu.nateko.cp.viewscore.viewsConfig
+@import se.lu.nateko.cp.viewscore.hostsConfig
 @import eu.icoscp.envri.Envri
 
 @()(implicit envri: Envri)
@@ -41,7 +41,7 @@ window.addEventListener("load", function(){
 		if (response.email) {
 			const email = response.email;
 
-			fetch(`https://@(viewsConfig.authHost)/db/users/${email}?keys=${encodeURIComponent('{cart:1}')}`, { credentials: 'include' })
+			fetch(`https://@(hostsConfig.authHost)/db/users/${email}?keys=${encodeURIComponent('{cart:1}')}`, { credentials: 'include' })
 				.then(response => response.json())
 				.then(data => {
 
@@ -49,7 +49,7 @@ window.addEventListener("load", function(){
 					cartLinks.forEach(link => {
 						link.querySelector('.items-number').innerText = data.cart._items.length;
 						link.addEventListener('click', function () {
-							window.location = 'https://@(viewsConfig.dataHost)/portal#{"route":"cart"}';
+						window.location = 'https://@(hostsConfig.dataHost)/portal#{"route":"cart"}';
 						});
 						link.style.display = 'block';
 					});
@@ -57,7 +57,7 @@ window.addEventListener("load", function(){
 					const accountLinks = document.querySelectorAll('.account-link');
 					accountLinks.forEach(link => {
 						link.addEventListener('click', function(){
-							window.location = 'https://@(viewsConfig.authHost)/';
+						window.location = 'https://@(hostsConfig.authHost)/';
 						});
 						link.style.display = 'block';
 					});
@@ -123,7 +123,7 @@ window.addEventListener("load", function(){
 	});
 
 	const updateProfile = (email, data) => {
-		fetch(`https://@(viewsConfig.authHost)/db/users/${email}`, {
+		fetch(`https://@(hostsConfig.authHost)/db/users/${email}`, {
 			credentials: 'include',
 			method: 'PATCH',
 			mode: 'cors',
@@ -135,7 +135,7 @@ window.addEventListener("load", function(){
 	};
 
 	const loginAndRedirect = (url) => {
-		window.location = 'https://@(viewsConfig.authHost)/login/?targetUrl=' + encodeURIComponent(url);
+		window.location = 'https://@(hostsConfig.authHost)/login/?targetUrl=' + encodeURIComponent(url);
 	}
 
 });
