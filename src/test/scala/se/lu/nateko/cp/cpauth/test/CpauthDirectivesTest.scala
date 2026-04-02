@@ -72,7 +72,7 @@ class CpauthDirectivesTest extends AnyFunSpec with ScalatestRouteTest {
 		val authConfig = config.auth
 		val dispatcher = system.dispatcher
 		val scheduler = system.scheduler
-		val viewsCoreConfig = ViewsCoreConfig(environmentName = None, showUnderConstruction = false, showCarbonBadge = false, domains = Map.empty)
+		val viewsCoreConfig = ViewsCoreConfig(environmentName = None, showUnderConstruction = false, showCarbonBadge = false, hosts = Map.empty)
 		val materializer = Materializer(system)
 		def hostToEnvri(host: String) = config.http.serviceHosts.map(_.swap).get(host)
 		val userDb = null
