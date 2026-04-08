@@ -1,5 +1,6 @@
 @import se.lu.nateko.cp.viewscore._
 @import se.lu.nateko.cp.viewscore.ImportVersions._
+@import se.lu.nateko.cp.viewscore.viewsCoreConfig
 @import views.js.MainMenuJS
 @import eu.icoscp.envri.Envri
 
@@ -9,7 +10,7 @@
 	styleConf: IcosStyleConfig,
 	footer: Html,
 	bootstrapJavascript: Boolean = false,
-)(customHeader: Html)(body: Html)(implicit envri: Envri, viewsCoreConfig: ViewsCoreConfig)
+)(customHeader: Html)(body: Html)(implicit envri: Envri)
 <!DOCTYPE html>
 <html lang="en">
 <head>
