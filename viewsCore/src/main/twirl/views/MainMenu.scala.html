@@ -3,7 +3,7 @@
 
 @(menuItems: Seq[CpMenuItem])
 @if(!menuItems.isEmpty){
-	<div class="nav navbar-nav justify-content-center px-4 was-ul">
+	<div class="nav navbar-nav justify-content-center px-4">
 		@for(item <- menuItems){
 			@menuItem(item, 0, "")
 		}
