@@ -1,8 +1,8 @@
 package se.lu.nateko.cp.viewscore
 
 object ImportVersions {
-	val bootstrapCSS = "next"
-	val bootstrapJS = "5.3.3"
-	val bootstrapJSIntegrity = "sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+	val bootstrapCSS = "5.3.8"
+	val bootstrapJS = "5.3.8"
+	val bootstrapJSIntegrity = "sha256-5P1JGBOIxI7FBAvT/mb1fCnI5n/NhQKzNUuW7Hq0fMc="
 	val fontAwesome = "6.7.2"
 }
