@@ -5,7 +5,7 @@
 @if(!menuItems.isEmpty){
 	<div class="nav navbar-nav justify-content-center px-4">
 		@for(item <- menuItems){
-			@menuItem(item, 0, "")
+			@menuItem(item, 0, false)
 		}
 		<div class="d-none cart-link menu-link mobile text-dark py-2 px-3 w-100">
 			<a><i class="fas fa-shopping-cart me-1"></i>Cart<div class="badge rounded-pill bg-secondary ms-1">
@@ -24,9 +24,8 @@
 }
 
 
-@menuItem(item: CpMenuItem, depth: Int, lastLevel2Url: String) = {
-	@defining(!item.children.isEmpty){ hasChildren =>
-	@defining(depth == 2 && lastLevel2Url.nonEmpty && item.url == lastLevel2Url){ hideLink =>
+@menuItem(item: CpMenuItem, depth: Int, hideLink: Boolean) = {
+	@defining(item.children.nonEmpty){ hasChildren =>
 	<div class="@itemClass(depth, hasChildren)">
 		@if(depth == 0) {
 			@if(hasChildren) {
@@ -49,25 +48,30 @@
 		}
 		@if(hasChildren) {
 			@if(depth == 0) {
-				@defining(("" +: item.children.map(_.children.headOption.map(_.url).getOrElse("")).dropRight(1))){ prevUrls =>
+				@defining({
+					val cols = item.children
+					def firstGrandchildUrl(col: CpMenuItem) = col.children.headOption.map(_.url)
+					cols.zipWithIndex.map { case (col, i) =>
+						i > 0 && firstGrandchildUrl(cols(i - 1)) == firstGrandchildUrl(col)
+					}
+				}){ firstChildIsDuplicate =>
 				<div class="dropdown-menu pt-3 pb-4 border rounded-0 justify-content-between">
-				@for((child, prevUrl) <- item.children.zip(prevUrls)){
-					@menuItem(child, 1, prevUrl)
+				@for((child, isDuplicate) <- item.children.zip(firstChildIsDuplicate)){
+					@menuItem(child, 1, isDuplicate)
 				}
 				</div>
 				}
 			} else if(depth == 1) {
-				@for(child <- item.children){
-					@menuItem(child, 2, lastLevel2Url)
+				@for((child, idx) <- item.children.zipWithIndex){
+					@menuItem(child, 2, hideLink && idx == 0)
 				}
 			} else {
 				@for(child <- item.children){
-					@menuItem(child, depth + 1, "")
+					@menuItem(child, depth + 1, false)
 				}
 			}
 		}
 	</div>
-	}
 	}
 }
 
@@ -83,4 +87,3 @@
 @link(uri: String) = @{
 	if(uri.startsWith("https://") || uri.startsWith("http://")) uri else cpHome + uri
 }
-
