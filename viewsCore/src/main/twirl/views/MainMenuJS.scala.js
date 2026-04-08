@@ -8,7 +8,7 @@ window.addEventListener("load", function(){
 	const menuButton = document.getElementById("menu-button");
 
 	if (menuButton !== null) {
-		const ddToggles = document.querySelectorAll("#cp_theme_d10_menu .top-node .dd-toggle");
+		const ddToggles = document.querySelectorAll("#cp_theme_d10_menu .top-node .drop-down-toggle");
 		const menuContainer = document.querySelector("#cp_theme_d10_menu");
 
 		ddToggles.forEach((ddToggle) => {
