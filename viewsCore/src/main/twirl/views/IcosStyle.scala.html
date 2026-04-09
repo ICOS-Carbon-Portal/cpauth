@@ -183,11 +183,19 @@
 		margin-top: 1rem;
 
 		a {
-			text-decoration: underline 6%;
+			text-decoration-style: underline;
+			text-decoration-thickness: 6%;
 			text-decoration-skip-ink: none;
 			text-underline-offset: 25%;
 			text-underline-position: from-font;
 		}
+	}
+
+	a:hover {
+		text-decoration-thickness: 6%;
+		text-decoration-skip-ink: none;
+		text-underline-offset: 25%;
+		text-underline-position: from-font;
 	}
 
 	.breadcrumb-item::before {
@@ -235,15 +243,8 @@
 			margin-top: 6rem;
 		}
 
-		a, a:not([class]) {
-			text-decoration: underline 6%;
-			text-decoration-skip-ink: none;
-			text-underline-offset: 25%;
-			text-underline-position: from-font;
-		}
-
 		a:hover, a:focus-within, a:not([class]):hover, a:not([class]):focus-within {
-			text-decoration-style: dashed;
+			text-decoration: underline;
 		}
 	}
 
