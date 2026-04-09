@@ -1,4 +1,4 @@
-@import se.lu.nateko.cp.viewscore.viewsConfig
+@import se.lu.nateko.cp.viewscore.hostsConfig
 @import eu.icoscp.envri.Envri
 
 @()(implicit envri: Envri)
@@ -52,20 +52,20 @@ window.addEventListener("load", function(){
 		if (response.email) {
 			const email = response.email;
 
-			fetch(`https://@(viewsConfig.authHost)/db/users/${email}?keys=${encodeURIComponent('{cart:1}')}`, { credentials: 'include' })
+			fetch(`https://@(hostsConfig.authHost)/db/users/${email}?keys=${encodeURIComponent('{cart:1}')}`, { credentials: 'include' })
 				.then(response => response.json())
 				.then(data => {
 
 					const cartLinks = document.querySelectorAll('.cart-link');
 					cartLinks.forEach(link => {
 						link.querySelector('.items-number').innerText = data.cart._items.length;
-						link.querySelector("a").href = 'https://@(viewsConfig.dataHost)/portal#{"route":"cart"}';;
+						link.querySelector("a").href = 'https://@(hostsConfig.dataHost)/portal#{"route":"cart"}';;
 						link.classList.remove("d-none");
 					});
 
 					const accountLinks = document.querySelectorAll('.account-link');
 					accountLinks.forEach(link => {
-						link.querySelector("a").href = 'https://@(viewsConfig.authHost)/';
+						link.querySelector("a").href = 'https://@(hostsConfig.authHost)/';
 						link.classList.remove("d-none");
 					});
 
@@ -132,7 +132,7 @@ window.addEventListener("load", function(){
 	});
 
 	const updateProfile = (email, data) => {
-		fetch(`https://@(viewsConfig.authHost)/db/users/${email}`, {
+		fetch(`https://@(hostsConfig.authHost)/db/users/${email}`, {
 			credentials: 'include',
 			method: 'PATCH',
 			mode: 'cors',
@@ -143,6 +143,5 @@ window.addEventListener("load", function(){
 		});
 	};
 
-	const getRedirectUrl = (url) => 'https://@(viewsConfig.authHost)/login/?targetUrl=' + encodeURIComponent(url);
-
+	const getRedirectUrl = (url) => 'https://@(hostsConfig.authHost)/login/?targetUrl=' + encodeURIComponent(url);
 });

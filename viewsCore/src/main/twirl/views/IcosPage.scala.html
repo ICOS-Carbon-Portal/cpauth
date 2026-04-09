@@ -1,5 +1,6 @@
 @import se.lu.nateko.cp.viewscore._
 @import se.lu.nateko.cp.viewscore.ImportVersions._
+@import se.lu.nateko.cp.viewscore.viewsCoreConfig
 @import views.js.MainMenuJS
 @import eu.icoscp.envri.Envri
 
@@ -40,11 +41,18 @@
 
 	@customHeader
 
-	<title>@title | @{envri.shortName}</title>
+	<title>@if(viewsCoreConfig.showUnderConstruction){🚧 }@title | @{envri.shortName}</title>
+	@EnvironmentStyles()
 
 </head>
 
 <body>
+	@if(viewsCoreConfig.showUnderConstruction) {
+	<div class="env-border"></div>
+	}
+	@for(name <- viewsCoreConfig.environmentName) {
+	<div class="env-badge">@name</div>
+	}
 	<a href="#main-content" class="visually-hidden-focusable">
 		Skip to main content
 		</a>
