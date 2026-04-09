@@ -143,6 +143,10 @@
 		border-color: var(--bs-secondary);
 	}
 
+	a:hover {
+		color: var(--bs-danger);
+	}
+
 	/** Header **/
 	.header .navbar-brand img {
 		height: 36px;
@@ -169,6 +173,26 @@
 
 	#search-block-form #edit-keys {
 		width: 220px;
+	}
+
+	/* Breadcrumbs */
+	.breadcrumb {
+		font-size: 0.875rem;
+		--bs-breadcrumb-divider: "\f105";
+		--bs-breadcrumb-divider-color: var(--bs-primary);
+		margin-top: 1rem;
+
+		a {
+			text-decoration: underline 6%;
+			text-decoration-skip-ink: none;
+			text-underline-offset: 25%;
+			text-underline-position: from-font;
+		}
+	}
+
+	.breadcrumb-item::before {
+		font-family: "Font Awesome 6 Free";
+		font-weight: 900;
 	}
 
 	/** Footer **/
