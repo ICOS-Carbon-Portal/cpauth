@@ -8,10 +8,10 @@
 		@for(item <- menuItems){
 			@menuItem(item, true)
 		}
-		<li class="nav-item account account-link">
+		<li class="nav-item account account-link d-none">
 			<a class="nav-link"><i class="fas fa-user"></i></a>
 		</li>
-		<li class="nav-item account cart-link">
+		<li class="nav-item account cart-link d-none">
 			<a class="nav-link position-relative"><i class="fas fa-shopping-cart"></i>
 				<span class="badge rounded-pill bg-danger position-absolute start-100 translate-middle">
 					<span class="items-number">0</span>
@@ -19,7 +19,7 @@
 				</span>
 			</a>
 		</li>
-		<li class="nav-item account login-link">
+		<li class="nav-item account login-link d-none">
 			<a class="nav-link"><i class="fas fa-sign-out-alt"></i> Log in</a>
 		</li>
 	</ul>
