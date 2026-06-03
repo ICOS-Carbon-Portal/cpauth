@@ -3,7 +3,7 @@
 
 @(menuItems: Seq[CpMenuItem])
 @if(!menuItems.isEmpty){
-	<div class="nav navbar-nav justify-content-center px-4">
+	<div class="nav navbar-nav justify-content-center px-3">
 		@for(item <- menuItems){
 			@menuItem(item, 0, false)
 		}
@@ -21,6 +21,7 @@
 			<a><i class="fas fa-sign-in-alt me-1"></i>Log in</a>
 		</div>
 	</div>
+	<div class="menu-backdrop" style="height: 0px;"></div>
 }
 
 
@@ -29,11 +30,11 @@
 	<div class="@itemClass(depth, hasChildren)">
 		@if(depth == 0) {
 			@if(hasChildren) {
-			<div class="drop-down-toggle text-dark py-2 px-3 w-100 d-flex justify-content-center top-link" role="button" tabindex="0">
+			<div class="drop-down-toggle text-dark p-2 w-100 d-flex justify-content-center top-link" role="button" tabindex="0">
 				<div>@item.title <span class="open-menu menu-icon"><i class="fas fa-chevron-down"></i></span></div>
 			</div>
 			} else {
-			<a href="@link(item.url)" class="text-dark py-2 px-3 w-100 d-flex justify-content-center top-link">
+			<a href="@link(item.url)" class="text-dark p-2 w-100 d-flex justify-content-center top-link">
 				<div>@item.title</div>
 			</a>
 			}
@@ -55,7 +56,7 @@
 						i > 0 && firstGrandchildUrl(cols(i - 1)) == firstGrandchildUrl(col)
 					}
 				}){ firstChildIsDuplicate =>
-				<div class="dropdown-menu pt-3 pb-4 border rounded-0 justify-content-between">
+				<div class="dropdown-menu pt-3 pb-4 rounded-0 justify-content-between">
 				@for((child, isDuplicate) <- item.children.zip(firstChildIsDuplicate)){
 					@menuItem(child, 1, isDuplicate)
 				}
