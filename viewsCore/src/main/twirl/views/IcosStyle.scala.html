@@ -333,7 +333,8 @@
 				visibility: hidden;
 				opacity: 0;
 				transform: translateY(-6px);
-				transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+				clip-path: inset(0 0 100% 0);
+				transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out, clip-path 0.2s ease-in-out;
 
 				&>div {
 					width: 19%;
@@ -346,7 +347,7 @@
 				position: absolute;
 				top: 38.5px;
 				left: 0;
-				width: 100vw;
+				width: 100%;
 				background: white;
 				box-shadow: rgba(0, 0, 0, 0.15) 0px 8px 16px 0px;
 				transition: height 0.2s ease-in-out;
