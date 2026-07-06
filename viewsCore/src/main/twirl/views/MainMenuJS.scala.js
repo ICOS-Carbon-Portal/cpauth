@@ -39,6 +39,7 @@ window.addEventListener("load", function(){
 
 		const menuBackdrop = document.querySelector(".menu-backdrop");
 		let committedTopNode = null;
+		let backdropHeight = 0;
 		let dwellTimer = null;
 		let closeTimer = null;
 		let switchTimer = null;
@@ -46,17 +47,30 @@ window.addEventListener("load", function(){
 		const CLOSE_GRACE = 100;
 		const SWITCH_DELAY = 160;
 
-		
+
 		function revealDropdown(topNode) {
 			if (committedTopNode !== topNode) { return; }
 			const dropdown = topNode.querySelector(':scope > .dropdown-menu');
-			if (dropdown) {
-				dropdown.style.visibility = 'visible';
-				dropdown.style.opacity = '1';
-				dropdown.style.transform = 'translateY(0)';
+			if (!dropdown) { return; }
+			const prevHeight = backdropHeight;
+			const newHeight = dropdown.offsetHeight;
+			backdropHeight = newHeight;
+			menuBackdrop.style.height = newHeight + 'px';
+
+			if (prevHeight > 0) { // dropdown already visible
+				const startClipPct = newHeight > prevHeight
+					? (100 * (newHeight - prevHeight) / newHeight).toFixed(2) + '%'
+					: '0%';
+				dropdown.style.transition = 'opacity 0.2s ease-in-out, transform 0.2s ease-in-out';
+				dropdown.style.clipPath = `inset(0 0 ${startClipPct} 0)`;
+				dropdown.getBoundingClientRect(); // commit the start state before restoring the CSS transition
+				dropdown.style.transition = ''; // restore CSS transition, which re-adds clip-path as a transitioning property
 			}
-			const height = (dropdown ? dropdown.offsetHeight : topNode.offsetHeight) + 'px';
-			menuBackdrop.style.height = height;
+
+			dropdown.style.visibility = 'visible';
+			dropdown.style.opacity = '1';
+			dropdown.style.transform = 'translateY(0)';
+			dropdown.style.clipPath = 'inset(0 0 0 0)';
 		}
 
 		function showDropdown(topNode) {
@@ -65,26 +79,33 @@ window.addEventListener("load", function(){
 			const prev = committedTopNode;
 			committedTopNode = topNode;
 			if (prev && prev !== topNode) {
-				hideDropdown(prev);
+				hideDropdown(prev, true);
 				switchTimer = setTimeout(function () { revealDropdown(topNode); }, SWITCH_DELAY);
 			} else {
 				revealDropdown(topNode);
 			}
 		}
 
-		function hideDropdown(topNode) {
+		function hideDropdown(topNode, menuAlreadyOpen) {
 			const dropdown = topNode.querySelector(':scope > .dropdown-menu');
 			if (!dropdown) { return; }
 			dropdown.style.opacity = '';
 			dropdown.style.transform = '';
-			setTimeout(function () { dropdown.style.visibility = ''; }, 200);
+			if (!menuAlreadyOpen) {
+				dropdown.style.clipPath = '';
+			}
+			setTimeout(function () {
+				dropdown.style.visibility = '';
+				dropdown.style.clipPath = '';
+			}, 200);
 		}
 
 		function closeMenu() {
 			if (committedTopNode) {
-				hideDropdown(committedTopNode);
+				hideDropdown(committedTopNode, false);
 				committedTopNode = null;
 			}
+			backdropHeight = 0;
 			menuBackdrop.style.height = '0px';
 		}
 
