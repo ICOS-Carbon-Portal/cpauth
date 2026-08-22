@@ -151,6 +151,13 @@ function atmoAccessUrl(targetUrl){
 		+ encodeURIComponent(targetUrl) : '');
 }
 
+// ENVRI-ID needs no URL builder: cpauth assembles the authorization request server-side so that
+// the PKCE code verifier and the nonce never reach the browser.
+function envriIdUrl(targetUrl){
+	return '/oauth/envriId/login'
+		+ (targetUrl ? '?targetUrl=' + encodeURIComponent(targetUrl) : '');
+}
+
 $(function(){
 	$idpInput = $("#idpUrlInput");
 	$idpBtn = $("#signonBtn");
@@ -177,6 +184,7 @@ $(function(){
 	$("#facebookLoginButton").attr('href', facebookUrl(targetUrl));
 	$("#orcididLoginButton").attr('href', orcididUrl(targetUrl));
 	$("#atmoAccessLoginButton").attr('href', atmoAccessUrl(targetUrl));
+	$("#envriIdLoginButton").attr('href', envriIdUrl(targetUrl));
 
 	$('#swamid-link').click(hideMessage);
 	$('#plain-link').click(hideMessage);

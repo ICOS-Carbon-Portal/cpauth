@@ -17,7 +17,7 @@ import eu.icoscp.geoipclient.CpGeoConfig
 import se.lu.nateko.cp.cpauth.core.Crypto
 
 enum OAuthProvider:
-	case facebook, orcidid, atmoAccess
+	case facebook, orcidid, atmoAccess, envriId
 
 case class HttpConfig(
 	serviceInterface: String,
@@ -88,8 +88,22 @@ object CpauthConfig{
 	}
 }
 
-case class OAuthProviderConfig(clientId: String, clientSecret: String, redirectPath: String){
+/**
+ * @param issuer base URL of the OpenID Provider, for providers whose endpoints are
+ *        deployment-specific (e.g. ENVRI-ID staging vs production). Authorization and token
+ *        endpoints are derived from it, so switching environments is a config change only.
+ */
+case class OAuthProviderConfig(
+	clientId: String,
+	clientSecret: String,
+	redirectPath: String,
+	issuer: Option[String]
+){
 	def public = this.copy(clientSecret = "")
+
+	def issuerOrCrash(provider: OAuthProvider): String = issuer.getOrElse(
+		throw new Exception(s"No 'issuer' configured for OAuth provider $provider")
+	)
 }
 
 object ConfigReader extends DefaultJsonProtocol:
@@ -114,6 +128,6 @@ object ConfigReader extends DefaultJsonProtocol:
 	given RootJsonFormat[PrivateAuthConfig] = jsonFormat2(PrivateAuthConfig.apply)
 	given RootJsonFormat[AuthConfig] = jsonFormat5(AuthConfig.apply)
 	given RootJsonFormat[EmailConfig] = jsonFormat6(EmailConfig.apply)
-	given RootJsonFormat[OAuthProviderConfig] = jsonFormat3(OAuthProviderConfig.apply)
+	given RootJsonFormat[OAuthProviderConfig] = jsonFormat4(OAuthProviderConfig.apply)
 
 	given RootJsonFormat[CpauthConfig] = jsonFormat7(CpauthConfig.apply)

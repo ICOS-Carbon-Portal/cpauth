@@ -11,7 +11,10 @@ import se.lu.nateko.cp.cpauth.core.Crypto.KeyType
 case class UserId(email: String)
 
 enum AuthSource:
-	case Password, PasswordReset, Saml, Orcid, Facebook, AtmoAccess
+	// NOTE: case names are part of the signed token payload (see AuthToken.toString usage in
+	// Authenticator.unwrapToken) and are parsed by AuthSource.valueOf in CookieToToken.
+	// Never rename a case; adding one requires all token-consuming services to be upgraded first.
+	case Password, PasswordReset, Saml, Orcid, Facebook, AtmoAccess, EnvriId
 
 case class AuthToken(userId: UserId, expiresOn: Long, source: AuthSource)
 

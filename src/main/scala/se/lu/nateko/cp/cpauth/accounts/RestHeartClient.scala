@@ -44,6 +44,8 @@ class RestHeartClient(
 	private val KeepIdsOnly = "keys" -> "{\"_id\": 1}"
 	private def pageSizeQpar(size: Int) = "pagesize" -> size.toString
 
+	private val VopersonIdPath = "profile.vopersonId"
+
 	def findUsers(filter: Map[String, String])(using Envri): Future[Seq[UserId]] = {
 
 		val filterParam: String = filter.map{
@@ -58,6 +60,32 @@ class RestHeartClient(
 			users <- Future.fromTry(parseFilteredUsersList(usersListResp))
 		) yield users
 	}
+
+	/**
+	 * Looks up the user who owns an ENVRI-ID persistent identifier, if any.
+	 * Matching on this rather than on the email address is what lets a user keep their
+	 * account when their home organisation email changes (ENVRI-ID guide, section 8).
+	 */
+	def findUserByVopersonId(vopersonId: String)(using Envri): Future[Option[UserId]] =
+		findUsers(Map(VopersonIdPath -> vopersonId)).map(_.headOption)
+
+	/**
+	 * Records the ENVRI-ID persistent identifier on an existing user profile.
+	 * Patches the dotted key so the rest of `profile` is left untouched.
+	 */
+	def setVopersonId(uid: UserId, vopersonId: String)(using Envri): Future[Done] =
+		val payload = JsObject(VopersonIdPath -> JsString(vopersonId))
+		for
+			entity <- Marshal(payload).to[RequestEntity]
+			status <- requestDiscardResp(
+				HttpRequest(method = HttpMethods.PATCH, uri = getUserUri(uid), entity = entity)
+			)
+			done <-
+				if status.isSuccess() then Future.successful(Done)
+				else Future.failed(new Exception(
+					s"Could not store voperson_id for ${uid.email}, got response ${status.defaultMessage()}"
+				))
+		yield done
 
 	private def parseFilteredUsersList(v: JsValue): Try[Seq[UserId]] = {
 		for(

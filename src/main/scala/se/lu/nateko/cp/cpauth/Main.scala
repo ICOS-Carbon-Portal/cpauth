@@ -14,7 +14,9 @@ import se.lu.nateko.cp.cpauth.core.EmailSender
 import se.lu.nateko.cp.cpauth.opensaml.IdpLibrary
 import se.lu.nateko.cp.cpauth.routing.*
 import se.lu.nateko.cp.cpauth.services.*
+import se.lu.nateko.cp.cpauth.utils.MapBasedOidcLoginStore
 import se.lu.nateko.cp.cpauth.utils.MapBasedUrlLookup
+import se.lu.nateko.cp.cpauth.utils.OidcLoginStore
 import se.lu.nateko.cp.cpauth.utils.TargetUrlLookup
 import eu.icoscp.geoipclient.CpGeoClient
 import eu.icoscp.geoipclient.ErrorEmailer
@@ -66,6 +68,11 @@ object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
 		PasswordLifecycleHandler(emailSender, cookieFactory, userDb, config.http, config.auth)
 
 	val targetLookup: TargetUrlLookup = new MapBasedUrlLookup
+
+	val oidcLoginStore: OidcLoginStore =
+		val store = new MapBasedOidcLoginStore
+		store.scheduleEviction
+		store
 
 	val cpauthExceptionHandler = ExceptionHandler{
 		case AuthenticationFailedException =>
