@@ -249,6 +249,56 @@ class EnvriIdLoginTest extends AnyFunSpec with ScalatestRouteTest:
 		}
 	}
 
+	describe("identity from ID token plus UserInfo"){
+		import spray.json.*
+		import se.lu.nateko.cp.cpauth.oauth.EnvriIdAuthenticationService.identityFrom
+
+		val idPayload = """{"sub": "abc@login.staging.envri.eu"}""".parseJson.asJsObject
+		val userInfo = """{
+			"sub": "abc@login.staging.envri.eu",
+			"voperson_id": "abc@login.staging.envri.eu",
+			"email": "jane.doe@example.org",
+			"given_name": "Jane",
+			"family_name": "Doe"
+		}""".parseJson.asJsObject
+
+		// The bug this replaces: claims were read from the ID token only, but ENVRI-ID
+		// releases them from UserInfo (OIDC Core 5.4), so every login failed on 'email'.
+		it("reads the claims from UserInfo when the ID token carries only 'sub'"){
+			val info = identityFrom(idPayload, userInfo).get
+			assert(info.vopersonId === "abc@login.staging.envri.eu")
+			assert(info.info.email === "jane.doe@example.org")
+			assert(info.info.givenName === "Jane")
+			assert(info.info.surname === "Doe")
+		}
+
+		it("reads the claims from the ID token when UserInfo carries only 'sub'"){
+			val fullIdToken = JsObject(userInfo.fields)
+			val minimalUserInfo = """{"sub": "abc@login.staging.envri.eu"}""".parseJson.asJsObject
+			val info = identityFrom(fullIdToken, minimalUserInfo).get
+			assert(info.info.email === "jane.doe@example.org")
+		}
+
+		it("falls back to 'sub' when no voperson_id is released"){
+			val noVoperson = JsObject(userInfo.fields - "voperson_id")
+			assert(identityFrom(idPayload, noVoperson).get.vopersonId === "abc@login.staging.envri.eu")
+		}
+
+		it("rejects a UserInfo response describing a different subject"){
+			val otherUser = JsObject(userInfo.fields + ("sub" -> JsString("someone-else@login.staging.envri.eu")))
+			val res = identityFrom(idPayload, otherUser)
+			assert(res.isFailure)
+			assert(res.failed.get.getMessage.contains("does not match the ID token subject"))
+		}
+
+		it("reports which claim was missing when neither source has it"){
+			val noEmail = JsObject(userInfo.fields - "email")
+			val res = identityFrom(idPayload, noEmail)
+			assert(res.isFailure)
+			assert(res.failed.get.getMessage.contains("'email'"))
+		}
+	}
+
 	describe("PKCE helpers"){
 
 		it("generates code verifiers within the length RFC 7636 allows"){
