@@ -1,7 +1,9 @@
 package se.lu.nateko.cp.cpauth
 
 import akka.actor.ActorSystem
+import akka.actor.CoordinatedShutdown
 import akka.actor.Scheduler
+import akka.Done
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives.*
@@ -21,10 +23,11 @@ import eu.icoscp.geoipclient.ErrorEmailer
 import se.lu.nateko.cp.cpauth.routing.PortalLogRouting
 
 import java.sql.DriverManager
-import scala.concurrent.Await
+
 import scala.concurrent.ExecutionContext
-import scala.concurrent.duration.DurationInt
+import scala.concurrent.Future
 import scala.util.Failure
+import scala.util.control.NonFatal
 import scala.util.Success
 
 import utils.Utils.getOrCrash
@@ -99,9 +102,24 @@ object Main extends App with SamlRouting with PasswordRouting with DrupalRouting
 		http.newServerAt(httpConfig.serviceInterface, httpConfig.servicePrivatePort).bindFlow(route)
 	}.onComplete{
 		case Success(binding) =>
-			sys.addShutdownHook{
-				Await.result(binding.unbind(), 3.seconds)
-				println("cpauth has been taken offline successfully")
+			val shutdown = CoordinatedShutdown(system)
+			shutdown.addTask(CoordinatedShutdown.PhaseServiceUnbind, "unbind-http-server"){() =>
+				binding.unbind().map(_ => Done)
+			}
+			shutdown.addTask(CoordinatedShutdown.PhaseBeforeActorSystemTerminate, "shutdown-user-db"){() =>
+				userDb.shutdown()
+					.map(_ => Done)
+					.recover{
+						case NonFatal(err) =>
+							log.warning(s"Could not shut down embedded DB cleanly: ${err.getMessage}")
+							Done
+					}
+			}
+			shutdown.addTask(CoordinatedShutdown.PhaseActorSystemTerminate, "log-shutdown-complete"){() =>
+				Future.successful{
+					println("cpauth has been taken offline successfully")
+					Done
+				}
 			}
 			log.info(s"Started cpauth: $binding")
 		case Failure(err) =>

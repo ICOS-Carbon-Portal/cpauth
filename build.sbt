@@ -104,6 +104,7 @@ lazy val cpauth = (project in file("."))
 			"com.typesafe.akka"      %% "akka-stream"                        % akkaVersion cross CrossVersion.for3Use2_13,
 			"com.typesafe.akka"      %% "akka-slf4j"                         % akkaVersion cross CrossVersion.for3Use2_13,
 			"ch.qos.logback"         %  "logback-classic"                    % "1.5.16",
+			"org.slf4j"              %  "jul-to-slf4j"                       % "1.7.36",
 			"org.opensaml"           %  "opensaml-saml-impl"                 % "4.3.2",
 			"org.scala-lang.modules" %% "scala-xml"                          % "2.3.0",
 //			"xalan"                  %  "serializer"                         % "2.7.2", //for DOM serialization to strings during debug
@@ -112,6 +113,7 @@ lazy val cpauth = (project in file("."))
 		),
 
 		fork := true,
+		reStart / javaOptions += "-Djava.util.logging.config.file=src/main/resources/logging.properties",
 
 		cpDeployTarget := "cpauth",
 		cpDeployBuildInfoPackage := "se.lu.nateko.cp.cpauth",

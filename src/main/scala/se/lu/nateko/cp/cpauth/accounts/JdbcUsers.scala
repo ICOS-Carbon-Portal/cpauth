@@ -26,6 +26,7 @@ trait UsersIo{
 	def userIsAdmin(uid: UserId): Future[Boolean]
 	def setAdminRights(uid: UserId, isAdmin: Boolean): Future[Unit]
 	def init(): Future[Unit]
+	def shutdown(): Future[Unit]
 }
 
 
@@ -33,8 +34,8 @@ class JdbcUsers(getConnection: () => Connection)(using ExecutionContext) extends
 
 	private def execute(statement: String): Future[Unit] = withConnection{ conn =>
 		val st = conn.createStatement
-		st.execute(statement)
-		st.close()
+		try st.execute(statement)
+		finally st.close()
 	}
 
 	private def withConnection[T](work: Connection => T): Future[T] = Future{
@@ -64,6 +65,8 @@ class JdbcUsers(getConnection: () => Connection)(using ExecutionContext) extends
 			isadmin	   boolean default false not null)"""
 		execute(sql)
 	}
+
+	def shutdown(): Future[Unit] = execute("SHUTDOWN")
 
 	def addUser(userEntry: UserEntry, password: String): Future[Unit] = withConnection{ conn =>
 		val ps = conn.prepareStatement("insert into users (mail,password,isadmin) values(?,?,?)")
